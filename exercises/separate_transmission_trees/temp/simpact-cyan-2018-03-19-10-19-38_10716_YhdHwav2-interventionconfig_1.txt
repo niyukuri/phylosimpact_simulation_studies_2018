@@ -1,0 +1,6 @@
+diagnosis.baseline = -2
+diagnosis.genderfactor = 0
+monitoring.cd4.threshold = 100
+diagnosis.isdiagnosedfactor = 0
+diagnosis.diagpartnersfactor = 0
+diagnosis.agefactor = 0
