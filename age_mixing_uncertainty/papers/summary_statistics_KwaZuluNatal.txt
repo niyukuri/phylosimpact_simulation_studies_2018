@@ -1,0 +1,83 @@
+#################
+# KwaZulu Natal #
+#################
+
+# Demographic characteristic
+
+N <- 9812 # all individuals sampled in the community
+N.HIV <- 3969 # HIV + individuals
+N.HIV.Seq <- 1589 # individuals sequenced
+N.HIV.Seq.Clust <- 469 # individuals in Clusters
+
+N.age.inf.25 <- 3696 # (39·0%) all below 25 years individuals sampled in the community
+N.HIV.age.inf.25 <- 690 # (16·1%) HIV + individuals
+N.HIV.Seq.age.inf.25 <- 372 # (21·7%) individuals sequenced
+N.HIV.Seq.Clust.age.inf.25 <- 128 # (27·3%) individuals in Clusters
+
+N.age.25.40 <- 4383 # (46·2%) all between 25 - 40 years old individuals sampled in the community
+N.HIV.age.25.40 <- 2402 # (64·0%) HIV + individuals
+N.HIV.Seq.age.25.40 <- 956 # (63·7%) individuals sequenced
+N.HIV.Seq.Clust.age.25.40 <- 263 # (56·1%) individuals in Clusters
+
+N.age.41.50 <- 1733 # (14·8%) all between 41 - 50 years old individuals sampled in the community
+N.HIV.age.41.50 <- 877 # (20·0%) HIV + individuals
+N.HIV.Seq.age.41.50 <- 261 # (14·6%) individuals sequenced
+N.HIV.Seq.Clust.age.41.50 <- 78 # (16·6%) individuals in Clusters
+
+# Individuals in heterosexual transmission clusters
+
+female <- 123
+male <- 103
+
+fem.age.inf.25 <- 43 # (35·0%)
+fem.age.25.40 <- 56 # (45·5%)
+fem.age.41.50 <- 24 # (19·5%)
+
+mal.age.inf.25 <- 21 # (20·4%)
+mal.age.25.40 <- 64 # (62·1%)
+mal.age.41.50 <- 18 # (17·5%)
+
+# Partners
+
+
+
+# Community-based HIV prevalence and proportion of individuals with sequences
+
+# Prevalence
+
+wom.age.inf.25 <- 567/2224 # (25·5%; 22·3%)
+wom.age.25.40 <- 1758/2835 # (62·0%; 59·8%)
+wom.age.41-49 <- 630/1206 # (52·2%; 50·1%)
+wom.tot <- 2955/6265 # (47·2%; 44·1%)
+
+men.age.inf.25 <- 123/1472 # (8·4%; 7·6%)
+men.age.25.40 <- 644/1548 # (41·6%; 40·3%)
+men.age.41.49 <- 247/527 # (46·9%; 47·2%)
+men.tot <- 1014/3547 # (28·6%; 28·0%)
+
+
+# Sequences
+
+wom.age.inf.25.seq <- 299/567 # (52·7%)
+wom.age.25.40.seq <- 627/1758 # (35·7%)
+wom.age.41-49.seq <- 176/630 # (27·9%)
+wom.tot.seq <- 1102/2955 # (37·3%)
+
+men.age.inf.25.seq <- 73/123 # (59·3%)
+men.age.25.40.seq <- 329/644 # (51·1%)
+men.age.41.49.seq <- 85/247 # (34·4%)
+men.tot.seq <- 487/1014 # (48·0%)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
