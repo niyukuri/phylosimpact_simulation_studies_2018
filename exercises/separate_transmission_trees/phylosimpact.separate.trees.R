@@ -37,7 +37,7 @@ cfg.list <- input.params.creator(population.eyecap.fraction = 0.2, #0.21,#1,
                                  population.simtime = 40, #20, #40,  #25 for validation. 20 for calibration
                                  population.nummen = 600, #3000, #600, # 3800, #2500,
                                  population.numwomen = 600, # 3000, #600, #4200, #2500,
-                                 hivseed.time = 20, # 10,
+                                 hivseed.time = 10, # 10,
                                  hivseed.type = "amount",
                                  hivseed.amount = 20, #30,
                                  hivseed.age.min = 20,
@@ -267,13 +267,19 @@ for(i in 1:length(trans.net)){
 
   tree.n <- trans.net[[i]] # transmission network for i^th seed
 
-  if(nrow(as.data.frame(tree.n)) >= 50){
+  if(nrow(as.data.frame(tree.n)) >= 3){ # consider seeds with at least 2 transmission events
     tree.i <- trans.network2tree(transnetwork = tree.n)
+    
     num.trees <- c(num.trees,tree.n$id[1])
+    
     num.i <- c(num.i,i)
+    
+    
+    tree.j <- tree.i
+    tree.j$tip.label <- paste(i,".", tree.j$tip.label, ".A", sep = "")
 
     # Save the transmission tree
-    write.tree(tree.i, file = paste("tree.model1.seed",i,".nwk", sep = ""))
+    write.tree(tree.j, file = paste("tree.model1.seed",i,".nwk", sep = ""))
 
     tr <- read.tree(file = paste("tree.model1.seed",i,".nwk", sep = ""))
 
@@ -305,7 +311,7 @@ for(i in 1:length(trans.net)){
     write.tree(tr,file = paste("seed.seq.bis",i,".nwk", sep = ""), append = TRUE)
     file.rename(from = paste("seed.seq.bis",i,".nwk", sep = ""), to = paste("seed.seq.bis",i,"Id",seed.id,".nwk", sep = ""))
 
-    system(paste("seq-gen -mGTR -f 0.3857, 0.1609, 0.2234, 0.2300  -a 0.9 -g 4 -i 0.5230 -r 2.9114, 12.5112, 1.2569, 0.8559, 12.9379, 1.0000 -s 0.00475  -n1 -k",seq.rand,"< seed.seq.bis",i,"Id",seed.id,".nwk -z",seed," > C.EpidemicSequences_seed_",i,".fasta",sep = ""))
+    system(paste("./seq-gen -mGTR -f 0.3857, 0.1609, 0.2234, 0.2300  -a 0.9 -g 4 -i 0.5230 -r 2.9114, 12.5112, 1.2569, 0.8559, 12.9379, 1.0000 -s 0.00475  -n1 -k",seq.rand,"< seed.seq.bis",i,"Id",seed.id,".nwk -z",seed," > C.EpidemicSequences_seed_",i,".fasta",sep = ""))
 
     # a: shape parameter of Gamma > Gamma Rate Heterogeneity
     # g: category of Gamma > Discrete Gamma Rate Heterogeneity
@@ -369,7 +375,7 @@ for (j in 1:length(IDs.transm)){
   # Compiling FastTree
   # gcc -DUSE_DOUBLE -O3 -finline-functions -funroll-loops -Wall -o FastTree FastTree.c -lm
 
-  system(paste("FastTree -gtr -nt <", paste("C.EpidemicSequences_seed_",id.trans,".fasta", sep = ""), paste(">C.EpidemicSequences_seed_",id.trans,".fasta.tree", sep = "")))
+  system(paste("./FastTree -gtr -nt <", paste("C.EpidemicSequences_seed_",id.trans,".fasta", sep = ""), paste(">C.EpidemicSequences_seed_",id.trans,".fasta.tree", sep = "")))
 
 
 }
@@ -400,7 +406,7 @@ for (j in 1:length(IDs.transm)){
   }
 
   # Use of library(treedater) to calibrate internal nodes
-  dater.tree <- dater(tree.const, Ord.tree.dates, s = 3012) # s is the length of sequence
+  dater.tree <- dater(tree.const, Ord.tree.dates, s = 3000) # s is the length of sequence
 
   save(dater.tree, file = paste("dated.tree.object_seed_",id.trans,".Rdata", sep = ""))
 
@@ -430,132 +436,60 @@ for (j in 1:length(IDs.transm)){
 
 }
 
-# IDs.transm <- c(2,3,8,10,12,16,19)
-
-#test.t.dated.2 <- get(load("dated.tree.object_seed_2.Rdata"))
-#N.2 <- node.age(test.t.dated.2)
-#int.node.age.2 <- N.2$Ti # internal nodes ages
-#latest.samp.2 <- N.2$timeToMRCA+N.2$timeOfMRCA # latest sampling date
-#
-#plot(test.t.dated.2, label.offset=0.1)  #the label.offset argument moves the species names a bit to the right (try different values!)
-#nodelabels() #add node numbers
-#tiplabels() #add tip numbers
 
 
+#### We choose transmission network for seed i and visualise 
 
-#test.t.dated.3 <- get(load("dated.tree.object_seed_3.Rdata"))
-#N.3 <- node.age(test.t.dated.3)
-#int.node.age.3 <- N.3$Ti # internal nodes ages
-#latest.samp.3 <- N.3$timeToMRCA+N.3$timeOfMRCA # latest sampling date
+# transmission network
+# internal nodes distribution
+# lineage through time
 
-#test.t.dated.8 <- get(load("dated.tree.object_seed_8.Rdata"))
-#N.8 <- node.age(test.t.dated.8)
-#int.node.age.8 <- N.8$Ti # internal nodes ages
-#latest.samp.8 <- N.8$timeToMRCA+N.8$timeOfMRCA # latest sampling date
+id.trans <- IDs.transm[2]
 
-#test.t.dated.10 <- get(load("dated.tree.object_seed_10.Rdata"))
-#N.10 <- node.age(test.t.dated.10)
-#int.node.age.10 <- N.10$Ti # internal nodes ages
-#latest.samp.10 <- N.10$timeToMRCA+N.10$timeOfMRCA # latest sampling date
-
-#test.t.dated.12 <- get(load("dated.tree.object_seed_12.Rdata"))
-#N.12 <- node.age(test.t.dated.12)
-#int.node.age.12 <- N.12$Ti # internal nodes ages
-#latest.samp.12 <- N.12$timeToMRCA+N.12$timeOfMRCA # latest sampling date
-
-#test.t.dated.16 <- get(load("dated.tree.object_seed_16.Rdata"))
-#N.16 <- node.age(test.t.dated.16)
-#int.node.age.16 <- N.16$Ti # internal nodes ages
-#latest.samp.16 <- N.16$timeToMRCA+N.16$timeOfMRCA # latest sampling date
-
-#test.t.dated.19 <- get(load("dated.tree.object_seed_19.Rdata"))
-#N.19 <- node.age(test.t.dated.19)
-#int.node.age.19 <- N.19$Ti # internal nodes ages
-#latest.samp.19 <- N.19$timeToMRCA+N.19$timeOfMRCA # latest sampling date
+# Load 
+dater.tree.i <- get(load(paste("dated.tree.object_seed_",id.trans,".Rdata", sep = "")))
 
 
-#### We choose seed 5 for the example
+# 1. Transmission network
+###########################
 
-id.trans <- 5
-
-tree.const <- read.tree(paste("C.EpidemicSequences_seed_",id.trans,".fasta.tree", sep = ""))
-
-samp.dates <- read.csv(paste("samplingtimes_seed_",id.trans,".csv", sep = ""))
-
-time.samp <- dates.Transform.NamedVector(dates=samp.dates)
-
-tree.tips <- as.numeric(tree.const$tip.label)
-
-Ord.tree.dates <- vector()
-for(i in 1:length(tree.tips)){
-  for(j in 1:length(time.samp)){
-    if(tree.tips[i] == samp.dates$V1[j]){
-      Ord.tree.dates <- c(Ord.tree.dates, time.samp[j])
-    }
-  }
-}
-
-# Use of library(treedater) to calibrate internal nodes
-dater.tree <- dater(tree.const, Ord.tree.dates, s = 3012) # s is the length of sequence
-
-# Save the tree
-write.tree(dater.tree, file = paste("calibratedTree_",id.trans,".nwk", sep = ""))
-
-# Node age with picante package
-
-N <- node.age(dater.tree)
-
-# potential transmission times
-int.node.age <- N$Ti # internal nodes ages
-##########################################
-
-# begin 1.12.2017
-dated.tree.5 <- get(load("dated.tree.object_seed_5.Rdata"))
-pb <- parboot.treedater(dated.tree.5)
-# end 1.12.2017
-
-latest.samp <- N$timeToMRCA+N$timeOfMRCA # latest sampling date
-
-
-## Transmission network of seed 5
+## Transmission network of seed i
 trans.net <- simpact.trans.net
-#int.node.age <- int.node.age.5
-tra.net.5 <- trans.net[[5]]
+#int.node.age <- int.node.age.i
+tra.net.i <- trans.net[[id.trans]]
 
-tra.net.5$dtimes <- abs(tra.net.5$dtimes-40)+1977 #(endpoint=40)
-tra.net.5$itimes <- abs(tra.net.5$itimes-40)+1977 #(endpoint=40) 10>1990, -> +1980
+tra.net.i$dtimes <- abs(tra.net.i$dtimes-datalist$itable$population.simtime[1])+1977 #(endpoint=40)
+tra.net.i$itimes <- abs(tra.net.i$itimes-datalist$itable$population.simtime[1])+1977 #(endpoint=40) 10>1990, -> +1980
 
 min.val = 1977
-max.val = round(max(tra.net.5$itimes))
+max.val = round(max(tra.net.i$itimes))
 
 
 step.int=1
+
 d <- (max.val-min.val)/step.int
 
-dat.f.trans <- as.data.frame(tra.net.5)
-dt.node.age.dt <- int.node.age
+dat.f.trans <- as.data.frame(tra.net.i)
 
 numb.tra <- vector()
 i.vec <- vector()
-int.node.vec <- vector()
+
 for (i in 1:d) {
-  inf <- 1976+i
-  sup <- 1977+i
+  inf <- 1986+i
+  sup <- 1987+i
   dat.f.trans.i <- dat.f.trans[which(dat.f.trans$itimes <= sup & dat.f.trans$itimes  >= inf),]
+  i.vec <- c(i.vec, sup)
   numb.i <- nrow(dat.f.trans.i)
   numb.tra <- c(numb.tra, numb.i)
-  i.vec <- c(i.vec, sup)
-  int.node.age.i <- int.node.age[int.node.age <= sup & dt.node.age.dt >= inf]
-  int.node.vec <- c(int.node.vec,length(int.node.age.i))
 }
 
 
 
-graph.build <- as.data.frame(trans.net[[5]])
+graph.build.i <- as.data.frame(trans.net[[id.trans]])
 
-graph.build[,4] <- as.character(graph.build$parent) # donors
-graph.build[,3] <- as.character(graph.build$id) # recipients
-gag = as.matrix(graph.build)
+graph.build.i[,4] <- as.character(graph.build.i$parent) # donors
+graph.build.i[,3] <- as.character(graph.build.i$id) # recipients
+gag = as.matrix(graph.build.i)
 ga.graph = graph.edgelist(gag[,4:3])
 
 V(ga.graph)$color <- "red"
@@ -563,6 +497,53 @@ V(ga.graph)$color <- "red"
 transNet.yrs.Old <- delete.vertices(ga.graph, "-1")
 
 
+# 2. Internal nodes
+###################
+
+# Node age with picante package
+
+N <- node.age(dater.tree.i)
+
+# potential transmission times
+int.node.age <- N$Ti # internal nodes ages
+
+latest.samp <- N$timeToMRCA+N$timeOfMRCA # latest sampling date
+
+i.vec <- vector()
+int.node.vec <- vector()
+for (i in 1:d) {
+  inf <- 1986+i
+  sup <- 1987+i
+  i.vec <- c(i.vec, sup)
+  int.node.age.i <- int.node.age[int.node.age <= sup & int.node.age >= inf]
+  int.node.vec <- c(int.node.vec,length(int.node.age.i))
+}
+
+# # Both together: internal nodes & transmission events
+
+# dat.f.trans <- as.data.frame(tra.net.i) # transmission network data
+# int.node.age # internal node ages
+# numb.tra <- vector()
+# i.vec <- vector()
+# int.node.vec <- vector()
+# for (i in 1:d) {
+#   inf <- 1986+i
+#   sup <- 1987+i
+#   dat.f.trans.i <- dat.f.trans[which(dat.f.trans$itimes <= sup & dat.f.trans$itimes  >= inf),]
+#   numb.i <- nrow(dat.f.trans.i)
+#   numb.tra <- c(numb.tra, numb.i)
+#   i.vec <- c(i.vec, sup)
+#   int.node.age.i <- int.node.age[int.node.age <= sup & dt.node.age.dt >= inf]
+#   int.node.vec <- c(int.node.vec,length(int.node.age.i))
+# }
+
+
+
+# 3. Lineage through time
+
+pb <- parboot.treedater(dated.tree.i)
+
+plot.parboot.ltt( pb )
 
 ### Plot figures
 #################
@@ -592,22 +573,22 @@ transNet.yrs.Old <- delete.vertices(ga.graph, "-1")
 
 
 # 3. Transmission events and internal nodes
-#x <- i.vec
-#plot(x, int.node.vec, type="b", col="red", lwd=2,
-#     xlab = "Calendar time",
-#     ylab = "Count") # 1 > 1
-#lines(x, numb.tra, col='green3', type='b', lwd=2)
-#legend("topleft", legend = c("Internal nodes", "Transmission events"),
-#       col=c("red","green3"), pch=1)
+x <- i.vec
+plot(x, int.node.vec, type="b", col="red", lwd=2,
+    xlab = "Calendar time",
+    ylab = "Count") # 1 > 1
+lines(x, numb.tra, col='green3', type='b', lwd=2)
+legend("topleft", legend = c("Internal nodes", "Transmission events"),
+      col=c("red","green3"), pch=1)
 
 
 # Object for plotting by ggplot
-SimpactPaperPhyloExample <- list()
-SimpactPaperPhyloExample$transNet.yrs.Ord <- transNet.yrs.Old
-SimpactPaperPhyloExample$dater.tree <- dater.tree
-SimpactPaperPhyloExample$i.vec <- i.vec
-SimpactPaperPhyloExample$int.node.vec <- int.node.vec
-SimpactPaperPhyloExample$numb.tra <- numb.tra
-save(SimpactPaperPhyloExample, file = "SimpactPaperPhyloExample.RData")
+phylosimpactOneSeed <- list()
+phylosimpactOneSeed$transNetwork.i <- transNet.yrs.Old
+phylosimpactOneSeed$dated.tree.i <- dater.tree.i
+phylosimpactOneSeed$vec.years.i <- i.vec
+phylosimpactOneSeed$int.node.vec.i <- int.node.vec
+phylosimpactOneSeed$numb.trasnm.i <- numb.tra
+save(phylosimpactOneSeed, file = "phylosimpactOneSeed.RData")
 
-#fig.obj <- get(load("SimpactPaperPhyloExample.RData"))
+#fig.obj <- get(load("phylosimpactOneSeed.RData"))
