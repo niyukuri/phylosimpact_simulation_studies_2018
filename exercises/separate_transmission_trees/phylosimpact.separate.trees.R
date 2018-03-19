@@ -305,7 +305,7 @@ for(i in 1:length(trans.net)){
     write.tree(tr,file = paste("seed.seq.bis",i,".nwk", sep = ""), append = TRUE)
     file.rename(from = paste("seed.seq.bis",i,".nwk", sep = ""), to = paste("seed.seq.bis",i,"Id",seed.id,".nwk", sep = ""))
 
-    system(paste("seq-gen -mGTR -f 0.3857, 0.1609, 0.2234, 0.2300  -a 0.9 -g 4 -i 0.5230 -r 2.9114, 12.5112, 1.2569, 0.8559, 12.9379, 1.0000 -s 0.00475  -n1 -k",seq.rand,"< seed.seq.bis",i,"Id",seed.id,".nwk -z",seed," > B.EpidemicSequences_seed_",i,".fasta",sep = ""))
+    system(paste("seq-gen -mGTR -f 0.3857, 0.1609, 0.2234, 0.2300  -a 0.9 -g 4 -i 0.5230 -r 2.9114, 12.5112, 1.2569, 0.8559, 12.9379, 1.0000 -s 0.00475  -n1 -k",seq.rand,"< seed.seq.bis",i,"Id",seed.id,".nwk -z",seed," > C.EpidemicSequences_seed_",i,".fasta",sep = ""))
 
     # a: shape parameter of Gamma > Gamma Rate Heterogeneity
     # g: category of Gamma > Discrete Gamma Rate Heterogeneity
@@ -364,12 +364,12 @@ for (j in 1:length(IDs.transm)){
   # Consensus tree:                HIV.Env.gene.fasta.contree
   # Screen log file:               HIV.Env.gene.fasta.log
 
-  # system(paste("./iqtree-omp -s", paste("B.EpidemicSequences_seed_",id.trans,".fasta", sep = ""), " -nt AUTO -alrt 1000 -bb 1000"))
+  # system(paste("./iqtree-omp -s", paste("C.EpidemicSequences_seed_",id.trans,".fasta", sep = ""), " -nt AUTO -alrt 1000 -bb 1000"))
 
   # Compiling FastTree
   # gcc -DUSE_DOUBLE -O3 -finline-functions -funroll-loops -Wall -o FastTree FastTree.c -lm
 
-  system(paste("FastTree -gtr -nt <", paste("B.EpidemicSequences_seed_",id.trans,".fasta", sep = ""), paste(">B.EpidemicSequences_seed_",id.trans,".fasta.tree", sep = "")))
+  system(paste("FastTree -gtr -nt <", paste("C.EpidemicSequences_seed_",id.trans,".fasta", sep = ""), paste(">C.EpidemicSequences_seed_",id.trans,".fasta.tree", sep = "")))
 
 
 }
@@ -382,7 +382,7 @@ for (j in 1:length(IDs.transm)){
 
   id.trans <- IDs.transm[j]
 
-  tree.const <- read.tree(paste("B.EpidemicSequences_seed_",id.trans,".fasta.tree", sep = ""))
+  tree.const <- read.tree(paste("C.EpidemicSequences_seed_",id.trans,".fasta.tree", sep = ""))
 
   samp.dates <- read.csv(paste("samplingtimes_seed_",id.trans,".csv", sep = ""))
 
@@ -478,7 +478,7 @@ for (j in 1:length(IDs.transm)){
 
 id.trans <- 5
 
-tree.const <- read.tree(paste("B.EpidemicSequences_seed_",id.trans,".fasta.tree", sep = ""))
+tree.const <- read.tree(paste("C.EpidemicSequences_seed_",id.trans,".fasta.tree", sep = ""))
 
 samp.dates <- read.csv(paste("samplingtimes_seed_",id.trans,".csv", sep = ""))
 
