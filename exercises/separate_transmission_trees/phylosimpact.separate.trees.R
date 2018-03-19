@@ -327,7 +327,7 @@ for(i in 1:length(trans.net)){
 
 # Chosen transmission networks with at least 3 individuals
 
-IDs.transm <- num.i # vector of of seeds chosen in the list of seeds
+IDs.transm <- num.i # vector of of seeds chosen in the list of seeds -
 
 
 #####################################################
