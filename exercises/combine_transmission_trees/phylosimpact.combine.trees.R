@@ -1,29 +1,39 @@
-
-setwd("/home/david/RSimpactHelp/R/Projects_2017/Example3PaperSimpact3/")
-
-# ## For sub-optimal sequence coverage
-
+setwd("/home/david/phylosimpact_simulation_studies_2018/exercises/combine_transmission_trees/")
 
 ## Load required packages
 
-pacman::p_load(devtools, Rcpp, ape, expoTree, data.table, phylosim, RSimpactCyan,
-               RSimpactHelper, readr, phangorn, Biostrings, dplyr, adephylo,igraph,
-               phyclust, DECIPHER,treedater,geiger,picante)
+library(devtools)
+library(Rcpp)
+library(ape)
+library(expoTree)
+library(data.table)
+library(RSimpactCyan)
+library(RSimpactHelper)
+library(readr)
+library(phangorn)
+library(dplyr)
+library(adephylo)
+library(treedater)
+library(geiger)
+library(picante)
+library(igraph)
 
-
-
+library(ggplot2)
+library(phyloTop)
+library(phytools)
 #######################
 # Step 1: Run Simpact #
 #######################
 
 ## Run Simpact for specific parameter combination
 
+
 age.distr <- agedistr.creator(shape = 5, scale = 65)
 cfg.list <- input.params.creator(population.eyecap.fraction = 0.2, #0.21,#1,
                                  population.msm = "no",
                                  population.simtime = 40, #20, #40,  #25 for validation. 20 for calibration
-                                 population.nummen = 1500, # 3800, #2500,
-                                 population.numwomen = 2000, #4200, #2500,
+                                 population.nummen = 600, #3000, #600, # 3800, #2500,
+                                 population.numwomen = 600, # 3000, #600, #4200, #2500,
                                  hivseed.time = 10, # 10,
                                  hivseed.type = "amount",
                                  hivseed.amount = 20, #30,
@@ -52,7 +62,7 @@ cfg.list <- input.params.creator(population.eyecap.fraction = 0.2, #0.21,#1,
 cfg.list["formation.hazard.agegapry.baseline"] <- 2
 cfg.list["mortality.aids.survtime.C"] <- 65
 cfg.list["mortality.aids.survtime.k"] <- -0.2
-cfg.list["monitoring.fraction.log_viralload"] <- 0 # 0.3
+cfg.list["monitoring.fraction.log_viralload"] <- 0 #0.3 
 cfg.list["dropout.interval.dist.uniform.min"] <- 1000
 cfg.list["dropout.interval.dist.uniform.max"] <- 2000
 
@@ -67,8 +77,8 @@ cfg.list["person.agegap.woman.dist.type"] <- "normal" #"fixed"
 
 cfg.list["mortality.aids.survtime.C"] <- 65
 cfg.list["mortality.aids.survtime.k"] <- -0.2
-cfg.list["monitoring.cd4.threshold"] <- 10000
-cfg.list["person.art.accept.threshold.dist.fixed.value"] <- 1
+cfg.list["monitoring.cd4.threshold"] <- 0 # 0 means nobody qualifies for ART
+cfg.list["person.art.accept.threshold.dist.fixed.value"] <- 0.4
 cfg.list["diagnosis.baseline"] <- -2
 
 
@@ -78,10 +88,9 @@ cfg.list["diagnosis.baseline"] <- -2
 
 # Let's introduce ART, and evaluate whether the HIV prevalence drops less  rapidly
 art.intro <- list()
-art.intro["time"] <- 0.0001 # 25
-art.intro["person.art.accept.threshold.dist.fixed.value"] <- 1 # 0.5 # inputvector[4] ######### 0.5
+art.intro["time"] <- 20
 art.intro["diagnosis.baseline"] <- -2 # 0#100
-art.intro["monitoring.cd4.threshold"] <- 10000 # 1200
+art.intro["monitoring.cd4.threshold"] <- 100 # 1200
 
 ### add something about diagnosis
 art.intro["diagnosis.agefactor"] <- 0
@@ -96,34 +105,41 @@ art.intro["diagnosis.isdiagnosedfactor"] <- 0
 
 
 # Gradual increase in CD4 threshold. in 2007:200. in 2010:350. in 2013:500
+art.intro1 <- list()
+art.intro1["time"] <- 22
+art.intro1["diagnosis.baseline"] <- -2 # 0#100
+art.intro1["monitoring.cd4.threshold"] <- 150 # 1200
 
-# art.intro2 <- list()
-# art.intro2["time"] <- 25 + 5 # inputvector[5] ######### 30
-# art.intro2["monitoring.cd4.threshold"] <- 200
-#
-# art.intro3 <- list()
-# art.intro3["time"] <- 33 # inputvector[4] + inputvector[5] + inputvector[6] ########### 33
-# art.intro3["monitoring.cd4.threshold"] <- 350
-#
-# art.intro4 <- list()
-# art.intro4["time"] <- 3 # inputvector[4] + inputvector[5] + inputvector[6] + inputvector[7] ########### 36
-# art.intro4["monitoring.cd4.threshold"] <- 500
-#
-# art.intro5 <- list()
-# art.intro5["time"] <- 38
-# art.intro5["monitoring.cd4.threshold"] <- 5000 # This is equivalent to immediate access
-# art.intro5["person.art.accept.threshold.dist.fixed.value"] <- 0.5 # inputvector[8] ########### 0.75
+
+art.intro2 <- list()
+art.intro2["time"] <- 25 # inputvector[5] ######### 30
+art.intro2["monitoring.cd4.threshold"] <- 200
+
+art.intro3 <- list()
+art.intro3["time"] <- 30 # inputvector[4] + inputvector[5] + inputvector[6] ########### 33
+art.intro3["monitoring.cd4.threshold"] <- 350
+
+art.intro4 <- list()
+art.intro4["time"] <- 33 # inputvector[4] + inputvector[5] + inputvector[6] + inputvector[7] ########### 36
+art.intro4["monitoring.cd4.threshold"] <- 500
+
+art.intro5 <- list()
+art.intro5["time"] <- 36
+art.intro5["monitoring.cd4.threshold"] <- 700 # This is equivalent to immediate access
 
 # tasp.indicator <- inputvector[9] # 1 if the scenario is TasP, 0 if the scenario is current status
 
-interventionlist <- list(art.intro) #, art.intro2, art.intro3, art.intro4, art.intro5)
+interventionlist <- list(art.intro, art.intro1, art.intro2, art.intro3, art.intro4, art.intro5)
 
 intervention <- interventionlist # scenario(interventionlist, tasp.indicator)
 
 
 
 
-inputvector <- c(123,1.1, 0.25, 0, 3, 0.23, 0.23, 45, 45, -0.5, 2.8, -0.2, -0.2, -2.5, -0.52, -0.05)
+inputvector <- c(123, 1.05, 0.25, 0, 3, 0.23, 0.23, 45, 45, -0.7, 2.8,
+                 -0.3, -0.3, 
+                 -2.7, # conception 
+                 -0.52, -0.05)
 
 
 cfg.list["hivtransmission.param.f1"] = log(inputvector[2])
@@ -161,15 +177,17 @@ cfg["conception.alpha_base"] <- inputvector[14] #is conception.alpha.base (highe
 cfg["dissolution.alpha_0"] <- inputvector[15]
 cfg["dissolution.alpha_4"] <- inputvector[16]
 
-# # #
-# # # # # Run Simpact
+
+#
+# # # # Run Simpact
 results <- simpact.run(configParams = cfg,
                        destDir = "temp",
                        agedist = age.distr,
                        seed = seedid,
                        intervention = intervention)
-#
+
 datalist <- readthedata(results)
+
 # #
 # # table(datalist$etable$eventname)
 # #
@@ -347,7 +365,7 @@ n.tr <- 1
 seed.id <- 123
 
 # # call the seed sequences - pool of viruses and rename the file
-file.copy(paste("hiv.seq.B.pol.j.fasta", sep = ""),paste("seed.seq.bis.nwk", sep = ""))
+file.copy(paste("hiv.seq.C.pol.j.fasta", sep = ""),paste("seed.seq.bis.nwk", sep = ""))
 # add the number of tree in the file and
 write(n.tr,file = paste("seed.seq.bis.nwk",sep = ""), append = TRUE)  # n.tr
 # the tree, to prepare the file to simulate the evolution of the virus across the tree
@@ -356,7 +374,7 @@ write.tree(resolved.combined.tree,file = paste("seed.seq.bis.nwk", sep = ""), ap
 
 file.rename(from = paste("seed.seq.bis.nwk", sep = ""), to = paste("seed.seq.bis.sim.nwk", sep = ""))
 
-system(paste("./seq-gen -mGTR -f 0.3857, 0.1609, 0.2234, 0.2300  -a 0.9 -g 4 -i 0.5230  -r 2.9114, 12.5112, 1.2569, 0.8559, 12.9379, 1.0000 -s 0.00475  -n1 -k",seq.rand,"< seed.seq.bis.sim.nwk -z",seed," > B.Epidemic_seed.seq.bis.sim.nwk.fasta",sep = ""))
+system(paste("./seq-gen -mGTR -f 0.3857, 0.1609, 0.2234, 0.2300  -a 0.9 -g 4 -i 0.5230  -r 2.9114, 12.5112, 1.2569, 0.8559, 12.9379, 1.0000 -s 0.00475  -n1 -k",seq.rand,"< seed.seq.bis.sim.nwk -z",seed," > C.Epidemic_seed.seq.bis.sim.nwk.fasta",sep = ""))
 
 # a: shape parameter of Gamma > Gamma Rate Heterogeneity
 # g: category of Gamma > Discrete Gamma Rate Heterogeneity
@@ -384,12 +402,12 @@ dates.Transform.NamedVector  <- function(dates=dates){
 
 # Many tools to build the trees: within R like ape, phangorn, and outside compiled tools like iq-tree and FastTree
 
-system(paste("./FastTree  -nt <", paste("B.Epidemic_seed.seq.bis.sim.nwk.fasta"), paste(">B.Epidemic_seed.seq.bis.sim.nwk.fasta.tree", sep = "")))
+system(paste("./FastTree -gtr -nt <", paste("C.Epidemic_seed.seq.bis.sim.nwk.fasta"), paste(">C.Epidemic_seed.seq.bis.sim.nwk.fasta.tree", sep = "")))
 
 
 samp.dates <- colitem # call the data table of dates
 
-tree.const <- read.tree(paste("B.Epidemic_seed.seq.bis.sim.nwk.fasta.tree", sep = ""))
+tree.const <- read.tree(paste("C.Epidemic_seed.seq.bis.sim.nwk.fasta.tree", sep = ""))
 
 time.samp <- dates.Transform.NamedVector(dates=samp.dates) # name the dates
 
@@ -413,13 +431,13 @@ for(i in 1:length(tree.tips)){
 
 # Use of library(treedater) to calibrate internal nodes
 
-dater.tree <- dater(tree.const, Ord.tree.dates, s = 3012) # s is the length of sequence
+dater.tree <- dater(tree.const, Ord.tree.dates, s = 3000) # s is the length of sequence
 
-# save(dater.tree, file = paste("dated.tree.object.Rdata", sep = ""))
+# save(dater.tree, file = paste("dater.tree.object.Rdata", sep = ""))
 
 # test.t.dated <- dater.tree
 
-dater.tree <- get(load("dated.tree.object.Rdata"))
+# dater.tree <- get(load("dated.tree.object.Rdata"))
 
 N <- node.age(dater.tree)
 
@@ -428,77 +446,42 @@ int.node.age <- N$Ti # internal nodes ages
 latest.samp <- N$timeToMRCA+N$timeOfMRCA # latest sampling date
 
 
-### Lineage Through Time ###
-############################
 
-# Estimating confidence intervals for rates and dates using a parametric bootstrap
+#### Visualise combined transmission chains
 
-pb <- parboot.treedater(dater.tree,
-                        nreps = 100,
-                        level = .95 ) # Lineage Through Time
-
-# plot.parboot.ltt( pb ) # This function computes the lineages through time given bootstrap replicate trees.
-                       # The pseudo-maximum likelihood estimate is plotted alongside CIs based on bootstrap trees.
-
-# Function to compute lineages through time with confidence intervals
-
-plot.parboot.ltt.dat <- function (pbtd, t0 = NA, res = 100, ...)
-{
-  t1 <- max(pbtd$td$sts, na.rm = T)
-  if (is.na(t0))
-    t0 <- min(sapply(pbtd$trees, function(tr) tr$timeOf))
-  times <- seq(t0, t1, l = res)
-  ltt <- cbind(times = times, t(sapply(times, function(t) {
-    c(pml = sum(pbtd$td$sts > t) - sum(pbtd$td$Ti > t), setNames(quantile(sapply(pbtd$trees,
-                                                                                 function(tre) sum(tre$sts > t) - sum(tre$Ti > t)),
-                                                                          probs = c(0.025, 0.5, 0.975)), c("lb", "median",
-                                                                                                           "ub")))
-  })))
-  pl.df <- as.data.frame(ltt)
-  return(pl.df)
-  # p <- ggplot(pl.df) + geom_ribbon(aes(x = times, ymin = lb,
-  #                                      ymax = ub), fill = "blue", col = "blue", alpha = 0.1)
-  # p <- p + geom_path(aes(x = times, y = pml))
-  # (p <- p + ylab("Lineages through time") + xlab("Time"))
-}
-
-LTT <- plot.parboot.ltt.dat(pb)
+# transmission network
+# internal nodes distribution
+# lineage through time
 
 
-
-###################################################
-# Step 5: Visualise and Use of simulation outputs #
-###################################################
-
-
-
-## Count transmission events per each transmission network ##
-#############################################################
+# 1. Transmission network
+###########################
 
 
 trans.net <- simpact.trans.net
 
+# (i) Transmission events
 transmissions.vec.i <- list()
 time.calendar.vec.i <- list()
 
 for (i in 1:length(IDs.transm)){
-
+  
   p <- IDs.transm[i]
-
+  
   trans.net.i <- simpact.trans.net[[p]]
-
+  
   Infec.time.i <- trans.net.i$InfecTime + 1987
-
+  
   min.val = 1987
   max.val = round(max(trans.net.i$itimes)) + 1987
-
+  
   step.int=1
   d <- (max.val-min.val)/step.int
-
-
+  
+  
   dat.f.trans.i <- as.data.frame(trans.net.i)
   dat.f.trans.i$itimes <- abs(dat.f.trans.i$itimes-40)+1977
-
+  
   numb.tra <- vector()
   i.vec <- vector()
   for (j in 1:d){
@@ -509,30 +492,72 @@ for (i in 1:length(IDs.transm)){
     numb.tra <- c(numb.tra, numb.i)
     i.vec <- c(i.vec, sup)
   }
-
+  
   transmissions.vec.i[[i]] <- numb.tra
   time.calendar.vec.i[[i]] <- i.vec
-
+  
 }
 
 ## Summing transmission events in all transmission networks ##
-##############################################################
 
 for (i in 1:length(IDs.transm)){
   if(i==1){
     trans.sum <- transmissions.vec.i[[i]]
   }
   else{
-
+    
     read.trans.sum <- transmissions.vec.i[[i]]
     trans.sum <- trans.sum + read.trans.sum
   }
 }
 
+# (ii) Transmission network: union of all
+
+network.list <- list()
+
+for (i in 1:length(IDs.transm)){
+  
+  p <- IDs.transm[i]
+  
+  trans.net.i <- as.data.frame(simpact.trans.net[[p]])
+  
+  trans.net.i <- trans.net.i[-1,]
+  
+  trans.net.i$id <- paste("A.",p,".",trans.net.i$id, sep = "")
+  trans.net.i$parent <- paste("A.",p,".",trans.net.i$parent, sep = "")
+  
+  graph.build <- trans.net.i
+  
+  graph.build[,4] <- as.character(graph.build$parent) # donors
+  graph.build[,3] <- as.character(graph.build$id) # recipients
+  gag = as.matrix(graph.build)
+  ga.graph = graph.edgelist(gag[,4:3])
+  
+  V(ga.graph)$color <- "red"
+  
+  # transNet.yrs.Old <- delete.vertices(ga.graph, "-1")
+  
+  network.list[[i]] <- ga.graph
+  
+}
+
+## Union of  all transmission networks ##
+
+for (i in 1:length(IDs.transm)){
+  if(i==1){
+    trans.network.union <- network.list[[i]]
+  }
+  else{
+    
+    read.trans.network.union <- network.list[[i]]
+    trans.network.union <- trans.network.union + read.trans.network.union
+  }
+}
 
 
-## Summing internal nodes in same age interval ##
-#################################################
+# 2. Internal nodes
+###################
+
 
 dt.node.age.dt <- int.node.age
 
@@ -551,59 +576,50 @@ for (i in 1:d) {
 }
 
 
-# Transmissison events and internal nodes within same time intervals
+# 3. Lineage through time
+##########################
+
+# Estimating confidence intervals for rates and dates using a parametric bootstrap
+
+pb <- parboot.treedater(dater.tree) # Lineage Through Time
+
+plot.parboot.ltt( pb )
+
+# plot.parboot.ltt( pb ) # This function computes the lineages through time given bootstrap replicate trees.
+                       # The pseudo-maximum likelihood estimate is plotted alongside CIs based on bootstrap trees.
+# 
+# # Function to compute lineages through time with confidence intervals
+# 
+# plot.parboot.ltt.dat <- function (pbtd, t0 = NA, res = 100, ...)
+# {
+#   t1 <- max(pbtd$td$sts, na.rm = T)
+#   if (is.na(t0))
+#     t0 <- min(sapply(pbtd$trees, function(tr) tr$timeOf))
+#   times <- seq(t0, t1, l = res)
+#   ltt <- cbind(times = times, t(sapply(times, function(t) {
+#     c(pml = sum(pbtd$td$sts > t) - sum(pbtd$td$Ti > t), setNames(quantile(sapply(pbtd$trees,
+#                                                                                  function(tre) sum(tre$sts > t) - sum(tre$Ti > t)),
+#                                                                           probs = c(0.025, 0.5, 0.975)), c("lb", "median",
+#                                                                                                            "ub")))
+#   })))
+#   pl.df <- as.data.frame(ltt)
+#   return(pl.df)
+#   # p <- ggplot(pl.df) + geom_ribbon(aes(x = times, ymin = lb,
+#   #                                      ymax = ub), fill = "blue", col = "blue", alpha = 0.1)
+#   # p <- p + geom_path(aes(x = times, y = pml))
+#   # (p <- p + ylab("Lineages through time") + xlab("Time"))
+# }
+# 
+# LTT <- plot.parboot.ltt.dat(pb)
+
+
+
+
+### Plot figures
+#################
 
 numb.tra <- trans.sum
 int.node.vec <- int.node.vec
-
-
-
-#### PLOTTING #####
-
-
-## Transmission network plotting: Union of all transmission networks ##
-#######################################################################
-
-network.list <- list()
-
-for (i in 1:length(IDs.transm)){
-
-  p <- IDs.transm[i]
-
-  trans.net.i <- as.data.frame(simpact.trans.net[[p]])
-
-  trans.net.i <- trans.net.i[-1,]
-
-  trans.net.i$id <- paste("A.",p,".",trans.net.i$id, sep = "")
-  trans.net.i$parent <- paste("A.",p,".",trans.net.i$parent, sep = "")
-
-  graph.build <- trans.net.i
-
-  graph.build[,4] <- as.character(graph.build$parent) # donors
-  graph.build[,3] <- as.character(graph.build$id) # recipients
-  gag = as.matrix(graph.build)
-  ga.graph = graph.edgelist(gag[,4:3])
-
-  V(ga.graph)$color <- "red"
-
-  # transNet.yrs.Old <- delete.vertices(ga.graph, "-1")
-
-  network.list[[i]] <- ga.graph
-
-}
-
-
-for (i in 1:length(IDs.transm)){
-  if(i==1){
-    trans.network.union <- network.list[[i]]
-  }
-  else{
-
-    read.trans.network.union <- network.list[[i]]
-    trans.network.union <- trans.network.union + read.trans.network.union
-  }
-}
-
 
 # 1. Transmission network from simpact                           # 1 #
 plot.igraph(trans.network.union, edge.arrow.size=0.1, vertex.size=5,
@@ -638,26 +654,28 @@ lines(x, numb.tra, col='green3', type='b', lwd=2)
 legend("topleft", legend = c("Internal nodes", "Transmission events"),
        col=c("red","green3"), pch=1)
 
+
 # 4. Plot of lineages through time with confidence intervals
 
 plot.parboot.ltt( pb )
 
-# Or
-
-pl.df <- LTT
-
-p <- ggplot(pl.df) + geom_ribbon(aes(x = times, ymin = lb,
-                                     ymax = ub), fill = "blue", col = "blue", alpha = 0.1)
-p <- p + geom_path(aes(x = times, y = pml))
-(p <- p + ylab("Lineages through time") + xlab("Calendar time"))
+# # Or
+# 
+# pl.df <- LTT
+# 
+# p <- ggplot(pl.df) + geom_ribbon(aes(x = times, ymin = lb,
+#                                      ymax = ub), fill = "blue", col = "blue", alpha = 0.1)
+# p <- p + geom_path(aes(x = times, y = pml))
+# (p <- p + ylab("Lineages through time") + xlab("Calendar time"))
 
 
 # Object for plotting by ggplot
-SimpactPaperPhyloExample <- list()
-SimpactPaperPhyloExample$transm.network <- trans.network.union
-SimpactPaperPhyloExample$dater.tree <- dater.tree
-SimpactPaperPhyloExample$years.vec <- i.vec
-SimpactPaperPhyloExample$int.node.vec <- int.node.vec
-SimpactPaperPhyloExample$numb.trans.vec <- numb.tra
-save(SimpactPaperPhyloExample, file = "SimpactPaperPhyloExample.RData")
+phylosimpactCombinedSeeds <- list()
+phylosimpactCombinedSeeds$transNetwork <- trans.network.union
+phylosimpactCombinedSeeds$dated.tree <- dater.tree
+phylosimpactCombinedSeeds$vec.years <- i.vec
+phylosimpactCombinedSeeds$int.node.vec <- int.node.vec
+phylosimpactCombinedSeeds$numb.trasnm <- numb.tra
+phylosimpactCombinedSeeds$LTT <- pb
+save(phylosimpactCombinedSeeds, file = "phylosimpactCombinedSeeds.RData")
 

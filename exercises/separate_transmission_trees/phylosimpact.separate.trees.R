@@ -1,7 +1,5 @@
 setwd("/home/david/phylosimpact_simulation_studies_2018/exercises/separate_transmission_trees")
 
-# ## For sub-optimal sequence coverage
-
 
 ## Load required packages
 
@@ -471,6 +469,7 @@ d <- (max.val-min.val)/step.int
 
 dat.f.trans <- as.data.frame(tra.net.i)
 
+# (i) Transmission events
 numb.tra <- vector()
 i.vec <- vector()
 
@@ -483,8 +482,7 @@ for (i in 1:d) {
   numb.tra <- c(numb.tra, numb.i)
 }
 
-
-
+# (ii) Transmission network
 graph.build.i <- as.data.frame(trans.net[[id.trans]])
 
 graph.build.i[,4] <- as.character(graph.build.i$parent) # donors
@@ -540,10 +538,10 @@ for (i in 1:d) {
 
 
 # 3. Lineage through time
+##########################
 
 pb <- parboot.treedater(dated.tree.i)
 
-plot.parboot.ltt( pb )
 
 ### Plot figures
 #################
@@ -566,20 +564,23 @@ plot.parboot.ltt( pb )
 
 # 2. Phylogenetic tree
 
-#plot(dater.tree, show.tip.label=FALSE,
+#plot(dated.tree.i, show.tip.label=FALSE,
 #     edge.width=1,
 #     edge.color="blue") # Try a few different settings!
 #axisPhylo(backward = FALSE)
 
 
 # 3. Transmission events and internal nodes
-x <- i.vec
-plot(x, int.node.vec, type="b", col="red", lwd=2,
-    xlab = "Calendar time",
-    ylab = "Count") # 1 > 1
-lines(x, numb.tra, col='green3', type='b', lwd=2)
-legend("topleft", legend = c("Internal nodes", "Transmission events"),
-      col=c("red","green3"), pch=1)
+# x <- i.vec
+# plot(x, int.node.vec, type="b", col="red", lwd=2,
+#     xlab = "Calendar time",
+#     ylab = "Count") # 1 > 1
+# lines(x, numb.tra, col='green3', type='b', lwd=2)
+# legend("topleft", legend = c("Internal nodes", "Transmission events"),
+#       col=c("red","green3"), pch=1)
+
+
+# 4. plot.parboot.ltt( pb )
 
 
 # Object for plotting by ggplot
@@ -589,6 +590,7 @@ phylosimpactOneSeed$dated.tree.i <- dater.tree.i
 phylosimpactOneSeed$vec.years.i <- i.vec
 phylosimpactOneSeed$int.node.vec.i <- int.node.vec
 phylosimpactOneSeed$numb.trasnm.i <- numb.tra
+phylosimpactOneSeed$LTT <- pb
 save(phylosimpactOneSeed, file = "phylosimpactOneSeed.RData")
 
 #fig.obj <- get(load("phylosimpactOneSeed.RData"))
