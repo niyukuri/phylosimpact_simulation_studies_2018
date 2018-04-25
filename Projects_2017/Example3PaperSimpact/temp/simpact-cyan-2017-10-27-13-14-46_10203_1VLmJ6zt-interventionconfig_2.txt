@@ -1,0 +1,7 @@
+diagnosis.baseline = 0
+diagnosis.diagpartnersfactor = 0
+diagnosis.genderfactor = 0
+monitoring.cd4.threshold = 100
+diagnosis.isdiagnosedfactor = 0
+person.art.accept.threshold.dist.fixed.value = 0.5
+diagnosis.agefactor = 0

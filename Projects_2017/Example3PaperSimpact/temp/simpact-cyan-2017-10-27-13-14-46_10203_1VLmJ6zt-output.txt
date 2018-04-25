@@ -1,0 +1,13 @@
+# read seed from /dev/urandom
+# Rng engine mt19937
+# Using seed 1
+# Performing extra check on read configuration parameters
+# WARNING: ignoring consistency check for config key intervention.baseconfigname (config value is 'simpact-cyan-2017-10-27-13-14-46_10203_1VLmJ6zt-interventionconfig_%.txt')
+# WARNING: ignoring consistency check for config key intervention.fileids (config value is '1,2,3,4,5')
+# WARNING: ignoring consistency check for config key population.agedistfile (config value is 'simpact-cyan-2017-10-27-13-14-46_10203_1VLmJ6zt-agedist.csv')
+# mNRM: using advanced algorithm
+# Release version
+# Simpact version is: 0.21.0
+# Current simulation time is 0.386224
+# Number of events executed is 90000
+# Started with 4000 people, ending with 3977 (difference is -23)

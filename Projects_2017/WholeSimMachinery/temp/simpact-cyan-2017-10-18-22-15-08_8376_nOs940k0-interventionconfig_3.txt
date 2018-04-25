@@ -1,0 +1,2 @@
+diagnosis.genderfactor = 1
+monitoring.cd4.threshold = 350
