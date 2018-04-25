@@ -32,8 +32,8 @@ age.distr <- agedistr.creator(shape = 5, scale = 65)
 cfg.list <- input.params.creator(population.eyecap.fraction = 0.2, #0.21,#1,
                                  population.msm = "no",
                                  population.simtime = 40, #20, #40,  #25 for validation. 20 for calibration
-                                 population.nummen = 600, #3000, #600, # 3800, #2500,
-                                 population.numwomen = 600, # 3000, #600, #4200, #2500,
+                                 population.nummen = 1200, #3000, #600, # 3800, #2500,
+                                 population.numwomen = 1600, # 3000, #600, #4200, #2500,
                                  hivseed.time = 10, # 10,
                                  hivseed.type = "amount",
                                  hivseed.amount = 20, #30,
@@ -108,6 +108,7 @@ art.intro["diagnosis.isdiagnosedfactor"] <- 0
 art.intro1 <- list()
 art.intro1["time"] <- 22
 art.intro1["diagnosis.baseline"] <- -2 # 0#100
+
 art.intro1["monitoring.cd4.threshold"] <- 150 # 1200
 
 
@@ -470,15 +471,15 @@ for (i in 1:length(IDs.transm)){
   
   trans.net.i <- simpact.trans.net[[p]]
   
-  Infec.time.i <- trans.net.i$InfecTime + 1987
+  Infec.time.i <- trans.net.i$InfecTime + 1977
   
-  min.val = 1987
-  max.val = round(max(trans.net.i$itimes)) + 1987
+  ##
+  min.val = 1977
+  max.val = 2017
   
   step.int=1
   d <- (max.val-min.val)/step.int
-  
-  
+  ##
   dat.f.trans.i <- as.data.frame(trans.net.i)
   dat.f.trans.i$itimes <- abs(dat.f.trans.i$itimes-40)+1977
   
@@ -561,7 +562,7 @@ for (i in 1:length(IDs.transm)){
 
 dt.node.age.dt <- int.node.age
 
-min.val = 1987
+min.val = 1977
 max.val = 2017
 
 step.int=1
@@ -583,7 +584,7 @@ for (i in 1:d) {
 
 pb <- parboot.treedater(dater.tree) # Lineage Through Time
 
-plot.parboot.ltt( pb )
+
 
 # plot.parboot.ltt( pb ) # This function computes the lineages through time given bootstrap replicate trees.
                        # The pseudo-maximum likelihood estimate is plotted alongside CIs based on bootstrap trees.
@@ -618,7 +619,7 @@ plot.parboot.ltt( pb )
 ### Plot figures
 #################
 
-numb.tra <- trans.sum
+trans.sum <- trans.sum
 int.node.vec <- int.node.vec
 
 # 1. Transmission network from simpact                           # 1 #
@@ -650,7 +651,7 @@ x <- i.vec
 plot(x, int.node.vec, type="b", col="red", lwd=2,
      xlab = "Calendar time",
      ylab = "Count") # 1 > 1
-lines(x, numb.tra, col='green3', type='b', lwd=2)
+lines(x, trans.sum, col='green3', type='b', lwd=2)
 legend("topleft", legend = c("Internal nodes", "Transmission events"),
        col=c("red","green3"), pch=1)
 
