@@ -33,8 +33,8 @@ age.distr <- agedistr.creator(shape = 5, scale = 65)
 cfg.list <- input.params.creator(population.eyecap.fraction = 0.2, #0.21,#1,
                                  population.msm = "no",
                                  population.simtime = 40, #20, #40,  #25 for validation. 20 for calibration
-                                 population.nummen = 600, #3000, #600, # 3800, #2500,
-                                 population.numwomen = 600, # 3000, #600, #4200, #2500,
+                                 population.nummen = 3000, #600, # 3800, #2500,
+                                 population.numwomen = 3000, #600, #4200, #2500,
                                  hivseed.time = 10, # 10,
                                  hivseed.type = "amount",
                                  hivseed.amount = 20, #30,
@@ -191,10 +191,10 @@ datalist <- readthedata(results)
 # table(datalist$etable$eventname)
 #
 # ## Save the output
-# save(datalist, file = "MasterModelSubOptimalSeqCovearge.datalist.RData")
+# save(datalist, file = "MasterModel.datalist.RData")
 
 # Read saved output data set
-# datalist <- get(load("MasterModelSubOptimalSeqCovearge.datalist.RData"))
+# datalist <- get(load("MasterModel.datalist.RData"))
 
 # table(datalist$etable$eventname) # check events
 
@@ -225,6 +225,10 @@ source("/home/david/RSimpactHelp/R/epi2tree2.R")
 
 
 simpact.trans.net <- transmNetworkBuilder.diff3(datalist = datalist, endpoint = 40)
+
+save(simpact.trans.net, file = "simpact.trans.net.RData")
+
+simpact.trans.net <- get(load("simpact.trans.net.RData"))
 
 smallest.branches <- rep(NA, times = length(simpact.trans.net))
 for (list.element in 1:length(simpact.trans.net)){
@@ -265,7 +269,7 @@ for(i in 1:length(trans.net)){
 
   tree.n <- trans.net[[i]] # transmission network for i^th seed
 
-  if(nrow(as.data.frame(tree.n)) >= 3){ # consider seeds with at least 2 transmission events
+  if(nrow(as.data.frame(tree.n)) >= 7){ # consider seeds with at least 2 transmission events
     tree.i <- trans.network2tree(transnetwork = tree.n)
     
     num.trees <- c(num.trees,tree.n$id[1])
@@ -333,6 +337,12 @@ for(i in 1:length(trans.net)){
 
 IDs.transm <- num.i # vector of of seeds chosen in the list of seeds -
 
+# > num.i
+# [1]  1  7  8  9 14
+
+num.i <- c(1,  7,  8,  9, 14)
+
+IDs.transm <- num.i
 
 #####################################################
 # Step 4: Construct time stamped phylogenetic trees #  
@@ -442,7 +452,7 @@ for (j in 1:length(IDs.transm)){
 # internal nodes distribution
 # lineage through time
 
-id.trans <- IDs.transm[2]
+id.trans <- IDs.transm[3]
 
 # Load 
 dater.tree.i <- get(load(paste("dated.tree.object_seed_",id.trans,".Rdata", sep = "")))
@@ -452,6 +462,8 @@ dater.tree.i <- get(load(paste("dated.tree.object_seed_",id.trans,".Rdata", sep 
 ###########################
 
 ## Transmission network of seed i
+simpact.trans.net <- get(load("simpact.trans.net.RData"))
+
 trans.net <- simpact.trans.net
 #int.node.age <- int.node.age.i
 tra.net.i <- trans.net[[id.trans]]
@@ -495,6 +507,15 @@ V(ga.graph)$color <- "red"
 transNet.yrs.Old <- delete.vertices(ga.graph, "-1")
 
 
+## Individuals sampled between 2012 and 2017
+dat <- dat.f.trans[dat.f.trans$dtimes>=2012,]
+
+selected.sequences <- paste("8.",dat$id,".A", sep = "")
+
+d <- read.FASTA("~/phylosimpact_simulation_studies_2018/exercises/separate_transmission_trees/split_8/")
+
+
+  
 # 2. Internal nodes
 ###################
 
@@ -540,8 +561,15 @@ for (i in 1:d) {
 # 3. Lineage through time
 ##########################
 
-pb <- parboot.treedater(dated.tree.i)
+# Estimating confidence intervals for rates and dates using a parametric bootstrap
 
+pb <- parboot.treedater(dater.tree.i) # Lineage Through Time
+
+save(pb, file="LTT.RData")
+
+pb <- get(load("LTT.RData"))
+
+# plot.parboot.ltt( pb )
 
 ### Plot figures
 #################
@@ -578,6 +606,46 @@ pb <- parboot.treedater(dated.tree.i)
 # lines(x, numb.tra, col='green3', type='b', lwd=2)
 # legend("topleft", legend = c("Internal nodes", "Transmission events"),
 #       col=c("red","green3"), pch=1)
+
+
+
+
+# # 3. Transmission event versus internal nodes
+# # calendaryear.isrelevant <- SimpactPaperPhyloExample$i.vec >= 1987
+# calendaryear <- i.vec # SimpactPaperPhyloExample$i.vec[calendaryear.isrelevant]
+# intern.nodes <- int.node.vec # SimpactPaperPhyloExample$int.node.vec[calendaryear.isrelevant]
+# trans.events <- numb.tra # SimpactPaperPhyloExample$numb.tra[calendaryear.isrelevant]
+# 
+# trans.and.nodes.df <- data.frame(calendaryear = calendaryear,
+#                                  intern.nodes = intern.nodes,
+#                                  trans.events = trans.events)
+# trans.and.nodes.long.df <- gather(trans.and.nodes.df, # library(tidyr)
+#                                   key = "Events",
+#                                   value = "Number",
+#                                   intern.nodes:trans.events,
+#                                   factor_key = TRUE)
+# 
+# 
+# ggplot(data = trans.and.nodes.long.df,
+#        aes(x = calendaryear,
+#            y = Number,
+#            colour = factor(Events))) +
+#   geom_point() +
+#   scale_color_brewer(palette="Set1",
+#                      name = "",
+#                      labels = c("Internal nodes",
+#                                 "Transmission events")) +
+#   geom_line() +
+#   theme(axis.line.x = element_line(),
+#         legend.position=c(0.62, 0.40),
+#         legend.key = element_blank(),
+#         legend.background = element_blank()) +
+#   scale_x_continuous(limits = c(1985, 2020),
+#                      breaks = seq(from = 1985,
+#                                   to = 2020,
+#                                   by = 5)) +
+#   xlab("Time")
+# 
 
 
 # 4. plot.parboot.ltt( pb )
