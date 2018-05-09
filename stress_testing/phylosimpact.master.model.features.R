@@ -2,6 +2,8 @@ rm(list = ls())
 
 setwd("~/Dropbox/1.Test.Master.Model.2018/") #
 
+pmax(100) # max packages to load
+
 # ## For sub-optimal sequence coverage
 
 # Kick-start the missing sequence data simulation study:
@@ -32,6 +34,209 @@ library(phyloTop)
 library(phytools)
 
 destDir <- "/home/david/Dropbox/1.Test.Master.Model.2018/temp" # laptop
+
+######################### Parameter space ###################
+
+# 1.1. Parameter space:
+
+#   1.1.1. Sexual behaviour parameters
+
+# [1] #' @param dissolution.alpha_0: Baseline parameter for relationship dissolution rate. (0.1)
+# [2] #' @param dissolution.alpha_4 : Effect of increasing mean age of the couple on relationship dissolution rate (-0.05)
+# [XX] #' @param formation.hazard.type: Type of hazard function for relationship formation. Choose between "simple", "agegap" and "agegapry".
+# [3] #' @param person.agegap.man.dist.normal.mu: Mean of preferred age differences distribution for men (-4)
+# [4] #' @param person.agegap.woman.dist.normal.mu: Mean of preferred age differences distribution for women (-4)
+# [5] #' @param person.agegap.man.dist.normal.sigma: Standard deviation of preferred age differences distribution for men (3)
+# [6] #' @param person.agegap.woman.dist.normal.sigma: Standard deviation of preferred age differences distribution for women (3)
+# [7] #' @param formation.hazard.agegapry.gap_agescale_man: Effect of male age on preferred age difference (~ 1 - slope in regression model FemaleAge ~ MaleAge) (0.3)
+# [8] #' @param formation.hazard.agegapry.gap_agescale_woman: Effect of male age on preferred age difference (~ 1 - slope in regression model FemaleAge ~ MaleAge) (0.3)
+# [9] #' @param formation.hazard.agegapry.numrel_man: Effect of number of ongoing relationships on the relationship formation rate for men (-0.2)
+# [10] #' @param formation.hazard.agegapry.numrel_woman: Effect of number of ongoing relationships on the relationship formation rate for women (-0.2)
+# [11] #' @param formation.hazard.agegapry.numrel_diff: Effect of absolute difference in number of ongoing relationships on the relationship formation rate (-0.1)
+# [12] #' @param population.eyecap.fraction: Allow for the indication of how many people can a person possible engage in a relation with. (0.2)
+# 
+# 1.1.2. HIV transmission and diasese progression
+
+# [13] #' @param hivtransmission.param.a: Baseline parameter for HIV transmission rate in serodiscordant couples (-1.0352239)
+# [14] #' @param hivtransmission.param.b: Parameter "b" for the linear component of the effect of viral load on the HIV transmission rate in serodiscordant couples (-89.339994)
+# [15] #' @param hivtransmission.param.c: Parameter "c" for the exponential component of the effect of viral load on the HIV transmission rate in serodiscordant couples (0.4948478)
+# [16] #' @param hivtransmission.param.f1: Effect of youngest age on HIV susceptibility (log(5) ~1.6 such that the hazard is x 5 in 15 year olds)
+# [17] #' @param hivtransmission.param.f2: Effect of female age on HIV susceptibility (log(log(2.5) / log(5)) / 5 ~-0.11 such that the hazard is x 2.5 in 20 year olds, compared to the reference (>>25 year olds)
+# [18] #' @param person.vsp.toacute.x: Effect of acute versus chronic HIV infection on infectiousness (10)
+# [19] #' @param person.vsp.toaids.x: Effect of "initial" AIDS stage versus chronic HIV infection on infectiousness (7)
+# [20] #' @param person.vsp.tofinalaids.x: Effect of "final" AIDS stage versus chronic HIV infection on infectiousness (12)
+
+# 1.1.3. Demographic parameters
+
+# [21] #' @param conception.alpha_base: Baseline parameter for conception rate. (-3)
+
+# inputvector: vector of 22 parameters, 1st being seed
+
+inputvector <- c(123, 0.1, -0.05, -4, -4, 3, 3,
+                 0.3, 0.3, -0.2, -0.2, -0.1, 0.2,
+                 -1.0352239, -89.339994, 0.4948478,
+                 1.6, -0.11, 10, 7, 12, -3)
+
+
+
+#################################### Features #############################
+
+# 1.2. Features from sexual and transmission network
+
+
+# 
+# 1.2.1. Demographic feature:
+
+#   (i) Population growth rate (pop.growth.calculator function)
+growthrate <- pop.growth.calculator(datalist = datalist.agemix,
+                                    timewindow = c(0, datalist.agemix$itable$population.simtime[1]))
+
+
+# 1.2.2. Transmission features:	
+
+#   (i) Prevalence (prevalence.calculator function)
+
+hiv.prev.lt25.women <- prevalence.calculator(datalist = datalist.agemix,
+                                             agegroup = c(15, 25),
+                                             timepoint = datalist.agemix$itable$population.simtime[1])$pointprevalence[2]
+hiv.prev.lt25.men <- prevalence.calculator(datalist = datalist.agemix,
+                                           agegroup = c(15, 25),
+                                           timepoint = datalist.agemix$itable$population.simtime[1])$pointprevalence[1]
+hiv.prev.25.34.women <- prevalence.calculator(datalist = datalist.agemix,
+                                              agegroup = c(25, 35),
+                                              timepoint = datalist.agemix$itable$population.simtime[1])$pointprevalence[2]
+hiv.prev.25.34.men <- prevalence.calculator(datalist = datalist.agemix,
+                                            agegroup = c(25, 35),
+                                            timepoint = datalist.agemix$itable$population.simtime[1])$pointprevalence[1]
+hiv.prev.35.44.women <- prevalence.calculator(datalist = datalist.agemix,
+                                              agegroup = c(35, 45),
+                                              timepoint = datalist.agemix$itable$population.simtime[1])$pointprevalence[2]
+hiv.prev.35.44.men <- prevalence.calculator(datalist = datalist.agemix,
+                                            agegroup = c(35, 45),
+                                            timepoint = datalist.agemix$itable$population.simtime[1])$pointprevalence[1]
+
+
+# (ii) Transmission 	rate (transmission.rate.calculator function)
+
+transm.rate <- transmission.rate.calculator(datalist = datalist,
+                             timewindow = c(20, 40), 
+                             int = FALSE, by=1)
+
+
+# (iii) ART coverage
+
+cov.vector <- ART.coverage.vector.creator(datalist = datalist.agemix,
+                                          agegroup = c(15, 50))
+# plot(cov.vector)
+
+
+
+# 1.2.3. Sexual behaviour features:
+
+#  (i) Relationship 	rate (relationship.rate.calculator function) - rate of new relationship formation (partner turnover rate):  	
+
+
+relas.rate <- relationship.rate.calculator(datalist = datalist,
+                             timewindow = c(20, 40), 
+                             int = FALSE, by=1)
+
+# (ii) Age gap in relationships
+
+
+datalist.agemix <- readthedata(results)
+
+agemix.df <- agemix.df.maker(datalist.agemix)
+
+agemix.model <- pattern.modeller(dataframe = agemix.df,
+                                 agegroup = c(15, 50),
+                                 timepoint = datalist.agemix$itable$population.simtime[1],
+                                 timewindow = 3)#1)#3)
+
+# men.lme <- tryCatch(agemixing.lme.fitter(data = dplyr::filter(agemix.model[[1]], Gender =="male")),
+#                     error = agemixing.lme.errFunction) # Returns an empty list if the lme model can't be fitted
+
+men.lmer <- tryCatch(ampmodel(data = dplyr::filter(agemix.model[[1]], Gender =="male")),
+                     error = agemixing.lme.errFunction) # Returns an empty list if the lme model can't be fitted
+
+bignumber <- NA # let's try if NA works (instead of 9999 for example)
+
+AAD.male <- ifelse(length(men.lmer) > 0, mean(dplyr::filter(agemix.model[[1]], Gender =="male")$AgeGap), bignumber)
+SDAD.male <- ifelse(length(men.lmer) > 0, sd(dplyr::filter(agemix.model[[1]], Gender =="male")$AgeGap), bignumber)
+#powerm <- ifelse(length(men.lme) > 0, as.numeric(attributes(men.lme$apVar)$Pars["varStruct.power"]), bignumber)
+slope.male <- ifelse(length(men.lmer) > 0, summary(men.lmer)$coefficients[2, 1], bignumber) #summary(men.lmer)$tTable[2, 1], bignumber)
+WSD.male <- ifelse(length(men.lmer) > 0, summary(men.lmer)$sigma, bignumber) #WVAD.base <- ifelse(length(men.lme) > 0, men.lme$sigma^2, bignumber)
+
+BSD.male <- ifelse(length(men.lmer) > 0, bvar(men.lmer), bignumber) # Bad name for the function because it actually extracts between subject standard deviation # BVAD <- ifelse(length(men.lmer) > 0, getVarCov(men.lme)[1,1], bignumber)
+
+intercept.male <- ifelse(length(men.lmer) > 0, summary(men.lmer)$coefficients[1,1] - 15, bignumber)
+
+
+age.scatter.df <- agemix.model[[1]]
+
+
+#  (iii) Point 	prevalence of concurrency in the adult population:
+
+# Concurrency point prevalence 6 months before a survey, among men
+
+pp.cp.6months.male <- concurr.pointprev.calculator(datalist = datalist.agemix,
+                                                   timepoint = datalist$itable$population.simtime[1] - 0.5)
+
+
+
+
+# 1.3. Features from phylogenetic tree:
+
+# library(phytools)
+
+# tree <- rtree(15) # might be tree object
+
+# tree <- read.tree("calibrated.tree.save.nwk")
+
+# Mean height of internal nodes
+
+H <- nodeHeights(tree) # similar to node.depth.edgelength(tree) 
+
+
+# It's clear from a casual inspection of the matrix that each parent node height (in the right column) 
+# is represented twice and only twice. Thus, if we exclude the root node (zero height), 
+# we can just take the mean of H[,1].
+
+mean.feature <- mean(sort(H[,1])[3:nrow(H)]) # important
+
+# library(phyloTop)
+
+colless.feature <- colless.phylo(tree, normalise = TRUE)
+
+sackin.feature <- sackin.phylo(tree, normalise = TRUE)
+
+
+Depths <- getDepths(tree) # depth of tips and nodes
+
+mean.tipsDepths.feature <- Depths$tipDepths
+
+mean.nodesDepths.feature <- Depths$nodeDepths
+
+maxHeight.feature <- maxHeight(tree, normalise = TRUE)
+
+
+# Estimating confidence intervals for rates and dates using a parametric bootstrap
+pb <- parboot.treedater(tree.calib) # Lineage Through Time
+
+# Lineages through time
+LTT <- plot.parboot.ltt.dat(pb)
+
+lb.mean.feature <- mean(LTT$lb) # mean of low values of LTT
+lb.median.feature <- median(LTT$lb) # median of low values of LTT
+
+ub.mean.feature <- mean(LTT$ub) # mean of upper values of LTT
+ub.median.feature <- median(LTT$ub) # median of upper values of LTT
+
+median.mean.feature <- mean(LTT$median) # mean of medians of values of LTT
+median.median.feature <- median(LTT$median) # median of medians of values of LTT
+
+
+
+
 
 
 rep.sample <- 5 # run the simulation 500 times
