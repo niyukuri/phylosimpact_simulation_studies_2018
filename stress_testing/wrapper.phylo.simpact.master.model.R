@@ -401,6 +401,64 @@ wrapper.phylo.simpact.master.model <- function(inputvector = input.vector){
   datalist.agemix <- readthedata(results)
   
   
+  
+  
+  ###########################################
+  # Step 2: Construct transmission networks #
+  ###########################################
+  
+  
+  
+  simpact.trans.net <- transmission.network.builder(datalist = datalist.agemix, endpoint = 40)
+  
+  
+  
+  ############################ METRICS: TRANSMISSION NETWORK CHARACTERISTICS #####################
+  
+  # 1. Incidence trend #
+  ######################
+  
+  incidence.df.15.24 <- incidence.calculator(datalist = datalist.agemix,
+                                             agegroup = c(15, 25), timewindow = c(10, 40))
+  
+  METRICS.incidence.df.15.24 <- incidence.df.15.24$incidence[3]
+  
+  incidence.df.25.34 <- incidence.calculator(datalist = datalist.agemix,
+                                             agegroup = c(25, 35), timewindow = c(10, 40))
+  
+  METRICS.incidence.df.25.34 <- incidence.df.25.34$incidence[3]
+  
+  incidence.df.35.44 <- incidence.calculator(datalist = datalist.agemix,
+                                             agegroup = c(35, 45), timewindow = c(10, 40))
+  
+  METRICS.incidence.df.35.44 <- incidence.df.35.44$incidence[3]
+  
+  # c(METRICS.incidence.df.15.24, METRICS.incidence.df.25.34, METRICS.incidence.df.35.44,
+  #   METRICS.age.mix.trans.interc, METRICS.age.mix.slope, METRICS.transm.average)
+  # 
+  # 2. Age mixing in transmissions #
+  ##################################
+  
+  agemix.df <- agemixing.trans.df(datalist = datalist.agemix, 
+                                  trans.network = simpact.trans.net)
+  
+  agemix.fit <- fit.agemix.trans(datatable = agemix.df)
+  
+  coef.inter <- fixef(agemix.fit)
+  
+  METRICS.age.mix.trans.interc <- coef.inter[[1]]
+  METRICS.age.mix.slope <- coef.inter[2]
+  
+  # 3. Onward transmissions #
+  ###########################
+  
+  transm.count <- onwardtransmissions.dat(datalist = datalist.agemix, 
+                                          trans.network = simpact.trans.net)
+  
+  METRICS.transm.average <- mean(transm.count)
+  
+  
+  
   #################################### Features #############################
   
   # 1.2. Features from sexual and transmission network
@@ -519,18 +577,7 @@ wrapper.phylo.simpact.master.model <- function(inputvector = input.vector){
   # 
   
   
-  
-  ###########################################
-  # Step 2: Construct transmission networks #
-  ###########################################
-  
-  
-  
-  simpact.trans.net <- transmission.network.builder(datalist = datalist.agemix, endpoint = 40)
-  
-  
-  
-  
+
   ###############################
   # Step 3: Sequence simulation #
   ###############################
@@ -649,7 +696,10 @@ wrapper.phylo.simpact.master.model <- function(inputvector = input.vector){
     median.median.feature <- median(LTT$median) # median of medians of values of LTT
     
     
-    summary.df <- c(growthrate, 
+    summary.df <- c(METRICS.incidence.df.15.24, METRICS.incidence.df.25.34, METRICS.incidence.df.35.44,
+                    METRICS.age.mix.trans.interc, METRICS.age.mix.slope, METRICS.transm.average,
+                    
+                    growthrate, 
                     
                     hiv.prev.lt25.women, hiv.prev.lt25.men, hiv.prev.25.34.women,
                     hiv.prev.25.34.men, hiv.prev.35.44.women, hiv.prev.35.44.men, transm.rate, # cov.vector
@@ -662,7 +712,10 @@ wrapper.phylo.simpact.master.model <- function(inputvector = input.vector){
                     median.mean.feature, median.median.feature)
     
     
-    features.names <- c("Pop.growthrate", 
+    features.names <- c("METRICS.incidence.df.15.24", "METRICS.incidence.df.25.34", "METRICS.incidence.df.35.44",
+                        "METRICS.age.mix.trans.interc", "METRICS.age.mix.slope", "METRICS.transm.average",
+                        
+                        "Pop.growthrate", 
                         
                         "hiv.prev.lt25.women", "hiv.prev.lt25.men", "hiv.prev.25.34.women",
                         "hiv.prev.25.34.men", "hiv.prev.35.44.women", "hiv.prev.35.44.men", "transm.rate", # cov.vector
@@ -681,7 +734,10 @@ wrapper.phylo.simpact.master.model <- function(inputvector = input.vector){
     
   }else{
     
-    features.names <- c("Pop.growthrate", 
+    features.names <- c("METRICS.incidence.df.15.24", "METRICS.incidence.df.25.34", "METRICS.incidence.df.35.44",
+                        "METRICS.age.mix.trans.interc", "METRICS.age.mix.slope", "METRICS.transm.average",
+                        
+                        "Pop.growthrate", 
                         
                         "hiv.prev.lt25.women", "hiv.prev.lt25.men", "hiv.prev.25.34.women",
                         "hiv.prev.25.34.men", "hiv.prev.35.44.women", "hiv.prev.35.44.men", "transm.rate", # cov.vector
@@ -695,7 +751,10 @@ wrapper.phylo.simpact.master.model <- function(inputvector = input.vector){
     
     summary.NA <- rep(NA,12)
     
-    summary.df.classic <- c(growthrate, 
+    summary.df.classic <- c(METRICS.incidence.df.15.24, METRICS.incidence.df.25.34, METRICS.incidence.df.35.44,
+                            METRICS.age.mix.trans.interc, METRICS.age.mix.slope, METRICS.transm.average,
+                            
+                            growthrate, 
                             
                             hiv.prev.lt25.women, hiv.prev.lt25.men, hiv.prev.25.34.women,
                             hiv.prev.25.34.men, hiv.prev.35.44.women, hiv.prev.35.44.men, transm.rate, # cov.vector
