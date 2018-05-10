@@ -3,6 +3,7 @@
 
 work.dir <- "/home/david/Desktop/mastermodeltest" # on laptop
 
+setwd(paste0(work.dir))
 
 #work.dir <- "/user/data/gent/vsc400/vsc40070/phylo/" # on cluster
 
@@ -447,8 +448,8 @@ wrapper.phylo.simpact.master.model <- function(inputvector = input.vector){
   
   # (iii) ART coverage
   
-  cov.vector <- ART.coverage.vector.creator(datalist = datalist.agemix,
-                                            agegroup = c(15, 50))
+  # cov.vector <- ART.coverage.vector.creator(datalist = datalist.agemix,
+  #                                          agegroup = c(15, 50))
   # plot(cov.vector)
   
   
@@ -500,14 +501,14 @@ wrapper.phylo.simpact.master.model <- function(inputvector = input.vector){
   pp.cp.6months.male <- concurr.pointprev.calculator(datalist = datalist.agemix,
                                                      timepoint = datalist.agemix$itable$population.simtime[1] - 0.5)
   
-  c(growthrate, hiv.prev.lt25.women, hiv.prev.lt25.men, hiv.prev.25.34.women,
-    hiv.prev.25.34.men, hiv.prev.35.44.women, hiv.prev.35.44.men, transm.rate, # cov.vector
-    relas.rate, 
-    
-    # AAD.male, SDAD.male, slope.male, WSD.male, BSD.male, intercept.male,
-    pp.cp.6months.male
-    )
-  
+  # c(growthrate, hiv.prev.lt25.women, hiv.prev.lt25.men, hiv.prev.25.34.women,
+  #   hiv.prev.25.34.men, hiv.prev.35.44.women, hiv.prev.35.44.men, transm.rate, # cov.vector
+  #   relas.rate, 
+  #   
+  #   # AAD.male, SDAD.male, slope.male, WSD.male, BSD.male, intercept.male,
+  #   pp.cp.6months.male
+  #   )
+  # 
   
   
   
@@ -544,7 +545,7 @@ wrapper.phylo.simpact.master.model <- function(inputvector = input.vector){
                                  datalist = datalist,
                                  seeds.num = seeds.num,
                                  endpoint = 40,
-                                 limitTransmEvents = 7, # no less than 7
+                                 limitTransmEvents = 3, # no less than 7
                                  hiv.seq.file = "hiv.seq.C.pol.j.fasta",
                                  clust = FALSE) # hiv.seq.file lodged in work.dir
   
@@ -618,9 +619,9 @@ wrapper.phylo.simpact.master.model <- function(inputvector = input.vector){
     
     Depths <- getDepths(tree.cal) # depth of tips and nodes
     
-    mean.tipsDepths.feature <- Depths$tipDepths
+    mean.tipsDepths.feature <- mean(Depths$tipDepths)
     
-    mean.nodesDepths.feature <- Depths$nodeDepths
+    mean.nodesDepths.feature <- mean(Depths$nodeDepths)
     
     maxHeight.feature <- maxHeight(tree.cal, normalise = TRUE)
     
@@ -686,15 +687,15 @@ wrapper.phylo.simpact.master.model <- function(inputvector = input.vector){
     
     summary.NA <- rep(NA,12)
     
-    summary.df <- cbind(growthrate, 
+    summary.df.classic <- c(growthrate, 
                         
                         hiv.prev.lt25.women, hiv.prev.lt25.men, hiv.prev.25.34.women,
                         hiv.prev.25.34.men, hiv.prev.35.44.women, hiv.prev.35.44.men, transm.rate, # cov.vector
                         relas.rate, 
                         # AAD.male, SDAD.male, slope.male, WSD.male, BSD.male, intercept.male,
-                        pp.cp.6months.male,
-                        
-                        summary.NA)
+                        pp.cp.6months.male)
+    
+    summary.df <- c(summary.df.classic,  summary.NA)
     
     names(summary.df) <- features.names
     
@@ -702,7 +703,7 @@ wrapper.phylo.simpact.master.model <- function(inputvector = input.vector){
     
   }
   
-  #  unlink(paste0(sub.dir.rename, "/"), recursive = TRUE)
+  unlink(paste0(sub.dir.rename), recursive = FALSE) # sub.dir.rename
   
 }
 
