@@ -298,9 +298,9 @@ sackin.feature <- sackin.phylo(tree, normalise = TRUE)
 
 Depths <- getDepths(tree) # depth of tips and nodes
 
-mean.tipsDepths.feature <- Depths$tipDepths
+mean.tipsDepths.feature <- mean(Depths$tipDepths)
 
-mean.nodesDepths.feature <- Depths$nodeDepths
+mean.nodesDepths.feature <- mean(Depths$nodeDepths)
 
 maxHeight.feature <- maxHeight(tree, normalise = TRUE)
 
