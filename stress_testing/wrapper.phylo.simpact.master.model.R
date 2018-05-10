@@ -231,7 +231,7 @@ wrapper.phylo.simpact.master.model <- function(inputvector = input.vector){
   # intervention <- interventionlist
   # 
   # 
- 
+  
   
   
   age.distr <- agedistr.creator(shape = 5, scale = 65)
@@ -463,9 +463,17 @@ wrapper.phylo.simpact.master.model <- function(inputvector = input.vector){
                                              timewindow = c(10, 40), 
                                              int = FALSE, by=1)
   
+  # (ii) Relationship per person per year
   
-  # (ii) Age gap in relationships
-
+  relsperpersonperyear <- nrow(datalist.agemix$rtable) / (nrow(datalist.agemix$ptable)/2) / cfg.list$population.simtime
+  
+  # (iv) SD age gap between couples
+  
+  agegapsd <- sd(datalist.agemix$rtable$AgeGap)
+  
+  
+  # (v) Age mixing in relationships
+  
   # 
   # agemix.df <- agemix.df.maker(datalist.agemix)
   # 
@@ -503,7 +511,7 @@ wrapper.phylo.simpact.master.model <- function(inputvector = input.vector){
   
   # c(growthrate, hiv.prev.lt25.women, hiv.prev.lt25.men, hiv.prev.25.34.women,
   #   hiv.prev.25.34.men, hiv.prev.35.44.women, hiv.prev.35.44.men, transm.rate, # cov.vector
-  #   relas.rate, 
+  #   relas.rate,  relsperpersonperyear, agegapsd,
   #   
   #   # AAD.male, SDAD.male, slope.male, WSD.male, BSD.male, intercept.male,
   #   pp.cp.6months.male
@@ -645,7 +653,7 @@ wrapper.phylo.simpact.master.model <- function(inputvector = input.vector){
                     
                     hiv.prev.lt25.women, hiv.prev.lt25.men, hiv.prev.25.34.women,
                     hiv.prev.25.34.men, hiv.prev.35.44.women, hiv.prev.35.44.men, transm.rate, # cov.vector
-                    relas.rate, 
+                    relas.rate,  relsperpersonperyear, agegapsd, 
                     #AAD.male, SDAD.male, slope.male, WSD.male, BSD.male, intercept.male,
                     pp.cp.6months.male,
                     
@@ -658,11 +666,11 @@ wrapper.phylo.simpact.master.model <- function(inputvector = input.vector){
                         
                         "hiv.prev.lt25.women", "hiv.prev.lt25.men", "hiv.prev.25.34.women",
                         "hiv.prev.25.34.men", "hiv.prev.35.44.women", "hiv.prev.35.44.men", "transm.rate", # cov.vector
-                        "relas.rate", 
+                        "relas.rate",  "relsperpersonperyear", "agegapsd",
                         #"AAD.male", "SDAD.male", "slope.male", "WSD.male", "BSD.male", "intercept.male",
                         "pp.cp.6months.male",
                         
-                        "mean.feature", "colless.feature", "sackin.feature", "mean.tipsDepths.feature", "mean.nodesDepths.feature",
+                        "meanHeight.feature", "colless.feature", "sackin.feature", "mean.tipsDepths.feature", "mean.nodesDepths.feature",
                         "maxHeight.feature", "LTT.lb.mean.feature", "LTT.lb.median.feature", "LTT.ub.mean.feature", "LTT.ub.median.feature",
                         "LTT.median.mean.feature", "LTT.median.median.feature")
     
@@ -677,23 +685,23 @@ wrapper.phylo.simpact.master.model <- function(inputvector = input.vector){
                         
                         "hiv.prev.lt25.women", "hiv.prev.lt25.men", "hiv.prev.25.34.women",
                         "hiv.prev.25.34.men", "hiv.prev.35.44.women", "hiv.prev.35.44.men", "transm.rate", # cov.vector
-                        "relas.rate", 
+                        "relas.rate",   "relsperpersonperyear", "agegapsd",
                         #"AAD.male", "SDAD.male", "slope.male", "WSD.male", "BSD.male", "intercept.male",
                         "pp.cp.6months.male",
                         
-                        "mean.feature", "colless.feature", "sackin.feature", "mean.tipsDepths.feature", "mean.nodesDepths.feature",
+                        "meanHeight.feature", "colless.feature", "sackin.feature", "mean.tipsDepths.feature", "mean.nodesDepths.feature",
                         "maxHeight.feature", "LTT.lb.mean.feature", "LTT.lb.median.feature", "LTT.ub.mean.feature", "LTT.ub.median.feature",
                         "LTT.median.mean.feature", "LTT.median.median.feature")
     
     summary.NA <- rep(NA,12)
     
     summary.df.classic <- c(growthrate, 
-                        
-                        hiv.prev.lt25.women, hiv.prev.lt25.men, hiv.prev.25.34.women,
-                        hiv.prev.25.34.men, hiv.prev.35.44.women, hiv.prev.35.44.men, transm.rate, # cov.vector
-                        relas.rate, 
-                        # AAD.male, SDAD.male, slope.male, WSD.male, BSD.male, intercept.male,
-                        pp.cp.6months.male)
+                            
+                            hiv.prev.lt25.women, hiv.prev.lt25.men, hiv.prev.25.34.women,
+                            hiv.prev.25.34.men, hiv.prev.35.44.women, hiv.prev.35.44.men, transm.rate, # cov.vector
+                            relas.rate, 
+                            # AAD.male, SDAD.male, slope.male, WSD.male, BSD.male, intercept.male,
+                            pp.cp.6months.male)
     
     summary.df <- c(summary.df.classic,  summary.NA)
     
