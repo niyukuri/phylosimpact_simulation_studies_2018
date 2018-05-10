@@ -821,3 +821,58 @@ print(paste0("Simulation time: ", round(sim.end.time/60,2), " minutes"))
 write.csv(features.matrix, file = paste0(work.dir,"/features.matrix.csv"))
 
 
+
+#######   CALIBRATION
+
+library(EasyABC)
+
+simpact4ABC <- function(inputvector.cal){
+  cfg <- cfg.list
+  cfg["formation.hazard.agegap.baseline"] <- inputvector.cal[1]
+  cfg["formation.hazard.agegap.gap_factor_man"] <- inputvector.cal[2]
+  cfg["formation.hazard.agegap.gap_factor_woman"] <- inputvector.cal[2]
+  results <- simpact.run(cfg, ABC_DestDir) #simpact.run(cfg, ABC_DestDir, identifierFormat = ABC_identifier)  
+  datalist <- readthedata(results)
+  relsperpersonperyear <- nrow(datalist$rtable) / (nrow(datalist$ptable)/2) / cfg$population.simtime
+  agegapsd <- sd(datalist$rtable$AgeGap)
+  outputvector <- c(relsperpersonperyear, agegapsd)
+  return(outputvector)
+}
+
+
+#We specify the prior distributions for the input parameters
+# The relationship formation rate must roughly double: hF' = 2hF
+# hF = exp(a0 + a1X1 + a2X2 + .... anXn)
+# 2hF = exp(a0 + a1X1 + a2X2 + .... anXn) * 2
+# 2hF = exp(a0 + a1X1 + a2X2 + .... anXn) * exp(log(2))
+# 2hF = exp(a0 + log(2) + a1X1 + a2X2 + .... anXn)
+# So we would naively expect that the baseline parameter (0.1) should be increased by log(2) ~ 0.7 to 0.8
+# However, we are also adjusting the "gap factors" and making relationships with large age gaps less
+# likely will result in an overall decrease in the number of relationships formed per time unit.
+
+simpact_prior <- list(c("unif", 0.8, 5), c("unif", -1, 0))
+# Lastly, we specify the target summary statistic
+sum_stat_obs <- c(1, 2)
+
+# Now we try to run a sequential ABC scheme, according to the method proposed by Lenormand et al. 2013
+# Maxime Lenormand, Franck Jabot and Guillaume Deffuant. Adaptive approximate Bayesian computation for complex models. Comput Stat (2013) 28:2777–2796 DOI 10.1007/s00180-013-0428-3
+
+
+# Initial number of simulations
+n_init <- 10 #40
+alpha <- 0.25 #0.5 # This is the proportion of particles kept at each step
+pacc <- 0.2 #0.5 # This is the stopping criterion of the algorithm: a small number ensures a better convergence of the algorithm, but at a cost in computing time. Must be 0 < p_acc_min < 1. The smaller, the more strict the criterion.
+
+ABC_LenormandResult0 <- ABC_sequential(method="Lenormand",
+                                       model=simpact4ABC,
+                                       prior=simpact_prior,
+                                       nb_simul=n_init,
+                                       summary_stat_target=sum_stat_obs,
+                                       alpha=alpha,
+                                       p_acc_min=pacc,
+                                       verbose=FALSE)
+
+# Time to get a coffee and a biscuit, this will take a while.
+
+ABC_LenormandResult0
+
