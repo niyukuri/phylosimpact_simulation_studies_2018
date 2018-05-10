@@ -62,7 +62,7 @@ destDir <- "/home/david/Dropbox/1.Test.Master.Model.2018/temp" # laptop
 # [15] #' @param hivtransmission.param.c: Parameter "c" for the exponential component of the effect of viral load on the HIV transmission rate in serodiscordant couples (0.4948478)
 # [16] #' @param hivtransmission.param.f1: Effect of youngest age on HIV susceptibility (log(5) ~1.6 such that the hazard is x 5 in 15 year olds)
 # [17] #' @param hivtransmission.param.f2: Effect of female age on HIV susceptibility (log(log(2.5) / log(5)) / 5 ~-0.11 such that the hazard is x 2.5 in 20 year olds, compared to the reference (>>25 year olds)
-# [18] #' @param person.vsp.toacute.x: Effect of acute versus chronic HIV infection on infectiousness (10)
+# [18] #' @param person.vsp.toacute.x: Effect of acute versus chronic HIV infection on infectiousness (5)  # See Bellan PLoS Medicine
 # [19] #' @param person.vsp.toaids.x: Effect of "initial" AIDS stage versus chronic HIV infection on infectiousness (7)
 # [20] #' @param person.vsp.tofinalaids.x: Effect of "final" AIDS stage versus chronic HIV infection on infectiousness (12)
 
@@ -75,7 +75,93 @@ destDir <- "/home/david/Dropbox/1.Test.Master.Model.2018/temp" # laptop
 inputvector <- c(123, 0.1, -0.05, -4, -4, 3, 3,
                  0.3, 0.3, -0.2, -0.2, -0.1, 0.2,
                  -1.0352239, -89.339994, 0.4948478,
-                 1.6, -0.11, 10, 7, 12, -3)
+                 1.6, -0.11, 5, 7, 12, -3)
+
+seedid <- inputvector[1]
+
+# Sexual behaviour
+###################
+
+cfg["dissolution.alpha_0"] <- inputvector[2]
+cfg["dissolution.alpha_4"] <- inputvector[3]
+cfg["person.agegap.man.dist.normal.mu"] <- inputvector[4]
+cfg["person.agegap.woman.dist.normal.mu"] <- inputvector[5]
+cfg["person.agegap.man.dist.normal.sigma"] <- inputvector[6]
+cfg["person.agegap.woman.dist.normal.sigma"] <- inputvector[7]
+cfg["formation.hazard.agegapry.gap_agescale_man"] <- inputvector[8]
+cfg["formation.hazard.agegapry.gap_agescale_woman"] <- inputvector[9]
+cfg["formation.hazard.agegapry.numrel_man"] <- inputvector[10]
+cfg["formation.hazard.agegapry.numrel_woman"] <- inputvector[11]
+cfg["formation.hazard.agegapry.numrel_diff"] <- inputvector[12]
+cfg["population.eyecap.fraction"] <- inputvector[13]
+
+# HIV transmission
+###################
+
+cfg["hivtransmission.param.a"] <- inputvector[14]
+cfg["hivtransmission.param.b"] <- inputvector[15]
+cfg["hivtransmission.param.c"] <- inputvector[16]
+cfg["hivtransmission.param.f1"] <- inputvector[17]
+cfg["hivtransmission.param.f2"] <- inputvector[18]
+cfg["person.vsp.toacute.x"] <- inputvector[19]
+cfg["person.vsp.toaids.x"] <- inputvector[20]
+cfg["person.vsp.tofinalaids.x"] <- inputvector[21]
+
+# Demographic
+##############
+
+cfg["conception.alpha_base"] <- inputvector[22]
+
+
+# Assumptions to avoid negative branch lengths
+###############################################
+
+cfg["monitoring.fraction.log_viralload"] <- 0
+ # + sampling == start ART
+ # when someone start ART, he/she is sampled and becomes non-infectious
+
+# Assumption of nature of sexual network
+#########################################
+
+cfg["population.msm"] = "no"
+
+
+# ART intervention
+###################
+
+# ART acceptability paramter and the ART  interventions
+
+cfg["person.art.accept.threshold.dist.fixed.value"] <- 0.6 
+
+
+# Let's introduce ART, 
+art.intro <- list()
+art.intro["time"] <- 25 #25
+art.intro["diagnosis.baseline"] <- 100
+art.intro["monitoring.cd4.threshold"] <- 100 
+
+# Gradual increase in CD4 threshold. in 2007:200. in 2010:350. in 2013:500
+
+art.intro2 <- list()
+art.intro2["time"] <- 25 + 5 #25 + 5 = 30
+art.intro2["monitoring.cd4.threshold"] <- 200
+
+art.intro3 <- list()
+art.intro3["time"] <- 25 + 8 #25 + 8 = 33
+art.intro3["monitoring.cd4.threshold"] <- 350
+
+art.intro4 <- list()
+art.intro4["time"] <- 25 + 11 #25 + 11 = 36
+art.intro4["monitoring.cd4.threshold"] <- 500
+
+art.intro5 <- list()
+art.intro5["time"] <- 25 + 13 #25 + 13 = 38
+art.intro5["monitoring.cd4.threshold"] <- 700 # This is equivalent to immediate access
+
+interventionlist <- list(art.intro, art.intro2, art.intro3, art.intro4, art.intro5)
+
+intervention <- interventionlist
+
 
 
 
