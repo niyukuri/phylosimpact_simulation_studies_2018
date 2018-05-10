@@ -300,11 +300,60 @@ agemixing.trans.df <- function(datalist = datalist,
 
 fit.agemix.trans <- function(datatable = agemix.df){
   
-  datatable <- agemix.df
+  datatable <- datatable
   
   agemix.inter <- lmer(AgeID2 ~ AgeID1 + (1|ID1), data = datatable)
   
   return(agemix.inter)
+  
+}
+
+
+# Onward transmissions
+######################
+
+
+onwardtransmissions.dat <- function(datalist = datalist, 
+                                    trans.network = trans.network){
+  
+  
+  pers.infec.raw <- as.data.frame(datalist$ptable[InfectType != -1])
+  
+  pers.infec <- pers.infec.raw[which(pers.infec.raw$InfectTime <= datalist$itable$population.simtime[1]),]
+  
+  # person table of infected individuals by seed event
+  pers.table.seed <- subset(pers.infec, pers.infec$InfectType==0)
+  
+  # id of people who got infection by seed event: seeds.id
+  seeds.id <- pers.table.seed$ID # do
+  
+  
+  # Onward transmissions in each transmission network
+  
+  onwardtransm <- vector("list", length(seeds.id))
+  
+  for (j in 1: length(seeds.id)) {
+    
+    trans.network.j <- as.data.frame(trans.network[[j]])
+    
+    trans.network.j <- trans.network.j[-1,] # remove the universal infector
+    
+    if(nrow(trans.network.j) > 1){ # consider transmission networks with at least one onward transmission
+      
+      d.j <- table(trans.network.j$DonId) # in the transmission table, the number of times DonId appears is the number of Onward transmissions after acuiring the infection 
+      num.j <- as.data.frame(as.numeric(d.j))
+      names(num.j) <- c("TransCount")
+      onwardtransm[[j]] <- num.j
+      
+    }
+    
+  }
+  
+  onwardtransmissions <- rbindlist(onwardtransm) 
+  
+  count.dat <- onwardtransmissions$TransCount
+  
+  return(count.dat) # count.dat = all infections - seeds which didn;t produce at least one transmission
   
 }
 
