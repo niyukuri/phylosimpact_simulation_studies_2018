@@ -162,7 +162,7 @@ agemix.df <- agemixing.trans.df(datalist = datalist,
 
 fit.agemix.trans <- function(datatable = agemix.df){
   
-  datatable <- agemix.df
+  datatable <- datatable
   
   agemix.inter <- lmer(AgeID2 ~ AgeID1 + (1|ID1), data = datatable)
   
