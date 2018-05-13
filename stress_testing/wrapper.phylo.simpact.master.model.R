@@ -8,7 +8,7 @@ setwd(paste0(work.dir))
 #work.dir <- "/user/data/gent/vsc400/vsc40070/phylo/" # on cluster
 
 
-pacman::p_load(snow, parallel)
+pacman::p_load(snow, parallel, RSimpactCyan, RSimpactHelper)
 
 
 wrapper.phylo.simpact.master.model <- function(inputvector = input.vector){
@@ -400,7 +400,7 @@ wrapper.phylo.simpact.master.model <- function(inputvector = input.vector){
   
   datalist.agemix <- readthedata(results)
   
-  
+  # datalist.agemix <- get(load("datalist.agemix.RData"))
   
   
   ###########################################
@@ -423,15 +423,24 @@ wrapper.phylo.simpact.master.model <- function(inputvector = input.vector){
   
   METRICS.incidence.df.15.24 <- incidence.df.15.24$incidence[3]
   
+  METRICS.incidence.df.15.24.men <- incidence.df.15.24$incidence[1]
+  METRICS.incidence.df.15.24.women <- incidence.df.15.24$incidence[2]
+  
   incidence.df.25.34 <- incidence.calculator(datalist = datalist.agemix,
                                              agegroup = c(25, 35), timewindow = c(10, 40))
   
   METRICS.incidence.df.25.34 <- incidence.df.25.34$incidence[3]
   
+  METRICS.incidence.df.25.34.men <- incidence.df.25.34$incidence[1]
+  METRICS.incidence.df.25.34.women <- incidence.df.25.34$incidence[2]
+  
   incidence.df.35.44 <- incidence.calculator(datalist = datalist.agemix,
                                              agegroup = c(35, 45), timewindow = c(10, 40))
   
   METRICS.incidence.df.35.44 <- incidence.df.35.44$incidence[3]
+  
+  METRICS.incidence.df.35.44.men <- incidence.df.35.44$incidence[1]
+  METRICS.incidence.df.35.44.women <- incidence.df.35.44$incidence[2]
   
   # c(METRICS.incidence.df.15.24, METRICS.incidence.df.25.34, METRICS.incidence.df.35.44,
   #   METRICS.age.mix.trans.interc, METRICS.age.mix.slope, METRICS.transm.average)
@@ -475,25 +484,29 @@ wrapper.phylo.simpact.master.model <- function(inputvector = input.vector){
   # 1.2.2. Transmission features:	
   
   #   (i) Prevalence (prevalence.calculator function)
-  
+# 
+#   hiv.prev.lt25.women <- prevalence.calculator(datalist = datalist.agemix,
+#                                                agegroup = c(15, 25),
+#                                                timepoint = datalist.agemix$itable$population.simtime[1])$pointprevalence[2]
+#   
   hiv.prev.lt25.women <- prevalence.calculator(datalist = datalist.agemix,
                                                agegroup = c(15, 25),
-                                               timepoint = datalist.agemix$itable$population.simtime[1])$pointprevalence[2]
+                                               timepoint = 40)$pointprevalence[2]
   hiv.prev.lt25.men <- prevalence.calculator(datalist = datalist.agemix,
                                              agegroup = c(15, 25),
-                                             timepoint = datalist.agemix$itable$population.simtime[1])$pointprevalence[1]
+                                             timepoint = 40)$pointprevalence[1]
   hiv.prev.25.34.women <- prevalence.calculator(datalist = datalist.agemix,
                                                 agegroup = c(25, 35),
-                                                timepoint = datalist.agemix$itable$population.simtime[1])$pointprevalence[2]
+                                                timepoint = 40)$pointprevalence[2]
   hiv.prev.25.34.men <- prevalence.calculator(datalist = datalist.agemix,
                                               agegroup = c(25, 35),
-                                              timepoint = datalist.agemix$itable$population.simtime[1])$pointprevalence[1]
+                                              timepoint = 40)$pointprevalence[1]
   hiv.prev.35.44.women <- prevalence.calculator(datalist = datalist.agemix,
                                                 agegroup = c(35, 45),
-                                                timepoint = datalist.agemix$itable$population.simtime[1])$pointprevalence[2]
+                                                timepoint = 40)$pointprevalence[2]
   hiv.prev.35.44.men <- prevalence.calculator(datalist = datalist.agemix,
                                               agegroup = c(35, 45),
-                                              timepoint = datalist.agemix$itable$population.simtime[1])$pointprevalence[1]
+                                              timepoint = 40)$pointprevalence[1]
   
   
   # (ii) Transmission 	rate (transmission.rate.calculator function)
@@ -510,6 +523,20 @@ wrapper.phylo.simpact.master.model <- function(inputvector = input.vector){
   #                                          agegroup = c(15, 50))
   # plot(cov.vector)
   
+  # ART.coverage.vector.creator <- function(datalist = datalist,
+  #          agegroup = c(15, 50)){
+  #   ART.cov.eval.timepoints <- seq(from = datalist$itable$t[2],
+  #                                  to = 40 #datalist$itable$population.simtime[1])
+  #   ART.cov.vector <- rep(NA, length(ART.cov.eval.timepoints))
+  #   for (art.cov.index in 1:length(ART.cov.vector)){
+  #     ART.cov.vector[art.cov.index] <- sum(ART.coverage.calculator(datalist = datalist,
+  #                                                                  agegroup = agegroup,
+  #                                                                  timepoint = ART.cov.eval.timepoints[art.cov.index])$sum.onART) /
+  #       sum(ART.coverage.calculator(datalist = datalist,
+  #                                   agegroup = agegroup,
+  #                                   timepoint = ART.cov.eval.timepoints[art.cov.index])$sum.cases)
+  #   }
+  #   return(ART.cov.vector)
   
   
   # 1.2.3. Sexual behaviour features:
@@ -523,7 +550,7 @@ wrapper.phylo.simpact.master.model <- function(inputvector = input.vector){
   
   # (ii) Relationship per person per year
   
-  relsperpersonperyear <- nrow(datalist.agemix$rtable) / (nrow(datalist.agemix$ptable)/2) / cfg.list$population.simtime
+  relsperpersonperyear <- nrow(datalist.agemix$rtable) / (nrow(datalist.agemix$ptable)/2) / 40 #cfg.list$population.simtime
   
   # (iv) SD age gap between couples
   
@@ -564,8 +591,13 @@ wrapper.phylo.simpact.master.model <- function(inputvector = input.vector){
   
   # Concurrency point prevalence 6 months before a survey, among men
   
+  # pp.cp.6months.male <- concurr.pointprev.calculator(datalist = datalist.agemix,
+  #                                                    timepoint = datalist.agemix$itable$population.simtime[1] - 0.5)
+  # 
+  
   pp.cp.6months.male <- concurr.pointprev.calculator(datalist = datalist.agemix,
-                                                     timepoint = datalist.agemix$itable$population.simtime[1] - 0.5)
+                                                     timepoint = 40 - 0.5)
+  
   
   # c(growthrate, hiv.prev.lt25.women, hiv.prev.lt25.men, hiv.prev.25.34.women,
   #   hiv.prev.25.34.men, hiv.prev.35.44.women, hiv.prev.35.44.men, transm.rate, # cov.vector
@@ -597,7 +629,6 @@ wrapper.phylo.simpact.master.model <- function(inputvector = input.vector){
                                  sub.dir.rename = sub.dir.rename,
                                  simpact.trans.net = simpact.trans.net,
                                  seq.gen.tool = "seq-gen",
-                                 datalist = datalist,
                                  seeds.num = seeds.num,
                                  endpoint = 40,
                                  limitTransmEvents = 3, # no less than 7
@@ -730,7 +761,7 @@ wrapper.phylo.simpact.master.model <- function(inputvector = input.vector){
     names(summary.df) <- features.names
     
     return(summary.df)
-    
+
     
   }else{
     
@@ -768,9 +799,12 @@ wrapper.phylo.simpact.master.model <- function(inputvector = input.vector){
     
     return(summary.df)
     
+    
   }
   
-  unlink(paste0(sub.dir.rename), recursive = FALSE) # sub.dir.rename
+  
+  unlink(paste0(sub.dir.rename), recursive = TRUE) # sub.dir.rename
+  
   
 }
 
@@ -820,7 +854,7 @@ print(paste0("Simulation time: ", round(sim.end.time/60,2), " minutes"))
 
 write.csv(features.matrix, file = paste0(work.dir,"/features.matrix.csv"))
 
-
+unlink(paste0("temp"), recursive = TRUE)
 
 #######   CALIBRATION
 
