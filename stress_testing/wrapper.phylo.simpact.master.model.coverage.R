@@ -1,7 +1,11 @@
 
 # Define directory
 
-work.dir <- "/home/david/Desktop/mastermodeltest" # on laptop
+# work.dir <- "/home/david/Desktop/mastermodeltest" # on laptop
+
+
+work.dir <- "/home/niyukuri/Desktop/mastermodeltest"
+
 
 setwd(paste0(work.dir))
 
@@ -16,12 +20,13 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
   source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
   
   
-  work.dir <- "/home/david/Desktop/mastermodeltest" # on laptop
+  # work.dir <- "/home/david/Desktop/mastermodeltest" # on laptop
   
+  work.dir <- "/home/niyukuri/Desktop/mastermodeltest"
   
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp"
   
-  destDir <- "/home/david/Desktop/mastermodeltest/temp"
-  
+  destDir <- "/home/niyukuri/Desktop/mastermodeltest/temp"
   
   library(RSimpactCyan)
   library(RSimpactHelper)
@@ -857,7 +862,7 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
     
     
     
-    ### Sequence coverage sceanrios  ###
+    ### Sequence coverage sceanrios  ###: 35 - 45 - 55 - 65 - 75 - 85 - 95 - 100
     ####################################
     
     
