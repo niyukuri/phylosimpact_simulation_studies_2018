@@ -1,10 +1,10 @@
 
 # Define directory
 
-# work.dir <- "/home/david/Desktop/mastermodeltest" # on laptop
+work.dir <- "/home/david/Desktop/mastermodeltest" # on laptop
 
 
-work.dir <- "/home/niyukuri/Desktop/mastermodeltest"
+# work.dir <- "/home/niyukuri/Desktop/mastermodeltest" on PC
 
 
 setwd(paste0(work.dir))
@@ -20,13 +20,14 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
   source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
   
   
-  # work.dir <- "/home/david/Desktop/mastermodeltest" # on laptop
+  work.dir <- "/home/david/Desktop/mastermodeltest" # on laptop
   
-  work.dir <- "/home/niyukuri/Desktop/mastermodeltest"
+  # work.dir <- "/home/niyukuri/Desktop/mastermodeltest" # on PC
   
-  # destDir <- "/home/david/Desktop/mastermodeltest/temp"
+  destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
   
-  destDir <- "/home/niyukuri/Desktop/mastermodeltest/temp"
+  # destDir <- "/home/niyukuri/Desktop/mastermodeltest/temp" # on PC
+  
   
   library(RSimpactCyan)
   library(RSimpactHelper)
@@ -805,7 +806,7 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
     int.node.age <- N$Ti # internal nodes ages
     
     latest.samp <- N$timeToMRCA+N$timeOfMRCA # latest sampling date
-
+    
     
     
     # 1.3. Features from phylogenetic tree:
@@ -874,179 +875,224 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
     # Sequence coverage Scenarios
     #############################
     
-    gender.men50.women50 <- IDs.indiv.seq.gender.fun(simpact.trans.net = simpact.trans.net,
+    cov.35.gender.men50.women50 <- IDs.indiv.seq.gender.fun(simpact.trans.net = simpact.trans.net,
                                                      limitTransmEvents = 7,
                                                      perc.men = 50,
+                                                     seq.cov = 35,
                                                      age.limit = 65)
-    IDs.gender.men50.women50 <- gender.men50.women50$outputvector
+    cov.35.IDs.gender.men50.women50 <- cov.35.gender.men50.women50$outputvector
     
-    gender.men30.women70 <- IDs.indiv.seq.gender.fun(simpact.trans.net = simpact.trans.net,
+    cov.35.gender.men30.women70 <- IDs.indiv.seq.gender.fun(simpact.trans.net = simpact.trans.net,
                                                      limitTransmEvents = 7,
                                                      perc.men = 30,
+                                                     seq.cov = 35,
                                                      age.limit = 65)
-    IDs.gender.men30.women70 <- gender.men30.women70$outputvector
+    cov.35.IDs.gender.men30.women70 <- cov.35.gender.men30.women70$outputvector
     
-    gender.men70.women30 <- IDs.indiv.seq.gender.fun(simpact.trans.net = simpact.trans.net,
+    cov.35.gender.men70.women30 <- IDs.indiv.seq.gender.fun(simpact.trans.net = simpact.trans.net,
                                                      limitTransmEvents = 7,
                                                      perc.men = 70,
+                                                     seq.cov = 35,
                                                      age.limit = 65)
-    IDs.gender.men70.women30 <- gender.men70.women30$outputvector
+    cov.35.IDs.gender.men70.women30 <- cov.35.gender.men70.women30$outputvector
     
-    gender.men50.women50.age.menwomen <- IDs.indiv.seq.gender.age.group.fun(simpact.trans.net = simpact.trans.net,
+    cov.35.gender.men50.women50.age.group <- IDs.indiv.seq.gender.age.group.fun(simpact.trans.net = simpact.trans.net,
                                                                             limitTransmEvents = 7, 
                                                                             perc.men = 50, 
+                                                                            seq.cov = 35,
                                                                             age.men = c(15, 60),
                                                                             age.women = c(15, 40))
-    IDs.gender.men50.women50.age.menwomen <- gender.men50.women50.age.menwomen$outputvector
+    cov.35.IDs.gender.men50.women50.age.group <- cov.35.gender.men50.women50.age.group$outputvector
     
-    gender.men30.women70.age.menwomen <- IDs.indiv.seq.gender.age.group.fun(simpact.trans.net = simpact.trans.net,
+    cov.35.gender.men30.women70.age.group <- IDs.indiv.seq.gender.age.group.fun(simpact.trans.net = simpact.trans.net,
                                                                             limitTransmEvents = 7, 
                                                                             perc.men = 30, 
+                                                                            seq.cov = 35,
                                                                             age.men = c(15, 60),
                                                                             age.women = c(15, 40))
-    IDs.gender.men30.women70.age.menwomen <- gender.men30.women70.age.menwomen$outputvector
+    cov.35.IDs.gender.men30.women70.age.group <- cov.35.gender.men30.women70.age.group$outputvector
     
-    gender.men70.women30.age.menwomen <- IDs.indiv.seq.gender.age.group.fun(simpact.trans.net = simpact.trans.net,
+    cov.35.gender.men70.women30.age.group <- IDs.indiv.seq.gender.age.group.fun(simpact.trans.net = simpact.trans.net,
                                                                             limitTransmEvents = 7, 
                                                                             perc.men = 70, 
+                                                                            seq.cov = 35,
                                                                             age.men = c(15, 60),
                                                                             age.women = c(15, 40))
-    IDs.gender.men70.women30.age.menwomen <- gender.men70.women30.age.menwomen$outputvector
+    cov.35.IDs.gender.men70.women30.age.group <- cov.35.gender.men70.women30.age.group$outputvector
     
-    
+
     ## XX
     # BEGIN
     
+    cut.val = 5
+    
     source("~/phylosimpact_simulation_studies_2018/stress_testing/phylogenetic.features.fun.R")
     # men.50.women50
-    choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.Fasta"),
-                        select.vec = IDs.gender.men50.women50, 
-                        name.file = paste0(sub.dir.rename, "/IDs.gender.men50.women50.C.Epidemic.Fasta"))
-    
-    
-    IDs.gender.men50.women50.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
-                                                                          sub.dir.rename = sub.dir.rename,
-                                                                          fasttree.tool = "FastTree",
-                                                                          calendar.dates = "samplingtimes.all.csv",
-                                                                          simseqfile = "IDs.gender.men50.women50.C.Epidemic.Fasta",
-                                                                          count.start = 1977,
-                                                                          endsim = 40,
-                                                                          clust = FALSE)
-    IDs.gender.men50.women50.tree.calib.LTT <- IDs.gender.men50.women50.tree.calib
-    
-    write.tree(IDs.gender.men50.women50.tree.calib, file = paste0(sub.dir.rename,"/IDs.gender.men50.women50.calibrated.tree.nwk"))
-    
-    
-    IDs.gender.men50.women50.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/IDs.gender.men50.women50.calibrated.tree.nwk"),
-                                                                   tree.calib.LTT = IDs.gender.men50.women50.tree.calib.LTT)
+    if(length(cov.35.IDs.gender.men50.women50)>=cut.val){
+      choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.Fasta"),
+                          select.vec = cov.35.IDs.gender.men50.women50, 
+                          name.file = paste0(sub.dir.rename, "/cov.35.IDs.gender.men50.women50.C.Epidemic.Fasta"))
+      
+      
+      cov.35.IDs.gender.men50.women50.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
+                                                                            sub.dir.rename = sub.dir.rename,
+                                                                            fasttree.tool = "FastTree",
+                                                                            calendar.dates = "samplingtimes.all.csv",
+                                                                            simseqfile = "cov.35.IDs.gender.men50.women50.C.Epidemic.Fasta",
+                                                                            count.start = 1977,
+                                                                            endsim = 40,
+                                                                            clust = FALSE)
+      cov.35.IDs.gender.men50.women50.tree.calib.LTT <- cov.35.IDs.gender.men50.women50.tree.calib
+      
+      write.tree(cov.35.IDs.gender.men50.women50.tree.calib, file = paste0(sub.dir.rename,"/cov.35.IDs.gender.men50.women50.calibrated.tree.nwk"))
+      
+      
+      cov.35.IDs.gender.men50.women50.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.35.IDs.gender.men50.women50.calibrated.tree.nwk"),
+                                                                            tree.calib.LTT = cov.35.IDs.gender.men50.women50.tree.calib.LTT)
+      
+    }else{
+      cov.35.IDs.gender.men50.women50.features <- rep(NA, 12)
+    }
     
     # men30.women70
-    choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.Fasta"),
-                        select.vec = IDs.gender.men30.women70, 
-                        name.file = paste0(sub.dir.rename, "/IDs.gender.men30.women70.C.Epidemic.Fasta"))
-    
-    
-    IDs.gender.men30.women70.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
-                                                                          sub.dir.rename = sub.dir.rename,
-                                                                          fasttree.tool = "FastTree",
-                                                                          calendar.dates = "samplingtimes.all.csv",
-                                                                          simseqfile = "IDs.gender.men30.women70.C.Epidemic.Fasta",
-                                                                          count.start = 1977,
-                                                                          endsim = 40,
-                                                                          clust = FALSE)
-    IDs.gender.men30.women70.tree.calib.LTT <- IDs.gender.men30.women70.tree.calib
-    
-    write.tree(IDs.gender.men30.women70.tree.calib, file = paste0(sub.dir.rename,"/IDs.gender.men30.women70.calibrated.tree.nwk"))
-    
-    
-    IDs.gender.men30.women70.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/IDs.gender.men30.women70.calibrated.tree.nwk"),
-                                                                   tree.calib.LTT = IDs.gender.men30.women70.tree.calib.LTT)
+    if(length(cov.35.IDs.gender.men30.women70) >=cut.val){
+      choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.Fasta"),
+                          select.vec = cov.35.IDs.gender.men30.women70, 
+                          name.file = paste0(sub.dir.rename, "/cov.35.IDs.gender.men30.women70.C.Epidemic.Fasta"))
+      
+      
+      cov.35.IDs.gender.men30.women70.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
+                                                                            sub.dir.rename = sub.dir.rename,
+                                                                            fasttree.tool = "FastTree",
+                                                                            calendar.dates = "samplingtimes.all.csv",
+                                                                            simseqfile = "cov.35.IDs.gender.men30.women70.C.Epidemic.Fasta",
+                                                                            count.start = 1977,
+                                                                            endsim = 40,
+                                                                            clust = FALSE)
+      cov.35.IDs.gender.men30.women70.tree.calib.LTT <- cov.35.IDs.gender.men30.women70.tree.calib
+      
+      write.tree(cov.35.IDs.gender.men30.women70.tree.calib, file = paste0(sub.dir.rename,"/cov.35.IDs.gender.men30.women70.calibrated.tree.nwk"))
+      
+      
+      cov.35.IDs.gender.men30.women70.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.35.IDs.gender.men30.women70.calibrated.tree.nwk"),
+                                                                            tree.calib.LTT = cov.35.IDs.gender.men30.women70.tree.calib.LTT)
+      
+    }else{
+      cov.35.IDs.gender.men30.women70.features <- rep(NA, 12)
+      
+    }
     
     # men70.women30
-    choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename, "/C.Epidemic.Fasta"),
-                        select.vec = IDs.gender.men70.women30, 
-                        name.file =  paste0(sub.dir.rename,"/IDs.gender.men70.women30.C.Epidemic.Fasta"))
     
+    if(length(cov.35.IDs.gender.men70.women30) >= cut.val){
+      choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename, "/C.Epidemic.Fasta"),
+                          select.vec = cov.35.IDs.gender.men70.women30, 
+                          name.file =  paste0(sub.dir.rename,"/cov.35.IDs.gender.men70.women30.C.Epidemic.Fasta"))
+      
+      
+      cov.35.IDs.gender.men70.women30.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
+                                                                            sub.dir.rename = sub.dir.rename,
+                                                                            fasttree.tool = "FastTree",
+                                                                            calendar.dates = "samplingtimes.all.csv",
+                                                                            simseqfile = "cov.35.IDs.gender.men70.women30.C.Epidemic.Fasta",
+                                                                            count.start = 1977,
+                                                                            endsim = 40,
+                                                                            clust = FALSE)
+      cov.35.IDs.gender.men70.women30.tree.calib.LTT <- cov.35.IDs.gender.men70.women30.tree.calib
+      
+      write.tree(cov.35.IDs.gender.men70.women30.tree.calib, file = paste0(sub.dir.rename,"/cov.35.IDs.gender.men70.women30.calibrated.tree.nwk"))
+      
+      
+      cov.35.IDs.gender.men70.women30.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.35.IDs.gender.men70.women30.calibrated.tree.nwk"),
+                                                                            tree.calib.LTT = cov.35.IDs.gender.men70.women30.tree.calib.LTT)
+      
+    }else{
+      cov.35.IDs.gender.men70.women30.features <- rep(NA, 12)
+    }
     
-    IDs.gender.men70.women30.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
-                                                                          sub.dir.rename = sub.dir.rename,
-                                                                          fasttree.tool = "FastTree",
-                                                                          calendar.dates = "samplingtimes.all.csv",
-                                                                          simseqfile = "IDs.gender.men70.women30.C.Epidemic.Fasta",
-                                                                          count.start = 1977,
-                                                                          endsim = 40,
-                                                                          clust = FALSE)
-    IDs.gender.men70.women30.tree.calib.LTT <- IDs.gender.men70.women30.tree.calib
+    # men50.women50.group
     
-    write.tree(IDs.gender.men70.women30.tree.calib, file = paste0(sub.dir.rename,"/IDs.gender.men70.women30.calibrated.tree.nwk"))
+    if(length(cov.35.IDs.gender.men50.women50.age.group)>=cut.val){
+      
+      choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.Fasta"),
+                          select.vec = cov.35.IDs.gender.men50.women50.age.group, 
+                          name.file = paste0(sub.dir.rename,"/cov.35.IDs.gender.men50.women50.age.group.C.Epidemic.Fasta"))
+      
+      
+      cov.35.IDs.gender.men50.women50.age.group.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
+                                                                                         sub.dir.rename = sub.dir.rename,
+                                                                                         fasttree.tool = "FastTree",
+                                                                                         calendar.dates = "samplingtimes.all.csv",
+                                                                                         simseqfile = "cov.35.IDs.gender.men50.women50.age.group.C.Epidemic.Fasta",
+                                                                                         count.start = 1977,
+                                                                                         endsim = 40,
+                                                                                         clust = FALSE)
+      cov.35.IDs.gender.men50.women50.age.group.tree.calib.LTT <- cov.35.IDs.gender.men50.women50.age.group.tree.calib
+      
+      write.tree(cov.35.IDs.gender.men50.women50.age.group.tree.calib, file = paste0(sub.dir.rename,"/cov.35.IDs.gender.men50.women50.age.group.calibrated.tree.nwk"))
+      
+      cov.35.IDs.gender.men50.women50.age.group.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.35.IDs.gender.men50.women50.age.group.calibrated.tree.nwk"),
+                                                                               tree.calib.LTT = cov.35.IDs.gender.men50.women50.age.group.tree.calib.LTT)
+      
+    }else{
+      cov.35.IDs.gender.men50.women50.age.group.features <- rep(NA, 12)
+    }
     
+    # men30.women70.group
     
-    IDs.gender.men70.women30.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/IDs.gender.men70.women30.calibrated.tree.nwk"),
-                                                                   tree.calib.LTT = IDs.gender.men70.women30.tree.calib.LTT)
+    if(length(cov.35.IDs.gender.men30.women70.age.group)>=cut.val){
+      
+      choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename, "/C.Epidemic.Fasta"),
+                          select.vec = cov.35.IDs.gender.men30.women70.age.group, 
+                          name.file = paste0(sub.dir.rename,"/cov.35.IDs.gender.men30.women70.age.group.C.Epidemic.Fasta"))
+      
+      
+      cov.35.IDs.gender.men30.women70.age.group.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
+                                                                                         sub.dir.rename = sub.dir.rename,
+                                                                                         fasttree.tool = "FastTree",
+                                                                                         calendar.dates = "samplingtimes.all.csv",
+                                                                                         simseqfile = "cov.35.IDs.gender.men30.women70.age.group.C.Epidemic.Fasta",
+                                                                                         count.start = 1977,
+                                                                                         endsim = 40,
+                                                                                         clust = FALSE)
+      cov.35.IDs.gender.men30.women70.age.group.tree.calib.LTT <- cov.35.IDs.gender.men30.women70.age.group.tree.calib
+      
+      write.tree(cov.35.IDs.gender.men30.women70.age.group.tree.calib, file = paste0(sub.dir.rename,"/cov.35.IDs.gender.men30.women70.age.group.calibrated.tree.nwk"))
+      
+      
+      cov.35.IDs.gender.men30.women70.age.group.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.35.IDs.gender.men30.women70.age.group.calibrated.tree.nwk"),
+                                                                               tree.calib.LTT = cov.35.IDs.gender.men30.women70.age.group.tree.calib.LTT)
+      
+    }else{
+      cov.35.IDs.gender.men30.women70.age.group.features <- rep(NA, 12)
+    }
     
-    # men50.women50.menwomen
-    choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.Fasta"),
-                        select.vec = IDs.gender.men50.women50.age.menwomen, 
-                        name.file = paste0(sub.dir.rename,"/IDs.gender.men50.women50.age.menwomen.C.Epidemic.Fasta"))
+    # men70.women30.group
     
-    
-    IDs.gender.men50.women50.age.menwomen.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
-                                                                                       sub.dir.rename = sub.dir.rename,
-                                                                                       fasttree.tool = "FastTree",
-                                                                                       calendar.dates = "samplingtimes.all.csv",
-                                                                                       simseqfile = "IDs.gender.men50.women50.age.menwomen.C.Epidemic.Fasta",
-                                                                                       count.start = 1977,
-                                                                                       endsim = 40,
-                                                                                       clust = FALSE)
-    IDs.gender.men50.women50.age.menwomen.tree.calib.LTT <- IDs.gender.men50.women50.age.menwomen.tree.calib
-    
-    write.tree(IDs.gender.men50.women50.age.menwomen.tree.calib, file = paste0(sub.dir.rename,"/IDs.gender.men50.women50.age.menwomen.calibrated.tree.nwk"))
-    
-    IDs.gender.men50.women50.age.menwomen.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/IDs.gender.men50.women50.age.menwomen.calibrated.tree.nwk"),
-                                                                                tree.calib.LTT = IDs.gender.men50.women50.age.menwomen.tree.calib.LTT)
-    
-    # men30.women70.menwomen
-    choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename, "/C.Epidemic.Fasta"),
-                        select.vec = IDs.gender.men30.women70.age.menwomen, 
-                        name.file = paste0(sub.dir.rename,"/IDs.gender.men30.women70.age.menwomen.C.Epidemic.Fasta"))
-    
-    
-    IDs.gender.men30.women70.age.menwomen.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
-                                                                                       sub.dir.rename = sub.dir.rename,
-                                                                                       fasttree.tool = "FastTree",
-                                                                                       calendar.dates = "samplingtimes.all.csv",
-                                                                                       simseqfile = "IDs.gender.men30.women70.age.menwomen.C.Epidemic.Fasta",
-                                                                                       count.start = 1977,
-                                                                                       endsim = 40,
-                                                                                       clust = FALSE)
-    IDs.gender.men30.women70.age.menwomen.tree.calib.LTT <- IDs.gender.men30.women70.age.menwomen.tree.calib
-    
-    write.tree(IDs.gender.men30.women70.age.menwomen.tree.calib, file = paste0(sub.dir.rename,"/IDs.gender.men30.women70.age.menwomen.calibrated.tree.nwk"))
-    
-    
-    IDs.gender.men30.women70.age.menwomen.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/IDs.gender.men30.women70.age.menwomen.calibrated.tree.nwk"),
-                                                                                tree.calib.LTT = IDs.gender.men30.women70.age.menwomen.tree.calib.LTT)
-    
-    # men70.women30.menwomen
-    choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename, "/C.Epidemic.Fasta"),
-                        select.vec = IDs.gender.men70.women30.age.menwomen, 
-                        name.file = paste0(sub.dir.rename,"/IDs.gender.men70.women30.age.menwomen.C.Epidemic.Fasta"))
-    
-    
-    IDs.gender.men70.women30.age.menwomen.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
-                                                                                       sub.dir.rename = sub.dir.rename,
-                                                                                       fasttree.tool = "FastTree",
-                                                                                       calendar.dates = "samplingtimes.all.csv",
-                                                                                       simseqfile = "IDs.gender.men70.women30.age.menwomen.C.Epidemic.Fasta",
-                                                                                       count.start = 1977,
-                                                                                       endsim = 40,
-                                                                                       clust = FALSE)
-    IDs.gender.men70.women30.age.menwomen.tree.calib.LTT <- IDs.gender.men70.women30.age.menwomen.tree.calib
-    
-    write.tree(IDs.gender.men70.women30.age.menwomen.tree.calib, file = paste0(sub.dir.rename,"/IDs.gender.men70.women30.age.menwomen.calibrated.tree.nwk"))
-    
-    IDs.gender.men70.women30.age.menwomen.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/IDs.gender.men70.women30.age.menwomen.calibrated.tree.nwk"),
-                                                                                tree.calib.LTT = IDs.gender.men70.women30.age.menwomen.tree.calib.LTT)
+    if(length(cov.35.IDs.gender.men70.women30.age.group)>=cut.val){
+      choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename, "/C.Epidemic.Fasta"),
+                          select.vec = cov.35.IDs.gender.men70.women30.age.group, 
+                          name.file = paste0(sub.dir.rename,"/cov.35.IDs.gender.men70.women30.age.group.C.Epidemic.Fasta"))
+      
+      
+      cov.35.IDs.gender.men70.women30.age.group.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
+                                                                                         sub.dir.rename = sub.dir.rename,
+                                                                                         fasttree.tool = "FastTree",
+                                                                                         calendar.dates = "samplingtimes.all.csv",
+                                                                                         simseqfile = "cov.35.IDs.gender.men70.women30.age.group.C.Epidemic.Fasta",
+                                                                                         count.start = 1977,
+                                                                                         endsim = 40,
+                                                                                         clust = FALSE)
+      cov.35.IDs.gender.men70.women30.age.group.tree.calib.LTT <- cov.35.IDs.gender.men70.women30.age.group.tree.calib
+      
+      write.tree(cov.35.IDs.gender.men70.women30.age.group.tree.calib, file = paste0(sub.dir.rename,"/cov.35.IDs.gender.men70.women30.age.group.calibrated.tree.nwk"))
+      
+      cov.35.IDs.gender.men70.women30.age.group.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.35.IDs.gender.men70.women30.age.group.calibrated.tree.nwk"),
+                                                                                  tree.calib.LTT = cov.35.IDs.gender.men70.women30.age.group.tree.calib.LTT)
+      
+    }else{
+      cov.35.IDs.gender.men70.women30.age.group.features <- rep(NA, 12)
+    }
     
     
     # 
@@ -1082,17 +1128,17 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                     maxHeight.feature, lb.mean.feature, lb.median.feature, ub.mean.feature, ub.median.feature,
                     median.mean.feature, median.median.feature,
                     
-                    as.numeric(IDs.gender.men50.women50.features), as.numeric(IDs.gender.men30.women70.features),
-                    as.numeric(IDs.gender.men70.women30.features),  # each one is a vector
-                    as.numeric(IDs.gender.men50.women50.age.menwomen.features), as.numeric(IDs.gender.men30.women70.age.menwomen.features),
-                    as.numeric(IDs.gender.men70.women30.age.menwomen.features)
+                    as.numeric(cov.35.IDs.gender.men50.women50.features), as.numeric(cov.35.IDs.gender.men30.women70.features),
+                    as.numeric(cov.35.IDs.gender.men70.women30.features),  # each one is a vector
+                    as.numeric(cov.35.IDs.gender.men50.women50.age.group.features), as.numeric(cov.35.IDs.gender.men30.women70.age.group.features),
+                    as.numeric(cov.35.IDs.gender.men70.women30.age.group.features)
     )
     
     # 
     # c(IDs.gender.men50.women50.features, IDs.gender.men30.women70.features,
     #   IDs.gender.men70.women30.features,  # each one is a vector
-    #   IDs.gender.men50.women50.age.menwomen.features, IDs.gender.men30.women70.age.menwomen.features,
-    #   IDs.gender.men70.women30.age.menwomen.features) 
+    #   IDs.gender.men50.women50.age.group.features, IDs.gender.men30.women70.age.group.features,
+    #   IDs.gender.men70.women30.age.group.features) 
     
     features.names <- c("METRICS.incidence.df.15.24", "METRICS.incidence.df.25.34", "METRICS.incidence.df.35.44",
                         
@@ -1122,41 +1168,41 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                         "LTT.median.mean.feature", "LTT.median.median.feature",
                         
                         
-                        "IDs.gender.men50.women50.meanHeight.feature", "IDs.gender.men50.women50.colless.feature", "IDs.gender.men50.women50.sackin.feature", 
-                        "IDs.gender.men50.women50.mean.tipsDepths.feature", "IDs.gender.men50.women50.mean.nodesDepths.feature",
-                        "IDs.gender.men50.women50.maxHeight.feature", "IDs.gender.men50.women50.LTT.lb.mean.feature", "IDs.gender.men50.women50.LTT.lb.median.feature", 
-                        "IDs.gender.men50.women50.LTT.ub.mean.feature", "IDs.gender.men50.women50.LTT.ub.median.feature",
-                        "IDs.gender.men50.women50.LTT.median.mean.feature", "IDs.gender.men50.women50.LTT.median.median.feature",
+                        "cov.35.IDs.gender.men50.women50.meanHeight.feature", "cov.35.IDs.gender.men50.women50.colless.feature", "cov.35.IDs.gender.men50.women50.sackin.feature", 
+                        "cov.35.IDs.gender.men50.women50.mean.tipsDepths.feature", "cov.35.IDs.gender.men50.women50.mean.nodesDepths.feature",
+                        "cov.35.IDs.gender.men50.women50.maxHeight.feature", "cov.35.IDs.gender.men50.women50.LTT.lb.mean.feature", "cov.35.IDs.gender.men50.women50.LTT.lb.median.feature", 
+                        "cov.35.IDs.gender.men50.women50.LTT.ub.mean.feature", "cov.35.IDs.gender.men50.women50.LTT.ub.median.feature",
+                        "cov.35.IDs.gender.men50.women50.LTT.median.mean.feature", "cov.35.IDs.gender.men50.women50.LTT.median.median.feature",
                         
-                        "IDs.gender.men30.women70.meanHeight.feature", "IDs.gender.men30.women70.colless.feature", "IDs.gender.men30.women70.sackin.feature", 
-                        "IDs.gender.men30.women70.mean.tipsDepths.feature", "IDs.gender.men30.women70.mean.nodesDepths.feature",
-                        "IDs.gender.men30.women70.maxHeight.feature", "IDs.gender.men30.women70.LTT.lb.mean.feature", "IDs.gender.men30.women70.LTT.lb.median.feature", 
-                        "IDs.gender.men30.women70.LTT.ub.mean.feature", "IDs.gender.men30.women70.LTT.ub.median.feature",
-                        "IDs.gender.men30.women70.LTT.median.mean.feature", "IDs.gender.men30.women70.LTT.median.median.feature",
+                        "cov.35.IDs.gender.men30.women70.meanHeight.feature", "cov.35.IDs.gender.men30.women70.colless.feature", "cov.35.IDs.gender.men30.women70.sackin.feature", 
+                        "cov.35.IDs.gender.men30.women70.mean.tipsDepths.feature", "cov.35.IDs.gender.men30.women70.mean.nodesDepths.feature",
+                        "cov.35.IDs.gender.men30.women70.maxHeight.feature", "cov.35.IDs.gender.men30.women70.LTT.lb.mean.feature", "cov.35.IDs.gender.men30.women70.LTT.lb.median.feature", 
+                        "cov.35.IDs.gender.men30.women70.LTT.ub.mean.feature", "cov.35.IDs.gender.men30.women70.LTT.ub.median.feature",
+                        "cov.35.IDs.gender.men30.women70.LTT.median.mean.feature", "cov.35.IDs.gender.men30.women70.LTT.median.median.feature",
                         
-                        "IDs.gender.men70.women30.meanHeight.feature", "IDs.gender.men70.women30.colless.feature", "IDs.gender.men70.women30.sackin.feature", 
-                        "IDs.gender.men70.women30.mean.tipsDepths.feature", "IDs.gender.men70.women30.mean.nodesDepths.feature",
-                        "IDs.gender.men70.women30.maxHeight.feature", "IDs.gender.men70.women30.LTT.lb.mean.feature", "IDs.gender.men70.women30.LTT.lb.median.feature", 
-                        "IDs.gender.men70.women30.LTT.ub.mean.feature", "IDs.gender.men70.women30.LTT.ub.median.feature",
-                        "IDs.gender.men70.women30.LTT.median.mean.feature", "IDs.gender.men70.women30.LTT.median.median.feature",
+                        "cov.35.IDs.gender.men70.women30.meanHeight.feature", "cov.35.IDs.gender.men70.women30.colless.feature", "cov.35.IDs.gender.men70.women30.sackin.feature", 
+                        "cov.35.IDs.gender.men70.women30.mean.tipsDepths.feature", "cov.35.IDs.gender.men70.women30.mean.nodesDepths.feature",
+                        "cov.35.IDs.gender.men70.women30.maxHeight.feature", "cov.35.IDs.gender.men70.women30.LTT.lb.mean.feature", "cov.35.IDs.gender.men70.women30.LTT.lb.median.feature", 
+                        "cov.35.IDs.gender.men70.women30.LTT.ub.mean.feature", "cov.35.IDs.gender.men70.women30.LTT.ub.median.feature",
+                        "cov.35.IDs.gender.men70.women30.LTT.median.mean.feature", "cov.35.IDs.gender.men70.women30.LTT.median.median.feature",
                         
-                        "IDs.gender.men50.women50.age.menwomen.meanHeight.feature", "IDs.gender.men50.women50.age.menwomen.colless.feature", "IDs.gender.men50.women50.age.menwomen.sackin.feature", 
-                        "IDs.gender.men50.women50.age.menwomen.mean.tipsDepths.feature", "IDs.gender.men50.women50.age.menwomen.mean.nodesDepths.feature",
-                        "IDs.gender.men50.women50.age.menwomen.maxHeight.feature", "IDs.gender.men50.women50.age.menwomen.LTT.lb.mean.feature", "IDs.gender.men50.women50.age.menwomen.LTT.lb.median.feature", 
-                        "IDs.gender.men50.women50.age.menwomen.LTT.ub.mean.feature", "IDs.gender.men50.women50.age.menwomen.LTT.ub.median.feature",
-                        "IDs.gender.men50.women50.age.menwomen.LTT.median.mean.feature", "IDs.gender.men50.women50.age.menwomen.LTT.median.median.feature",
+                        "cov.35.IDs.gender.men50.women50.age.group.meanHeight.feature", "cov.35.IDs.gender.men50.women50.age.group.colless.feature", "cov.35.IDs.gender.men50.women50.age.group.sackin.feature", 
+                        "cov.35.IDs.gender.men50.women50.age.group.mean.tipsDepths.feature", "cov.35.IDs.gender.men50.women50.age.group.mean.nodesDepths.feature",
+                        "cov.35.IDs.gender.men50.women50.age.group.maxHeight.feature", "cov.35.IDs.gender.men50.women50.age.group.LTT.lb.mean.feature", "cov.35.IDs.gender.men50.women50.age.group.LTT.lb.median.feature", 
+                        "cov.35.IDs.gender.men50.women50.age.group.LTT.ub.mean.feature", "cov.35.IDs.gender.men50.women50.age.group.LTT.ub.median.feature",
+                        "cov.35.IDs.gender.men50.women50.age.group.LTT.median.mean.feature", "cov.35.IDs.gender.men50.women50.age.group.LTT.median.median.feature",
                         
-                        "IDs.gender.men30.women70.age.menwomen.meanHeight.feature", "IDs.gender.men30.women70.age.menwomen.colless.feature", "IDs.gender.men30.women70.age.menwomen.sackin.feature", 
-                        "IDs.gender.men30.women70.age.menwomen.mean.tipsDepths.feature", "IDs.gender.men30.women70.age.menwomen.mean.nodesDepths.feature",
-                        "IDs.gender.men30.women70.age.menwomen.maxHeight.feature", "IDs.gender.men30.women70.age.menwomen.LTT.lb.mean.feature", "IDs.gender.men30.women70.age.menwomen.LTT.lb.median.feature", 
-                        "IDs.gender.men30.women70.age.menwomen.LTT.ub.mean.feature", "IDs.gender.men30.women70.age.menwomen.LTT.ub.median.feature",
-                        "IDs.gender.men30.women70.age.menwomen.LTT.median.mean.feature", "IDs.gender.men30.women70.age.menwomen.LTT.median.median.feature",
+                        "cov.35.IDs.gender.men30.women70.age.group.meanHeight.feature", "cov.35.IDs.gender.men30.women70.age.group.colless.feature", "cov.35.IDs.gender.men30.women70.age.group.sackin.feature", 
+                        "cov.35.IDs.gender.men30.women70.age.group.mean.tipsDepths.feature", "cov.35.IDs.gender.men30.women70.age.group.mean.nodesDepths.feature",
+                        "cov.35.IDs.gender.men30.women70.age.group.maxHeight.feature", "cov.35.IDs.gender.men30.women70.age.group.LTT.lb.mean.feature", "cov.35.IDs.gender.men30.women70.age.group.LTT.lb.median.feature", 
+                        "cov.35.IDs.gender.men30.women70.age.group.LTT.ub.mean.feature", "cov.35.IDs.gender.men30.women70.age.group.LTT.ub.median.feature",
+                        "cov.35.IDs.gender.men30.women70.age.group.LTT.median.mean.feature", "cov.35.IDs.gender.men30.women70.age.group.LTT.median.median.feature",
                         
-                        "IDs.gender.men70.women30.age.menwomen.meanHeight.feature", "IDs.gender.men70.women30.age.menwomen.colless.feature", "IDs.gender.men70.women30.age.menwomen.sackin.feature", 
-                        "IDs.gender.men70.women30.age.menwomen.mean.tipsDepths.feature", "IDs.gender.men70.women30.age.menwomen.mean.nodesDepths.feature",
-                        "IDs.gender.men70.women30.age.menwomen.maxHeight.feature", "IDs.gender.men70.women30.age.menwomen.LTT.lb.mean.feature", "IDs.gender.men70.women30.age.menwomen.LTT.lb.median.feature", 
-                        "IDs.gender.men70.women30.age.menwomen.LTT.ub.mean.feature", "IDs.gender.men70.women30.age.menwomen.LTT.ub.median.feature",
-                        "IDs.gender.men70.women30.age.menwomen.LTT.median.mean.feature", "IDs.gender.men70.women30.age.menwomen.LTT.median.median.feature"
+                        "cov.35.IDs.gender.men70.women30.age.group.meanHeight.feature", "cov.35.IDs.gender.men70.women30.age.group.colless.feature", "cov.35.IDs.gender.men70.women30.age.group.sackin.feature", 
+                        "cov.35.IDs.gender.men70.women30.age.group.mean.tipsDepths.feature", "cov.35.IDs.gender.men70.women30.age.group.mean.nodesDepths.feature",
+                        "cov.35.IDs.gender.men70.women30.age.group.maxHeight.feature", "cov.35.IDs.gender.men70.women30.age.group.LTT.lb.mean.feature", "cov.35.IDs.gender.men70.women30.age.group.LTT.lb.median.feature", 
+                        "cov.35.IDs.gender.men70.women30.age.group.LTT.ub.mean.feature", "cov.35.IDs.gender.men70.women30.age.group.LTT.ub.median.feature",
+                        "cov.35.IDs.gender.men70.women30.age.group.LTT.median.mean.feature", "cov.35.IDs.gender.men70.women30.age.group.LTT.median.median.feature"
                         
     )
     
@@ -1193,43 +1239,43 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                         "meanHeight.feature", "colless.feature", "sackin.feature", "mean.tipsDepths.feature", "mean.nodesDepths.feature",
                         "maxHeight.feature", "LTT.lb.mean.feature", "LTT.lb.median.feature", "LTT.ub.mean.feature", "LTT.ub.median.feature",
                         "LTT.median.mean.feature", "LTT.median.median.feature",
-
                         
-                        "IDs.gender.men50.women50.meanHeight.feature", "IDs.gender.men50.women50.colless.feature", "IDs.gender.men50.women50.sackin.feature", 
-                        "IDs.gender.men50.women50.mean.tipsDepths.feature", "IDs.gender.men50.women50.mean.nodesDepths.feature",
-                        "IDs.gender.men50.women50.maxHeight.feature", "IDs.gender.men50.women50.LTT.lb.mean.feature", "IDs.gender.men50.women50.LTT.lb.median.feature", 
-                        "IDs.gender.men50.women50.LTT.ub.mean.feature", "IDs.gender.men50.women50.LTT.ub.median.feature",
-                        "IDs.gender.men50.women50.LTT.median.mean.feature", "IDs.gender.men50.women50.LTT.median.median.feature",
                         
-                        "IDs.gender.men30.women70.meanHeight.feature", "IDs.gender.men30.women70.colless.feature", "IDs.gender.men30.women70.sackin.feature", 
-                        "IDs.gender.men30.women70.mean.tipsDepths.feature", "IDs.gender.men30.women70.mean.nodesDepths.feature",
-                        "IDs.gender.men30.women70.maxHeight.feature", "IDs.gender.men30.women70.LTT.lb.mean.feature", "IDs.gender.men30.women70.LTT.lb.median.feature", 
-                        "IDs.gender.men30.women70.LTT.ub.mean.feature", "IDs.gender.men30.women70.LTT.ub.median.feature",
-                        "IDs.gender.men30.women70.LTT.median.mean.feature", "IDs.gender.men30.women70.LTT.median.median.feature",
+                        "cov.35.IDs.gender.men50.women50.meanHeight.feature", "cov.35.IDs.gender.men50.women50.colless.feature", "cov.35.IDs.gender.men50.women50.sackin.feature", 
+                        "cov.35.IDs.gender.men50.women50.mean.tipsDepths.feature", "cov.35.IDs.gender.men50.women50.mean.nodesDepths.feature",
+                        "cov.35.IDs.gender.men50.women50.maxHeight.feature", "cov.35.IDs.gender.men50.women50.LTT.lb.mean.feature", "cov.35.IDs.gender.men50.women50.LTT.lb.median.feature", 
+                        "cov.35.IDs.gender.men50.women50.LTT.ub.mean.feature", "cov.35.IDs.gender.men50.women50.LTT.ub.median.feature",
+                        "cov.35.IDs.gender.men50.women50.LTT.median.mean.feature", "cov.35.IDs.gender.men50.women50.LTT.median.median.feature",
                         
-                        "IDs.gender.men70.women30.meanHeight.feature", "IDs.gender.men70.women30.colless.feature", "IDs.gender.men70.women30.sackin.feature", 
-                        "IDs.gender.men70.women30.mean.tipsDepths.feature", "IDs.gender.men70.women30.mean.nodesDepths.feature",
-                        "IDs.gender.men70.women30.maxHeight.feature", "IDs.gender.men70.women30.LTT.lb.mean.feature", "IDs.gender.men70.women30.LTT.lb.median.feature", 
-                        "IDs.gender.men70.women30.LTT.ub.mean.feature", "IDs.gender.men70.women30.LTT.ub.median.feature",
-                        "IDs.gender.men70.women30.LTT.median.mean.feature", "IDs.gender.men70.women30.LTT.median.median.feature",
+                        "cov.35.IDs.gender.men30.women70.meanHeight.feature", "cov.35.IDs.gender.men30.women70.colless.feature", "cov.35.IDs.gender.men30.women70.sackin.feature", 
+                        "cov.35.IDs.gender.men30.women70.mean.tipsDepths.feature", "cov.35.IDs.gender.men30.women70.mean.nodesDepths.feature",
+                        "cov.35.IDs.gender.men30.women70.maxHeight.feature", "cov.35.IDs.gender.men30.women70.LTT.lb.mean.feature", "cov.35.IDs.gender.men30.women70.LTT.lb.median.feature", 
+                        "cov.35.IDs.gender.men30.women70.LTT.ub.mean.feature", "cov.35.IDs.gender.men30.women70.LTT.ub.median.feature",
+                        "cov.35.IDs.gender.men30.women70.LTT.median.mean.feature", "cov.35.IDs.gender.men30.women70.LTT.median.median.feature",
                         
-                        "IDs.gender.men50.women50.age.menwomen.meanHeight.feature", "IDs.gender.men50.women50.age.menwomen.colless.feature", "IDs.gender.men50.women50.age.menwomen.sackin.feature", 
-                        "IDs.gender.men50.women50.age.menwomen.mean.tipsDepths.feature", "IDs.gender.men50.women50.age.menwomen.mean.nodesDepths.feature",
-                        "IDs.gender.men50.women50.age.menwomen.maxHeight.feature", "IDs.gender.men50.women50.age.menwomen.LTT.lb.mean.feature", "IDs.gender.men50.women50.age.menwomen.LTT.lb.median.feature", 
-                        "IDs.gender.men50.women50.age.menwomen.LTT.ub.mean.feature", "IDs.gender.men50.women50.age.menwomen.LTT.ub.median.feature",
-                        "IDs.gender.men50.women50.age.menwomen.LTT.median.mean.feature", "IDs.gender.men50.women50.age.menwomen.LTT.median.median.feature",
+                        "cov.35.IDs.gender.men70.women30.meanHeight.feature", "cov.35.IDs.gender.men70.women30.colless.feature", "cov.35.IDs.gender.men70.women30.sackin.feature", 
+                        "cov.35.IDs.gender.men70.women30.mean.tipsDepths.feature", "cov.35.IDs.gender.men70.women30.mean.nodesDepths.feature",
+                        "cov.35.IDs.gender.men70.women30.maxHeight.feature", "cov.35.IDs.gender.men70.women30.LTT.lb.mean.feature", "cov.35.IDs.gender.men70.women30.LTT.lb.median.feature", 
+                        "cov.35.IDs.gender.men70.women30.LTT.ub.mean.feature", "cov.35.IDs.gender.men70.women30.LTT.ub.median.feature",
+                        "cov.35.IDs.gender.men70.women30.LTT.median.mean.feature", "cov.35.IDs.gender.men70.women30.LTT.median.median.feature",
                         
-                        "IDs.gender.men30.women70.age.menwomen.meanHeight.feature", "IDs.gender.men30.women70.age.menwomen.colless.feature", "IDs.gender.men30.women70.age.menwomen.sackin.feature", 
-                        "IDs.gender.men30.women70.age.menwomen.mean.tipsDepths.feature", "IDs.gender.men30.women70.age.menwomen.mean.nodesDepths.feature",
-                        "IDs.gender.men30.women70.age.menwomen.maxHeight.feature", "IDs.gender.men30.women70.age.menwomen.LTT.lb.mean.feature", "IDs.gender.men30.women70.age.menwomen.LTT.lb.median.feature", 
-                        "IDs.gender.men30.women70.age.menwomen.LTT.ub.mean.feature", "IDs.gender.men30.women70.age.menwomen.LTT.ub.median.feature",
-                        "IDs.gender.men30.women70.age.menwomen.LTT.median.mean.feature", "IDs.gender.men30.women70.age.menwomen.LTT.median.median.feature",
+                        "cov.35.IDs.gender.men50.women50.age.group.meanHeight.feature", "cov.35.IDs.gender.men50.women50.age.group.colless.feature", "cov.35.IDs.gender.men50.women50.age.group.sackin.feature", 
+                        "cov.35.IDs.gender.men50.women50.age.group.mean.tipsDepths.feature", "cov.35.IDs.gender.men50.women50.age.group.mean.nodesDepths.feature",
+                        "cov.35.IDs.gender.men50.women50.age.group.maxHeight.feature", "cov.35.IDs.gender.men50.women50.age.group.LTT.lb.mean.feature", "cov.35.IDs.gender.men50.women50.age.group.LTT.lb.median.feature", 
+                        "cov.35.IDs.gender.men50.women50.age.group.LTT.ub.mean.feature", "cov.35.IDs.gender.men50.women50.age.group.LTT.ub.median.feature",
+                        "cov.35.IDs.gender.men50.women50.age.group.LTT.median.mean.feature", "cov.35.IDs.gender.men50.women50.age.group.LTT.median.median.feature",
                         
-                        "IDs.gender.men70.women30.age.menwomen.meanHeight.feature", "IDs.gender.men70.women30.age.menwomen.colless.feature", "IDs.gender.men70.women30.age.menwomen.sackin.feature", 
-                        "IDs.gender.men70.women30.age.menwomen.mean.tipsDepths.feature", "IDs.gender.men70.women30.age.menwomen.mean.nodesDepths.feature",
-                        "IDs.gender.men70.women30.age.menwomen.maxHeight.feature", "IDs.gender.men70.women30.age.menwomen.LTT.lb.mean.feature", "IDs.gender.men70.women30.age.menwomen.LTT.lb.median.feature", 
-                        "IDs.gender.men70.women30.age.menwomen.LTT.ub.mean.feature", "IDs.gender.men70.women30.age.menwomen.LTT.ub.median.feature",
-                        "IDs.gender.men70.women30.age.menwomen.LTT.median.mean.feature", "IDs.gender.men70.women30.age.menwomen.LTT.median.median.feature"
+                        "cov.35.IDs.gender.men30.women70.age.group.meanHeight.feature", "cov.35.IDs.gender.men30.women70.age.group.colless.feature", "cov.35.IDs.gender.men30.women70.age.group.sackin.feature", 
+                        "cov.35.IDs.gender.men30.women70.age.group.mean.tipsDepths.feature", "cov.35.IDs.gender.men30.women70.age.group.mean.nodesDepths.feature",
+                        "cov.35.IDs.gender.men30.women70.age.group.maxHeight.feature", "cov.35.IDs.gender.men30.women70.age.group.LTT.lb.mean.feature", "cov.35.IDs.gender.men30.women70.age.group.LTT.lb.median.feature", 
+                        "cov.35.IDs.gender.men30.women70.age.group.LTT.ub.mean.feature", "cov.35.IDs.gender.men30.women70.age.group.LTT.ub.median.feature",
+                        "cov.35.IDs.gender.men30.women70.age.group.LTT.median.mean.feature", "cov.35.IDs.gender.men30.women70.age.group.LTT.median.median.feature",
+                        
+                        "cov.35.IDs.gender.men70.women30.age.group.meanHeight.feature", "cov.35.IDs.gender.men70.women30.age.group.colless.feature", "cov.35.IDs.gender.men70.women30.age.group.sackin.feature", 
+                        "cov.35.IDs.gender.men70.women30.age.group.mean.tipsDepths.feature", "cov.35.IDs.gender.men70.women30.age.group.mean.nodesDepths.feature",
+                        "cov.35.IDs.gender.men70.women30.age.group.maxHeight.feature", "cov.35.IDs.gender.men70.women30.age.group.LTT.lb.mean.feature", "cov.35.IDs.gender.men70.women30.age.group.LTT.lb.median.feature", 
+                        "cov.35.IDs.gender.men70.women30.age.group.LTT.ub.mean.feature", "cov.35.IDs.gender.men70.women30.age.group.LTT.ub.median.feature",
+                        "cov.35.IDs.gender.men70.women30.age.group.LTT.median.mean.feature", "cov.35.IDs.gender.men70.women30.age.group.LTT.median.median.feature"
                         
     )
     
@@ -1290,11 +1336,11 @@ inputmatrix <- matrix(rep(inputvector, reps), byrow = TRUE, nrow = reps)
 
 
 
-sim.start.time <- proc.time()[3]
+sim.start.time <- proc.time()[3] # ! IDs.gender.men50.women50.age.group.features
 
 features.matrix <- phylo.simpact.parallel(model = wrapper.phylo.simpact.master.model.coverage,
                                           actual.input.matrix = inputmatrix,
-                                          seed_count = 123,
+                                          seed_count = 124,
                                           n_cluster = 4)
 
 sim.end.time <- proc.time()[3] - sim.start.time
