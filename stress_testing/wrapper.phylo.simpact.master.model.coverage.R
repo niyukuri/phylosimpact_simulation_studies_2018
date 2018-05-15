@@ -15,6 +15,13 @@ setwd(paste0(work.dir))
 pacman::p_load(snow, parallel, RSimpactCyan, RSimpactHelper, ape, Rsamtools)
 
 
+
+# inputvector <- c(101,1.05, 0.25, 0, 3, 0.23, 0.23, 45, 45, -0.7, 2.8,
+#                  -0.3, -0.3,
+#                  -2.7, # conception
+#                  -0.52, -0.05)
+
+
 wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vector){
   
   source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
@@ -419,6 +426,7 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
   
   simpact.trans.net <- transmission.network.builder(datalist = datalist.agemix, endpoint = 40)
   
+  simpact.trans.net.projection <- transmission.network.builder(datalist = datalist.agemix, endpoint = 45)
   
   
   ############################ METRICS: TRANSMISSION NETWORK CHARACTERISTICS #####################
@@ -426,6 +434,7 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
   # 1. Incidence trend #
   ######################
   
+  # Overall incidence in 30 years
   incidence.df.15.24 <- incidence.calculator(datalist = datalist.agemix,
                                              agegroup = c(15, 25), timewindow = c(10, 40))
   
@@ -449,6 +458,95 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
   
   METRICS.incidence.df.35.44.men <- incidence.df.35.44$incidence[1]
   METRICS.incidence.df.35.44.women <- incidence.df.35.44$incidence[2]
+  
+  # Incidence 35 - 40
+  
+  # # 35-36
+  # incidence.df.15.24.int.35.36 <- incidence.calculator(datalist = datalist.agemix,
+  #                                                      agegroup = c(15, 25), timewindow = c(35,36))
+  # 
+  # METRICS.incidence.df.15.24.int.35.36 <- incidence.df.15.24.int.35.36$incidence[3]
+  # 
+  # incidence.df.25.34.int.35.36 <- incidence.calculator(datalist = datalist.agemix,
+  #                                                      agegroup = c(25, 35), timewindow = c(35,36))
+  # 
+  # METRICS.incidence.df.25.34.int.35.36 <- incidence.df.25.34.int.35.36$incidence[3]
+  # 
+  # 
+  # incidence.df.35.44.int.35.36 <- incidence.calculator(datalist = datalist.agemix,
+  #                                                      agegroup = c(35, 45), timewindow = c(35,36))
+  # 
+  # METRICS.incidence.df.35.44.int.35.36 <- incidence.df.35.44.int.35.36$incidence[3]
+  # 
+  # 
+  # # 36-37
+  # incidence.df.15.24.int.36.37 <- incidence.calculator(datalist = datalist.agemix,
+  #                                                      agegroup = c(15, 25), timewindow = c(36,37))
+  # 
+  # METRICS.incidence.df.15.24.int.36.37 <- incidence.df.15.24.int.36.37$incidence[3]
+  # 
+  # incidence.df.25.34.int.36.37 <- incidence.calculator(datalist = datalist.agemix,
+  #                                                      agegroup = c(25, 35), timewindow = c(36,37))
+  # 
+  # METRICS.incidence.df.25.34.int.36.37 <- incidence.df.25.34.int.36.37$incidence[3]
+  # 
+  # 
+  # incidence.df.35.44.int.36.37 <- incidence.calculator(datalist = datalist.agemix,
+  #                                                      agegroup = c(35, 45), timewindow = c(36,37))
+  # 
+  # METRICS.incidence.df.35.44.int.36.37 <- incidence.df.35.44.int.36.37$incidence[3]
+  # 
+  # # 37-38
+  # incidence.df.15.24.int.37.38 <- incidence.calculator(datalist = datalist.agemix,
+  #                                                      agegroup = c(15, 25), timewindow = c(37,38))
+  # 
+  # METRICS.incidence.df.15.24.int.37.38 <- incidence.df.15.24.int.37.38$incidence[3]
+  # 
+  # incidence.df.25.34.int.37.38 <- incidence.calculator(datalist = datalist.agemix,
+  #                                                      agegroup = c(25, 35), timewindow = c(37,38))
+  # 
+  # METRICS.incidence.df.25.34.int.37.38 <- incidence.df.25.34.int.37.38$incidence[3]
+  # 
+  # 
+  # incidence.df.35.44.int.37.38 <- incidence.calculator(datalist = datalist.agemix,
+  #                                                      agegroup = c(35, 45), timewindow = c(37,38))
+  # 
+  # METRICS.incidence.df.35.44.int.37.38 <- incidence.df.35.44.int.37.38$incidence[3]
+  # 
+  # # 38-39
+  # incidence.df.15.24.int.38.39 <- incidence.calculator(datalist = datalist.agemix,
+  #                                                      agegroup = c(15, 25), timewindow = c(38,39))
+  # 
+  # METRICS.incidence.df.15.24.int.38.39 <- incidence.df.15.24.int.38.39$incidence[3]
+  # 
+  # incidence.df.25.34.int.38.39 <- incidence.calculator(datalist = datalist.agemix,
+  #                                                      agegroup = c(25, 35), timewindow = c(38,39))
+  # 
+  # METRICS.incidence.df.25.34.int.38.39 <- incidence.df.25.34.int.38.39$incidence[3]
+  # 
+  # 
+  # incidence.df.35.44.int.38.39 <- incidence.calculator(datalist = datalist.agemix,
+  #                                                      agegroup = c(35, 45), timewindow = c(38,39))
+  # 
+  # METRICS.incidence.df.35.44.int.38.39 <- incidence.df.35.44.int.38.39$incidence[3]
+  # 
+  # # 39-40
+  # incidence.df.15.24.int.39.40 <- incidence.calculator(datalist = datalist.agemix,
+  #                                                      agegroup = c(15, 25), timewindow = c(39,40))
+  # 
+  # METRICS.incidence.df.15.24.int.39.40 <- incidence.df.15.24.int.39.40$incidence[3]
+  # 
+  # incidence.df.25.34.int.39.40 <- incidence.calculator(datalist = datalist.agemix,
+  #                                                      agegroup = c(25, 35), timewindow = c(39,40))
+  # 
+  # METRICS.incidence.df.25.34.int.39.40 <- incidence.df.25.34.int.39.40$incidence[3]
+  # 
+  # 
+  # incidence.df.35.44.int.39.40 <- incidence.calculator(datalist = datalist.agemix,
+  #                                                      agegroup = c(35, 45), timewindow = c(39,40))
+  # 
+  # METRICS.incidence.df.35.44.int.39.40 <- incidence.df.35.44.int.39.40$incidence[3]
+  # 
   
   # In Next 5 years
   
@@ -595,7 +693,7 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
   
   #   (i) Population growth rate (pop.growth.calculator function)
   growthrate <- pop.growth.calculator(datalist = datalist.agemix,
-                                      timewindow = c(0, datalist.agemix$itable$population.simtime[1]))
+                                      timewindow = c(0,40)) # c(0, datalist.agemix$itable$population.simtime[1])
   
   
   # 1.2.2. Transmission features:	
@@ -662,7 +760,7 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
   
   
   relas.rate <- relationship.rate.calculator(datalist = datalist.agemix,
-                                             timewindow = c(10, 40), 
+                                             timewindow = c(0, 40), 
                                              int = FALSE, by=1)
   
   # (ii) Relationship per person per year
@@ -677,30 +775,44 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
   # (v) Age mixing in relationships
   
   # 
-  # agemix.df <- agemix.df.maker(datalist.agemix)
-  # 
-  # agemix.model <- pattern.modeller(dataframe = agemix.df,
-  #                                  agegroup = c(15, 50),
-  #                                  timepoint = datalist.agemix$itable$population.simtime[1],
-  #                                  timewindow = 3)#1)#3)
-  # 
+  agemix.df <- agemix.df.maker(datalist.agemix)
+  
+  agemix.model <- pattern.modeller(dataframe = agemix.df,
+                                   agegroup = c(15, 60),
+                                   timepoint = datalist.agemix$itable$population.simtime[1],
+                                   timewindow = 5)#1)#3)
+  
   # # men.lme <- tryCatch(agemixing.lme.fitter(data = dplyr::filter(agemix.model[[1]], Gender =="male")),
   # #                     error = agemixing.lme.errFunction) # Returns an empty list if the lme model can't be fitted
-  # 
+  #
   # men.lmer <- ampmodel(data = dplyr::filter(agemix.model[[1]], Gender =="male"))
-  # 
-  # bignumber <- NA # let's try if NA works (instead of 9999 for example)
-  # 
-  # AAD.male <- ifelse(length(men.lmer) > 0, mean(dplyr::filter(agemix.model[[1]], Gender =="male")$AgeGap), bignumber)
-  # SDAD.male <- ifelse(length(men.lmer) > 0, sd(dplyr::filter(agemix.model[[1]], Gender =="male")$AgeGap), bignumber)
-  # #powerm <- ifelse(length(men.lme) > 0, as.numeric(attributes(men.lme$apVar)$Pars["varStruct.power"]), bignumber)
-  # slope.male <- ifelse(length(men.lmer) > 0, summary(men.lmer)$coefficients[2, 1], bignumber) #summary(men.lmer)$tTable[2, 1], bignumber)
-  # WSD.male <- ifelse(length(men.lmer) > 0, summary(men.lmer)$sigma, bignumber) #WVAD.base <- ifelse(length(men.lme) > 0, men.lme$sigma^2, bignumber)
-  # 
-  # BSD.male <- ifelse(length(men.lmer) > 0, bvar(men.lmer), bignumber) # Bad name for the function because it actually extracts between subject standard deviation # BVAD <- ifelse(length(men.lmer) > 0, getVarCov(men.lme)[1,1], bignumber)
-  # 
-  # intercept.male <- ifelse(length(men.lmer) > 0, summary(men.lmer)$coefficients[1,1] - 15, bignumber)
-  # 
+  
+  men.lmer <- lmer(pagerelform ~ agerelform0 + (1 | ID),
+                   data = dplyr::filter(agemix.model[[1]], Gender =="male"),
+                   REML = TRUE,
+                   control=lmerControl(check.nobs.vs.nlev = "ignore",
+                                       check.nobs.vs.rankZ = "ignore",
+                                       check.nobs.vs.nRE="ignore"))
+  #
+  bignumber <- NA # let's try if NA works (instead of 9999 for example)
+  #
+  AAD.male <- ifelse(length(men.lmer) > 0, mean(dplyr::filter(agemix.model[[1]], Gender =="male")$AgeGap), bignumber)
+  SDAD.male <- ifelse(length(men.lmer) > 0, sd(dplyr::filter(agemix.model[[1]], Gender =="male")$AgeGap), bignumber)
+  #powerm <- ifelse(length(men.lme) > 0, as.numeric(attributes(men.lme$apVar)$Pars["varStruct.power"]), bignumber)
+  slope.male <- ifelse(length(men.lmer) > 0, summary(men.lmer)$coefficients[2, 1], bignumber) #summary(men.lmer)$tTable[2, 1], bignumber)
+  WSD.male <- ifelse(length(men.lmer) > 0, summary(men.lmer)$sigma, bignumber) #WVAD.base <- ifelse(length(men.lme) > 0, men.lme$sigma^2, bignumber)
+  
+  BSD.male <- ifelse(length(men.lmer) > 0, bvar(men.lmer), bignumber) # Bad name for the function because it actually extracts between subject standard deviation # BVAD <- ifelse(length(men.lmer) > 0, getVarCov(men.lme)[1,1], bignumber)
+  
+  intercept.male <- ifelse(length(men.lmer) > 0, summary(men.lmer)$coefficients[1,1] - 15, bignumber)
+  
+  # c(AAD.male, SDAD.male, slope.male, WSD.male, BSD.male, intercept.male)
+  
+  ## AAD: average age difference across all relationship
+  ## VAD: variance of these age differences
+  ## SDAD: standard deviation of age differences
+  ## BSD: between-subject standard deviation of age differences
+  
   
   # age.scatter.df <- agemix.model[[1]]
   
@@ -842,21 +954,21 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
     mean.nodesDepths.feature <- mean(Depths$nodeDepths)
     
     maxHeight.feature <- maxHeight(tree.cal, normalise = TRUE)
-    
-    # Estimating confidence intervals for rates and dates using a parametric bootstrap
-    pb <- parboot.treedater(tree.calib.LTT) # Lineage Through Time
-    
-    # Lineages through time
-    LTT <- plot.parboot.ltt.dat(pb)
-    
-    lb.mean.feature <- mean(LTT$lb) # mean of low values of LTT
-    lb.median.feature <- median(LTT$lb) # median of low values of LTT
-    
-    ub.mean.feature <- mean(LTT$ub) # mean of upper values of LTT
-    ub.median.feature <- median(LTT$ub) # median of upper values of LTT
-    
-    median.mean.feature <- mean(LTT$median) # mean of medians of values of LTT
-    median.median.feature <- median(LTT$median) # median of medians of values of LTT
+    # 
+    # # Estimating confidence intervals for rates and dates using a parametric bootstrap
+    # pb <- parboot.treedater(tree.calib.LTT) # Lineage Through Time
+    # 
+    # # Lineages through time
+    # LTT <- plot.parboot.ltt.dat(pb)
+    # 
+    # lb.mean.feature <- mean(LTT$lb) # mean of low values of LTT
+    # lb.median.feature <- median(LTT$lb) # median of low values of LTT
+    # 
+    # ub.mean.feature <- mean(LTT$ub) # mean of upper values of LTT
+    # ub.median.feature <- median(LTT$ub) # median of upper values of LTT
+    # 
+    # median.mean.feature <- mean(LTT$median) # mean of medians of values of LTT
+    # median.median.feature <- median(LTT$median) # median of medians of values of LTT
     ### END
     ####### Features ALL sequences
     
@@ -888,6 +1000,8 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                                                             seq.cov = 35,
                                                             age.limit = 65)
     cov.35.IDs.gender.men50.women50 <- cov.35.gender.men50.women50$outputvector
+    cov.35.gender.men50.women50.ratio.seq <- cov.35.gender.men50.women50$ratio.seq
+    cov.35.gender.men50.women50.ratio.emp <- cov.35.gender.men50.women50$ratio.emp
     
     cov.35.gender.men30.women70 <- IDs.indiv.seq.gender.fun(simpact.trans.net = simpact.trans.net,
                                                             limitTransmEvents = 7,
@@ -895,6 +1009,9 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                                                             seq.cov = 35,
                                                             age.limit = 65)
     cov.35.IDs.gender.men30.women70 <- cov.35.gender.men30.women70$outputvector
+    cov.35.gender.men30.women70.ratio.seq <- cov.35.gender.men30.women70$ratio.seq
+    cov.35.gender.men30.women70.ratio.emp <- cov.35.gender.men30.women70$ratio.emp
+    
     
     cov.35.gender.men70.women30 <- IDs.indiv.seq.gender.fun(simpact.trans.net = simpact.trans.net,
                                                             limitTransmEvents = 7,
@@ -902,6 +1019,8 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                                                             seq.cov = 35,
                                                             age.limit = 65)
     cov.35.IDs.gender.men70.women30 <- cov.35.gender.men70.women30$outputvector
+    cov.35.gender.men70.women30.ratio.seq <- cov.35.gender.men70.women30$ratio.seq
+    cov.35.gender.men70.women30.ratio.emp <- cov.35.gender.men70.women30$ratio.emp
     
     cov.35.gender.men50.women50.age.group <- IDs.indiv.seq.gender.age.group.fun(simpact.trans.net = simpact.trans.net,
                                                                                 limitTransmEvents = 7, 
@@ -910,6 +1029,9 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                                                                                 age.men = c(15, 60),
                                                                                 age.women = c(15, 40))
     cov.35.IDs.gender.men50.women50.age.group <- cov.35.gender.men50.women50.age.group$outputvector
+    cov.35.gender.men50.women50.age.group.ratio.seq <- cov.35.gender.men50.women50.age.group$ratio.seq
+    cov.35.gender.men50.women50.age.group.ratio.emp <- cov.35.gender.men50.women50.age.group$ratio.emp
+    
     
     cov.35.gender.men30.women70.age.group <- IDs.indiv.seq.gender.age.group.fun(simpact.trans.net = simpact.trans.net,
                                                                                 limitTransmEvents = 7, 
@@ -918,6 +1040,8 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                                                                                 age.men = c(15, 60),
                                                                                 age.women = c(15, 40))
     cov.35.IDs.gender.men30.women70.age.group <- cov.35.gender.men30.women70.age.group$outputvector
+    cov.35.gender.men30.women70.age.group.ratio.seq <- cov.35.gender.men30.women70.age.group$ratio.seq
+    cov.35.gender.men30.women70.age.group.ratio.emp <- cov.35.gender.men30.women70.age.group$ratio.emp
     
     cov.35.gender.men70.women30.age.group <- IDs.indiv.seq.gender.age.group.fun(simpact.trans.net = simpact.trans.net,
                                                                                 limitTransmEvents = 7, 
@@ -926,7 +1050,8 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                                                                                 age.men = c(15, 60),
                                                                                 age.women = c(15, 40))
     cov.35.IDs.gender.men70.women30.age.group <- cov.35.gender.men70.women30.age.group$outputvector
-    
+    cov.35.gender.men70.women30.age.group.ratio.seq <- cov.35.gender.men70.women30.age.group$ratio.seq
+    cov.35.gender.men70.women30.age.group.ratio.emp <- cov.35.gender.men70.women30.age.group$ratio.emp
     
     ## XX
     # BEGIN
@@ -954,11 +1079,12 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
       write.tree(cov.35.IDs.gender.men50.women50.tree.calib, file = paste0(sub.dir.rename,"/cov.35.IDs.gender.men50.women50.calibrated.tree.nwk"))
       
       
-      cov.35.IDs.gender.men50.women50.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.35.IDs.gender.men50.women50.calibrated.tree.nwk"),
-                                                                            tree.calib.LTT = cov.35.IDs.gender.men50.women50.tree.calib.LTT)
-      
+      cov.35.IDs.gender.men50.women50.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.35.IDs.gender.men50.women50.calibrated.tree.nwk"))
+      # ,
+      #                                                                       tree.calib.LTT = cov.35.IDs.gender.men50.women50.tree.calib.LTT)
+      # 
     }else{
-      cov.35.IDs.gender.men50.women50.features <- rep(NA, 12)
+      cov.35.IDs.gender.men50.women50.features <- rep(NA, 6)
     }
     
     # men30.women70
@@ -981,11 +1107,12 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
       write.tree(cov.35.IDs.gender.men30.women70.tree.calib, file = paste0(sub.dir.rename,"/cov.35.IDs.gender.men30.women70.calibrated.tree.nwk"))
       
       
-      cov.35.IDs.gender.men30.women70.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.35.IDs.gender.men30.women70.calibrated.tree.nwk"),
-                                                                            tree.calib.LTT = cov.35.IDs.gender.men30.women70.tree.calib.LTT)
-      
+      cov.35.IDs.gender.men30.women70.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.35.IDs.gender.men30.women70.calibrated.tree.nwk"))
+      # ,
+      #                                                                       tree.calib.LTT = cov.35.IDs.gender.men30.women70.tree.calib.LTT)
+      # 
     }else{
-      cov.35.IDs.gender.men30.women70.features <- rep(NA, 12)
+      cov.35.IDs.gender.men30.women70.features <- rep(NA, 6)
       
     }
     
@@ -1010,11 +1137,12 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
       write.tree(cov.35.IDs.gender.men70.women30.tree.calib, file = paste0(sub.dir.rename,"/cov.35.IDs.gender.men70.women30.calibrated.tree.nwk"))
       
       
-      cov.35.IDs.gender.men70.women30.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.35.IDs.gender.men70.women30.calibrated.tree.nwk"),
-                                                                            tree.calib.LTT = cov.35.IDs.gender.men70.women30.tree.calib.LTT)
-      
+      cov.35.IDs.gender.men70.women30.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.35.IDs.gender.men70.women30.calibrated.tree.nwk"))
+      # ,
+      #                                                                       tree.calib.LTT = cov.35.IDs.gender.men70.women30.tree.calib.LTT)
+      # 
     }else{
-      cov.35.IDs.gender.men70.women30.features <- rep(NA, 12)
+      cov.35.IDs.gender.men70.women30.features <- rep(NA, 6)
     }
     
     # men50.women50.group
@@ -1038,11 +1166,12 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
       
       write.tree(cov.35.IDs.gender.men50.women50.age.group.tree.calib, file = paste0(sub.dir.rename,"/cov.35.IDs.gender.men50.women50.age.group.calibrated.tree.nwk"))
       
-      cov.35.IDs.gender.men50.women50.age.group.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.35.IDs.gender.men50.women50.age.group.calibrated.tree.nwk"),
-                                                                                      tree.calib.LTT = cov.35.IDs.gender.men50.women50.age.group.tree.calib.LTT)
-      
+      cov.35.IDs.gender.men50.women50.age.group.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.35.IDs.gender.men50.women50.age.group.calibrated.tree.nwk"))
+      # ,
+      #                                                                                 tree.calib.LTT = cov.35.IDs.gender.men50.women50.age.group.tree.calib.LTT)
+      # 
     }else{
-      cov.35.IDs.gender.men50.women50.age.group.features <- rep(NA, 12)
+      cov.35.IDs.gender.men50.women50.age.group.features <- rep(NA, 6)
     }
     
     # men30.women70.group
@@ -1067,11 +1196,12 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
       write.tree(cov.35.IDs.gender.men30.women70.age.group.tree.calib, file = paste0(sub.dir.rename,"/cov.35.IDs.gender.men30.women70.age.group.calibrated.tree.nwk"))
       
       
-      cov.35.IDs.gender.men30.women70.age.group.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.35.IDs.gender.men30.women70.age.group.calibrated.tree.nwk"),
-                                                                                      tree.calib.LTT = cov.35.IDs.gender.men30.women70.age.group.tree.calib.LTT)
-      
+      cov.35.IDs.gender.men30.women70.age.group.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.35.IDs.gender.men30.women70.age.group.calibrated.tree.nwk"))
+      # ,
+      #                                                                                 tree.calib.LTT = cov.35.IDs.gender.men30.women70.age.group.tree.calib.LTT)
+      # 
     }else{
-      cov.35.IDs.gender.men30.women70.age.group.features <- rep(NA, 12)
+      cov.35.IDs.gender.men30.women70.age.group.features <- rep(NA, 6)
     }
     
     # men70.women30.group
@@ -1094,11 +1224,12 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
       
       write.tree(cov.35.IDs.gender.men70.women30.age.group.tree.calib, file = paste0(sub.dir.rename,"/cov.35.IDs.gender.men70.women30.age.group.calibrated.tree.nwk"))
       
-      cov.35.IDs.gender.men70.women30.age.group.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.35.IDs.gender.men70.women30.age.group.calibrated.tree.nwk"),
-                                                                                      tree.calib.LTT = cov.35.IDs.gender.men70.women30.age.group.tree.calib.LTT)
-      
+      cov.35.IDs.gender.men70.women30.age.group.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.35.IDs.gender.men70.women30.age.group.calibrated.tree.nwk"))
+      # ,
+      #                                                                                 tree.calib.LTT = cov.35.IDs.gender.men70.women30.age.group.tree.calib.LTT)
+      # 
     }else{
-      cov.35.IDs.gender.men70.women30.age.group.features <- rep(NA, 12)
+      cov.35.IDs.gender.men70.women30.age.group.features <- rep(NA, 6)
     }
     
     
@@ -1111,6 +1242,8 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                                                             seq.cov = 45,
                                                             age.limit = 65)
     cov.45.IDs.gender.men50.women50 <- cov.45.gender.men50.women50$outputvector
+    cov.45.gender.men50.women50.ratio.seq <- cov.45.gender.men50.women50$ratio.seq
+    cov.45.gender.men50.women50.ratio.emp <- cov.45.gender.men50.women50$ratio.emp
     
     cov.45.gender.men30.women70 <- IDs.indiv.seq.gender.fun(simpact.trans.net = simpact.trans.net,
                                                             limitTransmEvents = 7,
@@ -1118,6 +1251,8 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                                                             seq.cov = 45,
                                                             age.limit = 65)
     cov.45.IDs.gender.men30.women70 <- cov.45.gender.men30.women70$outputvector
+    cov.45.gender.men30.women70.ratio.seq <- cov.45.gender.men30.women70$ratio.seq
+    cov.45.gender.men30.women70.ratio.emp <- cov.45.gender.men30.women70$ratio.emp
     
     cov.45.gender.men70.women30 <- IDs.indiv.seq.gender.fun(simpact.trans.net = simpact.trans.net,
                                                             limitTransmEvents = 7,
@@ -1125,6 +1260,8 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                                                             seq.cov = 45,
                                                             age.limit = 65)
     cov.45.IDs.gender.men70.women30 <- cov.45.gender.men70.women30$outputvector
+    cov.45.gender.men70.women30.ratio.seq <- cov.45.gender.men70.women30$ratio.seq
+    cov.45.gender.men70.women30.ratio.emp <- cov.45.gender.men70.women30$ratio.emp
     
     cov.45.gender.men50.women50.age.group <- IDs.indiv.seq.gender.age.group.fun(simpact.trans.net = simpact.trans.net,
                                                                                 limitTransmEvents = 7, 
@@ -1133,6 +1270,9 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                                                                                 age.men = c(15, 60),
                                                                                 age.women = c(15, 40))
     cov.45.IDs.gender.men50.women50.age.group <- cov.45.gender.men50.women50.age.group$outputvector
+    cov.45.gender.men50.women50.age.group.ratio.seq <- cov.45.gender.men50.women50.age.group$ratio.seq
+    cov.45.gender.men50.women50.age.group.ratio.emp <- cov.45.gender.men50.women50.age.group$ratio.emp
+    
     
     cov.45.gender.men30.women70.age.group <- IDs.indiv.seq.gender.age.group.fun(simpact.trans.net = simpact.trans.net,
                                                                                 limitTransmEvents = 7, 
@@ -1141,6 +1281,9 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                                                                                 age.men = c(15, 60),
                                                                                 age.women = c(15, 40))
     cov.45.IDs.gender.men30.women70.age.group <- cov.45.gender.men30.women70.age.group$outputvector
+    cov.45.gender.men30.women70.age.group.ratio.seq <- cov.45.gender.men30.women70.age.group$ratio.seq
+    cov.45.gender.men30.women70.age.group.ratio.emp <- cov.45.gender.men30.women70.age.group$ratio.emp
+    
     
     cov.45.gender.men70.women30.age.group <- IDs.indiv.seq.gender.age.group.fun(simpact.trans.net = simpact.trans.net,
                                                                                 limitTransmEvents = 7, 
@@ -1149,6 +1292,8 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                                                                                 age.men = c(15, 60),
                                                                                 age.women = c(15, 40))
     cov.45.IDs.gender.men70.women30.age.group <- cov.45.gender.men70.women30.age.group$outputvector
+    cov.45.gender.men70.women30.age.group.ratio.seq <- cov.45.gender.men70.women30.age.group$ratio.seq
+    cov.45.gender.men70.women30.age.group.ratio.emp <- cov.45.gender.men70.women30.age.group$ratio.emp
     
     
     ## XX
@@ -1177,11 +1322,12 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
       write.tree(cov.45.IDs.gender.men50.women50.tree.calib, file = paste0(sub.dir.rename,"/cov.45.IDs.gender.men50.women50.calibrated.tree.nwk"))
       
       
-      cov.45.IDs.gender.men50.women50.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.45.IDs.gender.men50.women50.calibrated.tree.nwk"),
-                                                                            tree.calib.LTT = cov.45.IDs.gender.men50.women50.tree.calib.LTT)
-      
+      cov.45.IDs.gender.men50.women50.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.45.IDs.gender.men50.women50.calibrated.tree.nwk"))
+      # ,
+      #                                                                       tree.calib.LTT = cov.45.IDs.gender.men50.women50.tree.calib.LTT)
+      # 
     }else{
-      cov.45.IDs.gender.men50.women50.features <- rep(NA, 12)
+      cov.45.IDs.gender.men50.women50.features <- rep(NA, 6)
     }
     
     # men30.women70
@@ -1204,11 +1350,12 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
       write.tree(cov.45.IDs.gender.men30.women70.tree.calib, file = paste0(sub.dir.rename,"/cov.45.IDs.gender.men30.women70.calibrated.tree.nwk"))
       
       
-      cov.45.IDs.gender.men30.women70.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.45.IDs.gender.men30.women70.calibrated.tree.nwk"),
-                                                                            tree.calib.LTT = cov.45.IDs.gender.men30.women70.tree.calib.LTT)
-      
+      cov.45.IDs.gender.men30.women70.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.45.IDs.gender.men30.women70.calibrated.tree.nwk"))
+      # ,
+      #                                                                       tree.calib.LTT = cov.45.IDs.gender.men30.women70.tree.calib.LTT)
+      # 
     }else{
-      cov.45.IDs.gender.men30.women70.features <- rep(NA, 12)
+      cov.45.IDs.gender.men30.women70.features <- rep(NA, 6)
       
     }
     
@@ -1233,11 +1380,12 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
       write.tree(cov.45.IDs.gender.men70.women30.tree.calib, file = paste0(sub.dir.rename,"/cov.45.IDs.gender.men70.women30.calibrated.tree.nwk"))
       
       
-      cov.45.IDs.gender.men70.women30.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.45.IDs.gender.men70.women30.calibrated.tree.nwk"),
-                                                                            tree.calib.LTT = cov.45.IDs.gender.men70.women30.tree.calib.LTT)
-      
+      cov.45.IDs.gender.men70.women30.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.45.IDs.gender.men70.women30.calibrated.tree.nwk"))
+      # ,
+      #                                                                       tree.calib.LTT = cov.45.IDs.gender.men70.women30.tree.calib.LTT)
+      # 
     }else{
-      cov.45.IDs.gender.men70.women30.features <- rep(NA, 12)
+      cov.45.IDs.gender.men70.women30.features <- rep(NA, 6)
     }
     
     # men50.women50.group
@@ -1261,11 +1409,12 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
       
       write.tree(cov.45.IDs.gender.men50.women50.age.group.tree.calib, file = paste0(sub.dir.rename,"/cov.45.IDs.gender.men50.women50.age.group.calibrated.tree.nwk"))
       
-      cov.45.IDs.gender.men50.women50.age.group.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.45.IDs.gender.men50.women50.age.group.calibrated.tree.nwk"),
-                                                                                      tree.calib.LTT = cov.45.IDs.gender.men50.women50.age.group.tree.calib.LTT)
-      
+      cov.45.IDs.gender.men50.women50.age.group.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.45.IDs.gender.men50.women50.age.group.calibrated.tree.nwk"))
+      # ,
+      #                                                                                 tree.calib.LTT = cov.45.IDs.gender.men50.women50.age.group.tree.calib.LTT)
+      # 
     }else{
-      cov.45.IDs.gender.men50.women50.age.group.features <- rep(NA, 12)
+      cov.45.IDs.gender.men50.women50.age.group.features <- rep(NA, 6)
     }
     
     # men30.women70.group
@@ -1290,11 +1439,12 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
       write.tree(cov.45.IDs.gender.men30.women70.age.group.tree.calib, file = paste0(sub.dir.rename,"/cov.45.IDs.gender.men30.women70.age.group.calibrated.tree.nwk"))
       
       
-      cov.45.IDs.gender.men30.women70.age.group.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.45.IDs.gender.men30.women70.age.group.calibrated.tree.nwk"),
-                                                                                      tree.calib.LTT = cov.45.IDs.gender.men30.women70.age.group.tree.calib.LTT)
-      
+      cov.45.IDs.gender.men30.women70.age.group.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.45.IDs.gender.men30.women70.age.group.calibrated.tree.nwk"))
+      # ,
+      #                                                                                 tree.calib.LTT = cov.45.IDs.gender.men30.women70.age.group.tree.calib.LTT)
+      # 
     }else{
-      cov.45.IDs.gender.men30.women70.age.group.features <- rep(NA, 12)
+      cov.45.IDs.gender.men30.women70.age.group.features <- rep(NA, 6)
     }
     
     # men70.women30.group
@@ -1317,11 +1467,12 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
       
       write.tree(cov.45.IDs.gender.men70.women30.age.group.tree.calib, file = paste0(sub.dir.rename,"/cov.45.IDs.gender.men70.women30.age.group.calibrated.tree.nwk"))
       
-      cov.45.IDs.gender.men70.women30.age.group.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.45.IDs.gender.men70.women30.age.group.calibrated.tree.nwk"),
-                                                                                      tree.calib.LTT = cov.45.IDs.gender.men70.women30.age.group.tree.calib.LTT)
-      
+      cov.45.IDs.gender.men70.women30.age.group.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.45.IDs.gender.men70.women30.age.group.calibrated.tree.nwk"))
+      # ,
+      #                                                                                 tree.calib.LTT = cov.45.IDs.gender.men70.women30.age.group.tree.calib.LTT)
+      # 
     }else{
-      cov.45.IDs.gender.men70.women30.age.group.features <- rep(NA, 12)
+      cov.45.IDs.gender.men70.women30.age.group.features <- rep(NA, 6)
     }
     
     
@@ -1336,6 +1487,9 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                                                             seq.cov = 55,
                                                             age.limit = 65)
     cov.55.IDs.gender.men50.women50 <- cov.55.gender.men50.women50$outputvector
+    cov.55.gender.men50.women50.ratio.seq <- cov.55.gender.men50.women50$ratio.seq
+    cov.55.gender.men50.women50.ratio.emp <- cov.55.gender.men50.women50$ratio.emp
+    
     
     cov.55.gender.men30.women70 <- IDs.indiv.seq.gender.fun(simpact.trans.net = simpact.trans.net,
                                                             limitTransmEvents = 7,
@@ -1343,6 +1497,10 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                                                             seq.cov = 55,
                                                             age.limit = 65)
     cov.55.IDs.gender.men30.women70 <- cov.55.gender.men30.women70$outputvector
+    cov.55.gender.men30.women70.ratio.seq <- cov.55.gender.men30.women70$ratio.seq
+    cov.55.gender.men30.women70.ratio.emp <- cov.55.gender.men30.women70$ratio.emp
+    
+    
     
     cov.55.gender.men70.women30 <- IDs.indiv.seq.gender.fun(simpact.trans.net = simpact.trans.net,
                                                             limitTransmEvents = 7,
@@ -1350,6 +1508,8 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                                                             seq.cov = 55,
                                                             age.limit = 65)
     cov.55.IDs.gender.men70.women30 <- cov.55.gender.men70.women30$outputvector
+    cov.55.gender.men70.women30.ratio.seq <- cov.55.gender.men70.women30$ratio.seq
+    cov.55.gender.men70.women30.ratio.emp <- cov.55.gender.men70.women30$ratio.emp
     
     cov.55.gender.men50.women50.age.group <- IDs.indiv.seq.gender.age.group.fun(simpact.trans.net = simpact.trans.net,
                                                                                 limitTransmEvents = 7, 
@@ -1358,6 +1518,8 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                                                                                 age.men = c(15, 60),
                                                                                 age.women = c(15, 40))
     cov.55.IDs.gender.men50.women50.age.group <- cov.55.gender.men50.women50.age.group$outputvector
+    cov.55.gender.men50.women50.age.group.ratio.seq <- cov.55.gender.men50.women50.age.group$ratio.seq
+    cov.55.gender.men50.women50.age.group.ratio.emp <- cov.55.gender.men50.women50.age.group$ratio.emp
     
     cov.55.gender.men30.women70.age.group <- IDs.indiv.seq.gender.age.group.fun(simpact.trans.net = simpact.trans.net,
                                                                                 limitTransmEvents = 7, 
@@ -1366,6 +1528,8 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                                                                                 age.men = c(15, 60),
                                                                                 age.women = c(15, 40))
     cov.55.IDs.gender.men30.women70.age.group <- cov.55.gender.men30.women70.age.group$outputvector
+    cov.55.gender.men30.women70.age.group.ratio.seq <- cov.55.gender.men30.women70.age.group$ratio.seq
+    cov.55.gender.men30.women70.age.group.ratio.emp <- cov.55.gender.men30.women70.age.group$ratio.emp
     
     cov.55.gender.men70.women30.age.group <- IDs.indiv.seq.gender.age.group.fun(simpact.trans.net = simpact.trans.net,
                                                                                 limitTransmEvents = 7, 
@@ -1374,6 +1538,8 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                                                                                 age.men = c(15, 60),
                                                                                 age.women = c(15, 40))
     cov.55.IDs.gender.men70.women30.age.group <- cov.55.gender.men70.women30.age.group$outputvector
+    cov.55.gender.men70.women30.age.group.ratio.seq <- cov.55.gender.men70.women30.age.group$ratio.seq
+    cov.55.gender.men70.women30.age.group.ratio.emp <- cov.55.gender.men70.women30.age.group$ratio.emp
     
     
     ## XX
@@ -1402,11 +1568,12 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
       write.tree(cov.55.IDs.gender.men50.women50.tree.calib, file = paste0(sub.dir.rename,"/cov.55.IDs.gender.men50.women50.calibrated.tree.nwk"))
       
       
-      cov.55.IDs.gender.men50.women50.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.55.IDs.gender.men50.women50.calibrated.tree.nwk"),
-                                                                            tree.calib.LTT = cov.55.IDs.gender.men50.women50.tree.calib.LTT)
-      
+      cov.55.IDs.gender.men50.women50.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.55.IDs.gender.men50.women50.calibrated.tree.nwk"))
+      # ,
+      #                                                                       tree.calib.LTT = cov.55.IDs.gender.men50.women50.tree.calib.LTT)
+      # 
     }else{
-      cov.55.IDs.gender.men50.women50.features <- rep(NA, 12)
+      cov.55.IDs.gender.men50.women50.features <- rep(NA, 6)
     }
     
     # men30.women70
@@ -1429,11 +1596,12 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
       write.tree(cov.55.IDs.gender.men30.women70.tree.calib, file = paste0(sub.dir.rename,"/cov.55.IDs.gender.men30.women70.calibrated.tree.nwk"))
       
       
-      cov.55.IDs.gender.men30.women70.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.55.IDs.gender.men30.women70.calibrated.tree.nwk"),
-                                                                            tree.calib.LTT = cov.55.IDs.gender.men30.women70.tree.calib.LTT)
-      
+      cov.55.IDs.gender.men30.women70.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.55.IDs.gender.men30.women70.calibrated.tree.nwk"))
+      # ,
+      #                                                                       tree.calib.LTT = cov.55.IDs.gender.men30.women70.tree.calib.LTT)
+      # 
     }else{
-      cov.55.IDs.gender.men30.women70.features <- rep(NA, 12)
+      cov.55.IDs.gender.men30.women70.features <- rep(NA, 6)
       
     }
     
@@ -1458,11 +1626,12 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
       write.tree(cov.55.IDs.gender.men70.women30.tree.calib, file = paste0(sub.dir.rename,"/cov.55.IDs.gender.men70.women30.calibrated.tree.nwk"))
       
       
-      cov.55.IDs.gender.men70.women30.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.55.IDs.gender.men70.women30.calibrated.tree.nwk"),
-                                                                            tree.calib.LTT = cov.55.IDs.gender.men70.women30.tree.calib.LTT)
-      
+      cov.55.IDs.gender.men70.women30.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.55.IDs.gender.men70.women30.calibrated.tree.nwk"))
+      # ,
+      #                                                                       tree.calib.LTT = cov.55.IDs.gender.men70.women30.tree.calib.LTT)
+      # 
     }else{
-      cov.55.IDs.gender.men70.women30.features <- rep(NA, 12)
+      cov.55.IDs.gender.men70.women30.features <- rep(NA, 6)
     }
     
     # men50.women50.group
@@ -1486,11 +1655,12 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
       
       write.tree(cov.55.IDs.gender.men50.women50.age.group.tree.calib, file = paste0(sub.dir.rename,"/cov.55.IDs.gender.men50.women50.age.group.calibrated.tree.nwk"))
       
-      cov.55.IDs.gender.men50.women50.age.group.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.55.IDs.gender.men50.women50.age.group.calibrated.tree.nwk"),
-                                                                                      tree.calib.LTT = cov.55.IDs.gender.men50.women50.age.group.tree.calib.LTT)
-      
+      cov.55.IDs.gender.men50.women50.age.group.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.55.IDs.gender.men50.women50.age.group.calibrated.tree.nwk"))
+      # ,
+      #                                                                                 tree.calib.LTT = cov.55.IDs.gender.men50.women50.age.group.tree.calib.LTT)
+      # 
     }else{
-      cov.55.IDs.gender.men50.women50.age.group.features <- rep(NA, 12)
+      cov.55.IDs.gender.men50.women50.age.group.features <- rep(NA, 6)
     }
     
     # men30.women70.group
@@ -1515,11 +1685,12 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
       write.tree(cov.55.IDs.gender.men30.women70.age.group.tree.calib, file = paste0(sub.dir.rename,"/cov.55.IDs.gender.men30.women70.age.group.calibrated.tree.nwk"))
       
       
-      cov.55.IDs.gender.men30.women70.age.group.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.55.IDs.gender.men30.women70.age.group.calibrated.tree.nwk"),
-                                                                                      tree.calib.LTT = cov.55.IDs.gender.men30.women70.age.group.tree.calib.LTT)
-      
+      cov.55.IDs.gender.men30.women70.age.group.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.55.IDs.gender.men30.women70.age.group.calibrated.tree.nwk"))
+      # ,
+      #                                                                                 tree.calib.LTT = cov.55.IDs.gender.men30.women70.age.group.tree.calib.LTT)
+      # 
     }else{
-      cov.55.IDs.gender.men30.women70.age.group.features <- rep(NA, 12)
+      cov.55.IDs.gender.men30.women70.age.group.features <- rep(NA, 6)
     }
     
     # men70.women30.group
@@ -1542,11 +1713,12 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
       
       write.tree(cov.55.IDs.gender.men70.women30.age.group.tree.calib, file = paste0(sub.dir.rename,"/cov.55.IDs.gender.men70.women30.age.group.calibrated.tree.nwk"))
       
-      cov.55.IDs.gender.men70.women30.age.group.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.55.IDs.gender.men70.women30.age.group.calibrated.tree.nwk"),
-                                                                                      tree.calib.LTT = cov.55.IDs.gender.men70.women30.age.group.tree.calib.LTT)
-      
+      cov.55.IDs.gender.men70.women30.age.group.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.55.IDs.gender.men70.women30.age.group.calibrated.tree.nwk"))
+      # ,
+      #                                                                                 tree.calib.LTT = cov.55.IDs.gender.men70.women30.age.group.tree.calib.LTT)
+      # 
     }else{
-      cov.55.IDs.gender.men70.women30.age.group.features <- rep(NA, 12)
+      cov.55.IDs.gender.men70.women30.age.group.features <- rep(NA, 6)
     }
     
     
@@ -1561,6 +1733,9 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                                                             seq.cov = 65,
                                                             age.limit = 65)
     cov.65.IDs.gender.men50.women50 <- cov.65.gender.men50.women50$outputvector
+    cov.65.gender.men50.women50.ratio.seq <- cov.65.gender.men50.women50$ratio.seq
+    cov.65.gender.men50.women50.ratio.emp <- cov.65.gender.men50.women50$ratio.emp
+    
     
     cov.65.gender.men30.women70 <- IDs.indiv.seq.gender.fun(simpact.trans.net = simpact.trans.net,
                                                             limitTransmEvents = 7,
@@ -1568,6 +1743,9 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                                                             seq.cov = 65,
                                                             age.limit = 65)
     cov.65.IDs.gender.men30.women70 <- cov.65.gender.men30.women70$outputvector
+    cov.65.gender.men30.women70.ratio.seq <- cov.65.gender.men30.women70$ratio.seq
+    cov.65.gender.men30.women70.ratio.emp <- cov.65.gender.men30.women70$ratio.emp
+    
     
     cov.65.gender.men70.women30 <- IDs.indiv.seq.gender.fun(simpact.trans.net = simpact.trans.net,
                                                             limitTransmEvents = 7,
@@ -1575,6 +1753,9 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                                                             seq.cov = 65,
                                                             age.limit = 65)
     cov.65.IDs.gender.men70.women30 <- cov.65.gender.men70.women30$outputvector
+    cov.65.gender.men70.women30.ratio.seq <- cov.65.gender.men70.women30$ratio.seq
+    cov.65.gender.men70.women30.ratio.emp <- cov.65.gender.men70.women30$ratio.emp
+    
     
     cov.65.gender.men50.women50.age.group <- IDs.indiv.seq.gender.age.group.fun(simpact.trans.net = simpact.trans.net,
                                                                                 limitTransmEvents = 7, 
@@ -1583,6 +1764,9 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                                                                                 age.men = c(15, 60),
                                                                                 age.women = c(15, 40))
     cov.65.IDs.gender.men50.women50.age.group <- cov.65.gender.men50.women50.age.group$outputvector
+    cov.65.gender.men50.women50.age.group.ratio.seq <- cov.65.gender.men50.women50.age.group$ratio.seq
+    cov.65.gender.men50.women50.age.group.ratio.emp <- cov.65.gender.men50.women50.age.group$ratio.emp
+    
     
     cov.65.gender.men30.women70.age.group <- IDs.indiv.seq.gender.age.group.fun(simpact.trans.net = simpact.trans.net,
                                                                                 limitTransmEvents = 7, 
@@ -1591,6 +1775,9 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                                                                                 age.men = c(15, 60),
                                                                                 age.women = c(15, 40))
     cov.65.IDs.gender.men30.women70.age.group <- cov.65.gender.men30.women70.age.group$outputvector
+    cov.65.gender.men30.women70.age.group.ratio.seq <- cov.65.gender.men30.women70.age.group$ratio.seq
+    cov.65.gender.men30.women70.age.group.ratio.emp <- cov.65.gender.men30.women70.age.group$ratio.emp
+    
     
     cov.65.gender.men70.women30.age.group <- IDs.indiv.seq.gender.age.group.fun(simpact.trans.net = simpact.trans.net,
                                                                                 limitTransmEvents = 7, 
@@ -1599,6 +1786,8 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                                                                                 age.men = c(15, 60),
                                                                                 age.women = c(15, 40))
     cov.65.IDs.gender.men70.women30.age.group <- cov.65.gender.men70.women30.age.group$outputvector
+    cov.65.gender.men70.women30.age.group.ratio.seq <- cov.65.gender.men70.women30.age.group$ratio.seq
+    cov.65.gender.men70.women30.age.group.ratio.emp <- cov.65.gender.men70.women30.age.group$ratio.emp
     
     
     ## XX
@@ -1627,11 +1816,12 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
       write.tree(cov.65.IDs.gender.men50.women50.tree.calib, file = paste0(sub.dir.rename,"/cov.65.IDs.gender.men50.women50.calibrated.tree.nwk"))
       
       
-      cov.65.IDs.gender.men50.women50.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.65.IDs.gender.men50.women50.calibrated.tree.nwk"),
-                                                                            tree.calib.LTT = cov.65.IDs.gender.men50.women50.tree.calib.LTT)
-      
+      cov.65.IDs.gender.men50.women50.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.65.IDs.gender.men50.women50.calibrated.tree.nwk"))
+      # ,
+      #                                                                       tree.calib.LTT = cov.65.IDs.gender.men50.women50.tree.calib.LTT)
+      # 
     }else{
-      cov.65.IDs.gender.men50.women50.features <- rep(NA, 12)
+      cov.65.IDs.gender.men50.women50.features <- rep(NA, 6)
     }
     
     # men30.women70
@@ -1654,11 +1844,12 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
       write.tree(cov.65.IDs.gender.men30.women70.tree.calib, file = paste0(sub.dir.rename,"/cov.65.IDs.gender.men30.women70.calibrated.tree.nwk"))
       
       
-      cov.65.IDs.gender.men30.women70.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.65.IDs.gender.men30.women70.calibrated.tree.nwk"),
-                                                                            tree.calib.LTT = cov.65.IDs.gender.men30.women70.tree.calib.LTT)
-      
+      cov.65.IDs.gender.men30.women70.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.65.IDs.gender.men30.women70.calibrated.tree.nwk"))
+      # ,
+      #                                                                       tree.calib.LTT = cov.65.IDs.gender.men30.women70.tree.calib.LTT)
+      # 
     }else{
-      cov.65.IDs.gender.men30.women70.features <- rep(NA, 12)
+      cov.65.IDs.gender.men30.women70.features <- rep(NA, 6)
       
     }
     
@@ -1683,11 +1874,12 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
       write.tree(cov.65.IDs.gender.men70.women30.tree.calib, file = paste0(sub.dir.rename,"/cov.65.IDs.gender.men70.women30.calibrated.tree.nwk"))
       
       
-      cov.65.IDs.gender.men70.women30.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.65.IDs.gender.men70.women30.calibrated.tree.nwk"),
-                                                                            tree.calib.LTT = cov.65.IDs.gender.men70.women30.tree.calib.LTT)
-      
+      cov.65.IDs.gender.men70.women30.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.65.IDs.gender.men70.women30.calibrated.tree.nwk"))
+      # ,
+      #                                                                       tree.calib.LTT = cov.65.IDs.gender.men70.women30.tree.calib.LTT)
+      # 
     }else{
-      cov.65.IDs.gender.men70.women30.features <- rep(NA, 12)
+      cov.65.IDs.gender.men70.women30.features <- rep(NA, 6)
     }
     
     # men50.women50.group
@@ -1711,11 +1903,12 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
       
       write.tree(cov.65.IDs.gender.men50.women50.age.group.tree.calib, file = paste0(sub.dir.rename,"/cov.65.IDs.gender.men50.women50.age.group.calibrated.tree.nwk"))
       
-      cov.65.IDs.gender.men50.women50.age.group.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.65.IDs.gender.men50.women50.age.group.calibrated.tree.nwk"),
-                                                                                      tree.calib.LTT = cov.65.IDs.gender.men50.women50.age.group.tree.calib.LTT)
-      
+      cov.65.IDs.gender.men50.women50.age.group.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.65.IDs.gender.men50.women50.age.group.calibrated.tree.nwk"))
+      # ,
+      #                                                                                 tree.calib.LTT = cov.65.IDs.gender.men50.women50.age.group.tree.calib.LTT)
+      # 
     }else{
-      cov.65.IDs.gender.men50.women50.age.group.features <- rep(NA, 12)
+      cov.65.IDs.gender.men50.women50.age.group.features <- rep(NA, 6)
     }
     
     # men30.women70.group
@@ -1740,11 +1933,12 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
       write.tree(cov.65.IDs.gender.men30.women70.age.group.tree.calib, file = paste0(sub.dir.rename,"/cov.65.IDs.gender.men30.women70.age.group.calibrated.tree.nwk"))
       
       
-      cov.65.IDs.gender.men30.women70.age.group.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.65.IDs.gender.men30.women70.age.group.calibrated.tree.nwk"),
-                                                                                      tree.calib.LTT = cov.65.IDs.gender.men30.women70.age.group.tree.calib.LTT)
-      
+      cov.65.IDs.gender.men30.women70.age.group.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.65.IDs.gender.men30.women70.age.group.calibrated.tree.nwk"))
+      # ,
+      #                                                                                 tree.calib.LTT = cov.65.IDs.gender.men30.women70.age.group.tree.calib.LTT)
+      # 
     }else{
-      cov.65.IDs.gender.men30.women70.age.group.features <- rep(NA, 12)
+      cov.65.IDs.gender.men30.women70.age.group.features <- rep(NA, 6)
     }
     
     # men70.women30.group
@@ -1767,11 +1961,12 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
       
       write.tree(cov.65.IDs.gender.men70.women30.age.group.tree.calib, file = paste0(sub.dir.rename,"/cov.65.IDs.gender.men70.women30.age.group.calibrated.tree.nwk"))
       
-      cov.65.IDs.gender.men70.women30.age.group.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.65.IDs.gender.men70.women30.age.group.calibrated.tree.nwk"),
-                                                                                      tree.calib.LTT = cov.65.IDs.gender.men70.women30.age.group.tree.calib.LTT)
-      
+      cov.65.IDs.gender.men70.women30.age.group.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.65.IDs.gender.men70.women30.age.group.calibrated.tree.nwk"))
+      # ,
+      #                                                                                 tree.calib.LTT = cov.65.IDs.gender.men70.women30.age.group.tree.calib.LTT)
+      # 
     }else{
-      cov.65.IDs.gender.men70.women30.age.group.features <- rep(NA, 12)
+      cov.65.IDs.gender.men70.women30.age.group.features <- rep(NA, 6)
     }
     
     
@@ -1785,6 +1980,9 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                                                             seq.cov = 75,
                                                             age.limit = 65)
     cov.75.IDs.gender.men50.women50 <- cov.75.gender.men50.women50$outputvector
+    cov.75.gender.men50.women50.ratio.seq <- cov.75.gender.men50.women50$ratio.seq
+    cov.75.gender.men50.women50.ratio.emp <- cov.75.gender.men50.women50$ratio.emp
+    
     
     cov.75.gender.men30.women70 <- IDs.indiv.seq.gender.fun(simpact.trans.net = simpact.trans.net,
                                                             limitTransmEvents = 7,
@@ -1792,6 +1990,9 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                                                             seq.cov = 75,
                                                             age.limit = 65)
     cov.75.IDs.gender.men30.women70 <- cov.75.gender.men30.women70$outputvector
+    cov.75.gender.men30.women70.ratio.seq <- cov.75.gender.men30.women70$ratio.seq
+    cov.75.gender.men30.women70.ratio.emp <- cov.75.gender.men30.women70$ratio.emp
+    
     
     cov.75.gender.men70.women30 <- IDs.indiv.seq.gender.fun(simpact.trans.net = simpact.trans.net,
                                                             limitTransmEvents = 7,
@@ -1799,6 +2000,8 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                                                             seq.cov = 75,
                                                             age.limit = 65)
     cov.75.IDs.gender.men70.women30 <- cov.75.gender.men70.women30$outputvector
+    cov.75.gender.men70.women30.ratio.seq <- cov.75.gender.men70.women30$ratio.seq
+    cov.75.gender.men70.women30.ratio.emp <- cov.75.gender.men70.women30$ratio.emp
     
     cov.75.gender.men50.women50.age.group <- IDs.indiv.seq.gender.age.group.fun(simpact.trans.net = simpact.trans.net,
                                                                                 limitTransmEvents = 7, 
@@ -1807,6 +2010,9 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                                                                                 age.men = c(15, 60),
                                                                                 age.women = c(15, 40))
     cov.75.IDs.gender.men50.women50.age.group <- cov.75.gender.men50.women50.age.group$outputvector
+    cov.75.gender.men50.women50.age.group.ratio.seq <- cov.75.gender.men50.women50.age.group$ratio.seq
+    cov.75.gender.men50.women50.age.group.ratio.emp <- cov.75.gender.men50.women50.age.group$ratio.emp
+    
     
     cov.75.gender.men30.women70.age.group <- IDs.indiv.seq.gender.age.group.fun(simpact.trans.net = simpact.trans.net,
                                                                                 limitTransmEvents = 7, 
@@ -1815,6 +2021,9 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                                                                                 age.men = c(15, 60),
                                                                                 age.women = c(15, 40))
     cov.75.IDs.gender.men30.women70.age.group <- cov.75.gender.men30.women70.age.group$outputvector
+    cov.75.gender.men30.women70.age.group.ratio.seq <- cov.75.gender.men30.women70.age.group$ratio.seq
+    cov.75.gender.men30.women70.age.group.ratio.emp <- cov.75.gender.men30.women70.age.group$ratio.emp
+    
     
     cov.75.gender.men70.women30.age.group <- IDs.indiv.seq.gender.age.group.fun(simpact.trans.net = simpact.trans.net,
                                                                                 limitTransmEvents = 7, 
@@ -1823,7 +2032,8 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                                                                                 age.men = c(15, 60),
                                                                                 age.women = c(15, 40))
     cov.75.IDs.gender.men70.women30.age.group <- cov.75.gender.men70.women30.age.group$outputvector
-    
+    cov.75.gender.men70.women30.age.group.ratio.seq <- cov.75.gender.men70.women30.age.group$ratio.seq
+    cov.75.gender.men70.women30.age.group.ratio.emp <- cov.75.gender.men70.women30.age.group$ratio.emp
     
     ## XX
     # BEGIN
@@ -1851,11 +2061,12 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
       write.tree(cov.75.IDs.gender.men50.women50.tree.calib, file = paste0(sub.dir.rename,"/cov.75.IDs.gender.men50.women50.calibrated.tree.nwk"))
       
       
-      cov.75.IDs.gender.men50.women50.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.75.IDs.gender.men50.women50.calibrated.tree.nwk"),
-                                                                            tree.calib.LTT = cov.75.IDs.gender.men50.women50.tree.calib.LTT)
-      
+      cov.75.IDs.gender.men50.women50.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.75.IDs.gender.men50.women50.calibrated.tree.nwk"))
+      # ,
+      #                                                                       tree.calib.LTT = cov.75.IDs.gender.men50.women50.tree.calib.LTT)
+      # 
     }else{
-      cov.75.IDs.gender.men50.women50.features <- rep(NA, 12)
+      cov.75.IDs.gender.men50.women50.features <- rep(NA, 6)
     }
     
     # men30.women70
@@ -1878,11 +2089,12 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
       write.tree(cov.75.IDs.gender.men30.women70.tree.calib, file = paste0(sub.dir.rename,"/cov.75.IDs.gender.men30.women70.calibrated.tree.nwk"))
       
       
-      cov.75.IDs.gender.men30.women70.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.75.IDs.gender.men30.women70.calibrated.tree.nwk"),
-                                                                            tree.calib.LTT = cov.75.IDs.gender.men30.women70.tree.calib.LTT)
-      
+      cov.75.IDs.gender.men30.women70.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.75.IDs.gender.men30.women70.calibrated.tree.nwk"))
+      # ,
+      #                                                                       tree.calib.LTT = cov.75.IDs.gender.men30.women70.tree.calib.LTT)
+      # 
     }else{
-      cov.75.IDs.gender.men30.women70.features <- rep(NA, 12)
+      cov.75.IDs.gender.men30.women70.features <- rep(NA, 6)
       
     }
     
@@ -1907,11 +2119,12 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
       write.tree(cov.75.IDs.gender.men70.women30.tree.calib, file = paste0(sub.dir.rename,"/cov.75.IDs.gender.men70.women30.calibrated.tree.nwk"))
       
       
-      cov.75.IDs.gender.men70.women30.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.75.IDs.gender.men70.women30.calibrated.tree.nwk"),
-                                                                            tree.calib.LTT = cov.75.IDs.gender.men70.women30.tree.calib.LTT)
-      
+      cov.75.IDs.gender.men70.women30.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.75.IDs.gender.men70.women30.calibrated.tree.nwk"))
+      # ,
+      #                                                                       tree.calib.LTT = cov.75.IDs.gender.men70.women30.tree.calib.LTT)
+      # 
     }else{
-      cov.75.IDs.gender.men70.women30.features <- rep(NA, 12)
+      cov.75.IDs.gender.men70.women30.features <- rep(NA, 6)
     }
     
     # men50.women50.group
@@ -1935,11 +2148,12 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
       
       write.tree(cov.75.IDs.gender.men50.women50.age.group.tree.calib, file = paste0(sub.dir.rename,"/cov.75.IDs.gender.men50.women50.age.group.calibrated.tree.nwk"))
       
-      cov.75.IDs.gender.men50.women50.age.group.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.75.IDs.gender.men50.women50.age.group.calibrated.tree.nwk"),
-                                                                                      tree.calib.LTT = cov.75.IDs.gender.men50.women50.age.group.tree.calib.LTT)
-      
+      cov.75.IDs.gender.men50.women50.age.group.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.75.IDs.gender.men50.women50.age.group.calibrated.tree.nwk"))
+      # ,
+      #                                                                                 tree.calib.LTT = cov.75.IDs.gender.men50.women50.age.group.tree.calib.LTT)
+      # 
     }else{
-      cov.75.IDs.gender.men50.women50.age.group.features <- rep(NA, 12)
+      cov.75.IDs.gender.men50.women50.age.group.features <- rep(NA, 6)
     }
     
     # men30.women70.group
@@ -1964,11 +2178,12 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
       write.tree(cov.75.IDs.gender.men30.women70.age.group.tree.calib, file = paste0(sub.dir.rename,"/cov.75.IDs.gender.men30.women70.age.group.calibrated.tree.nwk"))
       
       
-      cov.75.IDs.gender.men30.women70.age.group.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.75.IDs.gender.men30.women70.age.group.calibrated.tree.nwk"),
-                                                                                      tree.calib.LTT = cov.75.IDs.gender.men30.women70.age.group.tree.calib.LTT)
-      
+      cov.75.IDs.gender.men30.women70.age.group.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.75.IDs.gender.men30.women70.age.group.calibrated.tree.nwk"))
+      # ,
+      #                                                                                 tree.calib.LTT = cov.75.IDs.gender.men30.women70.age.group.tree.calib.LTT)
+      # 
     }else{
-      cov.75.IDs.gender.men30.women70.age.group.features <- rep(NA, 12)
+      cov.75.IDs.gender.men30.women70.age.group.features <- rep(NA, 6)
     }
     
     # men70.women30.group
@@ -1991,11 +2206,12 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
       
       write.tree(cov.75.IDs.gender.men70.women30.age.group.tree.calib, file = paste0(sub.dir.rename,"/cov.75.IDs.gender.men70.women30.age.group.calibrated.tree.nwk"))
       
-      cov.75.IDs.gender.men70.women30.age.group.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.75.IDs.gender.men70.women30.age.group.calibrated.tree.nwk"),
-                                                                                      tree.calib.LTT = cov.75.IDs.gender.men70.women30.age.group.tree.calib.LTT)
-      
+      cov.75.IDs.gender.men70.women30.age.group.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.75.IDs.gender.men70.women30.age.group.calibrated.tree.nwk"))
+      # ,
+      #                                                                                 tree.calib.LTT = cov.75.IDs.gender.men70.women30.age.group.tree.calib.LTT)
+      # 
     }else{
-      cov.75.IDs.gender.men70.women30.age.group.features <- rep(NA, 12)
+      cov.75.IDs.gender.men70.women30.age.group.features <- rep(NA, 6)
     }
     
     
@@ -2008,6 +2224,9 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                                                             seq.cov = 85,
                                                             age.limit = 65)
     cov.85.IDs.gender.men50.women50 <- cov.85.gender.men50.women50$outputvector
+    cov.85.gender.men50.women50.ratio.seq <- cov.85.gender.men50.women50$ratio.seq
+    cov.85.gender.men50.women50.ratio.emp <- cov.85.gender.men50.women50$ratio.emp
+    
     
     cov.85.gender.men30.women70 <- IDs.indiv.seq.gender.fun(simpact.trans.net = simpact.trans.net,
                                                             limitTransmEvents = 7,
@@ -2015,6 +2234,9 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                                                             seq.cov = 85,
                                                             age.limit = 65)
     cov.85.IDs.gender.men30.women70 <- cov.85.gender.men30.women70$outputvector
+    cov.85.gender.men30.women70.ratio.seq <- cov.85.gender.men30.women70$ratio.seq
+    cov.85.gender.men30.women70.ratio.emp <- cov.85.gender.men30.women70$ratio.emp
+    
     
     cov.85.gender.men70.women30 <- IDs.indiv.seq.gender.fun(simpact.trans.net = simpact.trans.net,
                                                             limitTransmEvents = 7,
@@ -2022,6 +2244,9 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                                                             seq.cov = 85,
                                                             age.limit = 65)
     cov.85.IDs.gender.men70.women30 <- cov.85.gender.men70.women30$outputvector
+    cov.85.gender.men70.women30.ratio.seq <- cov.85.gender.men70.women30$ratio.seq
+    cov.85.gender.men70.women30.ratio.emp <- cov.85.gender.men70.women30$ratio.emp
+    
     
     cov.85.gender.men50.women50.age.group <- IDs.indiv.seq.gender.age.group.fun(simpact.trans.net = simpact.trans.net,
                                                                                 limitTransmEvents = 7, 
@@ -2030,6 +2255,9 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                                                                                 age.men = c(15, 60),
                                                                                 age.women = c(15, 40))
     cov.85.IDs.gender.men50.women50.age.group <- cov.85.gender.men50.women50.age.group$outputvector
+    cov.85.gender.men50.women50.age.group.ratio.seq <- cov.85.gender.men50.women50.age.group$ratio.seq
+    cov.85.gender.men50.women50.age.group.ratio.emp <- cov.85.gender.men50.women50.age.group$ratio.emp
+    
     
     cov.85.gender.men30.women70.age.group <- IDs.indiv.seq.gender.age.group.fun(simpact.trans.net = simpact.trans.net,
                                                                                 limitTransmEvents = 7, 
@@ -2038,6 +2266,9 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                                                                                 age.men = c(15, 60),
                                                                                 age.women = c(15, 40))
     cov.85.IDs.gender.men30.women70.age.group <- cov.85.gender.men30.women70.age.group$outputvector
+    cov.85.gender.men30.women70.age.group.ratio.seq <- cov.85.gender.men30.women70.age.group$ratio.seq
+    cov.85.gender.men30.women70.age.group.ratio.emp <- cov.85.gender.men30.women70.age.group$ratio.emp
+    
     
     cov.85.gender.men70.women30.age.group <- IDs.indiv.seq.gender.age.group.fun(simpact.trans.net = simpact.trans.net,
                                                                                 limitTransmEvents = 7, 
@@ -2046,6 +2277,9 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                                                                                 age.men = c(15, 60),
                                                                                 age.women = c(15, 40))
     cov.85.IDs.gender.men70.women30.age.group <- cov.85.gender.men70.women30.age.group$outputvector
+    cov.85.gender.men70.women30.age.group.ratio.seq <- cov.85.gender.men70.women30.age.group$ratio.seq
+    cov.85.gender.men70.women30.age.group.ratio.emp <- cov.85.gender.men70.women30.age.group$ratio.emp
+    
     
     
     ## XX
@@ -2074,11 +2308,12 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
       write.tree(cov.85.IDs.gender.men50.women50.tree.calib, file = paste0(sub.dir.rename,"/cov.85.IDs.gender.men50.women50.calibrated.tree.nwk"))
       
       
-      cov.85.IDs.gender.men50.women50.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.85.IDs.gender.men50.women50.calibrated.tree.nwk"),
-                                                                            tree.calib.LTT = cov.85.IDs.gender.men50.women50.tree.calib.LTT)
-      
+      cov.85.IDs.gender.men50.women50.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.85.IDs.gender.men50.women50.calibrated.tree.nwk"))
+      # ,
+      #                                                                       tree.calib.LTT = cov.85.IDs.gender.men50.women50.tree.calib.LTT)
+      # 
     }else{
-      cov.85.IDs.gender.men50.women50.features <- rep(NA, 12)
+      cov.85.IDs.gender.men50.women50.features <- rep(NA, 6)
     }
     
     # men30.women70
@@ -2101,11 +2336,12 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
       write.tree(cov.85.IDs.gender.men30.women70.tree.calib, file = paste0(sub.dir.rename,"/cov.85.IDs.gender.men30.women70.calibrated.tree.nwk"))
       
       
-      cov.85.IDs.gender.men30.women70.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.85.IDs.gender.men30.women70.calibrated.tree.nwk"),
-                                                                            tree.calib.LTT = cov.85.IDs.gender.men30.women70.tree.calib.LTT)
-      
+      cov.85.IDs.gender.men30.women70.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.85.IDs.gender.men30.women70.calibrated.tree.nwk"))
+      # ,
+      #                                                                       tree.calib.LTT = cov.85.IDs.gender.men30.women70.tree.calib.LTT)
+      # 
     }else{
-      cov.85.IDs.gender.men30.women70.features <- rep(NA, 12)
+      cov.85.IDs.gender.men30.women70.features <- rep(NA, 6)
       
     }
     
@@ -2130,11 +2366,12 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
       write.tree(cov.85.IDs.gender.men70.women30.tree.calib, file = paste0(sub.dir.rename,"/cov.85.IDs.gender.men70.women30.calibrated.tree.nwk"))
       
       
-      cov.85.IDs.gender.men70.women30.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.85.IDs.gender.men70.women30.calibrated.tree.nwk"),
-                                                                            tree.calib.LTT = cov.85.IDs.gender.men70.women30.tree.calib.LTT)
-      
+      cov.85.IDs.gender.men70.women30.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.85.IDs.gender.men70.women30.calibrated.tree.nwk"))
+      # ,
+      #                                                                       tree.calib.LTT = cov.85.IDs.gender.men70.women30.tree.calib.LTT)
+      # 
     }else{
-      cov.85.IDs.gender.men70.women30.features <- rep(NA, 12)
+      cov.85.IDs.gender.men70.women30.features <- rep(NA, 6)
     }
     
     # men50.women50.group
@@ -2158,11 +2395,12 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
       
       write.tree(cov.85.IDs.gender.men50.women50.age.group.tree.calib, file = paste0(sub.dir.rename,"/cov.85.IDs.gender.men50.women50.age.group.calibrated.tree.nwk"))
       
-      cov.85.IDs.gender.men50.women50.age.group.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.85.IDs.gender.men50.women50.age.group.calibrated.tree.nwk"),
-                                                                                      tree.calib.LTT = cov.85.IDs.gender.men50.women50.age.group.tree.calib.LTT)
-      
+      cov.85.IDs.gender.men50.women50.age.group.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.85.IDs.gender.men50.women50.age.group.calibrated.tree.nwk"))
+      # ,
+      #                                                                                 tree.calib.LTT = cov.85.IDs.gender.men50.women50.age.group.tree.calib.LTT)
+      # 
     }else{
-      cov.85.IDs.gender.men50.women50.age.group.features <- rep(NA, 12)
+      cov.85.IDs.gender.men50.women50.age.group.features <- rep(NA, 6)
     }
     
     # men30.women70.group
@@ -2187,11 +2425,12 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
       write.tree(cov.85.IDs.gender.men30.women70.age.group.tree.calib, file = paste0(sub.dir.rename,"/cov.85.IDs.gender.men30.women70.age.group.calibrated.tree.nwk"))
       
       
-      cov.85.IDs.gender.men30.women70.age.group.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.85.IDs.gender.men30.women70.age.group.calibrated.tree.nwk"),
-                                                                                      tree.calib.LTT = cov.85.IDs.gender.men30.women70.age.group.tree.calib.LTT)
-      
+      cov.85.IDs.gender.men30.women70.age.group.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.85.IDs.gender.men30.women70.age.group.calibrated.tree.nwk"))
+      # ,
+      #                                                                                 tree.calib.LTT = cov.85.IDs.gender.men30.women70.age.group.tree.calib.LTT)
+      # 
     }else{
-      cov.85.IDs.gender.men30.women70.age.group.features <- rep(NA, 12)
+      cov.85.IDs.gender.men30.women70.age.group.features <- rep(NA, 6)
     }
     
     # men70.women30.group
@@ -2214,11 +2453,12 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
       
       write.tree(cov.85.IDs.gender.men70.women30.age.group.tree.calib, file = paste0(sub.dir.rename,"/cov.85.IDs.gender.men70.women30.age.group.calibrated.tree.nwk"))
       
-      cov.85.IDs.gender.men70.women30.age.group.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.85.IDs.gender.men70.women30.age.group.calibrated.tree.nwk"),
-                                                                                      tree.calib.LTT = cov.85.IDs.gender.men70.women30.age.group.tree.calib.LTT)
-      
+      cov.85.IDs.gender.men70.women30.age.group.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.85.IDs.gender.men70.women30.age.group.calibrated.tree.nwk"))
+      # ,
+      #                                                                                 tree.calib.LTT = cov.85.IDs.gender.men70.women30.age.group.tree.calib.LTT)
+      # 
     }else{
-      cov.85.IDs.gender.men70.women30.age.group.features <- rep(NA, 12)
+      cov.85.IDs.gender.men70.women30.age.group.features <- rep(NA, 6)
     }
     
     
@@ -2233,6 +2473,9 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                                                             seq.cov = 95,
                                                             age.limit = 65)
     cov.95.IDs.gender.men50.women50 <- cov.95.gender.men50.women50$outputvector
+    cov.95.gender.men50.women50.ratio.seq <- cov.95.gender.men50.women50$ratio.seq
+    cov.95.gender.men50.women50.ratio.emp <- cov.95.gender.men50.women50$ratio.emp
+    
     
     cov.95.gender.men30.women70 <- IDs.indiv.seq.gender.fun(simpact.trans.net = simpact.trans.net,
                                                             limitTransmEvents = 7,
@@ -2240,6 +2483,9 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                                                             seq.cov = 95,
                                                             age.limit = 65)
     cov.95.IDs.gender.men30.women70 <- cov.95.gender.men30.women70$outputvector
+    cov.95.gender.men30.women70.ratio.seq <- cov.95.gender.men30.women70$ratio.seq
+    cov.95.gender.men30.women70.ratio.emp <- cov.95.gender.men30.women70$ratio.emp
+    
     
     cov.95.gender.men70.women30 <- IDs.indiv.seq.gender.fun(simpact.trans.net = simpact.trans.net,
                                                             limitTransmEvents = 7,
@@ -2247,6 +2493,9 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                                                             seq.cov = 95,
                                                             age.limit = 65)
     cov.95.IDs.gender.men70.women30 <- cov.95.gender.men70.women30$outputvector
+    cov.95.gender.men70.women30.ratio.seq <- cov.95.gender.men70.women30$ratio.seq
+    cov.95.gender.men70.women30.ratio.emp <- cov.95.gender.men70.women30$ratio.emp
+    
     
     cov.95.gender.men50.women50.age.group <- IDs.indiv.seq.gender.age.group.fun(simpact.trans.net = simpact.trans.net,
                                                                                 limitTransmEvents = 7, 
@@ -2255,6 +2504,9 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                                                                                 age.men = c(15, 60),
                                                                                 age.women = c(15, 40))
     cov.95.IDs.gender.men50.women50.age.group <- cov.95.gender.men50.women50.age.group$outputvector
+    cov.95.gender.men50.women50.age.group.ratio.seq <- cov.95.gender.men50.women50.age.group$ratio.seq
+    cov.95.gender.men50.women50.age.group.ratio.emp <- cov.95.gender.men50.women50.age.group$ratio.emp
+    
     
     cov.95.gender.men30.women70.age.group <- IDs.indiv.seq.gender.age.group.fun(simpact.trans.net = simpact.trans.net,
                                                                                 limitTransmEvents = 7, 
@@ -2263,6 +2515,9 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                                                                                 age.men = c(15, 60),
                                                                                 age.women = c(15, 40))
     cov.95.IDs.gender.men30.women70.age.group <- cov.95.gender.men30.women70.age.group$outputvector
+    cov.95.gender.men30.women70.age.group.ratio.seq <- cov.95.gender.men30.women70.age.group$ratio.seq
+    cov.95.gender.men30.women70.age.group.ratio.emp <- cov.95.gender.men30.women70.age.group$ratio.emp
+    
     
     cov.95.gender.men70.women30.age.group <- IDs.indiv.seq.gender.age.group.fun(simpact.trans.net = simpact.trans.net,
                                                                                 limitTransmEvents = 7, 
@@ -2271,6 +2526,9 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                                                                                 age.men = c(15, 60),
                                                                                 age.women = c(15, 40))
     cov.95.IDs.gender.men70.women30.age.group <- cov.95.gender.men70.women30.age.group$outputvector
+    cov.95.gender.men70.women30.age.group.ratio.seq <- cov.95.gender.men70.women30.age.group$ratio.seq
+    cov.95.gender.men70.women30.age.group.ratio.emp <- cov.95.gender.men70.women30.age.group$ratio.emp
+    
     
     
     ## XX
@@ -2299,11 +2557,12 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
       write.tree(cov.95.IDs.gender.men50.women50.tree.calib, file = paste0(sub.dir.rename,"/cov.95.IDs.gender.men50.women50.calibrated.tree.nwk"))
       
       
-      cov.95.IDs.gender.men50.women50.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.95.IDs.gender.men50.women50.calibrated.tree.nwk"),
-                                                                            tree.calib.LTT = cov.95.IDs.gender.men50.women50.tree.calib.LTT)
-      
+      cov.95.IDs.gender.men50.women50.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.95.IDs.gender.men50.women50.calibrated.tree.nwk"))
+      # ,
+      #                                                                       tree.calib.LTT = cov.95.IDs.gender.men50.women50.tree.calib.LTT)
+      # 
     }else{
-      cov.95.IDs.gender.men50.women50.features <- rep(NA, 12)
+      cov.95.IDs.gender.men50.women50.features <- rep(NA, 6)
     }
     
     # men30.women70
@@ -2326,11 +2585,12 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
       write.tree(cov.95.IDs.gender.men30.women70.tree.calib, file = paste0(sub.dir.rename,"/cov.95.IDs.gender.men30.women70.calibrated.tree.nwk"))
       
       
-      cov.95.IDs.gender.men30.women70.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.95.IDs.gender.men30.women70.calibrated.tree.nwk"),
-                                                                            tree.calib.LTT = cov.95.IDs.gender.men30.women70.tree.calib.LTT)
-      
+      cov.95.IDs.gender.men30.women70.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.95.IDs.gender.men30.women70.calibrated.tree.nwk"))
+      # ,
+      #                                                                       tree.calib.LTT = cov.95.IDs.gender.men30.women70.tree.calib.LTT)
+      # 
     }else{
-      cov.95.IDs.gender.men30.women70.features <- rep(NA, 12)
+      cov.95.IDs.gender.men30.women70.features <- rep(NA, 6)
       
     }
     
@@ -2355,11 +2615,12 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
       write.tree(cov.95.IDs.gender.men70.women30.tree.calib, file = paste0(sub.dir.rename,"/cov.95.IDs.gender.men70.women30.calibrated.tree.nwk"))
       
       
-      cov.95.IDs.gender.men70.women30.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.95.IDs.gender.men70.women30.calibrated.tree.nwk"),
-                                                                            tree.calib.LTT = cov.95.IDs.gender.men70.women30.tree.calib.LTT)
-      
+      cov.95.IDs.gender.men70.women30.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.95.IDs.gender.men70.women30.calibrated.tree.nwk"))
+      # ,
+      #                                                                       tree.calib.LTT = cov.95.IDs.gender.men70.women30.tree.calib.LTT)
+      # 
     }else{
-      cov.95.IDs.gender.men70.women30.features <- rep(NA, 12)
+      cov.95.IDs.gender.men70.women30.features <- rep(NA, 6)
     }
     
     # men50.women50.group
@@ -2383,11 +2644,12 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
       
       write.tree(cov.95.IDs.gender.men50.women50.age.group.tree.calib, file = paste0(sub.dir.rename,"/cov.95.IDs.gender.men50.women50.age.group.calibrated.tree.nwk"))
       
-      cov.95.IDs.gender.men50.women50.age.group.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.95.IDs.gender.men50.women50.age.group.calibrated.tree.nwk"),
-                                                                                      tree.calib.LTT = cov.95.IDs.gender.men50.women50.age.group.tree.calib.LTT)
-      
+      cov.95.IDs.gender.men50.women50.age.group.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.95.IDs.gender.men50.women50.age.group.calibrated.tree.nwk"))
+      # ,
+      #                                                                                 tree.calib.LTT = cov.95.IDs.gender.men50.women50.age.group.tree.calib.LTT)
+      # 
     }else{
-      cov.95.IDs.gender.men50.women50.age.group.features <- rep(NA, 12)
+      cov.95.IDs.gender.men50.women50.age.group.features <- rep(NA, 6)
     }
     
     # men30.women70.group
@@ -2412,11 +2674,12 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
       write.tree(cov.95.IDs.gender.men30.women70.age.group.tree.calib, file = paste0(sub.dir.rename,"/cov.95.IDs.gender.men30.women70.age.group.calibrated.tree.nwk"))
       
       
-      cov.95.IDs.gender.men30.women70.age.group.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.95.IDs.gender.men30.women70.age.group.calibrated.tree.nwk"),
-                                                                                      tree.calib.LTT = cov.95.IDs.gender.men30.women70.age.group.tree.calib.LTT)
-      
+      cov.95.IDs.gender.men30.women70.age.group.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.95.IDs.gender.men30.women70.age.group.calibrated.tree.nwk"))
+      # ,
+      #                                                                                 tree.calib.LTT = cov.95.IDs.gender.men30.women70.age.group.tree.calib.LTT)
+      # 
     }else{
-      cov.95.IDs.gender.men30.women70.age.group.features <- rep(NA, 12)
+      cov.95.IDs.gender.men30.women70.age.group.features <- rep(NA, 6)
     }
     
     # men70.women30.group
@@ -2439,11 +2702,12 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
       
       write.tree(cov.95.IDs.gender.men70.women30.age.group.tree.calib, file = paste0(sub.dir.rename,"/cov.95.IDs.gender.men70.women30.age.group.calibrated.tree.nwk"))
       
-      cov.95.IDs.gender.men70.women30.age.group.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.95.IDs.gender.men70.women30.age.group.calibrated.tree.nwk"),
-                                                                                      tree.calib.LTT = cov.95.IDs.gender.men70.women30.age.group.tree.calib.LTT)
-      
+      cov.95.IDs.gender.men70.women30.age.group.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.95.IDs.gender.men70.women30.age.group.calibrated.tree.nwk"))
+      # ,
+      #                                                                                 tree.calib.LTT = cov.95.IDs.gender.men70.women30.age.group.tree.calib.LTT)
+      # 
     }else{
-      cov.95.IDs.gender.men70.women30.age.group.features <- rep(NA, 12)
+      cov.95.IDs.gender.men70.women30.age.group.features <- rep(NA, 6)
     }
     
     # END
@@ -2470,15 +2734,17 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                     growthrate, hiv.prev.lt25.women, hiv.prev.lt25.men, hiv.prev.25.34.women,
                     hiv.prev.25.34.men, hiv.prev.35.44.women, hiv.prev.35.44.men, transm.rate, # cov.vector
                     relas.rate,  relsperpersonperyear, agegapsd,
+                    AAD.male, SDAD.male, slope.male, WSD.male, BSD.male, intercept.male,
                     
-                    # AAD.male, SDAD.male, slope.male, WSD.male, BSD.male, intercept.male,
                     pp.cp.6months.male,
                     
                     
                     mean.feature, colless.feature, sackin.feature, mean.tipsDepths.feature, mean.nodesDepths.feature,
-                    maxHeight.feature, lb.mean.feature, lb.median.feature, ub.mean.feature, ub.median.feature,
-                    median.mean.feature, median.median.feature,
+                    maxHeight.feature, 
                     
+                    # lb.mean.feature, lb.median.feature, ub.mean.feature, ub.median.feature,
+                    # median.mean.feature, median.median.feature,
+                    # 
                     as.numeric(cov.35.IDs.gender.men50.women50.features), as.numeric(cov.35.IDs.gender.men30.women70.features),
                     as.numeric(cov.35.IDs.gender.men70.women30.features),  # each one is a vector
                     as.numeric(cov.35.IDs.gender.men50.women50.age.group.features), as.numeric(cov.35.IDs.gender.men30.women70.age.group.features),
@@ -2512,14 +2778,59 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                     as.numeric(cov.95.IDs.gender.men50.women50.features), as.numeric(cov.95.IDs.gender.men30.women70.features),
                     as.numeric(cov.95.IDs.gender.men70.women30.features),  # each one is a vector
                     as.numeric(cov.95.IDs.gender.men50.women50.age.group.features), as.numeric(cov.95.IDs.gender.men30.women70.age.group.features),
-                    as.numeric(cov.95.IDs.gender.men70.women30.age.group.features)
+                    as.numeric(cov.95.IDs.gender.men70.women30.age.group.features),
+                    
+                    
+                    cov.35.gender.men50.women50.ratio.seq, cov.35.gender.men50.women50.ratio.emp,
+                    cov.35.gender.men30.women70.ratio.seq, cov.35.gender.men30.women70.ratio.emp,
+                    cov.35.gender.men70.women30.ratio.seq, cov.35.gender.men70.women30.ratio.emp,
+                    cov.35.gender.men50.women50.age.group.ratio.seq, cov.35.gender.men50.women50.age.group.ratio.emp,
+                    cov.35.gender.men30.women70.age.group.ratio.seq, cov.35.gender.men30.women70.age.group.ratio.emp,
+                    cov.35.gender.men70.women30.age.group.ratio.seq, cov.35.gender.men70.women30.age.group.ratio.emp, 
+                    
+                    cov.45.gender.men50.women50.ratio.seq, cov.45.gender.men50.women50.ratio.emp,
+                    cov.45.gender.men30.women70.ratio.seq, cov.45.gender.men30.women70.ratio.emp,
+                    cov.45.gender.men70.women30.ratio.seq, cov.45.gender.men70.women30.ratio.emp,
+                    cov.45.gender.men50.women50.age.group.ratio.seq, cov.45.gender.men50.women50.age.group.ratio.emp,
+                    cov.45.gender.men30.women70.age.group.ratio.seq, cov.45.gender.men30.women70.age.group.ratio.emp,
+                    cov.45.gender.men70.women30.age.group.ratio.seq, cov.45.gender.men70.women30.age.group.ratio.emp, 
+                    
+                    cov.55.gender.men50.women50.ratio.seq, cov.55.gender.men50.women50.ratio.emp,
+                    cov.55.gender.men30.women70.ratio.seq, cov.55.gender.men30.women70.ratio.emp,
+                    cov.55.gender.men70.women30.ratio.seq, cov.55.gender.men70.women30.ratio.emp,
+                    cov.55.gender.men50.women50.age.group.ratio.seq, cov.55.gender.men50.women50.age.group.ratio.emp,
+                    cov.55.gender.men30.women70.age.group.ratio.seq, cov.55.gender.men30.women70.age.group.ratio.emp,
+                    cov.55.gender.men70.women30.age.group.ratio.seq, cov.55.gender.men70.women30.age.group.ratio.emp, 
+                    
+                    cov.65.gender.men50.women50.ratio.seq, cov.65.gender.men50.women50.ratio.emp,
+                    cov.65.gender.men30.women70.ratio.seq, cov.65.gender.men30.women70.ratio.emp,
+                    cov.65.gender.men70.women30.ratio.seq, cov.65.gender.men70.women30.ratio.emp,
+                    cov.65.gender.men50.women50.age.group.ratio.seq, cov.65.gender.men50.women50.age.group.ratio.emp,
+                    cov.65.gender.men30.women70.age.group.ratio.seq, cov.65.gender.men30.women70.age.group.ratio.emp,
+                    cov.65.gender.men70.women30.age.group.ratio.seq, cov.65.gender.men70.women30.age.group.ratio.emp, 
+                    
+                    cov.75.gender.men50.women50.ratio.seq, cov.75.gender.men50.women50.ratio.emp,
+                    cov.75.gender.men30.women70.ratio.seq, cov.75.gender.men30.women70.ratio.emp,
+                    cov.75.gender.men70.women30.ratio.seq, cov.75.gender.men70.women30.ratio.emp,
+                    cov.75.gender.men50.women50.age.group.ratio.seq, cov.75.gender.men50.women50.age.group.ratio.emp,
+                    cov.75.gender.men30.women70.age.group.ratio.seq, cov.75.gender.men30.women70.age.group.ratio.emp,
+                    cov.75.gender.men70.women30.age.group.ratio.seq, cov.75.gender.men70.women30.age.group.ratio.emp, 
+                    
+                    cov.85.gender.men50.women50.ratio.seq, cov.85.gender.men50.women50.ratio.emp,
+                    cov.85.gender.men30.women70.ratio.seq, cov.85.gender.men30.women70.ratio.emp,
+                    cov.85.gender.men70.women30.ratio.seq, cov.85.gender.men70.women30.ratio.emp,
+                    cov.85.gender.men50.women50.age.group.ratio.seq, cov.85.gender.men50.women50.age.group.ratio.emp,
+                    cov.85.gender.men30.women70.age.group.ratio.seq, cov.85.gender.men30.women70.age.group.ratio.emp,
+                    cov.85.gender.men70.women30.age.group.ratio.seq, cov.85.gender.men70.women30.age.group.ratio.emp, 
+                    
+                    cov.95.gender.men50.women50.ratio.seq, cov.95.gender.men50.women50.ratio.emp,
+                    cov.95.gender.men30.women70.ratio.seq, cov.95.gender.men30.women70.ratio.emp,
+                    cov.95.gender.men70.women30.ratio.seq, cov.95.gender.men70.women30.ratio.emp,
+                    cov.95.gender.men50.women50.age.group.ratio.seq, cov.95.gender.men50.women50.age.group.ratio.emp,
+                    cov.95.gender.men30.women70.age.group.ratio.seq, cov.95.gender.men30.women70.age.group.ratio.emp,
+                    cov.95.gender.men70.women30.age.group.ratio.seq, cov.95.gender.men70.women30.age.group.ratio.emp
     )
     
-    # 
-    # c(IDs.gender.men50.women50.features, IDs.gender.men30.women70.features,
-    #   IDs.gender.men70.women30.features,  # each one is a vector
-    #   IDs.gender.men50.women50.age.group.features, IDs.gender.men30.women70.age.group.features,
-    #   IDs.gender.men70.women30.age.group.features) 
     
     features.names <- c("METRICS.incidence.df.15.24", "METRICS.incidence.df.25.34", "METRICS.incidence.df.35.44",
                         
@@ -2541,265 +2852,403 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                         "hiv.prev.lt25.women", "hiv.prev.lt25.men", "hiv.prev.25.34.women",
                         "hiv.prev.25.34.men", "hiv.prev.35.44.women", "hiv.prev.35.44.men", "transm.rate", # cov.vector
                         "relas.rate",  "relsperpersonperyear", "agegapsd",
-                        #"AAD.male", "SDAD.male", "slope.male", "WSD.male", "BSD.male", "intercept.male",
+                        
+                        "AAD.male", "SDAD.male", "slope.male", "WSD.male", "BSD.male", "intercept.male",
+                        
                         "pp.cp.6months.male",
                         
                         "meanHeight.feature", "colless.feature", "sackin.feature", "mean.tipsDepths.feature", "mean.nodesDepths.feature",
-                        "maxHeight.feature", "LTT.lb.mean.feature", "LTT.lb.median.feature", "LTT.ub.mean.feature", "LTT.ub.median.feature",
-                        "LTT.median.mean.feature", "LTT.median.median.feature",
+                        "maxHeight.feature", 
+                        
+                        # "LTT.lb.mean.feature", "LTT.lb.median.feature", "LTT.ub.mean.feature", "LTT.ub.median.feature",
+                        # "LTT.median.mean.feature", "LTT.median.median.feature",
                         
                         
                         "cov.35.IDs.gender.men50.women50.meanHeight.feature", "cov.35.IDs.gender.men50.women50.colless.feature", "cov.35.IDs.gender.men50.women50.sackin.feature", 
                         "cov.35.IDs.gender.men50.women50.mean.tipsDepths.feature", "cov.35.IDs.gender.men50.women50.mean.nodesDepths.feature",
-                        "cov.35.IDs.gender.men50.women50.maxHeight.feature", "cov.35.IDs.gender.men50.women50.LTT.lb.mean.feature", "cov.35.IDs.gender.men50.women50.LTT.lb.median.feature", 
-                        "cov.35.IDs.gender.men50.women50.LTT.ub.mean.feature", "cov.35.IDs.gender.men50.women50.LTT.ub.median.feature",
-                        "cov.35.IDs.gender.men50.women50.LTT.median.mean.feature", "cov.35.IDs.gender.men50.women50.LTT.median.median.feature",
+                        "cov.35.IDs.gender.men50.women50.maxHeight.feature", 
                         
+                        # "cov.35.IDs.gender.men50.women50.LTT.lb.mean.feature", "cov.35.IDs.gender.men50.women50.LTT.lb.median.feature", 
+                        # "cov.35.IDs.gender.men50.women50.LTT.ub.mean.feature", "cov.35.IDs.gender.men50.women50.LTT.ub.median.feature",
+                        # "cov.35.IDs.gender.men50.women50.LTT.median.mean.feature", "cov.35.IDs.gender.men50.women50.LTT.median.median.feature",
+                        # 
                         "cov.35.IDs.gender.men30.women70.meanHeight.feature", "cov.35.IDs.gender.men30.women70.colless.feature", "cov.35.IDs.gender.men30.women70.sackin.feature", 
                         "cov.35.IDs.gender.men30.women70.mean.tipsDepths.feature", "cov.35.IDs.gender.men30.women70.mean.nodesDepths.feature",
-                        "cov.35.IDs.gender.men30.women70.maxHeight.feature", "cov.35.IDs.gender.men30.women70.LTT.lb.mean.feature", "cov.35.IDs.gender.men30.women70.LTT.lb.median.feature", 
-                        "cov.35.IDs.gender.men30.women70.LTT.ub.mean.feature", "cov.35.IDs.gender.men30.women70.LTT.ub.median.feature",
-                        "cov.35.IDs.gender.men30.women70.LTT.median.mean.feature", "cov.35.IDs.gender.men30.women70.LTT.median.median.feature",
+                        "cov.35.IDs.gender.men30.women70.maxHeight.feature", 
                         
+                        # "cov.35.IDs.gender.men30.women70.LTT.lb.mean.feature", "cov.35.IDs.gender.men30.women70.LTT.lb.median.feature", 
+                        # "cov.35.IDs.gender.men30.women70.LTT.ub.mean.feature", "cov.35.IDs.gender.men30.women70.LTT.ub.median.feature",
+                        # "cov.35.IDs.gender.men30.women70.LTT.median.mean.feature", "cov.35.IDs.gender.men30.women70.LTT.median.median.feature",
+                        # 
                         "cov.35.IDs.gender.men70.women30.meanHeight.feature", "cov.35.IDs.gender.men70.women30.colless.feature", "cov.35.IDs.gender.men70.women30.sackin.feature", 
                         "cov.35.IDs.gender.men70.women30.mean.tipsDepths.feature", "cov.35.IDs.gender.men70.women30.mean.nodesDepths.feature",
-                        "cov.35.IDs.gender.men70.women30.maxHeight.feature", "cov.35.IDs.gender.men70.women30.LTT.lb.mean.feature", "cov.35.IDs.gender.men70.women30.LTT.lb.median.feature", 
-                        "cov.35.IDs.gender.men70.women30.LTT.ub.mean.feature", "cov.35.IDs.gender.men70.women30.LTT.ub.median.feature",
-                        "cov.35.IDs.gender.men70.women30.LTT.median.mean.feature", "cov.35.IDs.gender.men70.women30.LTT.median.median.feature",
-                        
+                        "cov.35.IDs.gender.men70.women30.maxHeight.feature", 
+                        # 
+                        # "cov.35.IDs.gender.men70.women30.LTT.lb.mean.feature", "cov.35.IDs.gender.men70.women30.LTT.lb.median.feature", 
+                        # "cov.35.IDs.gender.men70.women30.LTT.ub.mean.feature", "cov.35.IDs.gender.men70.women30.LTT.ub.median.feature",
+                        # "cov.35.IDs.gender.men70.women30.LTT.median.mean.feature", "cov.35.IDs.gender.men70.women30.LTT.median.median.feature",
+                        # 
                         "cov.35.IDs.gender.men50.women50.age.group.meanHeight.feature", "cov.35.IDs.gender.men50.women50.age.group.colless.feature", "cov.35.IDs.gender.men50.women50.age.group.sackin.feature", 
                         "cov.35.IDs.gender.men50.women50.age.group.mean.tipsDepths.feature", "cov.35.IDs.gender.men50.women50.age.group.mean.nodesDepths.feature",
-                        "cov.35.IDs.gender.men50.women50.age.group.maxHeight.feature", "cov.35.IDs.gender.men50.women50.age.group.LTT.lb.mean.feature", "cov.35.IDs.gender.men50.women50.age.group.LTT.lb.median.feature", 
-                        "cov.35.IDs.gender.men50.women50.age.group.LTT.ub.mean.feature", "cov.35.IDs.gender.men50.women50.age.group.LTT.ub.median.feature",
-                        "cov.35.IDs.gender.men50.women50.age.group.LTT.median.mean.feature", "cov.35.IDs.gender.men50.women50.age.group.LTT.median.median.feature",
+                        "cov.35.IDs.gender.men50.women50.age.group.maxHeight.feature", 
                         
+                        # "cov.35.IDs.gender.men50.women50.age.group.LTT.lb.mean.feature", "cov.35.IDs.gender.men50.women50.age.group.LTT.lb.median.feature", 
+                        # "cov.35.IDs.gender.men50.women50.age.group.LTT.ub.mean.feature", "cov.35.IDs.gender.men50.women50.age.group.LTT.ub.median.feature",
+                        # "cov.35.IDs.gender.men50.women50.age.group.LTT.median.mean.feature", "cov.35.IDs.gender.men50.women50.age.group.LTT.median.median.feature",
+                        # 
                         "cov.35.IDs.gender.men30.women70.age.group.meanHeight.feature", "cov.35.IDs.gender.men30.women70.age.group.colless.feature", "cov.35.IDs.gender.men30.women70.age.group.sackin.feature", 
                         "cov.35.IDs.gender.men30.women70.age.group.mean.tipsDepths.feature", "cov.35.IDs.gender.men30.women70.age.group.mean.nodesDepths.feature",
-                        "cov.35.IDs.gender.men30.women70.age.group.maxHeight.feature", "cov.35.IDs.gender.men30.women70.age.group.LTT.lb.mean.feature", "cov.35.IDs.gender.men30.women70.age.group.LTT.lb.median.feature", 
-                        "cov.35.IDs.gender.men30.women70.age.group.LTT.ub.mean.feature", "cov.35.IDs.gender.men30.women70.age.group.LTT.ub.median.feature",
-                        "cov.35.IDs.gender.men30.women70.age.group.LTT.median.mean.feature", "cov.35.IDs.gender.men30.women70.age.group.LTT.median.median.feature",
+                        "cov.35.IDs.gender.men30.women70.age.group.maxHeight.feature", 
                         
+                        # "cov.35.IDs.gender.men30.women70.age.group.LTT.lb.mean.feature", "cov.35.IDs.gender.men30.women70.age.group.LTT.lb.median.feature", 
+                        # "cov.35.IDs.gender.men30.women70.age.group.LTT.ub.mean.feature", "cov.35.IDs.gender.men30.women70.age.group.LTT.ub.median.feature",
+                        # "cov.35.IDs.gender.men30.women70.age.group.LTT.median.mean.feature", "cov.35.IDs.gender.men30.women70.age.group.LTT.median.median.feature",
+                        # 
                         "cov.35.IDs.gender.men70.women30.age.group.meanHeight.feature", "cov.35.IDs.gender.men70.women30.age.group.colless.feature", "cov.35.IDs.gender.men70.women30.age.group.sackin.feature", 
                         "cov.35.IDs.gender.men70.women30.age.group.mean.tipsDepths.feature", "cov.35.IDs.gender.men70.women30.age.group.mean.nodesDepths.feature",
-                        "cov.35.IDs.gender.men70.women30.age.group.maxHeight.feature", "cov.35.IDs.gender.men70.women30.age.group.LTT.lb.mean.feature", "cov.35.IDs.gender.men70.women30.age.group.LTT.lb.median.feature", 
-                        "cov.35.IDs.gender.men70.women30.age.group.LTT.ub.mean.feature", "cov.35.IDs.gender.men70.women30.age.group.LTT.ub.median.feature",
-                        "cov.35.IDs.gender.men70.women30.age.group.LTT.median.mean.feature", "cov.35.IDs.gender.men70.women30.age.group.LTT.median.median.feature",
+                        "cov.35.IDs.gender.men70.women30.age.group.maxHeight.feature", 
                         
+                        # "cov.35.IDs.gender.men70.women30.age.group.LTT.lb.mean.feature", "cov.35.IDs.gender.men70.women30.age.group.LTT.lb.median.feature", 
+                        # "cov.35.IDs.gender.men70.women30.age.group.LTT.ub.mean.feature", "cov.35.IDs.gender.men70.women30.age.group.LTT.ub.median.feature",
+                        # "cov.35.IDs.gender.men70.women30.age.group.LTT.median.mean.feature", "cov.35.IDs.gender.men70.women30.age.group.LTT.median.median.feature",
+                        # 
                         "cov.45.IDs.gender.men50.women50.meanHeight.feature", "cov.45.IDs.gender.men50.women50.colless.feature", "cov.45.IDs.gender.men50.women50.sackin.feature", 
                         "cov.45.IDs.gender.men50.women50.mean.tipsDepths.feature", "cov.45.IDs.gender.men50.women50.mean.nodesDepths.feature",
-                        "cov.45.IDs.gender.men50.women50.maxHeight.feature", "cov.45.IDs.gender.men50.women50.LTT.lb.mean.feature", "cov.45.IDs.gender.men50.women50.LTT.lb.median.feature", 
-                        "cov.45.IDs.gender.men50.women50.LTT.ub.mean.feature", "cov.45.IDs.gender.men50.women50.LTT.ub.median.feature",
-                        "cov.45.IDs.gender.men50.women50.LTT.median.mean.feature", "cov.45.IDs.gender.men50.women50.LTT.median.median.feature",
+                        "cov.45.IDs.gender.men50.women50.maxHeight.feature", 
                         
+                        # "cov.45.IDs.gender.men50.women50.LTT.lb.mean.feature", "cov.45.IDs.gender.men50.women50.LTT.lb.median.feature", 
+                        # "cov.45.IDs.gender.men50.women50.LTT.ub.mean.feature", "cov.45.IDs.gender.men50.women50.LTT.ub.median.feature",
+                        # "cov.45.IDs.gender.men50.women50.LTT.median.mean.feature", "cov.45.IDs.gender.men50.women50.LTT.median.median.feature",
+                        # 
                         "cov.45.IDs.gender.men30.women70.meanHeight.feature", "cov.45.IDs.gender.men30.women70.colless.feature", "cov.45.IDs.gender.men30.women70.sackin.feature", 
                         "cov.45.IDs.gender.men30.women70.mean.tipsDepths.feature", "cov.45.IDs.gender.men30.women70.mean.nodesDepths.feature",
-                        "cov.45.IDs.gender.men30.women70.maxHeight.feature", "cov.45.IDs.gender.men30.women70.LTT.lb.mean.feature", "cov.45.IDs.gender.men30.women70.LTT.lb.median.feature", 
-                        "cov.45.IDs.gender.men30.women70.LTT.ub.mean.feature", "cov.45.IDs.gender.men30.women70.LTT.ub.median.feature",
-                        "cov.45.IDs.gender.men30.women70.LTT.median.mean.feature", "cov.45.IDs.gender.men30.women70.LTT.median.median.feature",
+                        "cov.45.IDs.gender.men30.women70.maxHeight.feature", 
                         
+                        # "cov.45.IDs.gender.men30.women70.LTT.lb.mean.feature", "cov.45.IDs.gender.men30.women70.LTT.lb.median.feature", 
+                        # "cov.45.IDs.gender.men30.women70.LTT.ub.mean.feature", "cov.45.IDs.gender.men30.women70.LTT.ub.median.feature",
+                        # "cov.45.IDs.gender.men30.women70.LTT.median.mean.feature", "cov.45.IDs.gender.men30.women70.LTT.median.median.feature",
+                        # 
                         "cov.45.IDs.gender.men70.women30.meanHeight.feature", "cov.45.IDs.gender.men70.women30.colless.feature", "cov.45.IDs.gender.men70.women30.sackin.feature", 
                         "cov.45.IDs.gender.men70.women30.mean.tipsDepths.feature", "cov.45.IDs.gender.men70.women30.mean.nodesDepths.feature",
-                        "cov.45.IDs.gender.men70.women30.maxHeight.feature", "cov.45.IDs.gender.men70.women30.LTT.lb.mean.feature", "cov.45.IDs.gender.men70.women30.LTT.lb.median.feature", 
-                        "cov.45.IDs.gender.men70.women30.LTT.ub.mean.feature", "cov.45.IDs.gender.men70.women30.LTT.ub.median.feature",
-                        "cov.45.IDs.gender.men70.women30.LTT.median.mean.feature", "cov.45.IDs.gender.men70.women30.LTT.median.median.feature",
+                        "cov.45.IDs.gender.men70.women30.maxHeight.feature", 
                         
+                        # "cov.45.IDs.gender.men70.women30.LTT.lb.mean.feature", "cov.45.IDs.gender.men70.women30.LTT.lb.median.feature", 
+                        # "cov.45.IDs.gender.men70.women30.LTT.ub.mean.feature", "cov.45.IDs.gender.men70.women30.LTT.ub.median.feature",
+                        # "cov.45.IDs.gender.men70.women30.LTT.median.mean.feature", "cov.45.IDs.gender.men70.women30.LTT.median.median.feature",
+                        # 
                         "cov.45.IDs.gender.men50.women50.age.group.meanHeight.feature", "cov.45.IDs.gender.men50.women50.age.group.colless.feature", "cov.45.IDs.gender.men50.women50.age.group.sackin.feature", 
                         "cov.45.IDs.gender.men50.women50.age.group.mean.tipsDepths.feature", "cov.45.IDs.gender.men50.women50.age.group.mean.nodesDepths.feature",
-                        "cov.45.IDs.gender.men50.women50.age.group.maxHeight.feature", "cov.45.IDs.gender.men50.women50.age.group.LTT.lb.mean.feature", "cov.45.IDs.gender.men50.women50.age.group.LTT.lb.median.feature", 
-                        "cov.45.IDs.gender.men50.women50.age.group.LTT.ub.mean.feature", "cov.45.IDs.gender.men50.women50.age.group.LTT.ub.median.feature",
-                        "cov.45.IDs.gender.men50.women50.age.group.LTT.median.mean.feature", "cov.45.IDs.gender.men50.women50.age.group.LTT.median.median.feature",
+                        "cov.45.IDs.gender.men50.women50.age.group.maxHeight.feature", 
                         
+                        # "cov.45.IDs.gender.men50.women50.age.group.LTT.lb.mean.feature", "cov.45.IDs.gender.men50.women50.age.group.LTT.lb.median.feature", 
+                        # "cov.45.IDs.gender.men50.women50.age.group.LTT.ub.mean.feature", "cov.45.IDs.gender.men50.women50.age.group.LTT.ub.median.feature",
+                        # "cov.45.IDs.gender.men50.women50.age.group.LTT.median.mean.feature", "cov.45.IDs.gender.men50.women50.age.group.LTT.median.median.feature",
+                        # 
                         "cov.45.IDs.gender.men30.women70.age.group.meanHeight.feature", "cov.45.IDs.gender.men30.women70.age.group.colless.feature", "cov.45.IDs.gender.men30.women70.age.group.sackin.feature", 
                         "cov.45.IDs.gender.men30.women70.age.group.mean.tipsDepths.feature", "cov.45.IDs.gender.men30.women70.age.group.mean.nodesDepths.feature",
-                        "cov.45.IDs.gender.men30.women70.age.group.maxHeight.feature", "cov.45.IDs.gender.men30.women70.age.group.LTT.lb.mean.feature", "cov.45.IDs.gender.men30.women70.age.group.LTT.lb.median.feature", 
-                        "cov.45.IDs.gender.men30.women70.age.group.LTT.ub.mean.feature", "cov.45.IDs.gender.men30.women70.age.group.LTT.ub.median.feature",
-                        "cov.45.IDs.gender.men30.women70.age.group.LTT.median.mean.feature", "cov.45.IDs.gender.men30.women70.age.group.LTT.median.median.feature",
+                        "cov.45.IDs.gender.men30.women70.age.group.maxHeight.feature", 
                         
+                        # "cov.45.IDs.gender.men30.women70.age.group.LTT.lb.mean.feature", "cov.45.IDs.gender.men30.women70.age.group.LTT.lb.median.feature", 
+                        # "cov.45.IDs.gender.men30.women70.age.group.LTT.ub.mean.feature", "cov.45.IDs.gender.men30.women70.age.group.LTT.ub.median.feature",
+                        # "cov.45.IDs.gender.men30.women70.age.group.LTT.median.mean.feature", "cov.45.IDs.gender.men30.women70.age.group.LTT.median.median.feature",
+                        # 
                         "cov.45.IDs.gender.men70.women30.age.group.meanHeight.feature", "cov.45.IDs.gender.men70.women30.age.group.colless.feature", "cov.45.IDs.gender.men70.women30.age.group.sackin.feature", 
                         "cov.45.IDs.gender.men70.women30.age.group.mean.tipsDepths.feature", "cov.45.IDs.gender.men70.women30.age.group.mean.nodesDepths.feature",
-                        "cov.45.IDs.gender.men70.women30.age.group.maxHeight.feature", "cov.45.IDs.gender.men70.women30.age.group.LTT.lb.mean.feature", "cov.45.IDs.gender.men70.women30.age.group.LTT.lb.median.feature", 
-                        "cov.45.IDs.gender.men70.women30.age.group.LTT.ub.mean.feature", "cov.45.IDs.gender.men70.women30.age.group.LTT.ub.median.feature",
-                        "cov.45.IDs.gender.men70.women30.age.group.LTT.median.mean.feature", "cov.45.IDs.gender.men70.women30.age.group.LTT.median.median.feature",
+                        "cov.45.IDs.gender.men70.women30.age.group.maxHeight.feature", 
                         
+                        # "cov.45.IDs.gender.men70.women30.age.group.LTT.lb.mean.feature", "cov.45.IDs.gender.men70.women30.age.group.LTT.lb.median.feature", 
+                        # "cov.45.IDs.gender.men70.women30.age.group.LTT.ub.mean.feature", "cov.45.IDs.gender.men70.women30.age.group.LTT.ub.median.feature",
+                        # "cov.45.IDs.gender.men70.women30.age.group.LTT.median.mean.feature", "cov.45.IDs.gender.men70.women30.age.group.LTT.median.median.feature",
+                        # 
                         "cov.55.IDs.gender.men50.women50.meanHeight.feature", "cov.55.IDs.gender.men50.women50.colless.feature", "cov.55.IDs.gender.men50.women50.sackin.feature", 
                         "cov.55.IDs.gender.men50.women50.mean.tipsDepths.feature", "cov.55.IDs.gender.men50.women50.mean.nodesDepths.feature",
-                        "cov.55.IDs.gender.men50.women50.maxHeight.feature", "cov.55.IDs.gender.men50.women50.LTT.lb.mean.feature", "cov.55.IDs.gender.men50.women50.LTT.lb.median.feature", 
-                        "cov.55.IDs.gender.men50.women50.LTT.ub.mean.feature", "cov.55.IDs.gender.men50.women50.LTT.ub.median.feature",
-                        "cov.55.IDs.gender.men50.women50.LTT.median.mean.feature", "cov.55.IDs.gender.men50.women50.LTT.median.median.feature",
+                        "cov.55.IDs.gender.men50.women50.maxHeight.feature", 
                         
+                        # "cov.55.IDs.gender.men50.women50.LTT.lb.mean.feature", "cov.55.IDs.gender.men50.women50.LTT.lb.median.feature", 
+                        # "cov.55.IDs.gender.men50.women50.LTT.ub.mean.feature", "cov.55.IDs.gender.men50.women50.LTT.ub.median.feature",
+                        # "cov.55.IDs.gender.men50.women50.LTT.median.mean.feature", "cov.55.IDs.gender.men50.women50.LTT.median.median.feature",
+                        # 
                         "cov.55.IDs.gender.men30.women70.meanHeight.feature", "cov.55.IDs.gender.men30.women70.colless.feature", "cov.55.IDs.gender.men30.women70.sackin.feature", 
                         "cov.55.IDs.gender.men30.women70.mean.tipsDepths.feature", "cov.55.IDs.gender.men30.women70.mean.nodesDepths.feature",
-                        "cov.55.IDs.gender.men30.women70.maxHeight.feature", "cov.55.IDs.gender.men30.women70.LTT.lb.mean.feature", "cov.55.IDs.gender.men30.women70.LTT.lb.median.feature", 
-                        "cov.55.IDs.gender.men30.women70.LTT.ub.mean.feature", "cov.55.IDs.gender.men30.women70.LTT.ub.median.feature",
-                        "cov.55.IDs.gender.men30.women70.LTT.median.mean.feature", "cov.55.IDs.gender.men30.women70.LTT.median.median.feature",
-                        
+                        "cov.55.IDs.gender.men30.women70.maxHeight.feature", 
+                        # 
+                        # "cov.55.IDs.gender.men30.women70.LTT.lb.mean.feature", "cov.55.IDs.gender.men30.women70.LTT.lb.median.feature", 
+                        # "cov.55.IDs.gender.men30.women70.LTT.ub.mean.feature", "cov.55.IDs.gender.men30.women70.LTT.ub.median.feature",
+                        # "cov.55.IDs.gender.men30.women70.LTT.median.mean.feature", "cov.55.IDs.gender.men30.women70.LTT.median.median.feature",
+                        # 
                         "cov.55.IDs.gender.men70.women30.meanHeight.feature", "cov.55.IDs.gender.men70.women30.colless.feature", "cov.55.IDs.gender.men70.women30.sackin.feature", 
                         "cov.55.IDs.gender.men70.women30.mean.tipsDepths.feature", "cov.55.IDs.gender.men70.women30.mean.nodesDepths.feature",
-                        "cov.55.IDs.gender.men70.women30.maxHeight.feature", "cov.55.IDs.gender.men70.women30.LTT.lb.mean.feature", "cov.55.IDs.gender.men70.women30.LTT.lb.median.feature", 
-                        "cov.55.IDs.gender.men70.women30.LTT.ub.mean.feature", "cov.55.IDs.gender.men70.women30.LTT.ub.median.feature",
-                        "cov.55.IDs.gender.men70.women30.LTT.median.mean.feature", "cov.55.IDs.gender.men70.women30.LTT.median.median.feature",
+                        "cov.55.IDs.gender.men70.women30.maxHeight.feature", 
                         
+                        # "cov.55.IDs.gender.men70.women30.LTT.lb.mean.feature", "cov.55.IDs.gender.men70.women30.LTT.lb.median.feature", 
+                        # "cov.55.IDs.gender.men70.women30.LTT.ub.mean.feature", "cov.55.IDs.gender.men70.women30.LTT.ub.median.feature",
+                        # "cov.55.IDs.gender.men70.women30.LTT.median.mean.feature", "cov.55.IDs.gender.men70.women30.LTT.median.median.feature",
+                        # 
                         "cov.55.IDs.gender.men50.women50.age.group.meanHeight.feature", "cov.55.IDs.gender.men50.women50.age.group.colless.feature", "cov.55.IDs.gender.men50.women50.age.group.sackin.feature", 
                         "cov.55.IDs.gender.men50.women50.age.group.mean.tipsDepths.feature", "cov.55.IDs.gender.men50.women50.age.group.mean.nodesDepths.feature",
-                        "cov.55.IDs.gender.men50.women50.age.group.maxHeight.feature", "cov.55.IDs.gender.men50.women50.age.group.LTT.lb.mean.feature", "cov.55.IDs.gender.men50.women50.age.group.LTT.lb.median.feature", 
-                        "cov.55.IDs.gender.men50.women50.age.group.LTT.ub.mean.feature", "cov.55.IDs.gender.men50.women50.age.group.LTT.ub.median.feature",
-                        "cov.55.IDs.gender.men50.women50.age.group.LTT.median.mean.feature", "cov.55.IDs.gender.men50.women50.age.group.LTT.median.median.feature",
+                        "cov.55.IDs.gender.men50.women50.age.group.maxHeight.feature", 
                         
+                        # "cov.55.IDs.gender.men50.women50.age.group.LTT.lb.mean.feature", "cov.55.IDs.gender.men50.women50.age.group.LTT.lb.median.feature", 
+                        # "cov.55.IDs.gender.men50.women50.age.group.LTT.ub.mean.feature", "cov.55.IDs.gender.men50.women50.age.group.LTT.ub.median.feature",
+                        # "cov.55.IDs.gender.men50.women50.age.group.LTT.median.mean.feature", "cov.55.IDs.gender.men50.women50.age.group.LTT.median.median.feature",
+                        # 
                         "cov.55.IDs.gender.men30.women70.age.group.meanHeight.feature", "cov.55.IDs.gender.men30.women70.age.group.colless.feature", "cov.55.IDs.gender.men30.women70.age.group.sackin.feature", 
                         "cov.55.IDs.gender.men30.women70.age.group.mean.tipsDepths.feature", "cov.55.IDs.gender.men30.women70.age.group.mean.nodesDepths.feature",
-                        "cov.55.IDs.gender.men30.women70.age.group.maxHeight.feature", "cov.55.IDs.gender.men30.women70.age.group.LTT.lb.mean.feature", "cov.55.IDs.gender.men30.women70.age.group.LTT.lb.median.feature", 
-                        "cov.55.IDs.gender.men30.women70.age.group.LTT.ub.mean.feature", "cov.55.IDs.gender.men30.women70.age.group.LTT.ub.median.feature",
-                        "cov.55.IDs.gender.men30.women70.age.group.LTT.median.mean.feature", "cov.55.IDs.gender.men30.women70.age.group.LTT.median.median.feature",
+                        "cov.55.IDs.gender.men30.women70.age.group.maxHeight.feature", 
                         
+                        # "cov.55.IDs.gender.men30.women70.age.group.LTT.lb.mean.feature", "cov.55.IDs.gender.men30.women70.age.group.LTT.lb.median.feature", 
+                        # "cov.55.IDs.gender.men30.women70.age.group.LTT.ub.mean.feature", "cov.55.IDs.gender.men30.women70.age.group.LTT.ub.median.feature",
+                        # "cov.55.IDs.gender.men30.women70.age.group.LTT.median.mean.feature", "cov.55.IDs.gender.men30.women70.age.group.LTT.median.median.feature",
+                        # 
                         "cov.55.IDs.gender.men70.women30.age.group.meanHeight.feature", "cov.55.IDs.gender.men70.women30.age.group.colless.feature", "cov.55.IDs.gender.men70.women30.age.group.sackin.feature", 
                         "cov.55.IDs.gender.men70.women30.age.group.mean.tipsDepths.feature", "cov.55.IDs.gender.men70.women30.age.group.mean.nodesDepths.feature",
-                        "cov.55.IDs.gender.men70.women30.age.group.maxHeight.feature", "cov.55.IDs.gender.men70.women30.age.group.LTT.lb.mean.feature", "cov.55.IDs.gender.men70.women30.age.group.LTT.lb.median.feature", 
-                        "cov.55.IDs.gender.men70.women30.age.group.LTT.ub.mean.feature", "cov.55.IDs.gender.men70.women30.age.group.LTT.ub.median.feature",
-                        "cov.55.IDs.gender.men70.women30.age.group.LTT.median.mean.feature", "cov.55.IDs.gender.men70.women30.age.group.LTT.median.median.feature",
+                        "cov.55.IDs.gender.men70.women30.age.group.maxHeight.feature", 
                         
+                        # "cov.55.IDs.gender.men70.women30.age.group.LTT.lb.mean.feature", "cov.55.IDs.gender.men70.women30.age.group.LTT.lb.median.feature", 
+                        # "cov.55.IDs.gender.men70.women30.age.group.LTT.ub.mean.feature", "cov.55.IDs.gender.men70.women30.age.group.LTT.ub.median.feature",
+                        # "cov.55.IDs.gender.men70.women30.age.group.LTT.median.mean.feature", "cov.55.IDs.gender.men70.women30.age.group.LTT.median.median.feature",
+                        # 
                         "cov.65.IDs.gender.men50.women50.meanHeight.feature", "cov.65.IDs.gender.men50.women50.colless.feature", "cov.65.IDs.gender.men50.women50.sackin.feature", 
                         "cov.65.IDs.gender.men50.women50.mean.tipsDepths.feature", "cov.65.IDs.gender.men50.women50.mean.nodesDepths.feature",
-                        "cov.65.IDs.gender.men50.women50.maxHeight.feature", "cov.65.IDs.gender.men50.women50.LTT.lb.mean.feature", "cov.65.IDs.gender.men50.women50.LTT.lb.median.feature", 
-                        "cov.65.IDs.gender.men50.women50.LTT.ub.mean.feature", "cov.65.IDs.gender.men50.women50.LTT.ub.median.feature",
-                        "cov.65.IDs.gender.men50.women50.LTT.median.mean.feature", "cov.65.IDs.gender.men50.women50.LTT.median.median.feature",
+                        "cov.65.IDs.gender.men50.women50.maxHeight.feature", 
                         
+                        # "cov.65.IDs.gender.men50.women50.LTT.lb.mean.feature", "cov.65.IDs.gender.men50.women50.LTT.lb.median.feature", 
+                        # "cov.65.IDs.gender.men50.women50.LTT.ub.mean.feature", "cov.65.IDs.gender.men50.women50.LTT.ub.median.feature",
+                        # "cov.65.IDs.gender.men50.women50.LTT.median.mean.feature", "cov.65.IDs.gender.men50.women50.LTT.median.median.feature",
+                        # 
                         "cov.65.IDs.gender.men30.women70.meanHeight.feature", "cov.65.IDs.gender.men30.women70.colless.feature", "cov.65.IDs.gender.men30.women70.sackin.feature", 
                         "cov.65.IDs.gender.men30.women70.mean.tipsDepths.feature", "cov.65.IDs.gender.men30.women70.mean.nodesDepths.feature",
-                        "cov.65.IDs.gender.men30.women70.maxHeight.feature", "cov.65.IDs.gender.men30.women70.LTT.lb.mean.feature", "cov.65.IDs.gender.men30.women70.LTT.lb.median.feature", 
-                        "cov.65.IDs.gender.men30.women70.LTT.ub.mean.feature", "cov.65.IDs.gender.men30.women70.LTT.ub.median.feature",
-                        "cov.65.IDs.gender.men30.women70.LTT.median.mean.feature", "cov.65.IDs.gender.men30.women70.LTT.median.median.feature",
+                        "cov.65.IDs.gender.men30.women70.maxHeight.feature", 
                         
+                        # "cov.65.IDs.gender.men30.women70.LTT.lb.mean.feature", "cov.65.IDs.gender.men30.women70.LTT.lb.median.feature", 
+                        # "cov.65.IDs.gender.men30.women70.LTT.ub.mean.feature", "cov.65.IDs.gender.men30.women70.LTT.ub.median.feature",
+                        # "cov.65.IDs.gender.men30.women70.LTT.median.mean.feature", "cov.65.IDs.gender.men30.women70.LTT.median.median.feature",
+                        # 
                         "cov.65.IDs.gender.men70.women30.meanHeight.feature", "cov.65.IDs.gender.men70.women30.colless.feature", "cov.65.IDs.gender.men70.women30.sackin.feature", 
                         "cov.65.IDs.gender.men70.women30.mean.tipsDepths.feature", "cov.65.IDs.gender.men70.women30.mean.nodesDepths.feature",
-                        "cov.65.IDs.gender.men70.women30.maxHeight.feature", "cov.65.IDs.gender.men70.women30.LTT.lb.mean.feature", "cov.65.IDs.gender.men70.women30.LTT.lb.median.feature", 
-                        "cov.65.IDs.gender.men70.women30.LTT.ub.mean.feature", "cov.65.IDs.gender.men70.women30.LTT.ub.median.feature",
-                        "cov.65.IDs.gender.men70.women30.LTT.median.mean.feature", "cov.65.IDs.gender.men70.women30.LTT.median.median.feature",
+                        "cov.65.IDs.gender.men70.women30.maxHeight.feature", 
                         
+                        # "cov.65.IDs.gender.men70.women30.LTT.lb.mean.feature", "cov.65.IDs.gender.men70.women30.LTT.lb.median.feature", 
+                        # "cov.65.IDs.gender.men70.women30.LTT.ub.mean.feature", "cov.65.IDs.gender.men70.women30.LTT.ub.median.feature",
+                        # "cov.65.IDs.gender.men70.women30.LTT.median.mean.feature", "cov.65.IDs.gender.men70.women30.LTT.median.median.feature",
+                        # 
                         "cov.65.IDs.gender.men50.women50.age.group.meanHeight.feature", "cov.65.IDs.gender.men50.women50.age.group.colless.feature", "cov.65.IDs.gender.men50.women50.age.group.sackin.feature", 
                         "cov.65.IDs.gender.men50.women50.age.group.mean.tipsDepths.feature", "cov.65.IDs.gender.men50.women50.age.group.mean.nodesDepths.feature",
-                        "cov.65.IDs.gender.men50.women50.age.group.maxHeight.feature", "cov.65.IDs.gender.men50.women50.age.group.LTT.lb.mean.feature", "cov.65.IDs.gender.men50.women50.age.group.LTT.lb.median.feature", 
-                        "cov.65.IDs.gender.men50.women50.age.group.LTT.ub.mean.feature", "cov.65.IDs.gender.men50.women50.age.group.LTT.ub.median.feature",
-                        "cov.65.IDs.gender.men50.women50.age.group.LTT.median.mean.feature", "cov.65.IDs.gender.men50.women50.age.group.LTT.median.median.feature",
+                        "cov.65.IDs.gender.men50.women50.age.group.maxHeight.feature", 
                         
+                        # "cov.65.IDs.gender.men50.women50.age.group.LTT.lb.mean.feature", "cov.65.IDs.gender.men50.women50.age.group.LTT.lb.median.feature", 
+                        # "cov.65.IDs.gender.men50.women50.age.group.LTT.ub.mean.feature", "cov.65.IDs.gender.men50.women50.age.group.LTT.ub.median.feature",
+                        # "cov.65.IDs.gender.men50.women50.age.group.LTT.median.mean.feature", "cov.65.IDs.gender.men50.women50.age.group.LTT.median.median.feature",
+                        # 
                         "cov.65.IDs.gender.men30.women70.age.group.meanHeight.feature", "cov.65.IDs.gender.men30.women70.age.group.colless.feature", "cov.65.IDs.gender.men30.women70.age.group.sackin.feature", 
                         "cov.65.IDs.gender.men30.women70.age.group.mean.tipsDepths.feature", "cov.65.IDs.gender.men30.women70.age.group.mean.nodesDepths.feature",
-                        "cov.65.IDs.gender.men30.women70.age.group.maxHeight.feature", "cov.65.IDs.gender.men30.women70.age.group.LTT.lb.mean.feature", "cov.65.IDs.gender.men30.women70.age.group.LTT.lb.median.feature", 
-                        "cov.65.IDs.gender.men30.women70.age.group.LTT.ub.mean.feature", "cov.65.IDs.gender.men30.women70.age.group.LTT.ub.median.feature",
-                        "cov.65.IDs.gender.men30.women70.age.group.LTT.median.mean.feature", "cov.65.IDs.gender.men30.women70.age.group.LTT.median.median.feature",
+                        "cov.65.IDs.gender.men30.women70.age.group.maxHeight.feature", 
                         
+                        # "cov.65.IDs.gender.men30.women70.age.group.LTT.lb.mean.feature", "cov.65.IDs.gender.men30.women70.age.group.LTT.lb.median.feature", 
+                        # "cov.65.IDs.gender.men30.women70.age.group.LTT.ub.mean.feature", "cov.65.IDs.gender.men30.women70.age.group.LTT.ub.median.feature",
+                        # "cov.65.IDs.gender.men30.women70.age.group.LTT.median.mean.feature", "cov.65.IDs.gender.men30.women70.age.group.LTT.median.median.feature",
+                        # 
                         "cov.65.IDs.gender.men70.women30.age.group.meanHeight.feature", "cov.65.IDs.gender.men70.women30.age.group.colless.feature", "cov.65.IDs.gender.men70.women30.age.group.sackin.feature", 
                         "cov.65.IDs.gender.men70.women30.age.group.mean.tipsDepths.feature", "cov.65.IDs.gender.men70.women30.age.group.mean.nodesDepths.feature",
-                        "cov.65.IDs.gender.men70.women30.age.group.maxHeight.feature", "cov.65.IDs.gender.men70.women30.age.group.LTT.lb.mean.feature", "cov.65.IDs.gender.men70.women30.age.group.LTT.lb.median.feature", 
-                        "cov.65.IDs.gender.men70.women30.age.group.LTT.ub.mean.feature", "cov.65.IDs.gender.men70.women30.age.group.LTT.ub.median.feature",
-                        "cov.65.IDs.gender.men70.women30.age.group.LTT.median.mean.feature", "cov.65.IDs.gender.men70.women30.age.group.LTT.median.median.feature",
+                        "cov.65.IDs.gender.men70.women30.age.group.maxHeight.feature", 
                         
+                        # "cov.65.IDs.gender.men70.women30.age.group.LTT.lb.mean.feature", "cov.65.IDs.gender.men70.women30.age.group.LTT.lb.median.feature", 
+                        # "cov.65.IDs.gender.men70.women30.age.group.LTT.ub.mean.feature", "cov.65.IDs.gender.men70.women30.age.group.LTT.ub.median.feature",
+                        # "cov.65.IDs.gender.men70.women30.age.group.LTT.median.mean.feature", "cov.65.IDs.gender.men70.women30.age.group.LTT.median.median.feature",
+                        # 
                         "cov.75.IDs.gender.men50.women50.meanHeight.feature", "cov.75.IDs.gender.men50.women50.colless.feature", "cov.75.IDs.gender.men50.women50.sackin.feature", 
                         "cov.75.IDs.gender.men50.women50.mean.tipsDepths.feature", "cov.75.IDs.gender.men50.women50.mean.nodesDepths.feature",
-                        "cov.75.IDs.gender.men50.women50.maxHeight.feature", "cov.75.IDs.gender.men50.women50.LTT.lb.mean.feature", "cov.75.IDs.gender.men50.women50.LTT.lb.median.feature", 
-                        "cov.75.IDs.gender.men50.women50.LTT.ub.mean.feature", "cov.75.IDs.gender.men50.women50.LTT.ub.median.feature",
-                        "cov.75.IDs.gender.men50.women50.LTT.median.mean.feature", "cov.75.IDs.gender.men50.women50.LTT.median.median.feature",
+                        "cov.75.IDs.gender.men50.women50.maxHeight.feature", 
                         
+                        # "cov.75.IDs.gender.men50.women50.LTT.lb.mean.feature", "cov.75.IDs.gender.men50.women50.LTT.lb.median.feature", 
+                        # "cov.75.IDs.gender.men50.women50.LTT.ub.mean.feature", "cov.75.IDs.gender.men50.women50.LTT.ub.median.feature",
+                        # "cov.75.IDs.gender.men50.women50.LTT.median.mean.feature", "cov.75.IDs.gender.men50.women50.LTT.median.median.feature",
+                        # 
                         "cov.75.IDs.gender.men30.women70.meanHeight.feature", "cov.75.IDs.gender.men30.women70.colless.feature", "cov.75.IDs.gender.men30.women70.sackin.feature", 
                         "cov.75.IDs.gender.men30.women70.mean.tipsDepths.feature", "cov.75.IDs.gender.men30.women70.mean.nodesDepths.feature",
-                        "cov.75.IDs.gender.men30.women70.maxHeight.feature", "cov.75.IDs.gender.men30.women70.LTT.lb.mean.feature", "cov.75.IDs.gender.men30.women70.LTT.lb.median.feature", 
-                        "cov.75.IDs.gender.men30.women70.LTT.ub.mean.feature", "cov.75.IDs.gender.men30.women70.LTT.ub.median.feature",
-                        "cov.75.IDs.gender.men30.women70.LTT.median.mean.feature", "cov.75.IDs.gender.men30.women70.LTT.median.median.feature",
+                        "cov.75.IDs.gender.men30.women70.maxHeight.feature", 
                         
+                        # "cov.75.IDs.gender.men30.women70.LTT.lb.mean.feature", "cov.75.IDs.gender.men30.women70.LTT.lb.median.feature", 
+                        # "cov.75.IDs.gender.men30.women70.LTT.ub.mean.feature", "cov.75.IDs.gender.men30.women70.LTT.ub.median.feature",
+                        # "cov.75.IDs.gender.men30.women70.LTT.median.mean.feature", "cov.75.IDs.gender.men30.women70.LTT.median.median.feature",
+                        # 
                         "cov.75.IDs.gender.men70.women30.meanHeight.feature", "cov.75.IDs.gender.men70.women30.colless.feature", "cov.75.IDs.gender.men70.women30.sackin.feature", 
                         "cov.75.IDs.gender.men70.women30.mean.tipsDepths.feature", "cov.75.IDs.gender.men70.women30.mean.nodesDepths.feature",
-                        "cov.75.IDs.gender.men70.women30.maxHeight.feature", "cov.75.IDs.gender.men70.women30.LTT.lb.mean.feature", "cov.75.IDs.gender.men70.women30.LTT.lb.median.feature", 
-                        "cov.75.IDs.gender.men70.women30.LTT.ub.mean.feature", "cov.75.IDs.gender.men70.women30.LTT.ub.median.feature",
-                        "cov.75.IDs.gender.men70.women30.LTT.median.mean.feature", "cov.75.IDs.gender.men70.women30.LTT.median.median.feature",
+                        "cov.75.IDs.gender.men70.women30.maxHeight.feature", 
                         
+                        # "cov.75.IDs.gender.men70.women30.LTT.lb.mean.feature", "cov.75.IDs.gender.men70.women30.LTT.lb.median.feature", 
+                        # "cov.75.IDs.gender.men70.women30.LTT.ub.mean.feature", "cov.75.IDs.gender.men70.women30.LTT.ub.median.feature",
+                        # "cov.75.IDs.gender.men70.women30.LTT.median.mean.feature", "cov.75.IDs.gender.men70.women30.LTT.median.median.feature",
+                        # 
                         "cov.75.IDs.gender.men50.women50.age.group.meanHeight.feature", "cov.75.IDs.gender.men50.women50.age.group.colless.feature", "cov.75.IDs.gender.men50.women50.age.group.sackin.feature", 
                         "cov.75.IDs.gender.men50.women50.age.group.mean.tipsDepths.feature", "cov.75.IDs.gender.men50.women50.age.group.mean.nodesDepths.feature",
-                        "cov.75.IDs.gender.men50.women50.age.group.maxHeight.feature", "cov.75.IDs.gender.men50.women50.age.group.LTT.lb.mean.feature", "cov.75.IDs.gender.men50.women50.age.group.LTT.lb.median.feature", 
-                        "cov.75.IDs.gender.men50.women50.age.group.LTT.ub.mean.feature", "cov.75.IDs.gender.men50.women50.age.group.LTT.ub.median.feature",
-                        "cov.75.IDs.gender.men50.women50.age.group.LTT.median.mean.feature", "cov.75.IDs.gender.men50.women50.age.group.LTT.median.median.feature",
+                        "cov.75.IDs.gender.men50.women50.age.group.maxHeight.feature", 
                         
+                        # "cov.75.IDs.gender.men50.women50.age.group.LTT.lb.mean.feature", "cov.75.IDs.gender.men50.women50.age.group.LTT.lb.median.feature", 
+                        # "cov.75.IDs.gender.men50.women50.age.group.LTT.ub.mean.feature", "cov.75.IDs.gender.men50.women50.age.group.LTT.ub.median.feature",
+                        # "cov.75.IDs.gender.men50.women50.age.group.LTT.median.mean.feature", "cov.75.IDs.gender.men50.women50.age.group.LTT.median.median.feature",
+                        # 
                         "cov.75.IDs.gender.men30.women70.age.group.meanHeight.feature", "cov.75.IDs.gender.men30.women70.age.group.colless.feature", "cov.75.IDs.gender.men30.women70.age.group.sackin.feature", 
                         "cov.75.IDs.gender.men30.women70.age.group.mean.tipsDepths.feature", "cov.75.IDs.gender.men30.women70.age.group.mean.nodesDepths.feature",
-                        "cov.75.IDs.gender.men30.women70.age.group.maxHeight.feature", "cov.75.IDs.gender.men30.women70.age.group.LTT.lb.mean.feature", "cov.75.IDs.gender.men30.women70.age.group.LTT.lb.median.feature", 
-                        "cov.75.IDs.gender.men30.women70.age.group.LTT.ub.mean.feature", "cov.75.IDs.gender.men30.women70.age.group.LTT.ub.median.feature",
-                        "cov.75.IDs.gender.men30.women70.age.group.LTT.median.mean.feature", "cov.75.IDs.gender.men30.women70.age.group.LTT.median.median.feature",
+                        "cov.75.IDs.gender.men30.women70.age.group.maxHeight.feature", 
                         
+                        # "cov.75.IDs.gender.men30.women70.age.group.LTT.lb.mean.feature", "cov.75.IDs.gender.men30.women70.age.group.LTT.lb.median.feature", 
+                        # "cov.75.IDs.gender.men30.women70.age.group.LTT.ub.mean.feature", "cov.75.IDs.gender.men30.women70.age.group.LTT.ub.median.feature",
+                        # "cov.75.IDs.gender.men30.women70.age.group.LTT.median.mean.feature", "cov.75.IDs.gender.men30.women70.age.group.LTT.median.median.feature",
+                        # 
                         "cov.75.IDs.gender.men70.women30.age.group.meanHeight.feature", "cov.75.IDs.gender.men70.women30.age.group.colless.feature", "cov.75.IDs.gender.men70.women30.age.group.sackin.feature", 
                         "cov.75.IDs.gender.men70.women30.age.group.mean.tipsDepths.feature", "cov.75.IDs.gender.men70.women30.age.group.mean.nodesDepths.feature",
-                        "cov.75.IDs.gender.men70.women30.age.group.maxHeight.feature", "cov.75.IDs.gender.men70.women30.age.group.LTT.lb.mean.feature", "cov.75.IDs.gender.men70.women30.age.group.LTT.lb.median.feature", 
-                        "cov.75.IDs.gender.men70.women30.age.group.LTT.ub.mean.feature", "cov.75.IDs.gender.men70.women30.age.group.LTT.ub.median.feature",
-                        "cov.75.IDs.gender.men70.women30.age.group.LTT.median.mean.feature", "cov.75.IDs.gender.men70.women30.age.group.LTT.median.median.feature",
+                        "cov.75.IDs.gender.men70.women30.age.group.maxHeight.feature", 
                         
+                        # "cov.75.IDs.gender.men70.women30.age.group.LTT.lb.mean.feature", "cov.75.IDs.gender.men70.women30.age.group.LTT.lb.median.feature", 
+                        # "cov.75.IDs.gender.men70.women30.age.group.LTT.ub.mean.feature", "cov.75.IDs.gender.men70.women30.age.group.LTT.ub.median.feature",
+                        # "cov.75.IDs.gender.men70.women30.age.group.LTT.median.mean.feature", "cov.75.IDs.gender.men70.women30.age.group.LTT.median.median.feature",
+                        # 
                         "cov.85.IDs.gender.men50.women50.meanHeight.feature", "cov.85.IDs.gender.men50.women50.colless.feature", "cov.85.IDs.gender.men50.women50.sackin.feature", 
                         "cov.85.IDs.gender.men50.women50.mean.tipsDepths.feature", "cov.85.IDs.gender.men50.women50.mean.nodesDepths.feature",
-                        "cov.85.IDs.gender.men50.women50.maxHeight.feature", "cov.85.IDs.gender.men50.women50.LTT.lb.mean.feature", "cov.85.IDs.gender.men50.women50.LTT.lb.median.feature", 
-                        "cov.85.IDs.gender.men50.women50.LTT.ub.mean.feature", "cov.85.IDs.gender.men50.women50.LTT.ub.median.feature",
-                        "cov.85.IDs.gender.men50.women50.LTT.median.mean.feature", "cov.85.IDs.gender.men50.women50.LTT.median.median.feature",
+                        "cov.85.IDs.gender.men50.women50.maxHeight.feature", 
                         
+                        # "cov.85.IDs.gender.men50.women50.LTT.lb.mean.feature", "cov.85.IDs.gender.men50.women50.LTT.lb.median.feature", 
+                        # "cov.85.IDs.gender.men50.women50.LTT.ub.mean.feature", "cov.85.IDs.gender.men50.women50.LTT.ub.median.feature",
+                        # "cov.85.IDs.gender.men50.women50.LTT.median.mean.feature", "cov.85.IDs.gender.men50.women50.LTT.median.median.feature",
+                        # 
                         "cov.85.IDs.gender.men30.women70.meanHeight.feature", "cov.85.IDs.gender.men30.women70.colless.feature", "cov.85.IDs.gender.men30.women70.sackin.feature", 
                         "cov.85.IDs.gender.men30.women70.mean.tipsDepths.feature", "cov.85.IDs.gender.men30.women70.mean.nodesDepths.feature",
-                        "cov.85.IDs.gender.men30.women70.maxHeight.feature", "cov.85.IDs.gender.men30.women70.LTT.lb.mean.feature", "cov.85.IDs.gender.men30.women70.LTT.lb.median.feature", 
-                        "cov.85.IDs.gender.men30.women70.LTT.ub.mean.feature", "cov.85.IDs.gender.men30.women70.LTT.ub.median.feature",
-                        "cov.85.IDs.gender.men30.women70.LTT.median.mean.feature", "cov.85.IDs.gender.men30.women70.LTT.median.median.feature",
+                        "cov.85.IDs.gender.men30.women70.maxHeight.feature", 
                         
+                        # "cov.85.IDs.gender.men30.women70.LTT.lb.mean.feature", "cov.85.IDs.gender.men30.women70.LTT.lb.median.feature", 
+                        # "cov.85.IDs.gender.men30.women70.LTT.ub.mean.feature", "cov.85.IDs.gender.men30.women70.LTT.ub.median.feature",
+                        # "cov.85.IDs.gender.men30.women70.LTT.median.mean.feature", "cov.85.IDs.gender.men30.women70.LTT.median.median.feature",
+                        # 
                         "cov.85.IDs.gender.men70.women30.meanHeight.feature", "cov.85.IDs.gender.men70.women30.colless.feature", "cov.85.IDs.gender.men70.women30.sackin.feature", 
                         "cov.85.IDs.gender.men70.women30.mean.tipsDepths.feature", "cov.85.IDs.gender.men70.women30.mean.nodesDepths.feature",
-                        "cov.85.IDs.gender.men70.women30.maxHeight.feature", "cov.85.IDs.gender.men70.women30.LTT.lb.mean.feature", "cov.85.IDs.gender.men70.women30.LTT.lb.median.feature", 
-                        "cov.85.IDs.gender.men70.women30.LTT.ub.mean.feature", "cov.85.IDs.gender.men70.women30.LTT.ub.median.feature",
-                        "cov.85.IDs.gender.men70.women30.LTT.median.mean.feature", "cov.85.IDs.gender.men70.women30.LTT.median.median.feature",
+                        "cov.85.IDs.gender.men70.women30.maxHeight.feature", 
                         
+                        # "cov.85.IDs.gender.men70.women30.LTT.lb.mean.feature", "cov.85.IDs.gender.men70.women30.LTT.lb.median.feature", 
+                        # "cov.85.IDs.gender.men70.women30.LTT.ub.mean.feature", "cov.85.IDs.gender.men70.women30.LTT.ub.median.feature",
+                        # "cov.85.IDs.gender.men70.women30.LTT.median.mean.feature", "cov.85.IDs.gender.men70.women30.LTT.median.median.feature",
+                        # 
                         "cov.85.IDs.gender.men50.women50.age.group.meanHeight.feature", "cov.85.IDs.gender.men50.women50.age.group.colless.feature", "cov.85.IDs.gender.men50.women50.age.group.sackin.feature", 
                         "cov.85.IDs.gender.men50.women50.age.group.mean.tipsDepths.feature", "cov.85.IDs.gender.men50.women50.age.group.mean.nodesDepths.feature",
-                        "cov.85.IDs.gender.men50.women50.age.group.maxHeight.feature", "cov.85.IDs.gender.men50.women50.age.group.LTT.lb.mean.feature", "cov.85.IDs.gender.men50.women50.age.group.LTT.lb.median.feature", 
-                        "cov.85.IDs.gender.men50.women50.age.group.LTT.ub.mean.feature", "cov.85.IDs.gender.men50.women50.age.group.LTT.ub.median.feature",
-                        "cov.85.IDs.gender.men50.women50.age.group.LTT.median.mean.feature", "cov.85.IDs.gender.men50.women50.age.group.LTT.median.median.feature",
+                        "cov.85.IDs.gender.men50.women50.age.group.maxHeight.feature", 
                         
+                        # "cov.85.IDs.gender.men50.women50.age.group.LTT.lb.mean.feature", "cov.85.IDs.gender.men50.women50.age.group.LTT.lb.median.feature", 
+                        # "cov.85.IDs.gender.men50.women50.age.group.LTT.ub.mean.feature", "cov.85.IDs.gender.men50.women50.age.group.LTT.ub.median.feature",
+                        # "cov.85.IDs.gender.men50.women50.age.group.LTT.median.mean.feature", "cov.85.IDs.gender.men50.women50.age.group.LTT.median.median.feature",
+                        # 
                         "cov.85.IDs.gender.men30.women70.age.group.meanHeight.feature", "cov.85.IDs.gender.men30.women70.age.group.colless.feature", "cov.85.IDs.gender.men30.women70.age.group.sackin.feature", 
                         "cov.85.IDs.gender.men30.women70.age.group.mean.tipsDepths.feature", "cov.85.IDs.gender.men30.women70.age.group.mean.nodesDepths.feature",
-                        "cov.85.IDs.gender.men30.women70.age.group.maxHeight.feature", "cov.85.IDs.gender.men30.women70.age.group.LTT.lb.mean.feature", "cov.85.IDs.gender.men30.women70.age.group.LTT.lb.median.feature", 
-                        "cov.85.IDs.gender.men30.women70.age.group.LTT.ub.mean.feature", "cov.85.IDs.gender.men30.women70.age.group.LTT.ub.median.feature",
-                        "cov.85.IDs.gender.men30.women70.age.group.LTT.median.mean.feature", "cov.85.IDs.gender.men30.women70.age.group.LTT.median.median.feature",
+                        "cov.85.IDs.gender.men30.women70.age.group.maxHeight.feature", 
                         
+                        # "cov.85.IDs.gender.men30.women70.age.group.LTT.lb.mean.feature", "cov.85.IDs.gender.men30.women70.age.group.LTT.lb.median.feature", 
+                        # "cov.85.IDs.gender.men30.women70.age.group.LTT.ub.mean.feature", "cov.85.IDs.gender.men30.women70.age.group.LTT.ub.median.feature",
+                        # "cov.85.IDs.gender.men30.women70.age.group.LTT.median.mean.feature", "cov.85.IDs.gender.men30.women70.age.group.LTT.median.median.feature",
+                        # 
                         "cov.85.IDs.gender.men70.women30.age.group.meanHeight.feature", "cov.85.IDs.gender.men70.women30.age.group.colless.feature", "cov.85.IDs.gender.men70.women30.age.group.sackin.feature", 
                         "cov.85.IDs.gender.men70.women30.age.group.mean.tipsDepths.feature", "cov.85.IDs.gender.men70.women30.age.group.mean.nodesDepths.feature",
-                        "cov.85.IDs.gender.men70.women30.age.group.maxHeight.feature", "cov.85.IDs.gender.men70.women30.age.group.LTT.lb.mean.feature", "cov.85.IDs.gender.men70.women30.age.group.LTT.lb.median.feature", 
-                        "cov.85.IDs.gender.men70.women30.age.group.LTT.ub.mean.feature", "cov.85.IDs.gender.men70.women30.age.group.LTT.ub.median.feature",
-                        "cov.85.IDs.gender.men70.women30.age.group.LTT.median.mean.feature", "cov.85.IDs.gender.men70.women30.age.group.LTT.median.median.feature",
+                        "cov.85.IDs.gender.men70.women30.age.group.maxHeight.feature", 
                         
+                        # "cov.85.IDs.gender.men70.women30.age.group.LTT.lb.mean.feature", "cov.85.IDs.gender.men70.women30.age.group.LTT.lb.median.feature", 
+                        # "cov.85.IDs.gender.men70.women30.age.group.LTT.ub.mean.feature", "cov.85.IDs.gender.men70.women30.age.group.LTT.ub.median.feature",
+                        # "cov.85.IDs.gender.men70.women30.age.group.LTT.median.mean.feature", "cov.85.IDs.gender.men70.women30.age.group.LTT.median.median.feature",
+                        # 
                         "cov.95.IDs.gender.men50.women50.meanHeight.feature", "cov.95.IDs.gender.men50.women50.colless.feature", "cov.95.IDs.gender.men50.women50.sackin.feature", 
                         "cov.95.IDs.gender.men50.women50.mean.tipsDepths.feature", "cov.95.IDs.gender.men50.women50.mean.nodesDepths.feature",
-                        "cov.95.IDs.gender.men50.women50.maxHeight.feature", "cov.95.IDs.gender.men50.women50.LTT.lb.mean.feature", "cov.95.IDs.gender.men50.women50.LTT.lb.median.feature", 
-                        "cov.95.IDs.gender.men50.women50.LTT.ub.mean.feature", "cov.95.IDs.gender.men50.women50.LTT.ub.median.feature",
-                        "cov.95.IDs.gender.men50.women50.LTT.median.mean.feature", "cov.95.IDs.gender.men50.women50.LTT.median.median.feature",
+                        "cov.95.IDs.gender.men50.women50.maxHeight.feature", 
                         
+                        # "cov.95.IDs.gender.men50.women50.LTT.lb.mean.feature", "cov.95.IDs.gender.men50.women50.LTT.lb.median.feature", 
+                        # "cov.95.IDs.gender.men50.women50.LTT.ub.mean.feature", "cov.95.IDs.gender.men50.women50.LTT.ub.median.feature",
+                        # "cov.95.IDs.gender.men50.women50.LTT.median.mean.feature", "cov.95.IDs.gender.men50.women50.LTT.median.median.feature",
+                        # 
                         "cov.95.IDs.gender.men30.women70.meanHeight.feature", "cov.95.IDs.gender.men30.women70.colless.feature", "cov.95.IDs.gender.men30.women70.sackin.feature", 
                         "cov.95.IDs.gender.men30.women70.mean.tipsDepths.feature", "cov.95.IDs.gender.men30.women70.mean.nodesDepths.feature",
-                        "cov.95.IDs.gender.men30.women70.maxHeight.feature", "cov.95.IDs.gender.men30.women70.LTT.lb.mean.feature", "cov.95.IDs.gender.men30.women70.LTT.lb.median.feature", 
-                        "cov.95.IDs.gender.men30.women70.LTT.ub.mean.feature", "cov.95.IDs.gender.men30.women70.LTT.ub.median.feature",
-                        "cov.95.IDs.gender.men30.women70.LTT.median.mean.feature", "cov.95.IDs.gender.men30.women70.LTT.median.median.feature",
+                        "cov.95.IDs.gender.men30.women70.maxHeight.feature", 
                         
+                        # "cov.95.IDs.gender.men30.women70.LTT.lb.mean.feature", "cov.95.IDs.gender.men30.women70.LTT.lb.median.feature", 
+                        # "cov.95.IDs.gender.men30.women70.LTT.ub.mean.feature", "cov.95.IDs.gender.men30.women70.LTT.ub.median.feature",
+                        # "cov.95.IDs.gender.men30.women70.LTT.median.mean.feature", "cov.95.IDs.gender.men30.women70.LTT.median.median.feature",
+                        # 
                         "cov.95.IDs.gender.men70.women30.meanHeight.feature", "cov.95.IDs.gender.men70.women30.colless.feature", "cov.95.IDs.gender.men70.women30.sackin.feature", 
                         "cov.95.IDs.gender.men70.women30.mean.tipsDepths.feature", "cov.95.IDs.gender.men70.women30.mean.nodesDepths.feature",
-                        "cov.95.IDs.gender.men70.women30.maxHeight.feature", "cov.95.IDs.gender.men70.women30.LTT.lb.mean.feature", "cov.95.IDs.gender.men70.women30.LTT.lb.median.feature", 
-                        "cov.95.IDs.gender.men70.women30.LTT.ub.mean.feature", "cov.95.IDs.gender.men70.women30.LTT.ub.median.feature",
-                        "cov.95.IDs.gender.men70.women30.LTT.median.mean.feature", "cov.95.IDs.gender.men70.women30.LTT.median.median.feature",
+                        "cov.95.IDs.gender.men70.women30.maxHeight.feature", 
                         
+                        # "cov.95.IDs.gender.men70.women30.LTT.lb.mean.feature", "cov.95.IDs.gender.men70.women30.LTT.lb.median.feature", 
+                        # "cov.95.IDs.gender.men70.women30.LTT.ub.mean.feature", "cov.95.IDs.gender.men70.women30.LTT.ub.median.feature",
+                        # "cov.95.IDs.gender.men70.women30.LTT.median.mean.feature", "cov.95.IDs.gender.men70.women30.LTT.median.median.feature",
+                        # 
                         "cov.95.IDs.gender.men50.women50.age.group.meanHeight.feature", "cov.95.IDs.gender.men50.women50.age.group.colless.feature", "cov.95.IDs.gender.men50.women50.age.group.sackin.feature", 
                         "cov.95.IDs.gender.men50.women50.age.group.mean.tipsDepths.feature", "cov.95.IDs.gender.men50.women50.age.group.mean.nodesDepths.feature",
-                        "cov.95.IDs.gender.men50.women50.age.group.maxHeight.feature", "cov.95.IDs.gender.men50.women50.age.group.LTT.lb.mean.feature", "cov.95.IDs.gender.men50.women50.age.group.LTT.lb.median.feature", 
-                        "cov.95.IDs.gender.men50.women50.age.group.LTT.ub.mean.feature", "cov.95.IDs.gender.men50.women50.age.group.LTT.ub.median.feature",
-                        "cov.95.IDs.gender.men50.women50.age.group.LTT.median.mean.feature", "cov.95.IDs.gender.men50.women50.age.group.LTT.median.median.feature",
+                        "cov.95.IDs.gender.men50.women50.age.group.maxHeight.feature", 
                         
+                        # "cov.95.IDs.gender.men50.women50.age.group.LTT.lb.mean.feature", "cov.95.IDs.gender.men50.women50.age.group.LTT.lb.median.feature", 
+                        # "cov.95.IDs.gender.men50.women50.age.group.LTT.ub.mean.feature", "cov.95.IDs.gender.men50.women50.age.group.LTT.ub.median.feature",
+                        # "cov.95.IDs.gender.men50.women50.age.group.LTT.median.mean.feature", "cov.95.IDs.gender.men50.women50.age.group.LTT.median.median.feature",
+                        # 
                         "cov.95.IDs.gender.men30.women70.age.group.meanHeight.feature", "cov.95.IDs.gender.men30.women70.age.group.colless.feature", "cov.95.IDs.gender.men30.women70.age.group.sackin.feature", 
                         "cov.95.IDs.gender.men30.women70.age.group.mean.tipsDepths.feature", "cov.95.IDs.gender.men30.women70.age.group.mean.nodesDepths.feature",
-                        "cov.95.IDs.gender.men30.women70.age.group.maxHeight.feature", "cov.95.IDs.gender.men30.women70.age.group.LTT.lb.mean.feature", "cov.95.IDs.gender.men30.women70.age.group.LTT.lb.median.feature", 
-                        "cov.95.IDs.gender.men30.women70.age.group.LTT.ub.mean.feature", "cov.95.IDs.gender.men30.women70.age.group.LTT.ub.median.feature",
-                        "cov.95.IDs.gender.men30.women70.age.group.LTT.median.mean.feature", "cov.95.IDs.gender.men30.women70.age.group.LTT.median.median.feature",
+                        "cov.95.IDs.gender.men30.women70.age.group.maxHeight.feature", 
                         
+                        # "cov.95.IDs.gender.men30.women70.age.group.LTT.lb.mean.feature", "cov.95.IDs.gender.men30.women70.age.group.LTT.lb.median.feature", 
+                        # "cov.95.IDs.gender.men30.women70.age.group.LTT.ub.mean.feature", "cov.95.IDs.gender.men30.women70.age.group.LTT.ub.median.feature",
+                        # "cov.95.IDs.gender.men30.women70.age.group.LTT.median.mean.feature", "cov.95.IDs.gender.men30.women70.age.group.LTT.median.median.feature",
+                        # 
                         "cov.95.IDs.gender.men70.women30.age.group.meanHeight.feature", "cov.95.IDs.gender.men70.women30.age.group.colless.feature", "cov.95.IDs.gender.men70.women30.age.group.sackin.feature", 
                         "cov.95.IDs.gender.men70.women30.age.group.mean.tipsDepths.feature", "cov.95.IDs.gender.men70.women30.age.group.mean.nodesDepths.feature",
-                        "cov.95.IDs.gender.men70.women30.age.group.maxHeight.feature", "cov.95.IDs.gender.men70.women30.age.group.LTT.lb.mean.feature", "cov.95.IDs.gender.men70.women30.age.group.LTT.lb.median.feature", 
-                        "cov.95.IDs.gender.men70.women30.age.group.LTT.ub.mean.feature", "cov.95.IDs.gender.men70.women30.age.group.LTT.ub.median.feature",
-                        "cov.95.IDs.gender.men70.women30.age.group.LTT.median.mean.feature", "cov.95.IDs.gender.men70.women30.age.group.LTT.median.median.feature"
+                        "cov.95.IDs.gender.men70.women30.age.group.maxHeight.feature",
+                        # 
+                        # "cov.95.IDs.gender.men70.women30.age.group.LTT.lb.mean.feature", "cov.95.IDs.gender.men70.women30.age.group.LTT.lb.median.feature", 
+                        # "cov.95.IDs.gender.men70.women30.age.group.LTT.ub.mean.feature", "cov.95.IDs.gender.men70.women30.age.group.LTT.ub.median.feature",
+                        # "cov.95.IDs.gender.men70.women30.age.group.LTT.median.mean.feature", "cov.95.IDs.gender.men70.women30.age.group.LTT.median.median.feature"
+                        
+                        
+                        "cov.35.gender.men50.women50.ratio.seq", "cov.35.gender.men50.women50.ratio.emp",
+                        "cov.35.gender.men30.women70.ratio.seq", "cov.35.gender.men30.women70.ratio.emp",
+                        "cov.35.gender.men70.women30.ratio.seq", "cov.35.gender.men70.women30.ratio.emp",
+                        "cov.35.gender.men50.women50.age.group.ratio.seq", "cov.35.gender.men50.women50.age.group.ratio.emp",
+                        "cov.35.gender.men30.women70.age.group.ratio.seq", "cov.35.gender.men30.women70.age.group.ratio.emp",
+                        "cov.35.gender.men70.women30.age.group.ratio.seq", "cov.35.gender.men70.women30.age.group.ratio.emp", 
+                        
+                        "cov.45.gender.men50.women50.ratio.seq", "cov.45.gender.men50.women50.ratio.emp",
+                        "cov.45.gender.men30.women70.ratio.seq", "cov.45.gender.men30.women70.ratio.emp",
+                        "cov.45.gender.men70.women30.ratio.seq", "cov.45.gender.men70.women30.ratio.emp",
+                        "cov.45.gender.men50.women50.age.group.ratio.seq", "cov.45.gender.men50.women50.age.group.ratio.emp",
+                        "cov.45.gender.men30.women70.age.group.ratio.seq", "cov.45.gender.men30.women70.age.group.ratio.emp",
+                        "cov.45.gender.men70.women30.age.group.ratio.seq", "cov.45.gender.men70.women30.age.group.ratio.emp", 
+                        
+                        "cov.55.gender.men50.women50.ratio.seq", "cov.55.gender.men50.women50.ratio.emp",
+                        "cov.55.gender.men30.women70.ratio.seq", "cov.55.gender.men30.women70.ratio.emp",
+                        "cov.55.gender.men70.women30.ratio.seq", "cov.55.gender.men70.women30.ratio.emp",
+                        "cov.55.gender.men50.women50.age.group.ratio.seq", "cov.55.gender.men50.women50.age.group.ratio.emp",
+                        "cov.55.gender.men30.women70.age.group.ratio.seq", "cov.55.gender.men30.women70.age.group.ratio.emp",
+                        "cov.55.gender.men70.women30.age.group.ratio.seq", "cov.55.gender.men70.women30.age.group.ratio.emp", 
+                        
+                        "cov.65.gender.men50.women50.ratio.seq", "cov.65.gender.men50.women50.ratio.emp",
+                        "cov.65.gender.men30.women70.ratio.seq", "cov.65.gender.men30.women70.ratio.emp",
+                        "cov.65.gender.men70.women30.ratio.seq", "cov.65.gender.men70.women30.ratio.emp",
+                        "cov.65.gender.men50.women50.age.group.ratio.seq", "cov.65.gender.men50.women50.age.group.ratio.emp",
+                        "cov.65.gender.men30.women70.age.group.ratio.seq", "cov.65.gender.men30.women70.age.group.ratio.emp",
+                        "cov.65.gender.men70.women30.age.group.ratio.seq", "cov.65.gender.men70.women30.age.group.ratio.emp", 
+                        
+                        "cov.75.gender.men50.women50.ratio.seq", "cov.75.gender.men50.women50.ratio.emp",
+                        "cov.75.gender.men30.women70.ratio.seq", "cov.75.gender.men30.women70.ratio.emp",
+                        "cov.75.gender.men70.women30.ratio.seq", "cov.75.gender.men70.women30.ratio.emp",
+                        "cov.75.gender.men50.women50.age.group.ratio.seq", "cov.75.gender.men50.women50.age.group.ratio.emp",
+                        "cov.75.gender.men30.women70.age.group.ratio.seq", "cov.75.gender.men30.women70.age.group.ratio.emp",
+                        "cov.75.gender.men70.women30.age.group.ratio.seq", "cov.75.gender.men70.women30.age.group.ratio.emp", 
+                        
+                        "cov.85.gender.men50.women50.ratio.seq", "cov.85.gender.men50.women50.ratio.emp",
+                        "cov.85.gender.men30.women70.ratio.seq", "cov.85.gender.men30.women70.ratio.emp",
+                        "cov.85.gender.men70.women30.ratio.seq", "cov.85.gender.men70.women30.ratio.emp",
+                        "cov.85.gender.men50.women50.age.group.ratio.seq", "cov.85.gender.men50.women50.age.group.ratio.emp",
+                        "cov.85.gender.men30.women70.age.group.ratio.seq", "cov.85.gender.men30.women70.age.group.ratio.emp",
+                        "cov.85.gender.men70.women30.age.group.ratio.seq", "cov.85.gender.men70.women30.age.group.ratio.emp", 
+                        
+                        "cov.95.gender.men50.women50.ratio.seq", "cov.95.gender.men50.women50.ratio.emp",
+                        "cov.95.gender.men30.women70.ratio.seq", "cov.95.gender.men30.women70.ratio.emp",
+                        "cov.95.gender.men70.women30.ratio.seq", "cov.95.gender.men70.women30.ratio.emp",
+                        "cov.95.gender.men50.women50.age.group.ratio.seq", "cov.95.gender.men50.women50.age.group.ratio.emp",
+                        "cov.95.gender.men30.women70.age.group.ratio.seq", "cov.95.gender.men30.women70.age.group.ratio.emp",
+                        "cov.95.gender.men70.women30.age.group.ratio.seq", "cov.95.gender.men70.women30.age.group.ratio.emp"
     )
     
     names(summary.df) <- features.names # > length(features.names) [1] 549
@@ -2828,269 +3277,407 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                         
                         "hiv.prev.lt25.women", "hiv.prev.lt25.men", "hiv.prev.25.34.women",
                         "hiv.prev.25.34.men", "hiv.prev.35.44.women", "hiv.prev.35.44.men", "transm.rate", # cov.vector
-                        "relas.rate",   "relsperpersonperyear", "agegapsd",
-                        #"AAD.male", "SDAD.male", "slope.male", "WSD.male", "BSD.male", "intercept.male",
+                        "relas.rate",  "relsperpersonperyear", "agegapsd",
+                        
+                        "AAD.male", "SDAD.male", "slope.male", "WSD.male", "BSD.male", "intercept.male",
+                        
                         "pp.cp.6months.male",
                         
                         "meanHeight.feature", "colless.feature", "sackin.feature", "mean.tipsDepths.feature", "mean.nodesDepths.feature",
-                        "maxHeight.feature", "LTT.lb.mean.feature", "LTT.lb.median.feature", "LTT.ub.mean.feature", "LTT.ub.median.feature",
-                        "LTT.median.mean.feature", "LTT.median.median.feature",
+                        "maxHeight.feature", 
+                        
+                        # "LTT.lb.mean.feature", "LTT.lb.median.feature", "LTT.ub.mean.feature", "LTT.ub.median.feature",
+                        # "LTT.median.mean.feature", "LTT.median.median.feature",
                         
                         
                         "cov.35.IDs.gender.men50.women50.meanHeight.feature", "cov.35.IDs.gender.men50.women50.colless.feature", "cov.35.IDs.gender.men50.women50.sackin.feature", 
                         "cov.35.IDs.gender.men50.women50.mean.tipsDepths.feature", "cov.35.IDs.gender.men50.women50.mean.nodesDepths.feature",
-                        "cov.35.IDs.gender.men50.women50.maxHeight.feature", "cov.35.IDs.gender.men50.women50.LTT.lb.mean.feature", "cov.35.IDs.gender.men50.women50.LTT.lb.median.feature", 
-                        "cov.35.IDs.gender.men50.women50.LTT.ub.mean.feature", "cov.35.IDs.gender.men50.women50.LTT.ub.median.feature",
-                        "cov.35.IDs.gender.men50.women50.LTT.median.mean.feature", "cov.35.IDs.gender.men50.women50.LTT.median.median.feature",
+                        "cov.35.IDs.gender.men50.women50.maxHeight.feature", 
                         
+                        # "cov.35.IDs.gender.men50.women50.LTT.lb.mean.feature", "cov.35.IDs.gender.men50.women50.LTT.lb.median.feature", 
+                        # "cov.35.IDs.gender.men50.women50.LTT.ub.mean.feature", "cov.35.IDs.gender.men50.women50.LTT.ub.median.feature",
+                        # "cov.35.IDs.gender.men50.women50.LTT.median.mean.feature", "cov.35.IDs.gender.men50.women50.LTT.median.median.feature",
+                        # 
                         "cov.35.IDs.gender.men30.women70.meanHeight.feature", "cov.35.IDs.gender.men30.women70.colless.feature", "cov.35.IDs.gender.men30.women70.sackin.feature", 
                         "cov.35.IDs.gender.men30.women70.mean.tipsDepths.feature", "cov.35.IDs.gender.men30.women70.mean.nodesDepths.feature",
-                        "cov.35.IDs.gender.men30.women70.maxHeight.feature", "cov.35.IDs.gender.men30.women70.LTT.lb.mean.feature", "cov.35.IDs.gender.men30.women70.LTT.lb.median.feature", 
-                        "cov.35.IDs.gender.men30.women70.LTT.ub.mean.feature", "cov.35.IDs.gender.men30.women70.LTT.ub.median.feature",
-                        "cov.35.IDs.gender.men30.women70.LTT.median.mean.feature", "cov.35.IDs.gender.men30.women70.LTT.median.median.feature",
+                        "cov.35.IDs.gender.men30.women70.maxHeight.feature", 
                         
+                        # "cov.35.IDs.gender.men30.women70.LTT.lb.mean.feature", "cov.35.IDs.gender.men30.women70.LTT.lb.median.feature", 
+                        # "cov.35.IDs.gender.men30.women70.LTT.ub.mean.feature", "cov.35.IDs.gender.men30.women70.LTT.ub.median.feature",
+                        # "cov.35.IDs.gender.men30.women70.LTT.median.mean.feature", "cov.35.IDs.gender.men30.women70.LTT.median.median.feature",
+                        # 
                         "cov.35.IDs.gender.men70.women30.meanHeight.feature", "cov.35.IDs.gender.men70.women30.colless.feature", "cov.35.IDs.gender.men70.women30.sackin.feature", 
                         "cov.35.IDs.gender.men70.women30.mean.tipsDepths.feature", "cov.35.IDs.gender.men70.women30.mean.nodesDepths.feature",
-                        "cov.35.IDs.gender.men70.women30.maxHeight.feature", "cov.35.IDs.gender.men70.women30.LTT.lb.mean.feature", "cov.35.IDs.gender.men70.women30.LTT.lb.median.feature", 
-                        "cov.35.IDs.gender.men70.women30.LTT.ub.mean.feature", "cov.35.IDs.gender.men70.women30.LTT.ub.median.feature",
-                        "cov.35.IDs.gender.men70.women30.LTT.median.mean.feature", "cov.35.IDs.gender.men70.women30.LTT.median.median.feature",
-                        
+                        "cov.35.IDs.gender.men70.women30.maxHeight.feature", 
+                        # 
+                        # "cov.35.IDs.gender.men70.women30.LTT.lb.mean.feature", "cov.35.IDs.gender.men70.women30.LTT.lb.median.feature", 
+                        # "cov.35.IDs.gender.men70.women30.LTT.ub.mean.feature", "cov.35.IDs.gender.men70.women30.LTT.ub.median.feature",
+                        # "cov.35.IDs.gender.men70.women30.LTT.median.mean.feature", "cov.35.IDs.gender.men70.women30.LTT.median.median.feature",
+                        # 
                         "cov.35.IDs.gender.men50.women50.age.group.meanHeight.feature", "cov.35.IDs.gender.men50.women50.age.group.colless.feature", "cov.35.IDs.gender.men50.women50.age.group.sackin.feature", 
                         "cov.35.IDs.gender.men50.women50.age.group.mean.tipsDepths.feature", "cov.35.IDs.gender.men50.women50.age.group.mean.nodesDepths.feature",
-                        "cov.35.IDs.gender.men50.women50.age.group.maxHeight.feature", "cov.35.IDs.gender.men50.women50.age.group.LTT.lb.mean.feature", "cov.35.IDs.gender.men50.women50.age.group.LTT.lb.median.feature", 
-                        "cov.35.IDs.gender.men50.women50.age.group.LTT.ub.mean.feature", "cov.35.IDs.gender.men50.women50.age.group.LTT.ub.median.feature",
-                        "cov.35.IDs.gender.men50.women50.age.group.LTT.median.mean.feature", "cov.35.IDs.gender.men50.women50.age.group.LTT.median.median.feature",
+                        "cov.35.IDs.gender.men50.women50.age.group.maxHeight.feature", 
                         
+                        # "cov.35.IDs.gender.men50.women50.age.group.LTT.lb.mean.feature", "cov.35.IDs.gender.men50.women50.age.group.LTT.lb.median.feature", 
+                        # "cov.35.IDs.gender.men50.women50.age.group.LTT.ub.mean.feature", "cov.35.IDs.gender.men50.women50.age.group.LTT.ub.median.feature",
+                        # "cov.35.IDs.gender.men50.women50.age.group.LTT.median.mean.feature", "cov.35.IDs.gender.men50.women50.age.group.LTT.median.median.feature",
+                        # 
                         "cov.35.IDs.gender.men30.women70.age.group.meanHeight.feature", "cov.35.IDs.gender.men30.women70.age.group.colless.feature", "cov.35.IDs.gender.men30.women70.age.group.sackin.feature", 
                         "cov.35.IDs.gender.men30.women70.age.group.mean.tipsDepths.feature", "cov.35.IDs.gender.men30.women70.age.group.mean.nodesDepths.feature",
-                        "cov.35.IDs.gender.men30.women70.age.group.maxHeight.feature", "cov.35.IDs.gender.men30.women70.age.group.LTT.lb.mean.feature", "cov.35.IDs.gender.men30.women70.age.group.LTT.lb.median.feature", 
-                        "cov.35.IDs.gender.men30.women70.age.group.LTT.ub.mean.feature", "cov.35.IDs.gender.men30.women70.age.group.LTT.ub.median.feature",
-                        "cov.35.IDs.gender.men30.women70.age.group.LTT.median.mean.feature", "cov.35.IDs.gender.men30.women70.age.group.LTT.median.median.feature",
+                        "cov.35.IDs.gender.men30.women70.age.group.maxHeight.feature", 
                         
+                        # "cov.35.IDs.gender.men30.women70.age.group.LTT.lb.mean.feature", "cov.35.IDs.gender.men30.women70.age.group.LTT.lb.median.feature", 
+                        # "cov.35.IDs.gender.men30.women70.age.group.LTT.ub.mean.feature", "cov.35.IDs.gender.men30.women70.age.group.LTT.ub.median.feature",
+                        # "cov.35.IDs.gender.men30.women70.age.group.LTT.median.mean.feature", "cov.35.IDs.gender.men30.women70.age.group.LTT.median.median.feature",
+                        # 
                         "cov.35.IDs.gender.men70.women30.age.group.meanHeight.feature", "cov.35.IDs.gender.men70.women30.age.group.colless.feature", "cov.35.IDs.gender.men70.women30.age.group.sackin.feature", 
                         "cov.35.IDs.gender.men70.women30.age.group.mean.tipsDepths.feature", "cov.35.IDs.gender.men70.women30.age.group.mean.nodesDepths.feature",
-                        "cov.35.IDs.gender.men70.women30.age.group.maxHeight.feature", "cov.35.IDs.gender.men70.women30.age.group.LTT.lb.mean.feature", "cov.35.IDs.gender.men70.women30.age.group.LTT.lb.median.feature", 
-                        "cov.35.IDs.gender.men70.women30.age.group.LTT.ub.mean.feature", "cov.35.IDs.gender.men70.women30.age.group.LTT.ub.median.feature",
-                        "cov.35.IDs.gender.men70.women30.age.group.LTT.median.mean.feature", "cov.35.IDs.gender.men70.women30.age.group.LTT.median.median.feature",
+                        "cov.35.IDs.gender.men70.women30.age.group.maxHeight.feature", 
                         
+                        # "cov.35.IDs.gender.men70.women30.age.group.LTT.lb.mean.feature", "cov.35.IDs.gender.men70.women30.age.group.LTT.lb.median.feature", 
+                        # "cov.35.IDs.gender.men70.women30.age.group.LTT.ub.mean.feature", "cov.35.IDs.gender.men70.women30.age.group.LTT.ub.median.feature",
+                        # "cov.35.IDs.gender.men70.women30.age.group.LTT.median.mean.feature", "cov.35.IDs.gender.men70.women30.age.group.LTT.median.median.feature",
+                        # 
                         "cov.45.IDs.gender.men50.women50.meanHeight.feature", "cov.45.IDs.gender.men50.women50.colless.feature", "cov.45.IDs.gender.men50.women50.sackin.feature", 
                         "cov.45.IDs.gender.men50.women50.mean.tipsDepths.feature", "cov.45.IDs.gender.men50.women50.mean.nodesDepths.feature",
-                        "cov.45.IDs.gender.men50.women50.maxHeight.feature", "cov.45.IDs.gender.men50.women50.LTT.lb.mean.feature", "cov.45.IDs.gender.men50.women50.LTT.lb.median.feature", 
-                        "cov.45.IDs.gender.men50.women50.LTT.ub.mean.feature", "cov.45.IDs.gender.men50.women50.LTT.ub.median.feature",
-                        "cov.45.IDs.gender.men50.women50.LTT.median.mean.feature", "cov.45.IDs.gender.men50.women50.LTT.median.median.feature",
+                        "cov.45.IDs.gender.men50.women50.maxHeight.feature", 
                         
+                        # "cov.45.IDs.gender.men50.women50.LTT.lb.mean.feature", "cov.45.IDs.gender.men50.women50.LTT.lb.median.feature", 
+                        # "cov.45.IDs.gender.men50.women50.LTT.ub.mean.feature", "cov.45.IDs.gender.men50.women50.LTT.ub.median.feature",
+                        # "cov.45.IDs.gender.men50.women50.LTT.median.mean.feature", "cov.45.IDs.gender.men50.women50.LTT.median.median.feature",
+                        # 
                         "cov.45.IDs.gender.men30.women70.meanHeight.feature", "cov.45.IDs.gender.men30.women70.colless.feature", "cov.45.IDs.gender.men30.women70.sackin.feature", 
                         "cov.45.IDs.gender.men30.women70.mean.tipsDepths.feature", "cov.45.IDs.gender.men30.women70.mean.nodesDepths.feature",
-                        "cov.45.IDs.gender.men30.women70.maxHeight.feature", "cov.45.IDs.gender.men30.women70.LTT.lb.mean.feature", "cov.45.IDs.gender.men30.women70.LTT.lb.median.feature", 
-                        "cov.45.IDs.gender.men30.women70.LTT.ub.mean.feature", "cov.45.IDs.gender.men30.women70.LTT.ub.median.feature",
-                        "cov.45.IDs.gender.men30.women70.LTT.median.mean.feature", "cov.45.IDs.gender.men30.women70.LTT.median.median.feature",
+                        "cov.45.IDs.gender.men30.women70.maxHeight.feature", 
                         
+                        # "cov.45.IDs.gender.men30.women70.LTT.lb.mean.feature", "cov.45.IDs.gender.men30.women70.LTT.lb.median.feature", 
+                        # "cov.45.IDs.gender.men30.women70.LTT.ub.mean.feature", "cov.45.IDs.gender.men30.women70.LTT.ub.median.feature",
+                        # "cov.45.IDs.gender.men30.women70.LTT.median.mean.feature", "cov.45.IDs.gender.men30.women70.LTT.median.median.feature",
+                        # 
                         "cov.45.IDs.gender.men70.women30.meanHeight.feature", "cov.45.IDs.gender.men70.women30.colless.feature", "cov.45.IDs.gender.men70.women30.sackin.feature", 
                         "cov.45.IDs.gender.men70.women30.mean.tipsDepths.feature", "cov.45.IDs.gender.men70.women30.mean.nodesDepths.feature",
-                        "cov.45.IDs.gender.men70.women30.maxHeight.feature", "cov.45.IDs.gender.men70.women30.LTT.lb.mean.feature", "cov.45.IDs.gender.men70.women30.LTT.lb.median.feature", 
-                        "cov.45.IDs.gender.men70.women30.LTT.ub.mean.feature", "cov.45.IDs.gender.men70.women30.LTT.ub.median.feature",
-                        "cov.45.IDs.gender.men70.women30.LTT.median.mean.feature", "cov.45.IDs.gender.men70.women30.LTT.median.median.feature",
+                        "cov.45.IDs.gender.men70.women30.maxHeight.feature", 
                         
+                        # "cov.45.IDs.gender.men70.women30.LTT.lb.mean.feature", "cov.45.IDs.gender.men70.women30.LTT.lb.median.feature", 
+                        # "cov.45.IDs.gender.men70.women30.LTT.ub.mean.feature", "cov.45.IDs.gender.men70.women30.LTT.ub.median.feature",
+                        # "cov.45.IDs.gender.men70.women30.LTT.median.mean.feature", "cov.45.IDs.gender.men70.women30.LTT.median.median.feature",
+                        # 
                         "cov.45.IDs.gender.men50.women50.age.group.meanHeight.feature", "cov.45.IDs.gender.men50.women50.age.group.colless.feature", "cov.45.IDs.gender.men50.women50.age.group.sackin.feature", 
                         "cov.45.IDs.gender.men50.women50.age.group.mean.tipsDepths.feature", "cov.45.IDs.gender.men50.women50.age.group.mean.nodesDepths.feature",
-                        "cov.45.IDs.gender.men50.women50.age.group.maxHeight.feature", "cov.45.IDs.gender.men50.women50.age.group.LTT.lb.mean.feature", "cov.45.IDs.gender.men50.women50.age.group.LTT.lb.median.feature", 
-                        "cov.45.IDs.gender.men50.women50.age.group.LTT.ub.mean.feature", "cov.45.IDs.gender.men50.women50.age.group.LTT.ub.median.feature",
-                        "cov.45.IDs.gender.men50.women50.age.group.LTT.median.mean.feature", "cov.45.IDs.gender.men50.women50.age.group.LTT.median.median.feature",
+                        "cov.45.IDs.gender.men50.women50.age.group.maxHeight.feature", 
                         
+                        # "cov.45.IDs.gender.men50.women50.age.group.LTT.lb.mean.feature", "cov.45.IDs.gender.men50.women50.age.group.LTT.lb.median.feature", 
+                        # "cov.45.IDs.gender.men50.women50.age.group.LTT.ub.mean.feature", "cov.45.IDs.gender.men50.women50.age.group.LTT.ub.median.feature",
+                        # "cov.45.IDs.gender.men50.women50.age.group.LTT.median.mean.feature", "cov.45.IDs.gender.men50.women50.age.group.LTT.median.median.feature",
+                        # 
                         "cov.45.IDs.gender.men30.women70.age.group.meanHeight.feature", "cov.45.IDs.gender.men30.women70.age.group.colless.feature", "cov.45.IDs.gender.men30.women70.age.group.sackin.feature", 
                         "cov.45.IDs.gender.men30.women70.age.group.mean.tipsDepths.feature", "cov.45.IDs.gender.men30.women70.age.group.mean.nodesDepths.feature",
-                        "cov.45.IDs.gender.men30.women70.age.group.maxHeight.feature", "cov.45.IDs.gender.men30.women70.age.group.LTT.lb.mean.feature", "cov.45.IDs.gender.men30.women70.age.group.LTT.lb.median.feature", 
-                        "cov.45.IDs.gender.men30.women70.age.group.LTT.ub.mean.feature", "cov.45.IDs.gender.men30.women70.age.group.LTT.ub.median.feature",
-                        "cov.45.IDs.gender.men30.women70.age.group.LTT.median.mean.feature", "cov.45.IDs.gender.men30.women70.age.group.LTT.median.median.feature",
+                        "cov.45.IDs.gender.men30.women70.age.group.maxHeight.feature", 
                         
+                        # "cov.45.IDs.gender.men30.women70.age.group.LTT.lb.mean.feature", "cov.45.IDs.gender.men30.women70.age.group.LTT.lb.median.feature", 
+                        # "cov.45.IDs.gender.men30.women70.age.group.LTT.ub.mean.feature", "cov.45.IDs.gender.men30.women70.age.group.LTT.ub.median.feature",
+                        # "cov.45.IDs.gender.men30.women70.age.group.LTT.median.mean.feature", "cov.45.IDs.gender.men30.women70.age.group.LTT.median.median.feature",
+                        # 
                         "cov.45.IDs.gender.men70.women30.age.group.meanHeight.feature", "cov.45.IDs.gender.men70.women30.age.group.colless.feature", "cov.45.IDs.gender.men70.women30.age.group.sackin.feature", 
                         "cov.45.IDs.gender.men70.women30.age.group.mean.tipsDepths.feature", "cov.45.IDs.gender.men70.women30.age.group.mean.nodesDepths.feature",
-                        "cov.45.IDs.gender.men70.women30.age.group.maxHeight.feature", "cov.45.IDs.gender.men70.women30.age.group.LTT.lb.mean.feature", "cov.45.IDs.gender.men70.women30.age.group.LTT.lb.median.feature", 
-                        "cov.45.IDs.gender.men70.women30.age.group.LTT.ub.mean.feature", "cov.45.IDs.gender.men70.women30.age.group.LTT.ub.median.feature",
-                        "cov.45.IDs.gender.men70.women30.age.group.LTT.median.mean.feature", "cov.45.IDs.gender.men70.women30.age.group.LTT.median.median.feature",
+                        "cov.45.IDs.gender.men70.women30.age.group.maxHeight.feature", 
                         
+                        # "cov.45.IDs.gender.men70.women30.age.group.LTT.lb.mean.feature", "cov.45.IDs.gender.men70.women30.age.group.LTT.lb.median.feature", 
+                        # "cov.45.IDs.gender.men70.women30.age.group.LTT.ub.mean.feature", "cov.45.IDs.gender.men70.women30.age.group.LTT.ub.median.feature",
+                        # "cov.45.IDs.gender.men70.women30.age.group.LTT.median.mean.feature", "cov.45.IDs.gender.men70.women30.age.group.LTT.median.median.feature",
+                        # 
                         "cov.55.IDs.gender.men50.women50.meanHeight.feature", "cov.55.IDs.gender.men50.women50.colless.feature", "cov.55.IDs.gender.men50.women50.sackin.feature", 
                         "cov.55.IDs.gender.men50.women50.mean.tipsDepths.feature", "cov.55.IDs.gender.men50.women50.mean.nodesDepths.feature",
-                        "cov.55.IDs.gender.men50.women50.maxHeight.feature", "cov.55.IDs.gender.men50.women50.LTT.lb.mean.feature", "cov.55.IDs.gender.men50.women50.LTT.lb.median.feature", 
-                        "cov.55.IDs.gender.men50.women50.LTT.ub.mean.feature", "cov.55.IDs.gender.men50.women50.LTT.ub.median.feature",
-                        "cov.55.IDs.gender.men50.women50.LTT.median.mean.feature", "cov.55.IDs.gender.men50.women50.LTT.median.median.feature",
+                        "cov.55.IDs.gender.men50.women50.maxHeight.feature", 
                         
+                        # "cov.55.IDs.gender.men50.women50.LTT.lb.mean.feature", "cov.55.IDs.gender.men50.women50.LTT.lb.median.feature", 
+                        # "cov.55.IDs.gender.men50.women50.LTT.ub.mean.feature", "cov.55.IDs.gender.men50.women50.LTT.ub.median.feature",
+                        # "cov.55.IDs.gender.men50.women50.LTT.median.mean.feature", "cov.55.IDs.gender.men50.women50.LTT.median.median.feature",
+                        # 
                         "cov.55.IDs.gender.men30.women70.meanHeight.feature", "cov.55.IDs.gender.men30.women70.colless.feature", "cov.55.IDs.gender.men30.women70.sackin.feature", 
                         "cov.55.IDs.gender.men30.women70.mean.tipsDepths.feature", "cov.55.IDs.gender.men30.women70.mean.nodesDepths.feature",
-                        "cov.55.IDs.gender.men30.women70.maxHeight.feature", "cov.55.IDs.gender.men30.women70.LTT.lb.mean.feature", "cov.55.IDs.gender.men30.women70.LTT.lb.median.feature", 
-                        "cov.55.IDs.gender.men30.women70.LTT.ub.mean.feature", "cov.55.IDs.gender.men30.women70.LTT.ub.median.feature",
-                        "cov.55.IDs.gender.men30.women70.LTT.median.mean.feature", "cov.55.IDs.gender.men30.women70.LTT.median.median.feature",
-                        
+                        "cov.55.IDs.gender.men30.women70.maxHeight.feature", 
+                        # 
+                        # "cov.55.IDs.gender.men30.women70.LTT.lb.mean.feature", "cov.55.IDs.gender.men30.women70.LTT.lb.median.feature", 
+                        # "cov.55.IDs.gender.men30.women70.LTT.ub.mean.feature", "cov.55.IDs.gender.men30.women70.LTT.ub.median.feature",
+                        # "cov.55.IDs.gender.men30.women70.LTT.median.mean.feature", "cov.55.IDs.gender.men30.women70.LTT.median.median.feature",
+                        # 
                         "cov.55.IDs.gender.men70.women30.meanHeight.feature", "cov.55.IDs.gender.men70.women30.colless.feature", "cov.55.IDs.gender.men70.women30.sackin.feature", 
                         "cov.55.IDs.gender.men70.women30.mean.tipsDepths.feature", "cov.55.IDs.gender.men70.women30.mean.nodesDepths.feature",
-                        "cov.55.IDs.gender.men70.women30.maxHeight.feature", "cov.55.IDs.gender.men70.women30.LTT.lb.mean.feature", "cov.55.IDs.gender.men70.women30.LTT.lb.median.feature", 
-                        "cov.55.IDs.gender.men70.women30.LTT.ub.mean.feature", "cov.55.IDs.gender.men70.women30.LTT.ub.median.feature",
-                        "cov.55.IDs.gender.men70.women30.LTT.median.mean.feature", "cov.55.IDs.gender.men70.women30.LTT.median.median.feature",
+                        "cov.55.IDs.gender.men70.women30.maxHeight.feature", 
                         
+                        # "cov.55.IDs.gender.men70.women30.LTT.lb.mean.feature", "cov.55.IDs.gender.men70.women30.LTT.lb.median.feature", 
+                        # "cov.55.IDs.gender.men70.women30.LTT.ub.mean.feature", "cov.55.IDs.gender.men70.women30.LTT.ub.median.feature",
+                        # "cov.55.IDs.gender.men70.women30.LTT.median.mean.feature", "cov.55.IDs.gender.men70.women30.LTT.median.median.feature",
+                        # 
                         "cov.55.IDs.gender.men50.women50.age.group.meanHeight.feature", "cov.55.IDs.gender.men50.women50.age.group.colless.feature", "cov.55.IDs.gender.men50.women50.age.group.sackin.feature", 
                         "cov.55.IDs.gender.men50.women50.age.group.mean.tipsDepths.feature", "cov.55.IDs.gender.men50.women50.age.group.mean.nodesDepths.feature",
-                        "cov.55.IDs.gender.men50.women50.age.group.maxHeight.feature", "cov.55.IDs.gender.men50.women50.age.group.LTT.lb.mean.feature", "cov.55.IDs.gender.men50.women50.age.group.LTT.lb.median.feature", 
-                        "cov.55.IDs.gender.men50.women50.age.group.LTT.ub.mean.feature", "cov.55.IDs.gender.men50.women50.age.group.LTT.ub.median.feature",
-                        "cov.55.IDs.gender.men50.women50.age.group.LTT.median.mean.feature", "cov.55.IDs.gender.men50.women50.age.group.LTT.median.median.feature",
+                        "cov.55.IDs.gender.men50.women50.age.group.maxHeight.feature", 
                         
+                        # "cov.55.IDs.gender.men50.women50.age.group.LTT.lb.mean.feature", "cov.55.IDs.gender.men50.women50.age.group.LTT.lb.median.feature", 
+                        # "cov.55.IDs.gender.men50.women50.age.group.LTT.ub.mean.feature", "cov.55.IDs.gender.men50.women50.age.group.LTT.ub.median.feature",
+                        # "cov.55.IDs.gender.men50.women50.age.group.LTT.median.mean.feature", "cov.55.IDs.gender.men50.women50.age.group.LTT.median.median.feature",
+                        # 
                         "cov.55.IDs.gender.men30.women70.age.group.meanHeight.feature", "cov.55.IDs.gender.men30.women70.age.group.colless.feature", "cov.55.IDs.gender.men30.women70.age.group.sackin.feature", 
                         "cov.55.IDs.gender.men30.women70.age.group.mean.tipsDepths.feature", "cov.55.IDs.gender.men30.women70.age.group.mean.nodesDepths.feature",
-                        "cov.55.IDs.gender.men30.women70.age.group.maxHeight.feature", "cov.55.IDs.gender.men30.women70.age.group.LTT.lb.mean.feature", "cov.55.IDs.gender.men30.women70.age.group.LTT.lb.median.feature", 
-                        "cov.55.IDs.gender.men30.women70.age.group.LTT.ub.mean.feature", "cov.55.IDs.gender.men30.women70.age.group.LTT.ub.median.feature",
-                        "cov.55.IDs.gender.men30.women70.age.group.LTT.median.mean.feature", "cov.55.IDs.gender.men30.women70.age.group.LTT.median.median.feature",
+                        "cov.55.IDs.gender.men30.women70.age.group.maxHeight.feature", 
                         
+                        # "cov.55.IDs.gender.men30.women70.age.group.LTT.lb.mean.feature", "cov.55.IDs.gender.men30.women70.age.group.LTT.lb.median.feature", 
+                        # "cov.55.IDs.gender.men30.women70.age.group.LTT.ub.mean.feature", "cov.55.IDs.gender.men30.women70.age.group.LTT.ub.median.feature",
+                        # "cov.55.IDs.gender.men30.women70.age.group.LTT.median.mean.feature", "cov.55.IDs.gender.men30.women70.age.group.LTT.median.median.feature",
+                        # 
                         "cov.55.IDs.gender.men70.women30.age.group.meanHeight.feature", "cov.55.IDs.gender.men70.women30.age.group.colless.feature", "cov.55.IDs.gender.men70.women30.age.group.sackin.feature", 
                         "cov.55.IDs.gender.men70.women30.age.group.mean.tipsDepths.feature", "cov.55.IDs.gender.men70.women30.age.group.mean.nodesDepths.feature",
-                        "cov.55.IDs.gender.men70.women30.age.group.maxHeight.feature", "cov.55.IDs.gender.men70.women30.age.group.LTT.lb.mean.feature", "cov.55.IDs.gender.men70.women30.age.group.LTT.lb.median.feature", 
-                        "cov.55.IDs.gender.men70.women30.age.group.LTT.ub.mean.feature", "cov.55.IDs.gender.men70.women30.age.group.LTT.ub.median.feature",
-                        "cov.55.IDs.gender.men70.women30.age.group.LTT.median.mean.feature", "cov.55.IDs.gender.men70.women30.age.group.LTT.median.median.feature",
+                        "cov.55.IDs.gender.men70.women30.age.group.maxHeight.feature", 
                         
+                        # "cov.55.IDs.gender.men70.women30.age.group.LTT.lb.mean.feature", "cov.55.IDs.gender.men70.women30.age.group.LTT.lb.median.feature", 
+                        # "cov.55.IDs.gender.men70.women30.age.group.LTT.ub.mean.feature", "cov.55.IDs.gender.men70.women30.age.group.LTT.ub.median.feature",
+                        # "cov.55.IDs.gender.men70.women30.age.group.LTT.median.mean.feature", "cov.55.IDs.gender.men70.women30.age.group.LTT.median.median.feature",
+                        # 
                         "cov.65.IDs.gender.men50.women50.meanHeight.feature", "cov.65.IDs.gender.men50.women50.colless.feature", "cov.65.IDs.gender.men50.women50.sackin.feature", 
                         "cov.65.IDs.gender.men50.women50.mean.tipsDepths.feature", "cov.65.IDs.gender.men50.women50.mean.nodesDepths.feature",
-                        "cov.65.IDs.gender.men50.women50.maxHeight.feature", "cov.65.IDs.gender.men50.women50.LTT.lb.mean.feature", "cov.65.IDs.gender.men50.women50.LTT.lb.median.feature", 
-                        "cov.65.IDs.gender.men50.women50.LTT.ub.mean.feature", "cov.65.IDs.gender.men50.women50.LTT.ub.median.feature",
-                        "cov.65.IDs.gender.men50.women50.LTT.median.mean.feature", "cov.65.IDs.gender.men50.women50.LTT.median.median.feature",
+                        "cov.65.IDs.gender.men50.women50.maxHeight.feature", 
                         
+                        # "cov.65.IDs.gender.men50.women50.LTT.lb.mean.feature", "cov.65.IDs.gender.men50.women50.LTT.lb.median.feature", 
+                        # "cov.65.IDs.gender.men50.women50.LTT.ub.mean.feature", "cov.65.IDs.gender.men50.women50.LTT.ub.median.feature",
+                        # "cov.65.IDs.gender.men50.women50.LTT.median.mean.feature", "cov.65.IDs.gender.men50.women50.LTT.median.median.feature",
+                        # 
                         "cov.65.IDs.gender.men30.women70.meanHeight.feature", "cov.65.IDs.gender.men30.women70.colless.feature", "cov.65.IDs.gender.men30.women70.sackin.feature", 
                         "cov.65.IDs.gender.men30.women70.mean.tipsDepths.feature", "cov.65.IDs.gender.men30.women70.mean.nodesDepths.feature",
-                        "cov.65.IDs.gender.men30.women70.maxHeight.feature", "cov.65.IDs.gender.men30.women70.LTT.lb.mean.feature", "cov.65.IDs.gender.men30.women70.LTT.lb.median.feature", 
-                        "cov.65.IDs.gender.men30.women70.LTT.ub.mean.feature", "cov.65.IDs.gender.men30.women70.LTT.ub.median.feature",
-                        "cov.65.IDs.gender.men30.women70.LTT.median.mean.feature", "cov.65.IDs.gender.men30.women70.LTT.median.median.feature",
+                        "cov.65.IDs.gender.men30.women70.maxHeight.feature", 
                         
+                        # "cov.65.IDs.gender.men30.women70.LTT.lb.mean.feature", "cov.65.IDs.gender.men30.women70.LTT.lb.median.feature", 
+                        # "cov.65.IDs.gender.men30.women70.LTT.ub.mean.feature", "cov.65.IDs.gender.men30.women70.LTT.ub.median.feature",
+                        # "cov.65.IDs.gender.men30.women70.LTT.median.mean.feature", "cov.65.IDs.gender.men30.women70.LTT.median.median.feature",
+                        # 
                         "cov.65.IDs.gender.men70.women30.meanHeight.feature", "cov.65.IDs.gender.men70.women30.colless.feature", "cov.65.IDs.gender.men70.women30.sackin.feature", 
                         "cov.65.IDs.gender.men70.women30.mean.tipsDepths.feature", "cov.65.IDs.gender.men70.women30.mean.nodesDepths.feature",
-                        "cov.65.IDs.gender.men70.women30.maxHeight.feature", "cov.65.IDs.gender.men70.women30.LTT.lb.mean.feature", "cov.65.IDs.gender.men70.women30.LTT.lb.median.feature", 
-                        "cov.65.IDs.gender.men70.women30.LTT.ub.mean.feature", "cov.65.IDs.gender.men70.women30.LTT.ub.median.feature",
-                        "cov.65.IDs.gender.men70.women30.LTT.median.mean.feature", "cov.65.IDs.gender.men70.women30.LTT.median.median.feature",
+                        "cov.65.IDs.gender.men70.women30.maxHeight.feature", 
                         
+                        # "cov.65.IDs.gender.men70.women30.LTT.lb.mean.feature", "cov.65.IDs.gender.men70.women30.LTT.lb.median.feature", 
+                        # "cov.65.IDs.gender.men70.women30.LTT.ub.mean.feature", "cov.65.IDs.gender.men70.women30.LTT.ub.median.feature",
+                        # "cov.65.IDs.gender.men70.women30.LTT.median.mean.feature", "cov.65.IDs.gender.men70.women30.LTT.median.median.feature",
+                        # 
                         "cov.65.IDs.gender.men50.women50.age.group.meanHeight.feature", "cov.65.IDs.gender.men50.women50.age.group.colless.feature", "cov.65.IDs.gender.men50.women50.age.group.sackin.feature", 
                         "cov.65.IDs.gender.men50.women50.age.group.mean.tipsDepths.feature", "cov.65.IDs.gender.men50.women50.age.group.mean.nodesDepths.feature",
-                        "cov.65.IDs.gender.men50.women50.age.group.maxHeight.feature", "cov.65.IDs.gender.men50.women50.age.group.LTT.lb.mean.feature", "cov.65.IDs.gender.men50.women50.age.group.LTT.lb.median.feature", 
-                        "cov.65.IDs.gender.men50.women50.age.group.LTT.ub.mean.feature", "cov.65.IDs.gender.men50.women50.age.group.LTT.ub.median.feature",
-                        "cov.65.IDs.gender.men50.women50.age.group.LTT.median.mean.feature", "cov.65.IDs.gender.men50.women50.age.group.LTT.median.median.feature",
+                        "cov.65.IDs.gender.men50.women50.age.group.maxHeight.feature", 
                         
+                        # "cov.65.IDs.gender.men50.women50.age.group.LTT.lb.mean.feature", "cov.65.IDs.gender.men50.women50.age.group.LTT.lb.median.feature", 
+                        # "cov.65.IDs.gender.men50.women50.age.group.LTT.ub.mean.feature", "cov.65.IDs.gender.men50.women50.age.group.LTT.ub.median.feature",
+                        # "cov.65.IDs.gender.men50.women50.age.group.LTT.median.mean.feature", "cov.65.IDs.gender.men50.women50.age.group.LTT.median.median.feature",
+                        # 
                         "cov.65.IDs.gender.men30.women70.age.group.meanHeight.feature", "cov.65.IDs.gender.men30.women70.age.group.colless.feature", "cov.65.IDs.gender.men30.women70.age.group.sackin.feature", 
                         "cov.65.IDs.gender.men30.women70.age.group.mean.tipsDepths.feature", "cov.65.IDs.gender.men30.women70.age.group.mean.nodesDepths.feature",
-                        "cov.65.IDs.gender.men30.women70.age.group.maxHeight.feature", "cov.65.IDs.gender.men30.women70.age.group.LTT.lb.mean.feature", "cov.65.IDs.gender.men30.women70.age.group.LTT.lb.median.feature", 
-                        "cov.65.IDs.gender.men30.women70.age.group.LTT.ub.mean.feature", "cov.65.IDs.gender.men30.women70.age.group.LTT.ub.median.feature",
-                        "cov.65.IDs.gender.men30.women70.age.group.LTT.median.mean.feature", "cov.65.IDs.gender.men30.women70.age.group.LTT.median.median.feature",
+                        "cov.65.IDs.gender.men30.women70.age.group.maxHeight.feature", 
                         
+                        # "cov.65.IDs.gender.men30.women70.age.group.LTT.lb.mean.feature", "cov.65.IDs.gender.men30.women70.age.group.LTT.lb.median.feature", 
+                        # "cov.65.IDs.gender.men30.women70.age.group.LTT.ub.mean.feature", "cov.65.IDs.gender.men30.women70.age.group.LTT.ub.median.feature",
+                        # "cov.65.IDs.gender.men30.women70.age.group.LTT.median.mean.feature", "cov.65.IDs.gender.men30.women70.age.group.LTT.median.median.feature",
+                        # 
                         "cov.65.IDs.gender.men70.women30.age.group.meanHeight.feature", "cov.65.IDs.gender.men70.women30.age.group.colless.feature", "cov.65.IDs.gender.men70.women30.age.group.sackin.feature", 
                         "cov.65.IDs.gender.men70.women30.age.group.mean.tipsDepths.feature", "cov.65.IDs.gender.men70.women30.age.group.mean.nodesDepths.feature",
-                        "cov.65.IDs.gender.men70.women30.age.group.maxHeight.feature", "cov.65.IDs.gender.men70.women30.age.group.LTT.lb.mean.feature", "cov.65.IDs.gender.men70.women30.age.group.LTT.lb.median.feature", 
-                        "cov.65.IDs.gender.men70.women30.age.group.LTT.ub.mean.feature", "cov.65.IDs.gender.men70.women30.age.group.LTT.ub.median.feature",
-                        "cov.65.IDs.gender.men70.women30.age.group.LTT.median.mean.feature", "cov.65.IDs.gender.men70.women30.age.group.LTT.median.median.feature",
+                        "cov.65.IDs.gender.men70.women30.age.group.maxHeight.feature", 
                         
+                        # "cov.65.IDs.gender.men70.women30.age.group.LTT.lb.mean.feature", "cov.65.IDs.gender.men70.women30.age.group.LTT.lb.median.feature", 
+                        # "cov.65.IDs.gender.men70.women30.age.group.LTT.ub.mean.feature", "cov.65.IDs.gender.men70.women30.age.group.LTT.ub.median.feature",
+                        # "cov.65.IDs.gender.men70.women30.age.group.LTT.median.mean.feature", "cov.65.IDs.gender.men70.women30.age.group.LTT.median.median.feature",
+                        # 
                         "cov.75.IDs.gender.men50.women50.meanHeight.feature", "cov.75.IDs.gender.men50.women50.colless.feature", "cov.75.IDs.gender.men50.women50.sackin.feature", 
                         "cov.75.IDs.gender.men50.women50.mean.tipsDepths.feature", "cov.75.IDs.gender.men50.women50.mean.nodesDepths.feature",
-                        "cov.75.IDs.gender.men50.women50.maxHeight.feature", "cov.75.IDs.gender.men50.women50.LTT.lb.mean.feature", "cov.75.IDs.gender.men50.women50.LTT.lb.median.feature", 
-                        "cov.75.IDs.gender.men50.women50.LTT.ub.mean.feature", "cov.75.IDs.gender.men50.women50.LTT.ub.median.feature",
-                        "cov.75.IDs.gender.men50.women50.LTT.median.mean.feature", "cov.75.IDs.gender.men50.women50.LTT.median.median.feature",
+                        "cov.75.IDs.gender.men50.women50.maxHeight.feature", 
                         
+                        # "cov.75.IDs.gender.men50.women50.LTT.lb.mean.feature", "cov.75.IDs.gender.men50.women50.LTT.lb.median.feature", 
+                        # "cov.75.IDs.gender.men50.women50.LTT.ub.mean.feature", "cov.75.IDs.gender.men50.women50.LTT.ub.median.feature",
+                        # "cov.75.IDs.gender.men50.women50.LTT.median.mean.feature", "cov.75.IDs.gender.men50.women50.LTT.median.median.feature",
+                        # 
                         "cov.75.IDs.gender.men30.women70.meanHeight.feature", "cov.75.IDs.gender.men30.women70.colless.feature", "cov.75.IDs.gender.men30.women70.sackin.feature", 
                         "cov.75.IDs.gender.men30.women70.mean.tipsDepths.feature", "cov.75.IDs.gender.men30.women70.mean.nodesDepths.feature",
-                        "cov.75.IDs.gender.men30.women70.maxHeight.feature", "cov.75.IDs.gender.men30.women70.LTT.lb.mean.feature", "cov.75.IDs.gender.men30.women70.LTT.lb.median.feature", 
-                        "cov.75.IDs.gender.men30.women70.LTT.ub.mean.feature", "cov.75.IDs.gender.men30.women70.LTT.ub.median.feature",
-                        "cov.75.IDs.gender.men30.women70.LTT.median.mean.feature", "cov.75.IDs.gender.men30.women70.LTT.median.median.feature",
+                        "cov.75.IDs.gender.men30.women70.maxHeight.feature", 
                         
+                        # "cov.75.IDs.gender.men30.women70.LTT.lb.mean.feature", "cov.75.IDs.gender.men30.women70.LTT.lb.median.feature", 
+                        # "cov.75.IDs.gender.men30.women70.LTT.ub.mean.feature", "cov.75.IDs.gender.men30.women70.LTT.ub.median.feature",
+                        # "cov.75.IDs.gender.men30.women70.LTT.median.mean.feature", "cov.75.IDs.gender.men30.women70.LTT.median.median.feature",
+                        # 
                         "cov.75.IDs.gender.men70.women30.meanHeight.feature", "cov.75.IDs.gender.men70.women30.colless.feature", "cov.75.IDs.gender.men70.women30.sackin.feature", 
                         "cov.75.IDs.gender.men70.women30.mean.tipsDepths.feature", "cov.75.IDs.gender.men70.women30.mean.nodesDepths.feature",
-                        "cov.75.IDs.gender.men70.women30.maxHeight.feature", "cov.75.IDs.gender.men70.women30.LTT.lb.mean.feature", "cov.75.IDs.gender.men70.women30.LTT.lb.median.feature", 
-                        "cov.75.IDs.gender.men70.women30.LTT.ub.mean.feature", "cov.75.IDs.gender.men70.women30.LTT.ub.median.feature",
-                        "cov.75.IDs.gender.men70.women30.LTT.median.mean.feature", "cov.75.IDs.gender.men70.women30.LTT.median.median.feature",
+                        "cov.75.IDs.gender.men70.women30.maxHeight.feature", 
                         
+                        # "cov.75.IDs.gender.men70.women30.LTT.lb.mean.feature", "cov.75.IDs.gender.men70.women30.LTT.lb.median.feature", 
+                        # "cov.75.IDs.gender.men70.women30.LTT.ub.mean.feature", "cov.75.IDs.gender.men70.women30.LTT.ub.median.feature",
+                        # "cov.75.IDs.gender.men70.women30.LTT.median.mean.feature", "cov.75.IDs.gender.men70.women30.LTT.median.median.feature",
+                        # 
                         "cov.75.IDs.gender.men50.women50.age.group.meanHeight.feature", "cov.75.IDs.gender.men50.women50.age.group.colless.feature", "cov.75.IDs.gender.men50.women50.age.group.sackin.feature", 
                         "cov.75.IDs.gender.men50.women50.age.group.mean.tipsDepths.feature", "cov.75.IDs.gender.men50.women50.age.group.mean.nodesDepths.feature",
-                        "cov.75.IDs.gender.men50.women50.age.group.maxHeight.feature", "cov.75.IDs.gender.men50.women50.age.group.LTT.lb.mean.feature", "cov.75.IDs.gender.men50.women50.age.group.LTT.lb.median.feature", 
-                        "cov.75.IDs.gender.men50.women50.age.group.LTT.ub.mean.feature", "cov.75.IDs.gender.men50.women50.age.group.LTT.ub.median.feature",
-                        "cov.75.IDs.gender.men50.women50.age.group.LTT.median.mean.feature", "cov.75.IDs.gender.men50.women50.age.group.LTT.median.median.feature",
+                        "cov.75.IDs.gender.men50.women50.age.group.maxHeight.feature", 
                         
+                        # "cov.75.IDs.gender.men50.women50.age.group.LTT.lb.mean.feature", "cov.75.IDs.gender.men50.women50.age.group.LTT.lb.median.feature", 
+                        # "cov.75.IDs.gender.men50.women50.age.group.LTT.ub.mean.feature", "cov.75.IDs.gender.men50.women50.age.group.LTT.ub.median.feature",
+                        # "cov.75.IDs.gender.men50.women50.age.group.LTT.median.mean.feature", "cov.75.IDs.gender.men50.women50.age.group.LTT.median.median.feature",
+                        # 
                         "cov.75.IDs.gender.men30.women70.age.group.meanHeight.feature", "cov.75.IDs.gender.men30.women70.age.group.colless.feature", "cov.75.IDs.gender.men30.women70.age.group.sackin.feature", 
                         "cov.75.IDs.gender.men30.women70.age.group.mean.tipsDepths.feature", "cov.75.IDs.gender.men30.women70.age.group.mean.nodesDepths.feature",
-                        "cov.75.IDs.gender.men30.women70.age.group.maxHeight.feature", "cov.75.IDs.gender.men30.women70.age.group.LTT.lb.mean.feature", "cov.75.IDs.gender.men30.women70.age.group.LTT.lb.median.feature", 
-                        "cov.75.IDs.gender.men30.women70.age.group.LTT.ub.mean.feature", "cov.75.IDs.gender.men30.women70.age.group.LTT.ub.median.feature",
-                        "cov.75.IDs.gender.men30.women70.age.group.LTT.median.mean.feature", "cov.75.IDs.gender.men30.women70.age.group.LTT.median.median.feature",
+                        "cov.75.IDs.gender.men30.women70.age.group.maxHeight.feature", 
                         
+                        # "cov.75.IDs.gender.men30.women70.age.group.LTT.lb.mean.feature", "cov.75.IDs.gender.men30.women70.age.group.LTT.lb.median.feature", 
+                        # "cov.75.IDs.gender.men30.women70.age.group.LTT.ub.mean.feature", "cov.75.IDs.gender.men30.women70.age.group.LTT.ub.median.feature",
+                        # "cov.75.IDs.gender.men30.women70.age.group.LTT.median.mean.feature", "cov.75.IDs.gender.men30.women70.age.group.LTT.median.median.feature",
+                        # 
                         "cov.75.IDs.gender.men70.women30.age.group.meanHeight.feature", "cov.75.IDs.gender.men70.women30.age.group.colless.feature", "cov.75.IDs.gender.men70.women30.age.group.sackin.feature", 
                         "cov.75.IDs.gender.men70.women30.age.group.mean.tipsDepths.feature", "cov.75.IDs.gender.men70.women30.age.group.mean.nodesDepths.feature",
-                        "cov.75.IDs.gender.men70.women30.age.group.maxHeight.feature", "cov.75.IDs.gender.men70.women30.age.group.LTT.lb.mean.feature", "cov.75.IDs.gender.men70.women30.age.group.LTT.lb.median.feature", 
-                        "cov.75.IDs.gender.men70.women30.age.group.LTT.ub.mean.feature", "cov.75.IDs.gender.men70.women30.age.group.LTT.ub.median.feature",
-                        "cov.75.IDs.gender.men70.women30.age.group.LTT.median.mean.feature", "cov.75.IDs.gender.men70.women30.age.group.LTT.median.median.feature",
+                        "cov.75.IDs.gender.men70.women30.age.group.maxHeight.feature", 
                         
+                        # "cov.75.IDs.gender.men70.women30.age.group.LTT.lb.mean.feature", "cov.75.IDs.gender.men70.women30.age.group.LTT.lb.median.feature", 
+                        # "cov.75.IDs.gender.men70.women30.age.group.LTT.ub.mean.feature", "cov.75.IDs.gender.men70.women30.age.group.LTT.ub.median.feature",
+                        # "cov.75.IDs.gender.men70.women30.age.group.LTT.median.mean.feature", "cov.75.IDs.gender.men70.women30.age.group.LTT.median.median.feature",
+                        # 
                         "cov.85.IDs.gender.men50.women50.meanHeight.feature", "cov.85.IDs.gender.men50.women50.colless.feature", "cov.85.IDs.gender.men50.women50.sackin.feature", 
                         "cov.85.IDs.gender.men50.women50.mean.tipsDepths.feature", "cov.85.IDs.gender.men50.women50.mean.nodesDepths.feature",
-                        "cov.85.IDs.gender.men50.women50.maxHeight.feature", "cov.85.IDs.gender.men50.women50.LTT.lb.mean.feature", "cov.85.IDs.gender.men50.women50.LTT.lb.median.feature", 
-                        "cov.85.IDs.gender.men50.women50.LTT.ub.mean.feature", "cov.85.IDs.gender.men50.women50.LTT.ub.median.feature",
-                        "cov.85.IDs.gender.men50.women50.LTT.median.mean.feature", "cov.85.IDs.gender.men50.women50.LTT.median.median.feature",
+                        "cov.85.IDs.gender.men50.women50.maxHeight.feature", 
                         
+                        # "cov.85.IDs.gender.men50.women50.LTT.lb.mean.feature", "cov.85.IDs.gender.men50.women50.LTT.lb.median.feature", 
+                        # "cov.85.IDs.gender.men50.women50.LTT.ub.mean.feature", "cov.85.IDs.gender.men50.women50.LTT.ub.median.feature",
+                        # "cov.85.IDs.gender.men50.women50.LTT.median.mean.feature", "cov.85.IDs.gender.men50.women50.LTT.median.median.feature",
+                        # 
                         "cov.85.IDs.gender.men30.women70.meanHeight.feature", "cov.85.IDs.gender.men30.women70.colless.feature", "cov.85.IDs.gender.men30.women70.sackin.feature", 
                         "cov.85.IDs.gender.men30.women70.mean.tipsDepths.feature", "cov.85.IDs.gender.men30.women70.mean.nodesDepths.feature",
-                        "cov.85.IDs.gender.men30.women70.maxHeight.feature", "cov.85.IDs.gender.men30.women70.LTT.lb.mean.feature", "cov.85.IDs.gender.men30.women70.LTT.lb.median.feature", 
-                        "cov.85.IDs.gender.men30.women70.LTT.ub.mean.feature", "cov.85.IDs.gender.men30.women70.LTT.ub.median.feature",
-                        "cov.85.IDs.gender.men30.women70.LTT.median.mean.feature", "cov.85.IDs.gender.men30.women70.LTT.median.median.feature",
+                        "cov.85.IDs.gender.men30.women70.maxHeight.feature", 
                         
+                        # "cov.85.IDs.gender.men30.women70.LTT.lb.mean.feature", "cov.85.IDs.gender.men30.women70.LTT.lb.median.feature", 
+                        # "cov.85.IDs.gender.men30.women70.LTT.ub.mean.feature", "cov.85.IDs.gender.men30.women70.LTT.ub.median.feature",
+                        # "cov.85.IDs.gender.men30.women70.LTT.median.mean.feature", "cov.85.IDs.gender.men30.women70.LTT.median.median.feature",
+                        # 
                         "cov.85.IDs.gender.men70.women30.meanHeight.feature", "cov.85.IDs.gender.men70.women30.colless.feature", "cov.85.IDs.gender.men70.women30.sackin.feature", 
                         "cov.85.IDs.gender.men70.women30.mean.tipsDepths.feature", "cov.85.IDs.gender.men70.women30.mean.nodesDepths.feature",
-                        "cov.85.IDs.gender.men70.women30.maxHeight.feature", "cov.85.IDs.gender.men70.women30.LTT.lb.mean.feature", "cov.85.IDs.gender.men70.women30.LTT.lb.median.feature", 
-                        "cov.85.IDs.gender.men70.women30.LTT.ub.mean.feature", "cov.85.IDs.gender.men70.women30.LTT.ub.median.feature",
-                        "cov.85.IDs.gender.men70.women30.LTT.median.mean.feature", "cov.85.IDs.gender.men70.women30.LTT.median.median.feature",
+                        "cov.85.IDs.gender.men70.women30.maxHeight.feature", 
                         
+                        # "cov.85.IDs.gender.men70.women30.LTT.lb.mean.feature", "cov.85.IDs.gender.men70.women30.LTT.lb.median.feature", 
+                        # "cov.85.IDs.gender.men70.women30.LTT.ub.mean.feature", "cov.85.IDs.gender.men70.women30.LTT.ub.median.feature",
+                        # "cov.85.IDs.gender.men70.women30.LTT.median.mean.feature", "cov.85.IDs.gender.men70.women30.LTT.median.median.feature",
+                        # 
                         "cov.85.IDs.gender.men50.women50.age.group.meanHeight.feature", "cov.85.IDs.gender.men50.women50.age.group.colless.feature", "cov.85.IDs.gender.men50.women50.age.group.sackin.feature", 
                         "cov.85.IDs.gender.men50.women50.age.group.mean.tipsDepths.feature", "cov.85.IDs.gender.men50.women50.age.group.mean.nodesDepths.feature",
-                        "cov.85.IDs.gender.men50.women50.age.group.maxHeight.feature", "cov.85.IDs.gender.men50.women50.age.group.LTT.lb.mean.feature", "cov.85.IDs.gender.men50.women50.age.group.LTT.lb.median.feature", 
-                        "cov.85.IDs.gender.men50.women50.age.group.LTT.ub.mean.feature", "cov.85.IDs.gender.men50.women50.age.group.LTT.ub.median.feature",
-                        "cov.85.IDs.gender.men50.women50.age.group.LTT.median.mean.feature", "cov.85.IDs.gender.men50.women50.age.group.LTT.median.median.feature",
+                        "cov.85.IDs.gender.men50.women50.age.group.maxHeight.feature", 
                         
+                        # "cov.85.IDs.gender.men50.women50.age.group.LTT.lb.mean.feature", "cov.85.IDs.gender.men50.women50.age.group.LTT.lb.median.feature", 
+                        # "cov.85.IDs.gender.men50.women50.age.group.LTT.ub.mean.feature", "cov.85.IDs.gender.men50.women50.age.group.LTT.ub.median.feature",
+                        # "cov.85.IDs.gender.men50.women50.age.group.LTT.median.mean.feature", "cov.85.IDs.gender.men50.women50.age.group.LTT.median.median.feature",
+                        # 
                         "cov.85.IDs.gender.men30.women70.age.group.meanHeight.feature", "cov.85.IDs.gender.men30.women70.age.group.colless.feature", "cov.85.IDs.gender.men30.women70.age.group.sackin.feature", 
                         "cov.85.IDs.gender.men30.women70.age.group.mean.tipsDepths.feature", "cov.85.IDs.gender.men30.women70.age.group.mean.nodesDepths.feature",
-                        "cov.85.IDs.gender.men30.women70.age.group.maxHeight.feature", "cov.85.IDs.gender.men30.women70.age.group.LTT.lb.mean.feature", "cov.85.IDs.gender.men30.women70.age.group.LTT.lb.median.feature", 
-                        "cov.85.IDs.gender.men30.women70.age.group.LTT.ub.mean.feature", "cov.85.IDs.gender.men30.women70.age.group.LTT.ub.median.feature",
-                        "cov.85.IDs.gender.men30.women70.age.group.LTT.median.mean.feature", "cov.85.IDs.gender.men30.women70.age.group.LTT.median.median.feature",
+                        "cov.85.IDs.gender.men30.women70.age.group.maxHeight.feature", 
                         
+                        # "cov.85.IDs.gender.men30.women70.age.group.LTT.lb.mean.feature", "cov.85.IDs.gender.men30.women70.age.group.LTT.lb.median.feature", 
+                        # "cov.85.IDs.gender.men30.women70.age.group.LTT.ub.mean.feature", "cov.85.IDs.gender.men30.women70.age.group.LTT.ub.median.feature",
+                        # "cov.85.IDs.gender.men30.women70.age.group.LTT.median.mean.feature", "cov.85.IDs.gender.men30.women70.age.group.LTT.median.median.feature",
+                        # 
                         "cov.85.IDs.gender.men70.women30.age.group.meanHeight.feature", "cov.85.IDs.gender.men70.women30.age.group.colless.feature", "cov.85.IDs.gender.men70.women30.age.group.sackin.feature", 
                         "cov.85.IDs.gender.men70.women30.age.group.mean.tipsDepths.feature", "cov.85.IDs.gender.men70.women30.age.group.mean.nodesDepths.feature",
-                        "cov.85.IDs.gender.men70.women30.age.group.maxHeight.feature", "cov.85.IDs.gender.men70.women30.age.group.LTT.lb.mean.feature", "cov.85.IDs.gender.men70.women30.age.group.LTT.lb.median.feature", 
-                        "cov.85.IDs.gender.men70.women30.age.group.LTT.ub.mean.feature", "cov.85.IDs.gender.men70.women30.age.group.LTT.ub.median.feature",
-                        "cov.85.IDs.gender.men70.women30.age.group.LTT.median.mean.feature", "cov.85.IDs.gender.men70.women30.age.group.LTT.median.median.feature",
+                        "cov.85.IDs.gender.men70.women30.age.group.maxHeight.feature", 
                         
+                        # "cov.85.IDs.gender.men70.women30.age.group.LTT.lb.mean.feature", "cov.85.IDs.gender.men70.women30.age.group.LTT.lb.median.feature", 
+                        # "cov.85.IDs.gender.men70.women30.age.group.LTT.ub.mean.feature", "cov.85.IDs.gender.men70.women30.age.group.LTT.ub.median.feature",
+                        # "cov.85.IDs.gender.men70.women30.age.group.LTT.median.mean.feature", "cov.85.IDs.gender.men70.women30.age.group.LTT.median.median.feature",
+                        # 
                         "cov.95.IDs.gender.men50.women50.meanHeight.feature", "cov.95.IDs.gender.men50.women50.colless.feature", "cov.95.IDs.gender.men50.women50.sackin.feature", 
                         "cov.95.IDs.gender.men50.women50.mean.tipsDepths.feature", "cov.95.IDs.gender.men50.women50.mean.nodesDepths.feature",
-                        "cov.95.IDs.gender.men50.women50.maxHeight.feature", "cov.95.IDs.gender.men50.women50.LTT.lb.mean.feature", "cov.95.IDs.gender.men50.women50.LTT.lb.median.feature", 
-                        "cov.95.IDs.gender.men50.women50.LTT.ub.mean.feature", "cov.95.IDs.gender.men50.women50.LTT.ub.median.feature",
-                        "cov.95.IDs.gender.men50.women50.LTT.median.mean.feature", "cov.95.IDs.gender.men50.women50.LTT.median.median.feature",
+                        "cov.95.IDs.gender.men50.women50.maxHeight.feature", 
                         
+                        # "cov.95.IDs.gender.men50.women50.LTT.lb.mean.feature", "cov.95.IDs.gender.men50.women50.LTT.lb.median.feature", 
+                        # "cov.95.IDs.gender.men50.women50.LTT.ub.mean.feature", "cov.95.IDs.gender.men50.women50.LTT.ub.median.feature",
+                        # "cov.95.IDs.gender.men50.women50.LTT.median.mean.feature", "cov.95.IDs.gender.men50.women50.LTT.median.median.feature",
+                        # 
                         "cov.95.IDs.gender.men30.women70.meanHeight.feature", "cov.95.IDs.gender.men30.women70.colless.feature", "cov.95.IDs.gender.men30.women70.sackin.feature", 
                         "cov.95.IDs.gender.men30.women70.mean.tipsDepths.feature", "cov.95.IDs.gender.men30.women70.mean.nodesDepths.feature",
-                        "cov.95.IDs.gender.men30.women70.maxHeight.feature", "cov.95.IDs.gender.men30.women70.LTT.lb.mean.feature", "cov.95.IDs.gender.men30.women70.LTT.lb.median.feature", 
-                        "cov.95.IDs.gender.men30.women70.LTT.ub.mean.feature", "cov.95.IDs.gender.men30.women70.LTT.ub.median.feature",
-                        "cov.95.IDs.gender.men30.women70.LTT.median.mean.feature", "cov.95.IDs.gender.men30.women70.LTT.median.median.feature",
+                        "cov.95.IDs.gender.men30.women70.maxHeight.feature", 
                         
+                        # "cov.95.IDs.gender.men30.women70.LTT.lb.mean.feature", "cov.95.IDs.gender.men30.women70.LTT.lb.median.feature", 
+                        # "cov.95.IDs.gender.men30.women70.LTT.ub.mean.feature", "cov.95.IDs.gender.men30.women70.LTT.ub.median.feature",
+                        # "cov.95.IDs.gender.men30.women70.LTT.median.mean.feature", "cov.95.IDs.gender.men30.women70.LTT.median.median.feature",
+                        # 
                         "cov.95.IDs.gender.men70.women30.meanHeight.feature", "cov.95.IDs.gender.men70.women30.colless.feature", "cov.95.IDs.gender.men70.women30.sackin.feature", 
                         "cov.95.IDs.gender.men70.women30.mean.tipsDepths.feature", "cov.95.IDs.gender.men70.women30.mean.nodesDepths.feature",
-                        "cov.95.IDs.gender.men70.women30.maxHeight.feature", "cov.95.IDs.gender.men70.women30.LTT.lb.mean.feature", "cov.95.IDs.gender.men70.women30.LTT.lb.median.feature", 
-                        "cov.95.IDs.gender.men70.women30.LTT.ub.mean.feature", "cov.95.IDs.gender.men70.women30.LTT.ub.median.feature",
-                        "cov.95.IDs.gender.men70.women30.LTT.median.mean.feature", "cov.95.IDs.gender.men70.women30.LTT.median.median.feature",
+                        "cov.95.IDs.gender.men70.women30.maxHeight.feature", 
                         
+                        # "cov.95.IDs.gender.men70.women30.LTT.lb.mean.feature", "cov.95.IDs.gender.men70.women30.LTT.lb.median.feature", 
+                        # "cov.95.IDs.gender.men70.women30.LTT.ub.mean.feature", "cov.95.IDs.gender.men70.women30.LTT.ub.median.feature",
+                        # "cov.95.IDs.gender.men70.women30.LTT.median.mean.feature", "cov.95.IDs.gender.men70.women30.LTT.median.median.feature",
+                        # 
                         "cov.95.IDs.gender.men50.women50.age.group.meanHeight.feature", "cov.95.IDs.gender.men50.women50.age.group.colless.feature", "cov.95.IDs.gender.men50.women50.age.group.sackin.feature", 
                         "cov.95.IDs.gender.men50.women50.age.group.mean.tipsDepths.feature", "cov.95.IDs.gender.men50.women50.age.group.mean.nodesDepths.feature",
-                        "cov.95.IDs.gender.men50.women50.age.group.maxHeight.feature", "cov.95.IDs.gender.men50.women50.age.group.LTT.lb.mean.feature", "cov.95.IDs.gender.men50.women50.age.group.LTT.lb.median.feature", 
-                        "cov.95.IDs.gender.men50.women50.age.group.LTT.ub.mean.feature", "cov.95.IDs.gender.men50.women50.age.group.LTT.ub.median.feature",
-                        "cov.95.IDs.gender.men50.women50.age.group.LTT.median.mean.feature", "cov.95.IDs.gender.men50.women50.age.group.LTT.median.median.feature",
+                        "cov.95.IDs.gender.men50.women50.age.group.maxHeight.feature", 
                         
+                        # "cov.95.IDs.gender.men50.women50.age.group.LTT.lb.mean.feature", "cov.95.IDs.gender.men50.women50.age.group.LTT.lb.median.feature", 
+                        # "cov.95.IDs.gender.men50.women50.age.group.LTT.ub.mean.feature", "cov.95.IDs.gender.men50.women50.age.group.LTT.ub.median.feature",
+                        # "cov.95.IDs.gender.men50.women50.age.group.LTT.median.mean.feature", "cov.95.IDs.gender.men50.women50.age.group.LTT.median.median.feature",
+                        # 
                         "cov.95.IDs.gender.men30.women70.age.group.meanHeight.feature", "cov.95.IDs.gender.men30.women70.age.group.colless.feature", "cov.95.IDs.gender.men30.women70.age.group.sackin.feature", 
                         "cov.95.IDs.gender.men30.women70.age.group.mean.tipsDepths.feature", "cov.95.IDs.gender.men30.women70.age.group.mean.nodesDepths.feature",
-                        "cov.95.IDs.gender.men30.women70.age.group.maxHeight.feature", "cov.95.IDs.gender.men30.women70.age.group.LTT.lb.mean.feature", "cov.95.IDs.gender.men30.women70.age.group.LTT.lb.median.feature", 
-                        "cov.95.IDs.gender.men30.women70.age.group.LTT.ub.mean.feature", "cov.95.IDs.gender.men30.women70.age.group.LTT.ub.median.feature",
-                        "cov.95.IDs.gender.men30.women70.age.group.LTT.median.mean.feature", "cov.95.IDs.gender.men30.women70.age.group.LTT.median.median.feature",
+                        "cov.95.IDs.gender.men30.women70.age.group.maxHeight.feature", 
                         
+                        # "cov.95.IDs.gender.men30.women70.age.group.LTT.lb.mean.feature", "cov.95.IDs.gender.men30.women70.age.group.LTT.lb.median.feature", 
+                        # "cov.95.IDs.gender.men30.women70.age.group.LTT.ub.mean.feature", "cov.95.IDs.gender.men30.women70.age.group.LTT.ub.median.feature",
+                        # "cov.95.IDs.gender.men30.women70.age.group.LTT.median.mean.feature", "cov.95.IDs.gender.men30.women70.age.group.LTT.median.median.feature",
+                        # 
                         "cov.95.IDs.gender.men70.women30.age.group.meanHeight.feature", "cov.95.IDs.gender.men70.women30.age.group.colless.feature", "cov.95.IDs.gender.men70.women30.age.group.sackin.feature", 
                         "cov.95.IDs.gender.men70.women30.age.group.mean.tipsDepths.feature", "cov.95.IDs.gender.men70.women30.age.group.mean.nodesDepths.feature",
-                        "cov.95.IDs.gender.men70.women30.age.group.maxHeight.feature", "cov.95.IDs.gender.men70.women30.age.group.LTT.lb.mean.feature", "cov.95.IDs.gender.men70.women30.age.group.LTT.lb.median.feature", 
-                        "cov.95.IDs.gender.men70.women30.age.group.LTT.ub.mean.feature", "cov.95.IDs.gender.men70.women30.age.group.LTT.ub.median.feature",
-                        "cov.95.IDs.gender.men70.women30.age.group.LTT.median.mean.feature", "cov.95.IDs.gender.men70.women30.age.group.LTT.median.median.feature"                        
-                        )
+                        "cov.95.IDs.gender.men70.women30.age.group.maxHeight.feature",
+                        # 
+                        # "cov.95.IDs.gender.men70.women30.age.group.LTT.lb.mean.feature", "cov.95.IDs.gender.men70.women30.age.group.LTT.lb.median.feature", 
+                        # "cov.95.IDs.gender.men70.women30.age.group.LTT.ub.mean.feature", "cov.95.IDs.gender.men70.women30.age.group.LTT.ub.median.feature",
+                        # "cov.95.IDs.gender.men70.women30.age.group.LTT.median.mean.feature", "cov.95.IDs.gender.men70.women30.age.group.LTT.median.median.feature"
+                        
+                        
+                        "cov.35.gender.men50.women50.ratio.seq", "cov.35.gender.men50.women50.ratio.emp",
+                        "cov.35.gender.men30.women70.ratio.seq", "cov.35.gender.men30.women70.ratio.emp",
+                        "cov.35.gender.men70.women30.ratio.seq", "cov.35.gender.men70.women30.ratio.emp",
+                        "cov.35.gender.men50.women50.age.group.ratio.seq", "cov.35.gender.men50.women50.age.group.ratio.emp",
+                        "cov.35.gender.men30.women70.age.group.ratio.seq", "cov.35.gender.men30.women70.age.group.ratio.emp",
+                        "cov.35.gender.men70.women30.age.group.ratio.seq", "cov.35.gender.men70.women30.age.group.ratio.emp", 
+                        
+                        "cov.45.gender.men50.women50.ratio.seq", "cov.45.gender.men50.women50.ratio.emp",
+                        "cov.45.gender.men30.women70.ratio.seq", "cov.45.gender.men30.women70.ratio.emp",
+                        "cov.45.gender.men70.women30.ratio.seq", "cov.45.gender.men70.women30.ratio.emp",
+                        "cov.45.gender.men50.women50.age.group.ratio.seq", "cov.45.gender.men50.women50.age.group.ratio.emp",
+                        "cov.45.gender.men30.women70.age.group.ratio.seq", "cov.45.gender.men30.women70.age.group.ratio.emp",
+                        "cov.45.gender.men70.women30.age.group.ratio.seq", "cov.45.gender.men70.women30.age.group.ratio.emp", 
+                        
+                        "cov.55.gender.men50.women50.ratio.seq", "cov.55.gender.men50.women50.ratio.emp",
+                        "cov.55.gender.men30.women70.ratio.seq", "cov.55.gender.men30.women70.ratio.emp",
+                        "cov.55.gender.men70.women30.ratio.seq", "cov.55.gender.men70.women30.ratio.emp",
+                        "cov.55.gender.men50.women50.age.group.ratio.seq", "cov.55.gender.men50.women50.age.group.ratio.emp",
+                        "cov.55.gender.men30.women70.age.group.ratio.seq", "cov.55.gender.men30.women70.age.group.ratio.emp",
+                        "cov.55.gender.men70.women30.age.group.ratio.seq", "cov.55.gender.men70.women30.age.group.ratio.emp", 
+                        
+                        "cov.65.gender.men50.women50.ratio.seq", "cov.65.gender.men50.women50.ratio.emp",
+                        "cov.65.gender.men30.women70.ratio.seq", "cov.65.gender.men30.women70.ratio.emp",
+                        "cov.65.gender.men70.women30.ratio.seq", "cov.65.gender.men70.women30.ratio.emp",
+                        "cov.65.gender.men50.women50.age.group.ratio.seq", "cov.65.gender.men50.women50.age.group.ratio.emp",
+                        "cov.65.gender.men30.women70.age.group.ratio.seq", "cov.65.gender.men30.women70.age.group.ratio.emp",
+                        "cov.65.gender.men70.women30.age.group.ratio.seq", "cov.65.gender.men70.women30.age.group.ratio.emp", 
+                        
+                        "cov.75.gender.men50.women50.ratio.seq", "cov.75.gender.men50.women50.ratio.emp",
+                        "cov.75.gender.men30.women70.ratio.seq", "cov.75.gender.men30.women70.ratio.emp",
+                        "cov.75.gender.men70.women30.ratio.seq", "cov.75.gender.men70.women30.ratio.emp",
+                        "cov.75.gender.men50.women50.age.group.ratio.seq", "cov.75.gender.men50.women50.age.group.ratio.emp",
+                        "cov.75.gender.men30.women70.age.group.ratio.seq", "cov.75.gender.men30.women70.age.group.ratio.emp",
+                        "cov.75.gender.men70.women30.age.group.ratio.seq", "cov.75.gender.men70.women30.age.group.ratio.emp", 
+                        
+                        "cov.85.gender.men50.women50.ratio.seq", "cov.85.gender.men50.women50.ratio.emp",
+                        "cov.85.gender.men30.women70.ratio.seq", "cov.85.gender.men30.women70.ratio.emp",
+                        "cov.85.gender.men70.women30.ratio.seq", "cov.85.gender.men70.women30.ratio.emp",
+                        "cov.85.gender.men50.women50.age.group.ratio.seq", "cov.85.gender.men50.women50.age.group.ratio.emp",
+                        "cov.85.gender.men30.women70.age.group.ratio.seq", "cov.85.gender.men30.women70.age.group.ratio.emp",
+                        "cov.85.gender.men70.women30.age.group.ratio.seq", "cov.85.gender.men70.women30.age.group.ratio.emp", 
+                        
+                        "cov.95.gender.men50.women50.ratio.seq", "cov.95.gender.men50.women50.ratio.emp",
+                        "cov.95.gender.men30.women70.ratio.seq", "cov.95.gender.men30.women70.ratio.emp",
+                        "cov.95.gender.men70.women30.ratio.seq", "cov.95.gender.men70.women30.ratio.emp",
+                        "cov.95.gender.men50.women50.age.group.ratio.seq", "cov.95.gender.men50.women50.age.group.ratio.emp",
+                        "cov.95.gender.men30.women70.age.group.ratio.seq", "cov.95.gender.men30.women70.age.group.ratio.emp",
+                        "cov.95.gender.men70.women30.age.group.ratio.seq", "cov.95.gender.men70.women30.age.group.ratio.emp"
+    )
     
-    summary.NA <- rep(NA,516)
+    summary.NA <- rep(NA,129)
     
     summary.df.classic <- c(METRICS.incidence.df.15.24, METRICS.incidence.df.25.34, METRICS.incidence.df.35.44,
                             METRICS.age.mix.trans.interc, METRICS.age.mix.slope, METRICS.transm.average,
@@ -3100,7 +3687,9 @@ wrapper.phylo.simpact.master.model.coverage <- function(inputvector = input.vect
                             hiv.prev.lt25.women, hiv.prev.lt25.men, hiv.prev.25.34.women,
                             hiv.prev.25.34.men, hiv.prev.35.44.women, hiv.prev.35.44.men, transm.rate, # cov.vector
                             relas.rate, 
-                            # AAD.male, SDAD.male, slope.male, WSD.male, BSD.male, intercept.male,
+                            
+                            AAD.male, SDAD.male, slope.male, WSD.male, BSD.male, intercept.male,
+                            
                             pp.cp.6months.male)
     
     summary.df <- c(summary.df.classic,  summary.NA)
