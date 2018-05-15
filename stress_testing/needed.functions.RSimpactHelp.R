@@ -1,6 +1,18 @@
 
 
 
+bvar <- function(model) {
+  
+  # Outputs a df with between-subject variance, upr & lwr limits
+  
+  # Must take an merMod  object
+  
+  bsd <- as.numeric(as.data.frame(VarCorr(model))[1,5])
+  
+  
+}
+
+
 # Calculate the transmission rate
 ###################################
 
