@@ -260,7 +260,7 @@ gender.men50.women50.compute.summary.statistics.combined.65 <- function(datalist
     cov.65.gender.men50.women50 <- IDs.indiv.seq.gender.fun(simpact.trans.net = simpact.trans.net,
                                                             limitTransmEvents = 7,
                                                             perc.men = 50,
-                                                            seq.cov = 35,
+                                                            seq.cov = 65,
                                                             age.limit = 65)
     cov.65.IDs.gender.men50.women50 <- cov.65.gender.men50.women50$outputvector
     
@@ -383,8 +383,9 @@ gender.men50.women50.compute.summary.statistics.combined.65 <- function(datalist
                             hiv.prev.lt25.women, hiv.prev.lt25.men, hiv.prev.25.34.women,
                             hiv.prev.25.34.men, hiv.prev.35.44.women, hiv.prev.35.44.men, 
                             # transm.rate, # cov.vector
-                            # relas.rate, 
-                            # 
+                            # relas.rate,  
+                            relsperpersonperyear, agegapsd,
+                            
                             # AAD.male, SDAD.male, slope.male, WSD.male, BSD.male, intercept.male,
                             
                             pp.cp.6months.male)
