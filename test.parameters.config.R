@@ -62,6 +62,7 @@ cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
 inputvector <- c(123, # seed.id
                  -052, # dissolution.alpha_0
                  -0.52, # dissolution.alpha_4
+                 2, # formation.hazard.agegapry.baseline
                  0, # person.agegap.man.dist.normal.mu
                  0, # person.agegap.woman.dist.normal.mu
                  3, # person.agegap.man.dist.normal.sigma
@@ -95,36 +96,37 @@ seedid <- inputvector[1]
 #
 cfg.list["dissolution.alpha_0"] <- inputvector[2] # -0.52
 cfg.list["dissolution.alpha_4"] <- inputvector[3] # -0.05
-cfg.list["person.agegap.man.dist.normal.mu"] <- inputvector[4] # 0
-cfg.list["person.agegap.woman.dist.normal.mu"] <- inputvector[5] # 0
-cfg.list["person.agegap.man.dist.normal.sigma"] <- inputvector[6] # 3
-cfg.list["person.agegap.woman.dist.normal.sigma"] <- inputvector[7] # 3
-cfg.list["formation.hazard.agegapry.gap_agescale_man"] <- inputvector[8] # 0.25
-cfg.list["formation.hazard.agegapry.gap_agescale_woman"] <- inputvector[9] # 0.25
-cfg.list["formation.hazard.agegapry.numrel_man"] <- inputvector[10] # -0.3
-cfg.list["formation.hazard.agegapry.numrel_woman"] <- inputvector[11] # -0.3
-cfg.list["formation.hazard.agegapry.numrel_diff"] <- inputvector[12] # -0.1
-cfg.list["population.eyecap.fraction"] <- inputvector[13] # 0.2
+cfg.list["formation.hazard.agegapry.baseline"] <- inputvector[4] # 2
+cfg.list["person.agegap.man.dist.normal.mu"] <- inputvector[5] # 0
+cfg.list["person.agegap.woman.dist.normal.mu"] <- inputvector[6] # 0
+cfg.list["person.agegap.man.dist.normal.sigma"] <- inputvector[7] # 3
+cfg.list["person.agegap.woman.dist.normal.sigma"] <- inputvector[8] # 3
+cfg.list["formation.hazard.agegapry.gap_agescale_man"] <- inputvector[9] # 0.25
+cfg.list["formation.hazard.agegapry.gap_agescale_woman"] <- inputvector[10] # 0.25
+cfg.list["formation.hazard.agegapry.numrel_man"] <- inputvector[11] # -0.3
+cfg.list["formation.hazard.agegapry.numrel_woman"] <- inputvector[12] # -0.3
+cfg.list["formation.hazard.agegapry.numrel_diff"] <- inputvector[13] # -0.1
+cfg.list["population.eyecap.fraction"] <- inputvector[14] # 0.2
 #
 # # HIV transmission
 # ###################
 #
 
 
-cfg.list["hivtransmission.param.a"] <- inputvector[14] # -1
-cfg.list["hivtransmission.param.b"] <- inputvector[15] # -90
-cfg.list["hivtransmission.param.c"] <- inputvector[16] # 0.5
-cfg.list["hivtransmission.param.f1"] <- inputvector[17] # 0.04879016
-cfg.list["hivtransmission.param.f2"] <- inputvector[18] # -0.1386294
-cfg.list["person.vsp.toacute.x"] <- inputvector[19] # 5 
-cfg.list["person.vsp.toaids.x"] <- inputvector[20] # 7
-cfg.list["person.vsp.tofinalaids.x"] <- inputvector[21] # 12
+cfg.list["hivtransmission.param.a"] <- inputvector[15] # -1
+cfg.list["hivtransmission.param.b"] <- inputvector[16] # -90
+cfg.list["hivtransmission.param.c"] <- inputvector[17] # 0.5
+cfg.list["hivtransmission.param.f1"] <- inputvector[18] # 0.04879016
+cfg.list["hivtransmission.param.f2"] <- inputvector[19] # -0.1386294
+cfg.list["person.vsp.toacute.x"] <- inputvector[20] # 5 
+cfg.list["person.vsp.toaids.x"] <- inputvector[21] # 7
+cfg.list["person.vsp.tofinalaids.x"] <- inputvector[22] # 12
 #
 # # Demographic
 # ##############
 #
 
-cfg.list["conception.alpha_base"] <- inputvector[22] # -2.7
+cfg.list["conception.alpha_base"] <- inputvector[23] # -2.7
 
 #
 #
