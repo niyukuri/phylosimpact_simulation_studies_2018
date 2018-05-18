@@ -1,8 +1,8 @@
 
 
 age.group.gender.men50.women50.compute.summary.statistics.combined.85 <- function(datalist = datalist.agemix,
-                                                                        work.dir = work.dir,
-                                                                        sub.dir.rename = sub.dir.rename){
+                                                                                  work.dir = work.dir,
+                                                                                  sub.dir.rename = sub.dir.rename){
   
   source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
   
@@ -257,12 +257,13 @@ age.group.gender.men50.women50.compute.summary.statistics.combined.85 <- functio
     ### 6th Scenario: 85 ###
     ########################
     
-    cov.85.gender.men50.women50 <- IDs.indiv.seq.gender.fun(simpact.trans.net = simpact.trans.net,
-                                                            limitTransmEvents = 7,
-                                                            perc.men = 50,
-                                                            seq.cov = 85,
-                                                            age.limit = 65)
-    cov.85.IDs.gender.men50.women50 <- cov.85.gender.men50.women50$outputvector
+    cov.85.gender.men50.women50.age.group <- IDs.indiv.seq.gender.age.group.fun(simpact.trans.net = simpact.trans.net,
+                                                                                limitTransmEvents = 7, 
+                                                                                perc.men = 50, 
+                                                                                seq.cov = 85,
+                                                                                age.men = c(15, 60),
+                                                                                age.women = c(15, 40))
+    cov.85.IDs.gender.men50.women50.age.group <- cov.85.gender.men50.women50.age.group$outputvector
     
     
     
@@ -270,42 +271,39 @@ age.group.gender.men50.women50.compute.summary.statistics.combined.85 <- functio
     
     source("~/phylosimpact_simulation_studies_2018/stress_testing/phylogenetic.features.fun.R")
     # men.50.women50
-    if(length(cov.85.IDs.gender.men50.women50)>=cut.val){
+    if(length(cov.85.IDs.gender.men50.women50.age.group)>=cut.val){
       
       choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.Fasta"),
-                          select.vec = cov.85.IDs.gender.men50.women50, 
-                          name.file = paste0(sub.dir.rename, "/cov.85.IDs.gender.men50.women50.C.Epidemic.Fasta"))
+                          select.vec = cov.85.IDs.gender.men50.women50.age.group, 
+                          name.file = paste0(sub.dir.rename,"/cov.85.IDs.gender.men50.women50.age.group.C.Epidemic.Fasta"))
       
       
-      cov.85.IDs.gender.men50.women50.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
-                                                                                   sub.dir.rename = sub.dir.rename,
-                                                                                   fasttree.tool = "FastTree",
-                                                                                   calendar.dates = "samplingtimes.all.csv",
-                                                                                   simseqfile = "cov.85.IDs.gender.men50.women50.C.Epidemic.Fasta",
-                                                                                   count.start = 1977,
-                                                                                   endsim = 40,
-                                                                                   clust = FALSE)
-      cov.85.IDs.gender.men50.women50.tree.calib.LTT <- cov.85.IDs.gender.men50.women50.tree.calib
+      cov.85.IDs.gender.men50.women50.age.group.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
+                                                                                             sub.dir.rename = sub.dir.rename,
+                                                                                             fasttree.tool = "FastTree",
+                                                                                             calendar.dates = "samplingtimes.all.csv",
+                                                                                             simseqfile = "cov.85.IDs.gender.men50.women50.age.group.C.Epidemic.Fasta",
+                                                                                             count.start = 1977,
+                                                                                             endsim = 40,
+                                                                                             clust = FALSE)
+      cov.85.IDs.gender.men50.women50.age.group.tree.calib.LTT <- cov.85.IDs.gender.men50.women50.age.group.tree.calib
       
-      write.tree(cov.85.IDs.gender.men50.women50.tree.calib, file = paste0(sub.dir.rename,"/cov.85.IDs.gender.men50.women50.calibrated.tree.nwk"))
+      write.tree(cov.85.IDs.gender.men50.women50.age.group.tree.calib, file = paste0(sub.dir.rename,"/cov.85.IDs.gender.men50.women50.age.group.calibrated.tree.nwk"))
       
-      
-      cov.85.IDs.gender.men50.women50.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.85.IDs.gender.men50.women50.calibrated.tree.nwk"))
+      cov.85.IDs.gender.men50.women50.age.group.features <- phylogenetic.features.fun(tree.topo=paste0(sub.dir.rename,"/cov.85.IDs.gender.men50.women50.age.group.calibrated.tree.nwk"))
       # ,
-      #                                                                       tree.calib.LTT = cov.85.IDs.gender.men50.women50.tree.calib.LTT)
+      #                                                                                 tree.calib.LTT = cov.85.IDs.gender.men50.women50.age.group.tree.calib.LTT)
       # 
+      cov.85.IDs.gender.men50.women50.age.group.features <- as.numeric(cov.85.IDs.gender.men50.women50.age.group.features)
+      cov.85.gender.men50.women50.age.group.ratio.seq <- cov.85.gender.men50.women50.age.group$ratio.seq
+      cov.85.gender.men50.women50.age.group.ratio.emp <- cov.85.gender.men50.women50.age.group$ratio.emp
       
-      cov.85.IDs.gender.men50.women50.features <- as.numeric(cov.85.IDs.gender.men50.women50.features)
-      cov.85.gender.men50.women50.ratio.seq <- cov.85.gender.men50.women50$ratio.seq
-      cov.85.gender.men50.women50.ratio.emp <- cov.85.gender.men50.women50$ratio.emp
+      cov.85.IDs.gender.men50.women50.age.group.features <- c(cov.85.IDs.gender.men50.women50.age.group.features,
+                                                              cov.85.gender.men50.women50.age.group.ratio.seq,
+                                                              cov.85.gender.men50.women50.age.group.ratio.emp)
       
-      cov.85.IDs.gender.men50.women50.features <- c(cov.85.IDs.gender.men50.women50.features, 
-                                                    cov.85.gender.men50.women50.ratio.seq,
-                                                    cov.85.gender.men50.women50.ratio.emp)
-      
-      # cov.85.gender.men50.women50
     }else{
-      cov.85.IDs.gender.men50.women50.features <- rep(NA, 8)
+      cov.85.IDs.gender.men50.women50.age.group.features <- rep(NA, 8)
     }
     
     
@@ -325,7 +323,7 @@ age.group.gender.men50.women50.compute.summary.statistics.combined.85 <- functio
                     pp.cp.6months.male,
                     
                     
-                    as.numeric(cov.85.IDs.gender.men50.women50.features)
+                    as.numeric(cov.85.IDs.gender.men50.women50.age.group.features)
                     
                     # cov.85.gender.men50.women50.ratio.seq, cov.85.gender.men50.women50.ratio.emp
     )
@@ -343,12 +341,12 @@ age.group.gender.men50.women50.compute.summary.statistics.combined.85 <- functio
                         
                         "pp.cp.6months.male",
                         
-                        "cov.85.IDs.gender.men50.women50.meanHeight.feature", "cov.85.IDs.gender.men50.women50.colless.feature", "cov.85.IDs.gender.men50.women50.sackin.feature", 
-                        "cov.85.IDs.gender.men50.women50.mean.tipsDepths.feature", "cov.85.IDs.gender.men50.women50.mean.nodesDepths.feature",
-                        "cov.85.IDs.gender.men50.women50.maxHeight.feature", 
+                        "cov.85.IDs.gender.men50.women50.age.group.meanHeight.feature", "cov.85.IDs.gender.men50.women50.age.group.colless.feature", "cov.85.IDs.gender.men50.women50.age.group.sackin.feature", 
+                        "cov.85.IDs.gender.men50.women50.age.group.mean.tipsDepths.feature", "cov.85.IDs.gender.men50.women50.age.group.mean.nodesDepths.feature",
+                        "cov.85.IDs.gender.men50.women50.age.group.maxHeight.feature", 
                         
                         
-                        "cov.85.gender.men50.women50.ratio.seq", "cov.85.gender.men50.women50.ratio.emp"
+                        "cov.85.gender.men50.women50.age.group.ratio.seq", "cov.85.gender.men50.women50.age.group.ratio.emp"
     )
     
     names(summary.df) <- features.names # > length(features.names) [1] 549
@@ -359,7 +357,7 @@ age.group.gender.men50.women50.compute.summary.statistics.combined.85 <- functio
     features.names <- c("Pop.growthrate", 
                         
                         "hiv.prev.lt25.women", "hiv.prev.lt25.men", "hiv.prev.25.34.women",
-                        "hiv.prev.25.34.men", "hiv.prev.35.44.women", "hiv.prev.35.44.men", 
+                        "hiv.prev.25.34.men", "hiv.prev.35.44.women", "hiv.prev.35.44.men",
                         # "transm.rate", # cov.vector
                         # "relas.rate",  
                         "relsperpersonperyear", "agegapsd",
@@ -368,12 +366,12 @@ age.group.gender.men50.women50.compute.summary.statistics.combined.85 <- functio
                         
                         "pp.cp.6months.male",
                         
-                        "cov.85.IDs.gender.men50.women50.meanHeight.feature", "cov.85.IDs.gender.men50.women50.colless.feature", "cov.85.IDs.gender.men50.women50.sackin.feature", 
-                        "cov.85.IDs.gender.men50.women50.mean.tipsDepths.feature", "cov.85.IDs.gender.men50.women50.mean.nodesDepths.feature",
-                        "cov.85.IDs.gender.men50.women50.maxHeight.feature", 
+                        "cov.85.IDs.gender.men50.women50.age.group.meanHeight.feature", "cov.85.IDs.gender.men50.women50.age.group.colless.feature", "cov.85.IDs.gender.men50.women50.age.group.sackin.feature", 
+                        "cov.85.IDs.gender.men50.women50.age.group.mean.tipsDepths.feature", "cov.85.IDs.gender.men50.women50.age.group.mean.nodesDepths.feature",
+                        "cov.85.IDs.gender.men50.women50.age.group.maxHeight.feature", 
                         
                         
-                        "cov.85.gender.men50.women50.ratio.seq", "cov.85.gender.men50.women50.ratio.emp"
+                        "cov.85.gender.men50.women50.age.group.ratio.seq", "cov.85.gender.men50.women50.age.group.ratio.emp"
     )
     
     summary.NA <- rep(NA,8)
