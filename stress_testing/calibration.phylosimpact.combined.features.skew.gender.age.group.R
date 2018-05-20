@@ -300,7 +300,7 @@ sum_stat_obs <- c(0.003916345 , 0.000000000 , 0.000000000 , 0.000000000 ,
 n=3
 p=0.7
 ABC_rej.men.50.women50.age.group.35 <-ABC_rejection(model=simpact4ABC.men.50.women50.age.group.35, prior=simpact_prior, nb_simul=n,
-                                          summary_stat_target=sum_stat_obs, tol=p)
+                                                    summary_stat_target=sum_stat_obs, tol=p)
 
 output.params.men.50.women50.age.group.35 <- as.data.table(ABC_rej.men.50.women50.age.group.35$param)
 
