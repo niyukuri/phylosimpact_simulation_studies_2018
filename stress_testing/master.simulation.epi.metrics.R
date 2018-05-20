@@ -17,11 +17,6 @@ pacman::p_load(snow, parallel, RSimpactCyan, RSimpactHelper, ape, Rsamtools)
 
 
 # work.dir <- "~/Desktop/calibration/"
-# 
-# inputvector <- c(123,1.05, 0.25, 0, 3, 0.23, 0.23, 45, 45, -0.7, 2.8,
-#                  -0.3, -0.3,
-#                  -2.7, # conception
-#                  -0.52, -0.05)
 
 
 master.simulation.epi.metrics <- function(inputvector){
@@ -541,9 +536,6 @@ reps <- 2
 
 
 # Input parameters in matrix form reps times (rows).
-
-inputmatrix <- matrix(rep(inputvector, reps), byrow = TRUE, nrow = reps)
-
 
 
 sim.start.time <- proc.time()[3] 
