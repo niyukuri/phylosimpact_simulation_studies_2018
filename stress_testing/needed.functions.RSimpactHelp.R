@@ -218,26 +218,19 @@ plot.parboot.ltt.dat <- function (pbtd, t0 = NA, res = 100, ...)
 # Age mixing in transmission
 #############################
 
-agemixing.trans.df <- function(datalist = datalist, 
-                               trans.network = trans.network){
-  
-  pers.infec.raw <- as.data.frame(datalist$ptable[InfectType != -1])
-  
-  pers.infec <- pers.infec.raw[which(pers.infec.raw$InfectTime <= datalist$itable$population.simtime[1]),]
-  
-  # person table of infected individuals by seed event
-  pers.table.seed <- subset(pers.infec, pers.infec$InfectType==0)
-  
+agemixing.trans.df <- function(trans.network = trans.network,
+                               limitTransmEvents = 7){
+
   # id of people who got infection by seed event: seeds.id
-  seeds.id <- pers.table.seed$ID # do
+  seeds.id <- length(trans.network)
   
-  infectionTable <- vector("list", length(seeds.id))
+  infectionTable <- vector("list", seeds.id)
   
-  for (i in 1: length(seeds.id)) {
+  for (i in 1: seeds.id) {
     
     trans.network.i <- as.data.frame(trans.network[[i]])
     
-    if(nrow(trans.network.i) >= 3){
+    if(nrow(trans.network.i) >= limitTransmEvents){
       
       trans.network.i <- trans.network.i[-1,]
       
@@ -248,63 +241,21 @@ agemixing.trans.df <- function(datalist = datalist,
       
       names(rrtable) <- c("RecId", "DonId", "GenderRec",
                           "GenderDon", "TOBRec", "TOBDon", "InfecTime", "SampTime")
+      rrtable$AgeInfecDon <- abs(rrtable$TOBDon) + rrtable$InfecTime
+      rrtable$AgeInfecRec <- abs(rrtable$TOBRec) + rrtable$InfecTime
       
-      rrtable.men <- subset(rrtable, rrtable$GenderDon=="0")
-      rrtable.women <- subset(rrtable, rrtable$GenderDon=="1")
+      infectionTable[[i]] <- rrtable
       
-      ids.men <- rrtable.men$DonId
-      ids.men.part.w <- rrtable.men$RecId
-      age.gap.ID1 <- abs(rrtable.men$TOBDon) - abs(rrtable.men$TOBRec) # men are donors
-      tob.men.ID1 <- rrtable.men$TOBDon
-      tob.women.ID1 <- rrtable.men$TOBRec
-      
-      age.men.ID1 <- abs(rrtable.men$TOBDon) + rrtable.men$InfecTime
-      age.women.ID1 <- abs(rrtable.men$TOBRec) + rrtable.men$InfecTime
-      
-      infectime.m <- rrtable.men$InfecTime
-      samptime.m <- rrtable.men$SampTime
-      
-      ID1.m <- ids.men
-      ID2.m <- ids.men.part.w
-      age.gap.m <- age.gap.ID1
-      infectime.m <- infectime.m 
-      
-      infectable.m <- cbind(ID1.m, ID2.m, tob.men.ID1, tob.women.ID1, age.men.ID1, age.women.ID1, age.gap.m, infectime.m, samptime.m)
-      
-      ids.women <- rrtable.women$DonId
-      ids.women.part.m <- rrtable.women$RecId
-      age.gap.ID2 <- abs(rrtable.women$TOBRec) - abs(rrtable.women$TOBDon) # men are receptors
-      tob.men.ID2 <- rrtable.women$TOBRec
-      tob.women.ID2 <- rrtable.women$TOBDon
-      
-      age.men.ID2 <- abs(rrtable.women$TOBDon) + rrtable.women$InfecTime
-      age.women.ID2 <- abs(rrtable.women$TOBRec) + rrtable.women$InfecTime
-      
-      infectime.w <- rrtable.women$InfecTime
-      samptime.w <- rrtable.women$SampTime
-      
-      ID1.w <- ids.women.part.m
-      ID2.w <- ids.women
-      age.gap.w <- age.gap.ID2
-      infectime.w <- infectime.w
-      
-      infectable.w <- cbind(ID1.w, ID2.w, tob.men.ID2, tob.women.ID2, age.men.ID2, age.women.ID2, age.gap.w, infectime.w, samptime.w)
-      
-      infectable.i <- as.data.frame(rbind(infectable.m, infectable.w))
-      
-      names(infectable.i) <- c("ID1", "ID2", "TOBID1", "TOBID2", "AgeID1", "AgeID2", "AgeGap", "infecttime", "samptime")
-      infectionTable[[i]] <- infectable.i
-    }
-    
+       }
     
   }
-  
   
   infecttable <- rbindlist(infectionTable) 
   
   return(infecttable)
   
 }
+
 
 
 # Fit age mixing in transmission
@@ -314,7 +265,13 @@ fit.agemix.trans <- function(datatable = agemix.df){
   
   datatable <- datatable
   
-  agemix.inter <- lmer(AgeID2 ~ AgeID1 + (1|ID1), data = datatable)
+  men.lmer <- lmer(AgeInfecDon ~ AgeInfecRec + (1 | DonId),
+                   data = dplyr::filter(rrtable, GenderDon =="0"),
+                   REML = TRUE,
+                   control=lmerControl(check.nobs.vs.nlev = "ignore",
+                                       check.nobs.vs.rankZ = "ignore",
+                                       check.nobs.vs.nRE="ignore"))
+  agemix.inter <- men.lmer
   
   return(agemix.inter)
   
