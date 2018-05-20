@@ -24,9 +24,10 @@ library(Rsamtools) # select IDs sequences in a file
 library(robustbase) # colMedians
 
 
-# work.dir <- "/home/david/Desktop/calibration" # on laptop
 
-work.dir <- "/home/niyukuri/Desktop/calibration" # on PC
+work.dir <- "/home/david/Desktop/calibration" # on laptop
+
+# work.dir <- "/home/niyukuri/Desktop/calibration" # on PC
 
 
 setwd(paste0(work.dir))
