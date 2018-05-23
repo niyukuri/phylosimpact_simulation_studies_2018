@@ -220,42 +220,55 @@ plot.parboot.ltt.dat <- function (pbtd, t0 = NA, res = 100, ...)
 
 agemixing.trans.df <- function(trans.network = trans.network,
                                limitTransmEvents = 7){
-
+  
   # id of people who got infection by seed event: seeds.id
   seeds.id <- length(trans.network)
   
-  infectionTable <- vector("list", seeds.id)
+  ID.select <- vector() # ID of selected transmission network
+  ID.select.count <- vector() # number of individuals in these networks
   
   for (i in 1: seeds.id) {
     
+    
     trans.network.i <- as.data.frame(trans.network[[i]])
     
-    if(nrow(trans.network.i) >= limitTransmEvents){
+    if(nrow(trans.network.i)>=limitTransmEvents){
       
-      trans.network.i <- trans.network.i[-1,]
+
+      ID.select <- c(ID.select, i)
+      ID.select.count <- c(ID.select.count, nrow(trans.network.i))
       
-      rrtable <- as.data.frame(cbind(trans.network.i$RecId, trans.network.i$DonId, 
-                                     trans.network.i$GenderRec, trans.network.i$GenderDon,
-                                     trans.network.i$TOBRec, trans.network.i$TOBDon,
-                                     trans.network.i$InfecTime, trans.network.i$SampTime))
-      
-      names(rrtable) <- c("RecId", "DonId", "GenderRec",
-                          "GenderDon", "TOBRec", "TOBDon", "InfecTime", "SampTime")
-      rrtable$AgeInfecDon <- abs(rrtable$TOBDon) + rrtable$InfecTime
-      rrtable$AgeInfecRec <- abs(rrtable$TOBRec) + rrtable$InfecTime
-      
-      infectionTable[[i]] <- rrtable
-      
-       }
+    } # X if
     
-  }
+  } # Y for
   
-  infecttable <- rbindlist(infectionTable) 
+  
+  infectionTable <- vector("list", length(ID.select))
+  
+  for(j in 1:length(ID.select)){
+    
+    p <- ID.select[j]
+    
+    trans.network.i <- as.data.frame(trans.network[[p]])
+    
+    trans.network.i <- trans.network.i[-1,]
+    
+    trans.network.i$AgeInfecDon <- abs(trans.network.i$TOBDon) + trans.network.i$InfecTime
+    trans.network.i$AgeInfecRec <- abs(trans.network.i$TOBRec) + trans.network.i$InfecTime
+    
+    id.lab <- paste0(p,".",trans.network.i$id,".C")
+    
+    trans.network.i$id.lab <- id.lab
+    
+    infectionTable[[p]] <- trans.network.i
+  }
+
+  
+  infecttable <- rbindlist(infectionTable)
   
   return(infecttable)
   
 }
-
 
 
 # Fit age mixing in transmission
