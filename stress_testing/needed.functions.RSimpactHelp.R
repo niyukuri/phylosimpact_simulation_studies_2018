@@ -234,7 +234,7 @@ agemixing.trans.df <- function(trans.network = trans.network,
     
     if(nrow(trans.network.i)>=limitTransmEvents){
       
-
+      
       ID.select <- c(ID.select, i)
       ID.select.count <- c(ID.select.count, nrow(trans.network.i))
       
@@ -262,7 +262,7 @@ agemixing.trans.df <- function(trans.network = trans.network,
     
     infectionTable[[p]] <- trans.network.i
   }
-
+  
   
   infecttable <- rbindlist(infectionTable)
   
@@ -294,14 +294,17 @@ fit.agemix.trans <- function(datatable = agemix.df){
 # Onward transmissions
 ######################
 
-
 onwardtransmissions.dat <- function(datalist = datalist, 
-                                    trans.network = trans.network){
+                                    trans.network = trans.network,
+                                    limitTransmEvents = 3,
+                                    endpoint=40){
   
   
   pers.infec.raw <- as.data.frame(datalist$ptable[InfectType != -1])
   
-  pers.infec <- pers.infec.raw[which(pers.infec.raw$InfectTime <= datalist$itable$population.simtime[1]),]
+  pers.infec.raw.died <- pers.infec.raw[pers.infec.raw$TOD != "Inf", ] # consider only these who had full time to transmit before they die
+  
+  pers.infec <- pers.infec.raw.died[which(pers.infec.raw.died$InfectTime <= endpoint),]
   
   # person table of infected individuals by seed event
   pers.table.seed <- subset(pers.infec, pers.infec$InfectType==0)
@@ -320,7 +323,7 @@ onwardtransmissions.dat <- function(datalist = datalist,
     
     trans.network.j <- trans.network.j[-1,] # remove the universal infector
     
-    if(nrow(trans.network.j) > 1){ # consider transmission networks with at least one onward transmission
+    if(nrow(trans.network.j) >=limitTransmEvents){ # consider transmission networks with at least one onward transmission
       
       d.j <- table(trans.network.j$DonId) # in the transmission table, the number of times DonId appears is the number of Onward transmissions after acuiring the infection 
       num.j <- as.data.frame(as.numeric(d.j))
@@ -338,6 +341,7 @@ onwardtransmissions.dat <- function(datalist = datalist,
   return(count.dat) # count.dat = all infections - seeds which didn;t produce at least one transmission
   
 }
+
 
 
 
