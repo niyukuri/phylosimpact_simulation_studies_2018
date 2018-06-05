@@ -3,7 +3,9 @@
 
 
 phylogenetic.features.study1 <- function(tree.topo=tree,
-                                         tree.calib.LTT = tree.calib.LTT)
+                                         tree.calib.LTT = tree.calib.LTT,
+                                         work.dir = work.dir,
+                                         sub.dir.rename = sub.dir.rename)
 {
   
   ########################################
@@ -49,7 +51,7 @@ phylogenetic.features.study1 <- function(tree.topo=tree,
   count.poisson.fit <- glm(int.node.vec ~ years, data = poisson.reg.df,  family=poisson())
   
   count.coeff <-  count.poisson.fit[[1]][[1]]  # Ok
-  time.coeff <-  count.poisson.fit[[1]][2]  # Ok
+  time.coeff <-  count.poisson.fit[[1]][[2]]  # Ok
   
   
   # 2. Mean, median, and Sd of weithed age-structured of number of individuals in transmission clusters
@@ -57,11 +59,12 @@ phylogenetic.features.study1 <- function(tree.topo=tree,
   
   # run ClusterPicker
   
-  system(paste("java -jar ", paste("/home/david/Desktop/TEST_17_4_2018/ClusterPicker/ClusterPicker_1.2.3.jar", paste0("/home/david/Desktop/TEST_17_4_2018/C.Epidemic.fas"), paste0("/home/david/Desktop/TEST_17_4_2018/fasttree/C.Epidemic_seed.seq.bis.sim.nwk.fasta.nwk"),  paste0("0.9 0.9 0.045 2 gap"))))
+  system(paste("java -jar ", paste(paste0(work.dir,"/ClusterPicker_1.2.3.jar"), paste0(sub.dir.rename,"/C.Epidemic.fas"), paste0(sub.dir.rename,"/C.Epidemic_seed.seq.bis.sim.nwk.fasta.nwk"),  paste0("0.9 0.9 0.045 2 gap"))))
   
   # Read clusters' files
   
-  d <- list.files(pattern = "C.Epidemic_C.Epidemic_seed.seq.bis.simta_clusterPicks_cluster", all.files = FALSE,
+  d <- list.files(path = paste0(sub.dir.rename), pattern = "C.Epidemic_C.Epidemic_seed.seq.bis.simta_clusterPicks_cluster", 
+                  all.files = FALSE,
                   full.names = FALSE, recursive = FALSE)
   
   
@@ -83,7 +86,7 @@ phylogenetic.features.study1 <- function(tree.topo=tree,
   
   for (i in 1:length(d)) {
     
-    clus.read <- read.table(d[i], header = FALSE) # Ids of each cluster
+    clus.read <- read.table(file = paste0(paste0(sub.dir.rename,"/"),d[i]), header = FALSE) # Ids of each cluster
     #size <- c(size, nrow(clus.read))
     
     transm.df.cl <- subset(transm.df, transm.df$id.lab%in%as.character(clus.read$V1)) # transmission data table of IDs of a cluster
@@ -115,7 +118,7 @@ phylogenetic.features.study1 <- function(tree.topo=tree,
     women.40.50 <- nrow(age.group.40.50.df.women)
     
     pop.count <- nrow(transm.df.cl)
-
+    
     
     stat.clust.i$men.25 <- men.25*pop.count
     stat.clust.i$men.25.40 <- men.25.40*pop.count
@@ -131,11 +134,11 @@ phylogenetic.features.study1 <- function(tree.topo=tree,
     
   }
   
-
+  
   stat.clust.list <- list() # initialise a list age-structured average weithed number of female/male for all transission cluster
   
   stat.clust.list.j <- list()# initialise a list age-structured average weithed number of female/male in each transission cluster
-
+  
   
   for(j in 1:length(stat.clust)){
     
@@ -168,7 +171,7 @@ phylogenetic.features.study1 <- function(tree.topo=tree,
   median.clust.stat <- colMedians(as.matrix(clust.stat.table))  # Ok # library(robustbase)
   sd.clust.stat <- sapply(clust.stat.table, sd)  # Ok
   
-
+  
   
   # 3. Mean, median, and SD of size of transmission custers
   ###########################################################
@@ -227,15 +230,17 @@ phylogenetic.features.study1 <- function(tree.topo=tree,
                               median.nodesDepths.feature, maxHeight.feature)
   
   
-
+  name.mean.clust.stat <- names(mean.clust.stat)
+  name.median.clust.stat <- names(median.clust.stat)
+  name.sd.clust.stat <- names(sd.clust.stat)
   
   features.names <- c("count.coeff", "time.coeff",
-                      "mean.clust.stat", "median.clust.stat", "sd.clust.stat",
+                      name.mean.clust.stat, name.median.clust.stat,name.sd.clust.stat,
                       "mean.count.clust", "median.count.clust", "sd.count.clust",
                       "colless.feature", "sackin.feature", "mean.height.internal.nodes",
                       "median.height.internal.nodes", "mean.nodesDepths.feature", 
                       "median.nodesDepths.feature", "maxHeight.feature")
-
+  
   names(phylo.features.summary) <- features.names
   
   return(phylo.features.summary)
