@@ -122,34 +122,33 @@ compute.summary.statistics.classic <- function(datalist = datalist.agemix,
   # 
   # agemix.df <- agemix.df.maker(datalist.agemix)
   # 
-  # agemix.model <- pattern.modeller(dataframe = agemix.df,
-  #                                  agegroup = c(15, 60),
-  #                                  timepoint = 40, # datalist.agemix$itable$population.simtime[1],
-  #                                  timewindow = 5)#1)#3)
+  agemix.model <- pattern.modeller(dataframe = agemix.df,
+                                   agegroup = c(15, 60),
+                                   timepoint = 40, # datalist.agemix$itable$population.simtime[1],
+                                   timewindow = 5)#1)#3)
   # 
   # # men.lme <- tryCatch(agemixing.lme.fitter(data = dplyr::filter(agemix.model[[1]], Gender =="male")),
   # #                     error = agemixing.lme.errFunction) # Returns an empty list if the lme model can't be fitted
   #
   # men.lmer <- ampmodel(data = dplyr::filter(agemix.model[[1]], Gender =="male"))
   
-  # men.lmer <- lmer(pagerelform ~ agerelform0 + (1 | ID),
-  #                  data = dplyr::filter(agemix.model[[1]], Gender =="male"),
-  #                  REML = TRUE,
-  #                  control=lmerControl(check.nobs.vs.nlev = "ignore",
-  #                                      check.nobs.vs.rankZ = "ignore",
-  #                                      check.nobs.vs.nRE="ignore"))
-  # #
-  # bignumber <- NA # let's try if NA works (instead of 9999 for example)
-  # #
-  # AAD.male <- ifelse(length(men.lmer) > 0, mean(dplyr::filter(agemix.model[[1]], Gender =="male")$AgeGap), bignumber)
-  # SDAD.male <- ifelse(length(men.lmer) > 0, sd(dplyr::filter(agemix.model[[1]], Gender =="male")$AgeGap), bignumber)
-  # #powerm <- ifelse(length(men.lme) > 0, as.numeric(attributes(men.lme$apVar)$Pars["varStruct.power"]), bignumber)
-  # slope.male <- ifelse(length(men.lmer) > 0, summary(men.lmer)$coefficients[2, 1], bignumber) #summary(men.lmer)$tTable[2, 1], bignumber)
-  # WSD.male <- ifelse(length(men.lmer) > 0, summary(men.lmer)$sigma, bignumber) #WVAD.base <- ifelse(length(men.lme) > 0, men.lme$sigma^2, bignumber)
-  # 
-  # BSD.male <- ifelse(length(men.lmer) > 0, bvar(men.lmer), bignumber) # Bad name for the function because it actually extracts between subject standard deviation # BVAD <- ifelse(length(men.lmer) > 0, getVarCov(men.lme)[1,1], bignumber)
-  # 
-  # intercept.male <- ifelse(length(men.lmer) > 0, summary(men.lmer)$coefficients[1,1] - 15, bignumber)
+  men.lmer <- lmer(pagerelform ~ agerelform0 + (1 | ID),
+                   data = dplyr::filter(agemix.model[[1]], Gender =="male"),
+                   REML = TRUE,
+                   control=lmerControl(check.nobs.vs.nlev = "ignore",
+                                       check.nobs.vs.rankZ = "ignore",
+                                       check.nobs.vs.nRE="ignore"))
+
+  bignumber <- NA # let's try if NA works (instead of 9999 for example)
+  AAD.male <- ifelse(length(men.lmer) > 0, mean(dplyr::filter(agemix.model[[1]], Gender =="male")$AgeGap), bignumber)
+  SDAD.male <- ifelse(length(men.lmer) > 0, sd(dplyr::filter(agemix.model[[1]], Gender =="male")$AgeGap), bignumber)
+  #powerm <- ifelse(length(men.lme) > 0, as.numeric(attributes(men.lme$apVar)$Pars["varStruct.power"]), bignumber)
+  slope.male <- ifelse(length(men.lmer) > 0, summary(men.lmer)$coefficients[2, 1], bignumber) #summary(men.lmer)$tTable[2, 1], bignumber)
+  WSD.male <- ifelse(length(men.lmer) > 0, summary(men.lmer)$sigma, bignumber) #WVAD.base <- ifelse(length(men.lme) > 0, men.lme$sigma^2, bignumber)
+
+  BSD.male <- ifelse(length(men.lmer) > 0, bvar(men.lmer), bignumber) # Bad name for the function because it actually extracts between subject standard deviation # BVAD <- ifelse(length(men.lmer) > 0, getVarCov(men.lme)[1,1], bignumber)
+
+  intercept.male <- ifelse(length(men.lmer) > 0, summary(men.lmer)$coefficients[1,1] - 15, bignumber)
   
   # c(AAD.male, SDAD.male, slope.male, WSD.male, BSD.male, intercept.male)
   
@@ -205,7 +204,7 @@ compute.summary.statistics.classic <- function(datalist = datalist.agemix,
                   # relas.rate,  
                   relsperpersonperyear, agegapsd,
                   
-                  # AAD.male, SDAD.male, slope.male, WSD.male, BSD.male, intercept.male,
+                  AD.male, SDAD.male, slope.male, WSD.male, BSD.male, intercept.male,
                   
                   pp.cp.6months.male
                   
@@ -224,7 +223,7 @@ compute.summary.statistics.classic <- function(datalist = datalist.agemix,
                       # "relas.rate",  
                       "relsperpersonperyear", "agegapsd",
                       
-                      ## "AAD.male", "SDAD.male", "slope.male", "WSD.male", "BSD.male", "intercept.male",
+                      "AAD.male", "SDAD.male", "slope.male", "WSD.male", "BSD.male", "intercept.male",
                       
                       "pp.cp.6months.male"
                       
