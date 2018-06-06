@@ -65,7 +65,8 @@ epi.metric.study.1 <- function(datalist.agemix = datalist){
   METRICS.age.mix.trans.interc.men <- coef.inter.men[[1]]
   METRICS.age.mix.slope.men <- coef.inter.men[[2]]
   
-  agemix.fit.women <- fit.agemix.trans.women(datatable = agemix.df)
+
+  agemix.fit.women <- fit.agemix.trans.women(datatable = agemix.transm.df)
   
   coef.inter.women <- fixef(agemix.fit.women)
   
@@ -73,8 +74,11 @@ epi.metric.study.1 <- function(datalist.agemix = datalist){
   METRICS.age.mix.slope.women <- coef.inter.women[[2]]
   
   # XXXXXXXXX
+  age.group.25 <- 25
+  age.group.25.40 <- c(25,40)
+  age.group.40.50 <- c(40,50)
   
-  IDs.new.infec <- new.transmissions.dat(datalist = datalist, 
+  IDs.new.infec <- new.transmissions.dat(datalist = datalist.agemix, 
                                          time.window=c(30,40))
   
   transm.dfdat <- subset(agemix.transm.df, agemix.transm.df$RecId%in%IDs.new.infec) # transmission table of IDs of new infections
