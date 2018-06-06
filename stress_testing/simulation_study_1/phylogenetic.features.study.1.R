@@ -5,7 +5,10 @@
 phylogenetic.features.study1 <- function(tree.topo=tree,
                                          tree.calib.LTT = tree.calib.LTT,
                                          work.dir = work.dir,
-                                         sub.dir.rename = sub.dir.rename)
+                                         sub.dir.rename = sub.dir.rename,
+                                         simpact.trans.net = simpact.trans.net,
+                                         fasta.file = "C.Epidemic.fas",
+                                         tree.file = "C.Epidemic_seed.seq.bis.sim.nwk.fasta.nwk")
 {
   
   ########################################
@@ -59,7 +62,7 @@ phylogenetic.features.study1 <- function(tree.topo=tree,
   
   # run ClusterPicker
   
-  system(paste("java -jar ", paste(paste0(work.dir,"/ClusterPicker_1.2.3.jar"), paste0(sub.dir.rename,"/C.Epidemic.fas"), paste0(sub.dir.rename,"/C.Epidemic_seed.seq.bis.sim.nwk.fasta.nwk"),  paste0("0.9 0.9 0.045 2 gap"))))
+  system(paste("java -jar ", paste(paste0(work.dir,"/ClusterPicker_1.2.3.jar"), paste0(sub.dir.rename,"/", paste0(fasta.file)), paste0(sub.dir.rename,"/", paste0(tree.file)),  paste0("0.9 0.9 0.045 2 gap"))))
   
   # Read clusters' files
   
@@ -72,7 +75,7 @@ phylogenetic.features.study1 <- function(tree.topo=tree,
   
   age.group.25 <- 25
   age.group.25.40 <- c(25,40)
-  age.group.40.50 <- c(40,70)
+  age.group.40.50 <- c(40,50)
   
   
   # transmission table
@@ -173,7 +176,7 @@ phylogenetic.features.study1 <- function(tree.topo=tree,
   
   
   
-  # 3. Mean, median, and SD of size of transmission custers
+  # 3. Mean, median, and SD of size of transmission clusters
   ###########################################################
   
   # count.clust
