@@ -176,9 +176,9 @@ classic.features.study.1 <- function(datalist = datalist.agemix,
   
   
   summary.df <- c(growthrate, 
-                  
-                  hiv.prev.lt25.women, hiv.prev.lt25.men, hiv.prev.25.34.women,
-                  hiv.prev.25.34.men, hiv.prev.35.44.women, hiv.prev.35.44.men, 
+                  hiv.prev.lt25.women, hiv.prev.lt25.men, 
+                  hiv.prev.25.40.women, hiv.prev.25.40.men,
+                  hiv.prev.40.50.women, hiv.prev.40.50.men, 
                   cov.vector,
                   relsperpersonperyear, agegapsd,
                   
@@ -189,9 +189,9 @@ classic.features.study.1 <- function(datalist = datalist.agemix,
   name.cov.vector <- paste0(seq(from=1, to=length(cov.vector)),paste0(".cov.vector")) 
   
   features.names <- c("Pop.growthrate", 
-                      
-                      "hiv.prev.lt25.women", "hiv.prev.lt25.men", "hiv.prev.25.34.women",
-                      "hiv.prev.25.34.men", "hiv.prev.35.44.women", "hiv.prev.35.44.men",
+                      "hiv.prev.lt25.women", "hiv.prev.lt25.men", 
+                      "hiv.prev.25.40.women", "hiv.prev.25.40.men",
+                      "hiv.prev.40.50.women", "hiv.prev.40.50.men", 
                       name.cov.vector,
                       "relsperpersonperyear", "agegapsd",
                       
