@@ -79,27 +79,30 @@ classic.features.study.1 <- function(datalist = datalist.agemix,
   # (ii) Transmission 	rate (transmission.rate.calculator function)
   
   
-  # (iii) ART coverage
-  
-  ART.coverage.vector.creator.spec <- function(datalist = datalist.agemix, 
-                                               agegroup = c(15, 50))
-  {
-    ART.cov.eval.timepoints <- seq(from = datalist$itable$t[2],
-                                   to = 40) #datalist$itable$population.simtime[1])
-    ART.cov.vector <- rep(NA, length(ART.cov.eval.timepoints))
-    for (art.cov.index in 1:length(ART.cov.vector)){
-      ART.cov.vector[art.cov.index] <- sum(ART.coverage.calculator(datalist = datalist,
-                                                                   agegroup = agegroup,
-                                                                   timepoint = ART.cov.eval.timepoints[art.cov.index])$sum.onART) /
-        sum(ART.coverage.calculator(datalist = datalist,
-                                    agegroup = agegroup,
-                                    timepoint = ART.cov.eval.timepoints[art.cov.index])$sum.cases)
-    }
-    return(ART.cov.vector)
-  }
-  
-  cov.vector <- ART.coverage.vector.creator.spec(datalist = datalist.agemix,
-                                                 agegroup = c(15, 50))
+  # # (iii) ART coverage
+  # 
+  # ART.coverage.vector.creator.spec <- function(datalist = datalist.agemix, 
+  #                                              agegroup = c(15, 50))
+  # {
+  #   d <- round(as.vector(datalist$itable$t))[2]
+  #   
+  #   ART.cov.eval.timepoints <- seq.int(from = d, to = 40) 
+  #   
+  #   #datalist$itable$population.simtime[1])
+  #   ART.cov.vector <- rep(NA, length(ART.cov.eval.timepoints))
+  #   for (art.cov.index in 1:length(ART.cov.vector)){
+  #     ART.cov.vector[art.cov.index] <- sum(ART.coverage.calculator(datalist = datalist,
+  #                                                                  agegroup = agegroup,
+  #                                                                  timepoint = ART.cov.eval.timepoints[art.cov.index])$sum.onART) /
+  #       sum(ART.coverage.calculator(datalist = datalist,
+  #                                   agegroup = agegroup,
+  #                                   timepoint = ART.cov.eval.timepoints[art.cov.index])$sum.cases)
+  #   }
+  #   return(ART.cov.vector)
+  # }
+  # 
+  # cov.vector <- ART.coverage.vector.creator.spec(datalist = datalist.agemix,
+  #                                                agegroup = c(15, 50))
   
   # 1.2.3. Sexual behaviour features:
   
@@ -179,27 +182,27 @@ classic.features.study.1 <- function(datalist = datalist.agemix,
                   hiv.prev.lt25.women, hiv.prev.lt25.men, 
                   hiv.prev.25.40.women, hiv.prev.25.40.men,
                   hiv.prev.40.50.women, hiv.prev.40.50.men, 
-                  cov.vector,
+                  # cov.vector,
                   relsperpersonperyear, agegapsd,
                   
                   AAD.male, SDAD.male, slope.male, WSD.male, BSD.male, intercept.male,
                   
                   pp.cp.6months.male)
   
-  name.cov.vector <- paste0(seq(from=1, to=length(cov.vector)),paste0(".cov.vector")) 
+  # name.cov.vector <- paste0(seq(from=1, to=length(cov.vector)),paste0(".cov.vector")) 
   
   features.names <- c("Pop.growthrate", 
                       "hiv.prev.lt25.women", "hiv.prev.lt25.men", 
                       "hiv.prev.25.40.women", "hiv.prev.25.40.men",
                       "hiv.prev.40.50.women", "hiv.prev.40.50.men", 
-                      name.cov.vector,
+                     # name.cov.vector,
                       "relsperpersonperyear", "agegapsd",
                       
                       "AAD.male", "SDAD.male", "slope.male", "WSD.male", "BSD.male", "intercept.male",
                       
                       "pp.cp.6months.male")
   
-  names(summary.df) <- features.names # > length(features.names) [1] 31
+  names(summary.df) <- features.names # > length(features.names) [1] 16
   
   return(summary.df)
   
