@@ -80,8 +80,61 @@ phylogenetic.features.study1 <- function(tree.topo=tree,
   
   # transmission table
   
-  transm.df <- agemixing.trans.df(trans.network = simpact.trans.net,
-                                  limitTransmEvents = 7)
+  
+  
+  
+  # id of people who got infection by seed event: seeds.id
+  trans.network <- simpact.trans.net
+  seeds.id <- length(trans.network)
+  limitTransmEvents <- 7
+  
+  ID.select <- vector() # ID of selected transmission network
+  ID.select.count <- vector() # number of individuals in these networks
+  
+  for (i in 1: seeds.id) {
+    
+    
+    trans.network.i <- as.data.frame(trans.network[[i]])
+    
+    if(nrow(trans.network.i)>=limitTransmEvents){
+      
+      
+      ID.select <- c(ID.select, i)
+      ID.select.count <- c(ID.select.count, nrow(trans.network.i))
+      
+    } # X if
+    
+  } # Y for
+  
+  
+  infectionTable <- vector("list", length(ID.select))
+  
+  for(j in 1:length(ID.select)){
+    
+    p <- ID.select[j]
+    
+    trans.network.i <- as.data.frame(trans.network[[p]])
+    
+    trans.network.i <- trans.network.i[-1,]
+    
+    trans.network.i$AgeInfecDon <- abs(trans.network.i$TOBDon) + trans.network.i$InfecTime
+    trans.network.i$AgeInfecRec <- abs(trans.network.i$TOBRec) + trans.network.i$InfecTime
+    
+    id.lab <- paste0(p,".",trans.network.i$id,".C")
+    
+    trans.network.i$id.lab <- id.lab
+    
+    infectionTable[[p]] <- trans.network.i
+  }
+  
+  
+  infecttable <- rbindlist(infectionTable)
+  
+  
+  
+  transm.df <- infecttable
+  # transm.df <- agemixing.trans.df(trans.network = simpact.trans.net,
+  #                                 limitTransmEvents = 7)
   
   stat.clust <- list() # initialise age-structured weithed number of female/male in each transission cluster
   

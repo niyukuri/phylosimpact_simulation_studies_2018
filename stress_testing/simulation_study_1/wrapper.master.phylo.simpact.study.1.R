@@ -12,11 +12,11 @@ setwd(paste0(work.dir))
 #work.dir <- "/user/data/gent/vsc400/vsc40070/phylo/" # on cluster
 
 
-# pacman::p_load(snow, parallel, RSimpactCyan, RSimpactHelper, ape, Rsamtools)
+pacman::p_load(snow, parallel, RSimpactCyan, RSimpactHelper, ape, Rsamtools)
 
 
 
-# inputvector <- c(101,1.05, 0.25, 0, 3, 0.23, 0.23, 45, 45, -0.7, 2.8,
+# inputvector <- c(294052610,1.05, 0.25, 0, 3, 0.23, 0.23, 45, 45, -0.7, 2.8,
 #                  -0.3, -0.3,
 #                  -2.7, # conception
 #                  -0.52, -0.05)
@@ -1170,10 +1170,10 @@ wrapper.master.phylo.simpact.study.1 <- function(inputvector = input.vector){
 # 
 # test.all <- wrapper.phylo.simpact.study.1(inputvector = inputvector) # L = 437
 
-# inputvector <- c(1.05, 0.25, 0, 3, 0.23, 0.23, 45, 45, -0.7, 2.8,
-#                  -0.3, -0.3,
-#                  -2.7, # conception
-#                  -0.52, -0.05)
+inputvector <- c(1.05, 0.25, 0, 3, 0.23, 0.23, 45, 45, -0.7, 2.8,
+                 -0.3, -0.3,
+                 -2.7, # conception
+                 -0.52, -0.05)
 # 
 # 
 # 
@@ -1183,20 +1183,24 @@ wrapper.master.phylo.simpact.study.1 <- function(inputvector = input.vector){
 # 
 # # replication number
 # 
-# reps <- 4
+
+reps <- 4
+
 # 
 # 
 # # Input parameters in matrix form reps times (rows).
-# inputmatrix <- matrix(rep(inputvector, reps), byrow = TRUE, nrow = reps)
+
+inputmatrix <- matrix(rep(inputvector, reps), byrow = TRUE, nrow = reps)
+
 # 
 # 
 # 
 # sim.start.time <- proc.time()[3] # ! IDs.gender.men50.women50.age.group.features
 # 
-# features.matrix <- phylo.simpact.parallel(model = wrapper.master.phylo.simpact.study.1,
-#                                           actual.input.matrix = inputmatrix,
-#                                           seed_count = 124,
-#                                           n_cluster = 4)
+features.matrix <- phylo.simpact.parallel(model = wrapper.master.phylo.simpact.study.1,
+                                          actual.input.matrix = inputmatrix,
+                                          seed_count = 124,
+                                          n_cluster = 4)
 # 
 # sim.end.time <- proc.time()[3] - sim.start.time
 # 
@@ -1206,7 +1210,9 @@ wrapper.master.phylo.simpact.study.1 <- function(inputvector = input.vector){
 # 
 # # save features in the working directory
 # 
-# write.csv(features.matrix, file = paste0(work.dir,"/features.matrix.csv"))
+
+write.csv(features.matrix, file = paste0(work.dir,"/features.matrix.csv"))
+
 # 
 # unlink(paste0("temp"), recursive = TRUE)
 # 

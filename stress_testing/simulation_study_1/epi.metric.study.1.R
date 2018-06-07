@@ -119,7 +119,7 @@ epi.metric.study.1 <- function(datalist.agemix = datalist){
                   METRICS.age.mix.trans.interc.women, METRICS.age.mix.slope.women,
                   METRICS.transm.mean, METRICS.transm.median, METRICS.transm.sd)
   
-  names.metrics.df <- c("METRICS.incidence.df.15.24METRICS.incidence.df.25.39", "METRICS.incidence.df.40.49",
+  names.metrics.df <- c("METRICS.incidence.df.15", "24METRICS.incidence.df.25.39", "METRICS.incidence.df.40.49",
                         "METRICS.age.mix.trans.interc.men", "METRICS.age.mix.slope.men",
                         "METRICS.age.mix.trans.interc.women", "METRICS.age.mix.slope.women",
                         "METRICS.transm.mean", "METRICS.transm.median", "METRICS.transm.sd")
