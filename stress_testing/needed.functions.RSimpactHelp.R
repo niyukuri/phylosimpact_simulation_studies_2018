@@ -220,53 +220,66 @@ plot.parboot.ltt.dat <- function (pbtd, t0 = NA, res = 100, ...)
 
 agemixing.trans.df <- function(trans.network = trans.network,
                                limitTransmEvents = 7){
-
+  
   # id of people who got infection by seed event: seeds.id
   seeds.id <- length(trans.network)
   
-  infectionTable <- vector("list", seeds.id)
+  ID.select <- vector() # ID of selected transmission network
+  ID.select.count <- vector() # number of individuals in these networks
   
   for (i in 1: seeds.id) {
     
+    
     trans.network.i <- as.data.frame(trans.network[[i]])
     
-    if(nrow(trans.network.i) >= limitTransmEvents){
+    if(nrow(trans.network.i)>=limitTransmEvents){
       
-      trans.network.i <- trans.network.i[-1,]
       
-      rrtable <- as.data.frame(cbind(trans.network.i$RecId, trans.network.i$DonId, 
-                                     trans.network.i$GenderRec, trans.network.i$GenderDon,
-                                     trans.network.i$TOBRec, trans.network.i$TOBDon,
-                                     trans.network.i$InfecTime, trans.network.i$SampTime))
+      ID.select <- c(ID.select, i)
+      ID.select.count <- c(ID.select.count, nrow(trans.network.i))
       
-      names(rrtable) <- c("RecId", "DonId", "GenderRec",
-                          "GenderDon", "TOBRec", "TOBDon", "InfecTime", "SampTime")
-      rrtable$AgeInfecDon <- abs(rrtable$TOBDon) + rrtable$InfecTime
-      rrtable$AgeInfecRec <- abs(rrtable$TOBRec) + rrtable$InfecTime
-      
-      infectionTable[[i]] <- rrtable
-      
-       }
+    } # X if
     
+  } # Y for
+  
+  
+  infectionTable <- vector("list", length(ID.select))
+  
+  for(j in 1:length(ID.select)){
+    
+    p <- ID.select[j]
+    
+    trans.network.i <- as.data.frame(trans.network[[p]])
+    
+    trans.network.i <- trans.network.i[-1,]
+    
+    trans.network.i$AgeInfecDon <- abs(trans.network.i$TOBDon) + trans.network.i$InfecTime
+    trans.network.i$AgeInfecRec <- abs(trans.network.i$TOBRec) + trans.network.i$InfecTime
+    
+    id.lab <- paste0(p,".",trans.network.i$id,".C")
+    
+    trans.network.i$id.lab <- id.lab
+    
+    infectionTable[[p]] <- trans.network.i
   }
   
-  infecttable <- rbindlist(infectionTable) 
+  
+  infecttable <- rbindlist(infectionTable)
   
   return(infecttable)
   
 }
 
 
-
 # Fit age mixing in transmission
 ################################
 
-fit.agemix.trans <- function(datatable = agemix.df){
+fit.agemix.trans.men <- function(datatable = agemix.df){
   
   datatable <- datatable
   
   men.lmer <- lmer(AgeInfecDon ~ AgeInfecRec + (1 | DonId),
-                   data = dplyr::filter(rrtable, GenderDon =="0"),
+                   data = dplyr::filter(datatable, GenderDon =="0"),
                    REML = TRUE,
                    control=lmerControl(check.nobs.vs.nlev = "ignore",
                                        check.nobs.vs.rankZ = "ignore",
@@ -278,41 +291,65 @@ fit.agemix.trans <- function(datatable = agemix.df){
 }
 
 
+
+
+fit.agemix.trans.women <- function(datatable = agemix.df){
+  
+  datatable <- datatable
+  
+  men.lmer <- lmer(AgeInfecDon ~ AgeInfecRec + (1 | DonId),
+                   data = dplyr::filter(datatable, GenderDon =="1"),
+                   REML = TRUE,
+                   control=lmerControl(check.nobs.vs.nlev = "ignore",
+                                       check.nobs.vs.rankZ = "ignore",
+                                       check.nobs.vs.nRE="ignore"))
+  agemix.inter <- men.lmer
+  
+  return(agemix.inter)
+  
+}
+
+
+
 # Onward transmissions
 ######################
 
-
 onwardtransmissions.dat <- function(datalist = datalist, 
-                                    trans.network = trans.network){
+                                    trans.network = trans.network,
+                                    limitTransmEvents = 3,
+                                    time.window=c(10,40)){
   
   
   pers.infec.raw <- as.data.frame(datalist$ptable[InfectType != -1])
   
-  pers.infec <- pers.infec.raw[which(pers.infec.raw$InfectTime <= datalist$itable$population.simtime[1]),]
+  pers.infec.raw.died <- pers.infec.raw[pers.infec.raw$TOD != "Inf", ] # consider only these who had full time to transmit before they die
   
-  # person table of infected individuals by seed event
-  pers.table.seed <- subset(pers.infec, pers.infec$InfectType==0)
+  # Infected individuals who died within this time window
+  pers.infec.died <- pers.infec.raw.died[which(pers.infec.raw.died$TOD >= time.window[1] & pers.infec.raw.died$TOD <= time.window[2]),]
   
-  # id of people who got infection by seed event: seeds.id
-  seeds.id <- pers.table.seed$ID # do
-  
+  # Their IDs
+  pers.infec.died.IDs <- pers.infec.died$ID
   
   # Onward transmissions in each transmission network
   
-  onwardtransm <- vector("list", length(seeds.id))
+  onwardtransm <- vector("list", length(trans.network))
   
-  for (j in 1: length(seeds.id)) {
+  for (j in 1: length(trans.network)) {
     
     trans.network.j <- as.data.frame(trans.network[[j]])
     
     trans.network.j <- trans.network.j[-1,] # remove the universal infector
     
-    if(nrow(trans.network.j) > 1){ # consider transmission networks with at least one onward transmission
+    if(nrow(trans.network.j) >= limitTransmEvents){ # consider transmission networks with at least one onward transmission
       
       d.j <- table(trans.network.j$DonId) # in the transmission table, the number of times DonId appears is the number of Onward transmissions after acuiring the infection 
-      num.j <- as.data.frame(as.numeric(d.j))
-      names(num.j) <- c("TransCount")
-      onwardtransm[[j]] <- num.j
+      
+      IDs.names <- as.numeric(names(d.j))
+      count.transm <- as.numeric(d.j)
+      
+      own.df <- as.data.frame(cbind(IDs.names, count.transm))
+      
+      onwardtransm[[j]] <- own.df
       
     }
     
@@ -320,13 +357,35 @@ onwardtransmissions.dat <- function(datalist = datalist,
   
   onwardtransmissions <- rbindlist(onwardtransm) 
   
-  count.dat <- onwardtransmissions$TransCount
+  # Data table of these who died and their onward transmission
+  count.dat <- subset(onwardtransmissions, onwardtransmissions$IDs.names%in%pers.infec.died.IDs) 
   
-  return(count.dat) # count.dat = all infections - seeds which didn;t produce at least one transmission
+  
+  count.dat.vec <- count.dat$count.transm
+  
+  return(count.dat.vec) # count.dat = all infections - seeds which didn;t produce at least one transmission
   
 }
 
 
+# New transmissions
+
+new.transmissions.dat <- function(datalist = datalist, 
+                                  time.window=c(10,40)){
+  
+  
+  pers.infec.raw <- as.data.frame(datalist$ptable[InfectType != -1])
+  
+  pers.infec.raw.infec <- pers.infec.raw[pers.infec.raw$InfectTime != "Inf", ] # consider only these who have been infected
+  
+  # New infected individuals who during  this time window
+  pers.infec <- pers.infec.raw.infec[which(pers.infec.raw.infec$InfectTime >= time.window[1] & pers.infec.raw.infec$InfectTime <= time.window[2]),]
+  
+  # Their IDs
+  pers.infec.IDs <- pers.infec$ID
+  
+  return(pers.infec.IDs)
+}
 
 # compute phylogenetic features
 

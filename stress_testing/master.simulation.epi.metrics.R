@@ -459,7 +459,7 @@ master.simulation.epi.metrics <- function(inputvector){
                                   limitTransmEvents = 7)
   
   agemix.fit <- lmer(AgeInfecDon ~ AgeInfecRec + (1 | DonId),
-                     data = dplyr::filter(rrtable, GenderDon =="0"),
+                     data = dplyr::filter(agemix.df, GenderDon =="0"),
                      REML = TRUE,
                      control=lmerControl(check.nobs.vs.nlev = "ignore",
                                          check.nobs.vs.rankZ = "ignore",
@@ -480,6 +480,10 @@ master.simulation.epi.metrics <- function(inputvector){
   
   METRICS.transm.average <- mean(transm.count)
   
+  METRICS.transm.median <- median(transm.count) # add
+  
+  METRICS.transm.sd <- sd(transm.count) # add
+  
   
   epi.Metrics <- c(METRICS.incidence.df.15.24, METRICS.incidence.df.25.34, METRICS.incidence.df.35.44,
                    
@@ -494,7 +498,8 @@ master.simulation.epi.metrics <- function(inputvector){
                    METRICS.incidence.df.15.24.int.44.45, METRICS.incidence.df.25.34.int.44.45,
                    METRICS.incidence.df.35.44.int.44.45,
                    
-                   METRICS.age.mix.trans.interc, METRICS.age.mix.slope, METRICS.transm.average)
+                   METRICS.age.mix.trans.interc, METRICS.age.mix.slope, METRICS.transm.average,
+                   METRICS.transm.median, METRICS.transm.sd)
   
   
   metric.names <- c("METRICS.incidence.df.15.24", "METRICS.incidence.df.25.34", "METRICS.incidence.df.35.44",
@@ -510,7 +515,8 @@ master.simulation.epi.metrics <- function(inputvector){
                     "METRICS.incidence.df.15.24.int.44.45", "METRICS.incidence.df.25.34.int.44.45",
                     "METRICS.incidence.df.35.44.int.44.45",
                     
-                    "METRICS.age.mix.trans.interc", "METRICS.age.mix.slope", "METRICS.transm.average")
+                    "METRICS.age.mix.trans.interc", "METRICS.age.mix.slope", "METRICS.transm.average",
+                    "METRICS.transm.median", "METRICS.transm.sd")
   
   
   names(epi.Metrics) <- metric.names
@@ -523,7 +529,7 @@ master.simulation.epi.metrics <- function(inputvector){
 }
 
 
-epi.metric.sim <- master.simulation.epi.metrics(inputvector = inputvector)
+# epi.metric.sim <- master.simulation.epi.metrics(inputvector = inputvector)
 
 
 
@@ -532,11 +538,11 @@ inputvector <- c(1.05, 0.25, 0, 3, 0.23, 0.23, 45, 45, -0.7, 2.8,
                  -2.7, # conception
                  -0.52, -0.05)
 
-reps <- 2
+reps <- 20
 
 
 # Input parameters in matrix form reps times (rows).
-
+inputmatrix <- matrix(rep(inputvector, reps), byrow = TRUE, nrow = reps)
 
 sim.start.time <- proc.time()[3] 
 
