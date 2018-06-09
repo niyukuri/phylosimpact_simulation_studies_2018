@@ -268,9 +268,10 @@ agemixing.trans.df <- function(trans.network = trans.network,
     
     infecttable <- rbindlist(infectionTable)
     
-    return(infecttable)
   }
 
+  return(infecttable)
+  
   # X
   
 }
