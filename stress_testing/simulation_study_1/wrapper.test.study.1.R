@@ -65,7 +65,7 @@ wrapper.test.study.1 <- function(inputvector){
   cfg.list["formation.hazard.agegapry.baseline"] <- inputvector[4] # [3] # 2 c("unif", 1, 3)
   cfg.list["person.agegap.man.dist.normal.mu"] <- inputvector[5] # [4] # 0 c("unif", -0.5, 0.5)
   cfg.list["person.agegap.woman.dist.normal.mu"] <- inputvector[5] # [4] # 0
-  cfg.list["person.agegap.man.dist.normal.sigma"] <- inputvector[5] # [5] # 3 c("unif", 2, 4)
+  cfg.list["person.agegap.man.dist.normal.sigma"] <- inputvector[6] # [5] # 3 c("unif", 2, 4)
   cfg.list["person.agegap.woman.dist.normal.sigma"] <- inputvector[6] # [5] # 3 
   cfg.list["formation.hazard.agegapry.gap_agescale_man"] <- inputvector[7] # [6] # 0.25 c("unif", 0, 1)
   cfg.list["formation.hazard.agegapry.gap_agescale_woman"] <- inputvector[7] # [6] # 0.25
@@ -83,7 +83,7 @@ wrapper.test.study.1 <- function(inputvector){
   cfg.list["hivtransmission.param.c"] <- inputvector[13] # [12] # 0.5 c("unif", 0, 1)
   cfg.list["hivtransmission.param.f1"] <- inputvector[14] # [13] # 0.04879016 c("unif", 0, 0.5)
   cfg.list["hivtransmission.param.f2"] <- inputvector[15] # [14] # -0.1386294 c("unif", -0.5, 0)
-  cfg.list["person.vsp.toacute.x"] <- inputvector[6] # [15] # 5 c("unif", 3, 7)
+  cfg.list["person.vsp.toacute.x"] <- inputvector[16] # [15] # 5 c("unif", 3, 7)
   cfg.list["person.vsp.toaids.x"] <- inputvector[17] # [16] # 7 c("unif", 5, 9)
   cfg.list["person.vsp.tofinalaids.x"] <- inputvector[18] # [17] # 12 c("unif", 10, 14)
   #
@@ -268,3 +268,9 @@ wrapper.test.study.1 <- function(inputvector){
   
   
 }
+
+
+# d <- read.csv("inputvector.csv")
+# 
+# inputvector <- c(124,d$x)
+# f <- wrapper.test.study.1(inputvector = inputvector)
