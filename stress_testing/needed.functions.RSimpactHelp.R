@@ -242,31 +242,36 @@ agemixing.trans.df <- function(trans.network = trans.network,
     
   } # Y for
   
-  
-  infectionTable <- vector("list", length(ID.select))
-  
-  for(j in 1:length(ID.select)){
+  if(length(ID.select)>=1){
+    # blal
     
-    p <- ID.select[j]
+    infectionTable <- vector("list", length(ID.select))
     
-    trans.network.i <- as.data.frame(trans.network[[p]])
+    for(j in 1:length(ID.select)){
+      
+      p <- ID.select[j]
+      
+      trans.network.i <- as.data.frame(trans.network[[p]])
+      
+      trans.network.i <- trans.network.i[-1,]
+      
+      trans.network.i$AgeInfecDon <- abs(trans.network.i$TOBDon) + trans.network.i$InfecTime
+      trans.network.i$AgeInfecRec <- abs(trans.network.i$TOBRec) + trans.network.i$InfecTime
+      
+      id.lab <- paste0(p,".",trans.network.i$id,".C")
+      
+      trans.network.i$id.lab <- id.lab
+      
+      infectionTable[[p]] <- trans.network.i
+    }
     
-    trans.network.i <- trans.network.i[-1,]
     
-    trans.network.i$AgeInfecDon <- abs(trans.network.i$TOBDon) + trans.network.i$InfecTime
-    trans.network.i$AgeInfecRec <- abs(trans.network.i$TOBRec) + trans.network.i$InfecTime
+    infecttable <- rbindlist(infectionTable)
     
-    id.lab <- paste0(p,".",trans.network.i$id,".C")
-    
-    trans.network.i$id.lab <- id.lab
-    
-    infectionTable[[p]] <- trans.network.i
+    return(infecttable)
   }
-  
-  
-  infecttable <- rbindlist(infectionTable)
-  
-  return(infecttable)
+
+  # X
   
 }
 
