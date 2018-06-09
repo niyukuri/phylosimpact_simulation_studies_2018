@@ -367,6 +367,6 @@ features.matrix.calibrates <- phylo.simpact.parallel(model = wrapper.test.study.
 # 
 # # save features in the working directory
 
-write.csv(features.matrix.calibrates, file = paste0(work.dir,"/features.matrix.csv"))
+write.csv(features.matrix.calibrates, file = paste0(work.dir,"/features.matrix.calibrates"))
 
 
