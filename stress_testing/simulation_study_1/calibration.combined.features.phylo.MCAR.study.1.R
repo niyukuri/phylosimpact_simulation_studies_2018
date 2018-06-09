@@ -249,77 +249,91 @@ simpact4ABC.classic.phylo.MCAR.cov.50 <- function(inputvector){
   
   ## Phylodynamics components
   
-
+  
   # Construct transmission networks #
-
+  
   
   simpact.trans.net <- transmission.network.builder(datalist = datalist, endpoint = 40)
   
+  # Transmission data frame
   
-  # Simulate sequences
+  agemix.transm.df <- agemixing.trans.df(trans.network = simpact.trans.net, 
+                                         limitTransmEvents = 7)
   
-  
-  trans.net <- simpact.trans.net # all transmission networks
-  
-  
-  dirseqgen <- work.dir
-  
-  seeds.num <- 123
-  
-  # Sequence simulation is done for at least a transmission network with 6 individuals
-  # This means that limitTransmEvents equal at least 7
-  
-  sequence.simulation.seqgen.par(dir.seq = dirseqgen,
-                                 sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.50,
-                                 simpact.trans.net = simpact.trans.net,
-                                 seq.gen.tool = "seq-gen",
-                                 seeds.num = seeds.num,
-                                 endpoint = 40,
-                                 limitTransmEvents = 7, # no less than 7
-                                 hiv.seq.file = "hiv.seq.C.pol.j.fasta",
-                                 clust = FALSE) # hiv.seq.file lodged in work.dir
-  
-  # Transform the sequence format to be handled by ClusterPicker
-  sequ.dna <- read.dna(file = paste0(ABC_DestDir.classic.phylo.MCAR.cov.50,"/C.Epidemic_seed.seq.bis.sim.nwk.fasta"), format = "interleaved")
-  write.dna(sequ.dna, file = paste0(ABC_DestDir.classic.phylo.MCAR.cov.50,"/C.Epidemic.fas") , format = "fasta")
-  
-  
-  dirfasttree <- work.dir
-  
-  tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
+  if(!is.null(agemix.transm.df) == TRUE){
+    
+    
+    # Simulate sequences
+    
+    
+    trans.net <- simpact.trans.net # all transmission networks
+    
+    
+    dirseqgen <- work.dir
+    
+    seeds.num <- 123
+    
+    # Sequence simulation is done for at least a transmission network with 6 individuals
+    # This means that limitTransmEvents equal at least 7
+    
+    sequence.simulation.seqgen.par(dir.seq = dirseqgen,
+                                   sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.50,
+                                   simpact.trans.net = simpact.trans.net,
+                                   seq.gen.tool = "seq-gen",
+                                   seeds.num = seeds.num,
+                                   endpoint = 40,
+                                   limitTransmEvents = 7, # no less than 7
+                                   hiv.seq.file = "hiv.seq.C.pol.j.fasta",
+                                   clust = FALSE) # hiv.seq.file lodged in work.dir
+    
+    # Transform the sequence format to be handled by ClusterPicker
+    sequ.dna <- read.dna(file = paste0(ABC_DestDir.classic.phylo.MCAR.cov.50,"/C.Epidemic_seed.seq.bis.sim.nwk.fasta"), format = "interleaved")
+    write.dna(sequ.dna, file = paste0(ABC_DestDir.classic.phylo.MCAR.cov.50,"/C.Epidemic.fas") , format = "fasta")
+    
+    
+    dirfasttree <- work.dir
+    
+    tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
+                                                 sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.50,
+                                                 fasttree.tool = "FastTree",
+                                                 calendar.dates = "samplingtimes.all.csv",
+                                                 simseqfile = "C.Epidemic_seed.seq.bis.sim.nwk.fasta",
+                                                 count.start = 1977,
+                                                 endsim = 40,
+                                                 clust = FALSE)
+    
+    tree.calib.LTT <- tree.calib
+    
+    write.tree(tree.calib, file = paste0(ABC_DestDir.classic.phylo.MCAR.cov.50,"/calibrated.tree.nwk"))
+    
+    
+    N <- node.age(tree.calib)
+    
+    int.node.age <- N$Ti # internal nodes ages
+    
+    latest.samp <- N$timeToMRCA+N$timeOfMRCA # latest sampling date
+    
+    
+    tree.cal <- read.tree(paste0(ABC_DestDir.classic.phylo.MCAR.cov.50, "/calibrated.tree.nwk"))
+    
+    
+    
+    # Compute targets
+    
+    phlyo.stat <- phylogenetic.features.study1(tree.topo=tree.cal,
+                                               tree.calib.LTT = tree.calib.LTT,
+                                               work.dir = work.dir,
                                                sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.50,
-                                               fasttree.tool = "FastTree",
-                                               calendar.dates = "samplingtimes.all.csv",
-                                               simseqfile = "C.Epidemic_seed.seq.bis.sim.nwk.fasta",
-                                               count.start = 1977,
-                                               endsim = 40,
-                                               clust = FALSE)
+                                               simpact.trans.net = simpact.trans.net,
+                                               fasta.file = "C.Epidemic.fas",
+                                               tree.file = "C.Epidemic_seed.seq.bis.sim.nwk.fasta.nwk")
+    
+  }else{
+    
+    phlyo.stat <- rep(NA, length(phylo.target.cov.50)) # length(phylo.target.cov.50) =30
+    
+  }
   
-  tree.calib.LTT <- tree.calib
-  
-  write.tree(tree.calib, file = paste0(ABC_DestDir.classic.phylo.MCAR.cov.50,"/calibrated.tree.nwk"))
-  
-  
-  N <- node.age(tree.calib)
-  
-  int.node.age <- N$Ti # internal nodes ages
-  
-  latest.samp <- N$timeToMRCA+N$timeOfMRCA # latest sampling date
-  
-
-  tree.cal <- read.tree(paste0(ABC_DestDir.classic.phylo.MCAR.cov.50, "/calibrated.tree.nwk"))
-  
-  
-  
-  # Compute targets
-  
-  phlyo.stat <- phylogenetic.features.study1(tree.topo=tree.cal,
-                                             tree.calib.LTT = tree.calib.LTT,
-                                             work.dir = work.dir,
-                                             sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.50,
-                                             simpact.trans.net = simpact.trans.net,
-                                             fasta.file = "C.Epidemic.fas",
-                                             tree.file = "C.Epidemic_seed.seq.bis.sim.nwk.fasta.nwk")
   
   summary.stat <- c(classic.stat, phlyo.stat)
   
@@ -390,7 +404,7 @@ sum_stat_obs <- c(classic.target, phylo.target.cov.50)
 # 
 # ABC_LenormandResult0
 
-n=3
+n=5
 p=0.7
 ABC_rej.classic.phylo.MCAR.cov.50 <-ABC_rejection(model=simpact4ABC.classic.phylo.MCAR.cov.50, prior=simpact_prior, nb_simul=n,
                                                   summary_stat_target=sum_stat_obs, tol=p)
@@ -435,10 +449,10 @@ inputmatrix <- matrix(rep(inputvector, reps), byrow = TRUE, nrow = reps)
 # sim.start.time <- proc.time()[3] # ! IDs.gender.men50.women50.age.group.features
 # 
 
-features.matrix.calibrates <- phylo.simpact.parallel(model = wrapper.test.study.1,
-                                                     actual.input.matrix = inputmatrix,
-                                                     seed_count = 124,
-                                                     n_cluster = 4)
+features.matrix.calibrates.MCRA.50 <- phylo.simpact.parallel(model = wrapper.test.study.1,
+                                                             actual.input.matrix = inputmatrix,
+                                                             seed_count = 124,
+                                                             n_cluster = 4)
 
 # sim.end.time <- proc.time()[3] - sim.start.time
 # 
@@ -448,7 +462,7 @@ features.matrix.calibrates <- phylo.simpact.parallel(model = wrapper.test.study.
 # 
 # # save features in the working directory
 
-write.csv(features.matrix.calibrates, file = paste0(work.dir,"/features.matrix.csv"))
+write.csv(features.matrix.calibrates.MCRA.50, file = paste0(work.dir,"/features.cal.matrix.MCRA.50.csv"))
 
 # Error: Invalid grouping factor specification, ID Called from: FUN(X[[i]], ...) 
 # Error: grouping factors must have > 1 sampled level 

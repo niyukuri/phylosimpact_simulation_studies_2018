@@ -28,181 +28,208 @@ classic.features.study.1 <- function(datalist = datalist.agemix,
   # simpact.trans.net.projection <- transmission.network.builder(datalist = datalist.agemix, endpoint = 45)
   
   
-  #################################### Features #############################
+  #################################### Features on condition of transmission network #############################
   
-  # 1.2. Features from sexual and transmission network
+  agemix.transm.df <- agemixing.trans.df(trans.network = simpact.trans.net, 
+                                         limitTransmEvents = 7)
   
-  
-  # 
-  # 1.2.1. Demographic feature:
-  
-  #   (i) Population growth rate (pop.growth.calculator function)
-  growthrate <- pop.growth.calculator(datalist = datalist.agemix,
-                                      timewindow = c(0,40)) # c(0, datalist.agemix$itable$population.simtime[1])
-  
-  
-  # 1.2.2. Transmission features:	
-  
-  #   (i) Prevalence (prevalence.calculator function)
-  # 
-  #   hiv.prev.lt25.women <- prevalence.calculator(datalist = datalist.agemix,
-  #                                                agegroup = c(15, 25),
-  #                                                timepoint = datalist.agemix$itable$population.simtime[1])$pointprevalence[2]
-  #   
-  
-  # age.group.25 <- 25
-  # age.group.25.40 <- c(25,40)
-  # age.group.40.50 <- c(40,50)
-  
-  hiv.prev.lt25.women <- prevalence.calculator(datalist = datalist.agemix,
+  if(!is.null(agemix.transm.df) == TRUE){
+    
+    
+    # 1.2. Features from sexual and transmission network
+    
+    
+    # 
+    # 1.2.1. Demographic feature:
+    
+    #   (i) Population growth rate (pop.growth.calculator function)
+    growthrate <- pop.growth.calculator(datalist = datalist.agemix,
+                                        timewindow = c(0,40)) # c(0, datalist.agemix$itable$population.simtime[1])
+    
+    
+    # 1.2.2. Transmission features:	
+    
+    #   (i) Prevalence (prevalence.calculator function)
+    # 
+    #   hiv.prev.lt25.women <- prevalence.calculator(datalist = datalist.agemix,
+    #                                                agegroup = c(15, 25),
+    #                                                timepoint = datalist.agemix$itable$population.simtime[1])$pointprevalence[2]
+    #   
+    
+    # age.group.25 <- 25
+    # age.group.25.40 <- c(25,40)
+    # age.group.40.50 <- c(40,50)
+    
+    hiv.prev.lt25.women <- prevalence.calculator(datalist = datalist.agemix,
+                                                 agegroup = c(15, 25),
+                                                 timepoint = 40)$pointprevalence[2]
+    hiv.prev.lt25.men <- prevalence.calculator(datalist = datalist.agemix,
                                                agegroup = c(15, 25),
-                                               timepoint = 40)$pointprevalence[2]
-  hiv.prev.lt25.men <- prevalence.calculator(datalist = datalist.agemix,
-                                             agegroup = c(15, 25),
-                                             timepoint = 40)$pointprevalence[1]
-  
-  hiv.prev.25.40.women <- prevalence.calculator(datalist = datalist.agemix,
+                                               timepoint = 40)$pointprevalence[1]
+    
+    hiv.prev.25.40.women <- prevalence.calculator(datalist = datalist.agemix,
+                                                  agegroup = c(25, 40),
+                                                  timepoint = 40)$pointprevalence[2]
+    hiv.prev.25.40.men <- prevalence.calculator(datalist = datalist.agemix,
                                                 agegroup = c(25, 40),
-                                                timepoint = 40)$pointprevalence[2]
-  hiv.prev.25.40.men <- prevalence.calculator(datalist = datalist.agemix,
-                                              agegroup = c(25, 40),
-                                              timepoint = 40)$pointprevalence[1]
-  
-  hiv.prev.40.50.women <- prevalence.calculator(datalist = datalist.agemix,
+                                                timepoint = 40)$pointprevalence[1]
+    
+    hiv.prev.40.50.women <- prevalence.calculator(datalist = datalist.agemix,
+                                                  agegroup = c(40, 50),
+                                                  timepoint = 40)$pointprevalence[2]
+    hiv.prev.40.50.men <- prevalence.calculator(datalist = datalist.agemix,
                                                 agegroup = c(40, 50),
-                                                timepoint = 40)$pointprevalence[2]
-  hiv.prev.40.50.men <- prevalence.calculator(datalist = datalist.agemix,
-                                              agegroup = c(40, 50),
-                                              timepoint = 40)$pointprevalence[1]
-  
-  
-  # (ii) Transmission 	rate (transmission.rate.calculator function)
-  
-  
-  # # (iii) ART coverage
-  # 
-  # ART.coverage.vector.creator.spec <- function(datalist = datalist.agemix, 
-  #                                              agegroup = c(15, 50))
-  # {
-  #   d <- round(as.vector(datalist$itable$t))[2]
-  #   
-  #   ART.cov.eval.timepoints <- seq.int(from = d, to = 40) 
-  #   
-  #   #datalist$itable$population.simtime[1])
-  #   ART.cov.vector <- rep(NA, length(ART.cov.eval.timepoints))
-  #   for (art.cov.index in 1:length(ART.cov.vector)){
-  #     ART.cov.vector[art.cov.index] <- sum(ART.coverage.calculator(datalist = datalist,
-  #                                                                  agegroup = agegroup,
-  #                                                                  timepoint = ART.cov.eval.timepoints[art.cov.index])$sum.onART) /
-  #       sum(ART.coverage.calculator(datalist = datalist,
-  #                                   agegroup = agegroup,
-  #                                   timepoint = ART.cov.eval.timepoints[art.cov.index])$sum.cases)
-  #   }
-  #   return(ART.cov.vector)
-  # }
-  # 
-  # cov.vector <- ART.coverage.vector.creator.spec(datalist = datalist.agemix,
-  #                                                agegroup = c(15, 50))
-  
-  # 1.2.3. Sexual behaviour features:
-  
-  #  (i) Relationship 	rate (relationship.rate.calculator function) - rate of new relationship formation (partner turnover rate):  	
-  
-  # 
-  # relas.rate <- relationship.rate.calculator(datalist = datalist.agemix,
-  #                                            timewindow = c(0, 40), 
-  #                                            int = FALSE, by=1)
-  
-  # (ii) Relationship per person per year
-  
-  relsperpersonperyear <- nrow(datalist.agemix$rtable) / (nrow(datalist.agemix$ptable)/2) / 40 #cfg.list$population.simtime
-  
-  # (iv) SD age gap between couples
-  
-  agegapsd <- sd(datalist.agemix$rtable$AgeGap)
-  
-  
-  # (v) Age mixing in relationships
-  
-  # 
-  agemix.df <- agemix.df.maker(datalist.agemix)
-  # 
-  agemix.model <- pattern.modeller(dataframe = agemix.df,
-                                   agegroup = c(15, 50),
-                                   timepoint = 40, # datalist.agemix$itable$population.simtime[1],
-                                   timewindow = 5)#1)#3)
-  # 
-  # # men.lme <- tryCatch(agemixing.lme.fitter(data = dplyr::filter(agemix.model[[1]], Gender =="male")),
-  # #                     error = agemixing.lme.errFunction) # Returns an empty list if the lme model can't be fitted
-  #
-  # men.lmer <- ampmodel(data = dplyr::filter(agemix.model[[1]], Gender =="male"))
-  
-  men.lmer <- lmer(pagerelform ~ agerelform0 + (1 | ID),
-                   data = dplyr::filter(agemix.model[[1]], Gender =="male"),
-                   REML = TRUE,
-                   control=lmerControl(check.nobs.vs.nlev = "ignore",
-                                       check.nobs.vs.rankZ = "ignore",
-                                       check.nobs.vs.nRE="ignore"))
-  
-  bignumber <- NA # let's try if NA works (instead of 9999 for example)
-  AAD.male <- ifelse(length(men.lmer) > 0, mean(dplyr::filter(agemix.model[[1]], Gender =="male")$AgeGap), bignumber)
-  SDAD.male <- ifelse(length(men.lmer) > 0, sd(dplyr::filter(agemix.model[[1]], Gender =="male")$AgeGap), bignumber)
-  #powerm <- ifelse(length(men.lme) > 0, as.numeric(attributes(men.lme$apVar)$Pars["varStruct.power"]), bignumber)
-  slope.male <- ifelse(length(men.lmer) > 0, summary(men.lmer)$coefficients[2, 1], bignumber) #summary(men.lmer)$tTable[2, 1], bignumber)
-  WSD.male <- ifelse(length(men.lmer) > 0, summary(men.lmer)$sigma, bignumber) #WVAD.base <- ifelse(length(men.lme) > 0, men.lme$sigma^2, bignumber)
-  
-  BSD.male <- ifelse(length(men.lmer) > 0, bvar(men.lmer), bignumber) # Bad name for the function because it actually extracts between subject standard deviation # BVAD <- ifelse(length(men.lmer) > 0, getVarCov(men.lme)[1,1], bignumber)
-  
-  intercept.male <- ifelse(length(men.lmer) > 0, summary(men.lmer)$coefficients[1,1] - 15, bignumber)
-  
-  # c(AAD.male, SDAD.male, slope.male, WSD.male, BSD.male, intercept.male)
-  
-  ## AAD: average age difference across all relationship
-  ## VAD: variance of these age differences
-  ## SDAD: standard deviation of age differences
-  ## BSD: between-subject standard deviation of age differences
-  
-  
-  # age.scatter.df <- agemix.model[[1]]
-  
-  #  (iii) Point 	prevalence of concurrency in the adult population:
-  
-  # Concurrency point prevalence 6 months before a survey, among men
-  
-  # pp.cp.6months.male <- concurr.pointprev.calculator(datalist = datalist.agemix,
-  #                                                    timepoint = datalist.agemix$itable$population.simtime[1] - 0.5)
-  # 
-  
-  pp.cp.6months.male <- concurr.pointprev.calculator(datalist = datalist.agemix,
-                                                     timepoint = 40 - 0.5)
-  
-  
-  
-  summary.df <- c(growthrate, 
-                  hiv.prev.lt25.women, hiv.prev.lt25.men, 
-                  hiv.prev.25.40.women, hiv.prev.25.40.men,
-                  hiv.prev.40.50.women, hiv.prev.40.50.men, 
-                  # cov.vector,
-                  relsperpersonperyear, agegapsd,
-                  
-                  AAD.male, SDAD.male, slope.male, WSD.male, BSD.male, intercept.male,
-                  
-                  pp.cp.6months.male)
-  
-  # name.cov.vector <- paste0(seq(from=1, to=length(cov.vector)),paste0(".cov.vector")) 
-  
-  features.names <- c("Pop.growthrate", 
-                      "hiv.prev.lt25.women", "hiv.prev.lt25.men", 
-                      "hiv.prev.25.40.women", "hiv.prev.25.40.men",
-                      "hiv.prev.40.50.women", "hiv.prev.40.50.men", 
-                     # name.cov.vector,
-                      "relsperpersonperyear", "agegapsd",
-                      
-                      "AAD.male", "SDAD.male", "slope.male", "WSD.male", "BSD.male", "intercept.male",
-                      
-                      "pp.cp.6months.male")
-  
-  names(summary.df) <- features.names # > length(features.names) [1] 16
+                                                timepoint = 40)$pointprevalence[1]
+    
+    
+    # (ii) Transmission 	rate (transmission.rate.calculator function)
+    
+    
+    # # (iii) ART coverage
+    # 
+    # ART.coverage.vector.creator.spec <- function(datalist = datalist.agemix, 
+    #                                              agegroup = c(15, 50))
+    # {
+    #   d <- round(as.vector(datalist$itable$t))[2]
+    #   
+    #   ART.cov.eval.timepoints <- seq.int(from = d, to = 40) 
+    #   
+    #   #datalist$itable$population.simtime[1])
+    #   ART.cov.vector <- rep(NA, length(ART.cov.eval.timepoints))
+    #   for (art.cov.index in 1:length(ART.cov.vector)){
+    #     ART.cov.vector[art.cov.index] <- sum(ART.coverage.calculator(datalist = datalist,
+    #                                                                  agegroup = agegroup,
+    #                                                                  timepoint = ART.cov.eval.timepoints[art.cov.index])$sum.onART) /
+    #       sum(ART.coverage.calculator(datalist = datalist,
+    #                                   agegroup = agegroup,
+    #                                   timepoint = ART.cov.eval.timepoints[art.cov.index])$sum.cases)
+    #   }
+    #   return(ART.cov.vector)
+    # }
+    # 
+    # cov.vector <- ART.coverage.vector.creator.spec(datalist = datalist.agemix,
+    #                                                agegroup = c(15, 50))
+    
+    # 1.2.3. Sexual behaviour features:
+    
+    #  (i) Relationship 	rate (relationship.rate.calculator function) - rate of new relationship formation (partner turnover rate):  	
+    
+    # 
+    # relas.rate <- relationship.rate.calculator(datalist = datalist.agemix,
+    #                                            timewindow = c(0, 40), 
+    #                                            int = FALSE, by=1)
+    
+    # (ii) Relationship per person per year
+    
+    relsperpersonperyear <- nrow(datalist.agemix$rtable) / (nrow(datalist.agemix$ptable)/2) / 40 #cfg.list$population.simtime
+    
+    # (iv) SD age gap between couples
+    
+    agegapsd <- sd(datalist.agemix$rtable$AgeGap)
+    
+    
+    # (v) Age mixing in relationships
+    
+    # 
+    agemix.df <- agemix.df.maker(datalist.agemix)
+    # 
+    agemix.model <- pattern.modeller(dataframe = agemix.df,
+                                     agegroup = c(15, 50),
+                                     timepoint = 40, # datalist.agemix$itable$population.simtime[1],
+                                     timewindow = 5)#1)#3)
+    # 
+    # # men.lme <- tryCatch(agemixing.lme.fitter(data = dplyr::filter(agemix.model[[1]], Gender =="male")),
+    # #                     error = agemixing.lme.errFunction) # Returns an empty list if the lme model can't be fitted
+    #
+    # men.lmer <- ampmodel(data = dplyr::filter(agemix.model[[1]], Gender =="male"))
+    
+    men.lmer <- lmer(pagerelform ~ agerelform0 + (1 | ID),
+                     data = dplyr::filter(agemix.model[[1]], Gender =="male"),
+                     REML = TRUE,
+                     control=lmerControl(check.nobs.vs.nlev = "ignore",
+                                         check.nobs.vs.rankZ = "ignore",
+                                         check.nobs.vs.nRE="ignore"))
+    
+    bignumber <- NA # let's try if NA works (instead of 9999 for example)
+    AAD.male <- ifelse(length(men.lmer) > 0, mean(dplyr::filter(agemix.model[[1]], Gender =="male")$AgeGap), bignumber)
+    SDAD.male <- ifelse(length(men.lmer) > 0, sd(dplyr::filter(agemix.model[[1]], Gender =="male")$AgeGap), bignumber)
+    #powerm <- ifelse(length(men.lme) > 0, as.numeric(attributes(men.lme$apVar)$Pars["varStruct.power"]), bignumber)
+    slope.male <- ifelse(length(men.lmer) > 0, summary(men.lmer)$coefficients[2, 1], bignumber) #summary(men.lmer)$tTable[2, 1], bignumber)
+    WSD.male <- ifelse(length(men.lmer) > 0, summary(men.lmer)$sigma, bignumber) #WVAD.base <- ifelse(length(men.lme) > 0, men.lme$sigma^2, bignumber)
+    
+    BSD.male <- ifelse(length(men.lmer) > 0, bvar(men.lmer), bignumber) # Bad name for the function because it actually extracts between subject standard deviation # BVAD <- ifelse(length(men.lmer) > 0, getVarCov(men.lme)[1,1], bignumber)
+    
+    intercept.male <- ifelse(length(men.lmer) > 0, summary(men.lmer)$coefficients[1,1] - 15, bignumber)
+    
+    # c(AAD.male, SDAD.male, slope.male, WSD.male, BSD.male, intercept.male)
+    
+    ## AAD: average age difference across all relationship
+    ## VAD: variance of these age differences
+    ## SDAD: standard deviation of age differences
+    ## BSD: between-subject standard deviation of age differences
+    
+    
+    # age.scatter.df <- agemix.model[[1]]
+    
+    #  (iii) Point 	prevalence of concurrency in the adult population:
+    
+    # Concurrency point prevalence 6 months before a survey, among men
+    
+    # pp.cp.6months.male <- concurr.pointprev.calculator(datalist = datalist.agemix,
+    #                                                    timepoint = datalist.agemix$itable$population.simtime[1] - 0.5)
+    # 
+    
+    pp.cp.6months.male <- concurr.pointprev.calculator(datalist = datalist.agemix,
+                                                       timepoint = 40 - 0.5)
+    
+    
+    
+    summary.df <- c(growthrate, 
+                    hiv.prev.lt25.women, hiv.prev.lt25.men, 
+                    hiv.prev.25.40.women, hiv.prev.25.40.men,
+                    hiv.prev.40.50.women, hiv.prev.40.50.men, 
+                    # cov.vector,
+                    relsperpersonperyear, agegapsd,
+                    
+                    AAD.male, SDAD.male, slope.male, WSD.male, BSD.male, intercept.male,
+                    
+                    pp.cp.6months.male)
+    
+    # name.cov.vector <- paste0(seq(from=1, to=length(cov.vector)),paste0(".cov.vector")) 
+    
+    features.names <- c("Pop.growthrate", 
+                        "hiv.prev.lt25.women", "hiv.prev.lt25.men", 
+                        "hiv.prev.25.40.women", "hiv.prev.25.40.men",
+                        "hiv.prev.40.50.women", "hiv.prev.40.50.men", 
+                        # name.cov.vector,
+                        "relsperpersonperyear", "agegapsd",
+                        
+                        "AAD.male", "SDAD.male", "slope.male", "WSD.male", "BSD.male", "intercept.male",
+                        
+                        "pp.cp.6months.male")
+    
+    names(summary.df) <- features.names # > length(features.names) [1] 16
+
+    
+  }else{
+    
+    features.names <- c("Pop.growthrate", 
+                        "hiv.prev.lt25.women", "hiv.prev.lt25.men", 
+                        "hiv.prev.25.40.women", "hiv.prev.25.40.men",
+                        "hiv.prev.40.50.women", "hiv.prev.40.50.men", 
+                        # name.cov.vector,
+                        "relsperpersonperyear", "agegapsd",
+                        
+                        "AAD.male", "SDAD.male", "slope.male", "WSD.male", "BSD.male", "intercept.male",
+                        
+                        "pp.cp.6months.male")
+    
+    summary.df <- rep(NA, length(features.names))
+    
+    names(summary.df) <- features.names # > length(features.names) [1] 16
+    
+  }
+ 
   
   return(summary.df)
   
