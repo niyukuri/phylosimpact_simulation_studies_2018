@@ -1844,7 +1844,7 @@ features.matrix <- phylo.simpact.parallel(model = wrapper.master.phylo.simpact.s
                                           actual.input.matrix = inputmatrix,
                                           seed_count = 124,
                                           n_cluster = 4)
-# 
+                                                                                                                                                                                                                                                                                                                                                                                                                                    # 
 # sim.end.time <- proc.time()[3] - sim.start.time
 # 
 # print(paste0("Simulation time: ", round(sim.end.time/60,2), " minutes"))
