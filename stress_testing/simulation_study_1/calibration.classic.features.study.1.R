@@ -294,10 +294,10 @@ sum_stat_obs <- classic.target
 # Initial number of simulations
 # n_init <- 4 #40
 # alpha <- 0.75 #0.5 # This is the proportion of particles kept at each step
-# pacc <- 0.9 #0.5 # This is the stopping criterion of the algorithm: a small number ensures a better convergence of the algorithm, but at a cost in computing time. Must be 0 < p_acc_min < 1. The smaller, the more strict the criterion.
+# pacc <- 0.5 # This is the stopping criterion of the algorithm: a small number ensures a better convergence of the algorithm, but at a cost in computing time. Must be 0 < p_acc_min < 1. The smaller, the more strict the criterion.
 # 
 # ABC_LenormandResult0 <- ABC_sequential(method="Lenormand",
-#                                        model=simpact4ABC,
+#                                        model=simpact4ABC.classic,
 #                                        prior=simpact_prior,
 #                                        nb_simul=n_init,
 #                                        summary_stat_target=sum_stat_obs,
