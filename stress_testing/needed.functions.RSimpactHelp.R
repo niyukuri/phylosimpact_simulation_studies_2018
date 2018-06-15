@@ -145,6 +145,7 @@ concurr.pointprev.calculator <- function(datalist,
   DTalive.infected <- alive.infected(datalist = datalist,
                                      timepoint = timepoint, site = "All") # First we only take the data of people who were alive at time_i
   agemix.df <- agemix.df.maker(datalist)
+  
   degrees.df <- degree.df.maker(dataframe.df = agemix.df,
                                 agegroup = c(15, 50),
                                 hivstatus = 2,
@@ -268,11 +269,11 @@ agemixing.trans.df <- function(trans.network = trans.network,
     
     infecttable <- rbindlist(infectionTable)
     
+    return(infecttable)
+    
   }
 
-  return(infecttable)
-  
-  # X
+
   
 }
 
@@ -303,15 +304,15 @@ fit.agemix.trans.women <- function(datatable = agemix.df){
   
   datatable <- datatable
   
-  men.lmer <- lmer(AgeInfecDon ~ AgeInfecRec + (1 | DonId),
+  women.lmer <- lmer(AgeInfecDon ~ AgeInfecRec + (1 | DonId),
                    data = dplyr::filter(datatable, GenderDon =="1"),
                    REML = TRUE,
                    control=lmerControl(check.nobs.vs.nlev = "ignore",
                                        check.nobs.vs.rankZ = "ignore",
                                        check.nobs.vs.nRE="ignore"))
-  agemix.inter <- men.lmer
+  agemix.inter.women <- women.lmer
   
-  return(agemix.inter)
+  return(agemix.inter.women)
   
 }
 
