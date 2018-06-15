@@ -4,22 +4,14 @@ library(EasyABC)
 library(RSimpactCyan)
 library(RSimpactHelper)
 library(Rcpp)
-library(ape)
 library(expoTree)
 library(data.table)
 library(readr)
-library(phangorn)
 library(lme4)
 library(nlme)
 library(minque) # with lmer
 library(dplyr)
-library(adephylo)
-library(treedater)
-library(geiger)
-library(picante)
 library(igraph)
-library(phyloTop)
-library(phytools)
 library(Rsamtools)
 library(robustbase)
 
@@ -73,6 +65,9 @@ ABC_DestDir.classic <- paste0(work.dir,"/temp/",generate.filename(10))
 
 
 simpact4ABC.classic <- function(inputvector){
+  
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
   
   source("~/phylosimpact_simulation_studies_2018/stress_testing/simulation_study_1/classic.features.study.1.R")
   
