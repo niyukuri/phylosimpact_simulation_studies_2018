@@ -252,37 +252,84 @@ wrapper.master.phylo.simpact.study.1 <- function(inputvector = input.vector){
   
   
   age.distr <- agedistr.creator(shape = 5, scale = 65)
-  
-  cfg.list <- input.params.creator(population.eyecap.fraction = 0.2, #0.21,#1,
-                                   # population.msm = "no",
-                                   population.simtime = 50, #20, #40,  #25 for validation. 20 for calibration
-                                   population.nummen = 1000, #3000, #600, # 3800, #2500,
-                                   population.numwomen = 1000, # 3000, #600, #4200, #2500,
-                                   hivseed.time = 10, # 20,
+  #
+  cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
+                                   population.simtime = 50, 
+                                   population.nummen = 600, 
+                                   population.numwomen = 600,
+                                   hivseed.time = 10, 
                                    hivseed.type = "amount",
-                                   hivseed.amount = 20, #30,
+                                   hivseed.amount = 20, 
                                    hivseed.age.min = 20,
                                    hivseed.age.max = 50,
-                                   hivtransmission.param.a = -1, # -1,
-                                   hivtransmission.param.b = -90,
-                                   hivtransmission.param.c = 0.5,
-                                   hivtransmission.param.f1 = log(2), #log(inputvector[2]) , #log(2),
-                                   hivtransmission.param.f2 = log(log(1.4) / log(2)) / 5, #log(log(sqrt(inputvector[2])) / log(inputvector[2])) / 5, #log(log(1.4) / log(2)) / 5,
-                                   formation.hazard.agegapry.gap_factor_man_age = -0.01, #-0.01472653928518528523251061,
-                                   formation.hazard.agegapry.gap_factor_woman_age = -0.01, #-0.0726539285185285232510561,
                                    formation.hazard.agegapry.meanage = -0.025,
-                                   formation.hazard.agegapry.gap_factor_man_const = 0,
-                                   formation.hazard.agegapry.gap_factor_woman_const = 0,
-                                   formation.hazard.agegapry.gap_factor_man_exp = -1, #-6,#-1.5,
-                                   formation.hazard.agegapry.gap_factor_woman_exp = -1, #-6,#-1.5,
-                                   formation.hazard.agegapry.gap_agescale_man = 0.25, #inputvector[3], # 0.25,
-                                   formation.hazard.agegapry.gap_agescale_woman = 0.25, #inputvector[3], # 0.25,#-0.30000007,#-0.03,
-                                   debut.debutage = 15,
-                                   conception.alpha_base = -2.5#inputvector[14]#-2.5#,
-                                   #person.art.accept.threshold.dist.fixed.value = 0
+                                   debut.debutage = 15
   )
   
+  # # Sexual behaviour
+  # ###################
+  #
+  seedid <- inputvector[1]
   
+  cfg.list["dissolution.alpha_0"] <- inputvector[2] # [1] # -0.52 c("unif", -1, 0)
+  cfg.list["dissolution.alpha_4"] <- inputvector [3] # [2] # -0.05 c("unif", -0.5, 0)
+  cfg.list["formation.hazard.agegapry.baseline"] <- inputvector[4] # [3] # 2 c("unif", 1, 3)
+  cfg.list["person.agegap.man.dist.normal.mu"] <- inputvector[5] # [4] # 0 c("unif", -0.5, 0.5)
+  cfg.list["person.agegap.woman.dist.normal.mu"] <- inputvector[5] # [4] # 0
+  cfg.list["person.agegap.man.dist.normal.sigma"] <- inputvector[6] # [5] # 3 c("unif", 2, 4)
+  cfg.list["person.agegap.woman.dist.normal.sigma"] <- inputvector[6] # [5] # 3 
+  cfg.list["formation.hazard.agegapry.gap_agescale_man"] <- inputvector[7] # [6] # 0.25 c("unif", 0, 1)
+  cfg.list["formation.hazard.agegapry.gap_agescale_woman"] <- inputvector[7] # [6] # 0.25
+  cfg.list["formation.hazard.agegapry.numrel_man"] <- inputvector[8] # [7] # -0.3 c("unif", -1, 0)
+  cfg.list["formation.hazard.agegapry.numrel_woman"] <- inputvector[8] # [7] # -0.3
+  cfg.list["formation.hazard.agegapry.numrel_diff"] <- inputvector[9] # [8] # -0.1 c("unif", -0.9, 0)
+  cfg.list["population.eyecap.fraction"] <- inputvector[10] # [9] # 0.2 c("unif", 0, 0.5)
+  #
+  # # HIV transmission
+  # ###################
+  #
+  
+  
+  cfg.list["hivtransmission.param.a"] <- inputvector[11] # [10] # -1 c("unif", -2, 0)
+  cfg.list["hivtransmission.param.b"] <- inputvector[12] # [11] # -90 c("unif", -100, -80)
+  cfg.list["hivtransmission.param.c"] <- inputvector[13] # [12] # 0.5 c("unif", 0, 1)
+  cfg.list["hivtransmission.param.f1"] <- inputvector[14] # [13] # 0.04879016 c("unif", 0, 0.5)
+  cfg.list["hivtransmission.param.f2"] <- inputvector[15] # [14] # -0.1386294 c("unif", -0.5, 0)
+  
+  # Disease progression > may be remove in parameter to estimates
+  
+  cfg.list["person.vsp.toacute.x"] <- inputvector[16] # [15] # 5 c("unif", 3, 7)
+  cfg.list["person.vsp.toaids.x"] <- inputvector[17] # [16] # 7 c("unif", 5, 9)
+  cfg.list["person.vsp.tofinalaids.x"] <- inputvector[18] # [17] # 12 c("unif", 10, 14)
+  
+  
+  #
+  # # Demographic
+  # ##############
+  #
+  
+  cfg.list["conception.alpha_base"] <- inputvector[19] # [18] # -2.7 c("unif", -3.5, -1.7)
+  
+  #
+  #
+  # # Assumptions to avoid negative branch lengths
+  # ###############################################
+  #
+  
+  cfg.list["monitoring.fraction.log_viralload"] <- 0
+  
+  # # + sampling == start ART
+  # # when someone start ART, he/she is sampled and becomes non-infectious
+  #
+  # # Assumption of nature of sexual network
+  # #########################################
+  #
+  cfg.list["population.msm"] = "no"
+  
+  #
+  # ## Add-ons
+  #
+  ### BEGIN Add-on
   cfg.list["formation.hazard.agegapry.baseline"] <- 2
   cfg.list["mortality.aids.survtime.C"] <- 65
   cfg.list["mortality.aids.survtime.k"] <- -0.2
@@ -302,9 +349,23 @@ wrapper.master.phylo.simpact.study.1 <- function(inputvector = input.vector){
   cfg.list["mortality.aids.survtime.C"] <- 65
   cfg.list["mortality.aids.survtime.k"] <- -0.2
   cfg.list["monitoring.cd4.threshold"] <- 0 # 0 means nobody qualifies for ART
-  cfg.list["person.art.accept.threshold.dist.fixed.value"] <- 0.4
   cfg.list["diagnosis.baseline"] <- -2
   
+  
+  cfg.list["person.eagerness.man.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.woman.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.man.dist.gamma.b"] <- 45 # 45
+  cfg.list["person.eagerness.woman.dist.gamma.b"] <- 45 # 45
+  
+  #### END Add-ons
+  
+  
+  # # ART intervention
+  # ###################
+  #
+  # # ART acceptability paramter and the ART  interventions
+  
+  cfg.list["person.art.accept.threshold.dist.fixed.value"] <- 0.6
   
   # Let's introduce ART, and evaluate whether the HIV prevalence drops less  rapidly
   art.intro <- list()
@@ -344,39 +405,10 @@ wrapper.master.phylo.simpact.study.1 <- function(inputvector = input.vector){
   # tasp.indicator <- inputvector[9] # 1 if the scenario is TasP, 0 if the scenario is current status
   interventionlist <- list(art.intro, art.intro1, art.intro2, art.intro3, art.intro4, art.intro5)
   
-  intervention <- interventionlist # scenario(interventionlist, tasp.indicator)
+  intervention <- interventionlist
   
-  cfg.list["hivtransmission.param.f1"] <- log(inputvector[2])
-  cfg.list["hivtransmission.param.f2"] <- log(log(sqrt(inputvector[2])) / log(inputvector[2])) / 5
-  cfg.list["formation.hazard.agegapry.gap_agescale_man"] <- inputvector[3]
-  cfg.list["formation.hazard.agegapry.gap_agescale_woman"] <- inputvector[3]
-  cfg.list["person.agegap.man.dist.normal.mu"] <- inputvector[4]
-  cfg.list["person.agegap.woman.dist.normal.mu"] <- inputvector[4]
-  cfg.list["person.agegap.man.dist.normal.sigma"] <- inputvector[5]
-  cfg.list["person.agegap.woman.dist.normal.sigma"] <- inputvector[5]
-  cfg.list["person.eagerness.man.dist.gamma.a"] <- inputvector[6]
-  cfg.list["person.eagerness.woman.dist.gamma.a"] <- inputvector[7]
-  cfg.list["person.eagerness.man.dist.gamma.b"] <- inputvector[8]
-  cfg.list["person.eagerness.woman.dist.gamma.b"] <- inputvector[9]
-  
-  #cfg <- cfg.list
-  
+  # Events
   cfg.list["population.maxevents"] <- as.numeric(cfg.list["population.simtime"][1]) * as.numeric(cfg.list["population.nummen"][1]) * 3
-  # cfg["monitoring.fraction.log_viralload"] <- 0.3
-  cfg.list["person.vsp.toacute.x"] <- 5 # See Bellan PLoS Medicine
-  
-  seedid <- inputvector[1]
-  #cfg.list["person.agegap.man.dist.fixed.value"] <- -2 # inputvector[2]
-  #cfg.list["person.agegap.woman.dist.fixed.value"] <- -2 # inputvector[2]
-  cfg.list["formation.hazard.agegapry.gap_factor_man_exp"] <- inputvector[10] ######### -0.5
-  cfg.list["formation.hazard.agegapry.gap_factor_woman_exp"] <- inputvector[10] ######### -0.5
-  cfg.list["formation.hazard.agegapry.baseline"] <- inputvector[11]
-  
-  cfg.list["formation.hazard.agegapry.numrel_man"] <- inputvector[12]
-  cfg.list["formation.hazard.agegapry.numrel_woman"] <- inputvector[13]
-  cfg.list["conception.alpha_base"] <- inputvector[14] #is conception.alpha.base (higher up)
-  cfg.list["dissolution.alpha_0"] <- inputvector[15]
-  cfg.list["dissolution.alpha_4"] <- inputvector[16]
   
   
   # Avoid overlaping in same directory
@@ -1150,6 +1182,7 @@ wrapper.master.phylo.simpact.study.1 <- function(inputvector = input.vector){
     ### Missingess not at random: MAR
     ##################################
     
+    ### I. Women have 70% of being selected than men in all age groups
     
     ### 1st Scenario: 35 ###
     ########################
@@ -1736,6 +1769,7 @@ wrapper.master.phylo.simpact.study.1 <- function(inputvector = input.vector){
     }
     
     
+    
     mAr.sim.features.phylogenetic <- c(mAr.cov.35.IDs.features.phylogenetic,
                                        mAr.cov.40.IDs.features.phylogenetic,
                                        mAr.cov.45.IDs.features.phylogenetic,
@@ -1781,6 +1815,1275 @@ wrapper.master.phylo.simpact.study.1 <- function(inputvector = input.vector){
     names(mAr.sim.features.phylogenetic) <- mAr.name.sim.features.phylogenetic
     
     
+    #### II. Men have 70% of being selected than women
+    
+    ### 1st Scenario: 35 ###
+    ########################
+    
+    mAr.cov.B.35.IDs <- IDs.Seq.Age.Groups(simpact.trans.net = simpact.trans.net,
+                                           limitTransmEvents = 7,
+                                           timewindow = c(10,40),
+                                           seq.cov = 35,
+                                           seq.gender.ratio = 0.3, # within same age group women have 70% of being sampled & men have only 30% 
+                                           age.group.15.25 = c(15,25),
+                                           age.group.25.40 = c(25,40),
+                                           age.group.40.50 = c(40,50))
+    
+    
+    if(length(mAr.cov.B.35.IDs)>=cut.val){
+      
+      choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.fas"),
+                          select.vec = mAr.cov.B.35.IDs, 
+                          name.file = paste0(sub.dir.rename, "/mAr.cov.B.35.IDs.C.Epidemic.Fasta"))
+      
+      
+      mAr.cov.B.35.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
+                                                                    sub.dir.rename = sub.dir.rename,
+                                                                    fasttree.tool = "FastTree",
+                                                                    calendar.dates = "samplingtimes.all.csv",
+                                                                    simseqfile = "mAr.cov.B.35.IDs.C.Epidemic.Fasta",
+                                                                    count.start = 1977,
+                                                                    endsim = 40,
+                                                                    clust = FALSE)
+      
+      tree.cal.mAr.cov.B.35.IDs <- read.tree(paste0(sub.dir.rename, "/mAr.cov.B.35.IDs.C.Epidemic.Fasta.nwk"))
+      
+      mAr.cov.B.35.IDs.features.phylogenetic <- phylogenetic.features.study1(tree.topo=tree.cal.mAr.cov.B.35.IDs,
+                                                                             tree.calib.LTT = mAr.cov.B.35.IDs.tree.calib,
+                                                                             work.dir = work.dir,
+                                                                             sub.dir.rename = sub.dir.rename,
+                                                                             simpact.trans.net = simpact.trans.net,
+                                                                             fasta.file = "mAr.cov.B.35.IDs.C.Epidemic.Fasta",
+                                                                             tree.file = "mAr.cov.B.35.IDs.C.Epidemic.Fasta.nwk")
+      
+    }else{
+      
+      mAr.cov.B.35.IDs.features.phylogenetic <- rep(NA, length(mAr.cov.B.35.IDs.features.phylogenetic))
+    }
+    
+    
+    ### 2nd Scenario: 40 ###
+    ########################
+    
+    mAr.cov.B.40.IDs <- IDs.Seq.Age.Groups(simpact.trans.net = simpact.trans.net,
+                                           limitTransmEvents = 7,
+                                           timewindow = c(10,40),
+                                           seq.cov = 40,
+                                           seq.gender.ratio = 0.3, # within same age group women have 70% of being sampled & men have only 30% 
+                                           age.group.15.25 = c(15,25),
+                                           age.group.25.40 = c(25,40),
+                                           age.group.40.50 = c(40,50))
+    
+    
+    if(length(mAr.cov.B.40.IDs)>=cut.val){
+      
+      choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.fas"),
+                          select.vec = mAr.cov.B.40.IDs, 
+                          name.file = paste0(sub.dir.rename, "/mAr.cov.B.40.IDs.C.Epidemic.Fasta"))
+      
+      
+      mAr.cov.B.40.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
+                                                                    sub.dir.rename = sub.dir.rename,
+                                                                    fasttree.tool = "FastTree",
+                                                                    calendar.dates = "samplingtimes.all.csv",
+                                                                    simseqfile = "mAr.cov.B.40.IDs.C.Epidemic.Fasta",
+                                                                    count.start = 1977,
+                                                                    endsim = 40,
+                                                                    clust = FALSE)
+      
+      tree.cal.mAr.cov.B.40.IDs <- read.tree(paste0(sub.dir.rename, "/mAr.cov.B.40.IDs.C.Epidemic.Fasta.nwk"))
+      
+      mAr.cov.B.40.IDs.features.phylogenetic <- phylogenetic.features.study1(tree.topo=tree.cal.mAr.cov.B.40.IDs,
+                                                                             tree.calib.LTT = mAr.cov.B.40.IDs.tree.calib,
+                                                                             work.dir = work.dir,
+                                                                             sub.dir.rename = sub.dir.rename,
+                                                                             simpact.trans.net = simpact.trans.net,
+                                                                             fasta.file = "mAr.cov.B.40.IDs.C.Epidemic.Fasta",
+                                                                             tree.file = "mAr.cov.B.40.IDs.C.Epidemic.Fasta.nwk")
+      
+    }else{
+      
+      mAr.cov.B.40.IDs.features.phylogenetic <- rep(NA, length(mAr.cov.B.40.IDs.features.phylogenetic))
+    }
+    
+    
+    ### 3rd Scenario: 45 ###
+    ########################
+    
+    mAr.cov.B.45.IDs <- IDs.Seq.Age.Groups(simpact.trans.net = simpact.trans.net,
+                                           limitTransmEvents = 7,
+                                           timewindow = c(10,40),
+                                           seq.cov = 45,
+                                           seq.gender.ratio = 0.3, # within same age group women have 70% of being sampled & men have only 30% 
+                                           age.group.15.25 = c(15,25),
+                                           age.group.25.40 = c(25,40),
+                                           age.group.40.50 = c(40,50))
+    
+    
+    if(length(mAr.cov.B.45.IDs)>=cut.val){
+      
+      choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.fas"),
+                          select.vec = mAr.cov.B.45.IDs, 
+                          name.file = paste0(sub.dir.rename, "/mAr.cov.B.45.IDs.C.Epidemic.Fasta"))
+      
+      
+      mAr.cov.B.45.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
+                                                                    sub.dir.rename = sub.dir.rename,
+                                                                    fasttree.tool = "FastTree",
+                                                                    calendar.dates = "samplingtimes.all.csv",
+                                                                    simseqfile = "mAr.cov.B.45.IDs.C.Epidemic.Fasta",
+                                                                    count.start = 1977,
+                                                                    endsim = 40,
+                                                                    clust = FALSE)
+      
+      tree.cal.mAr.cov.B.45.IDs <- read.tree(paste0(sub.dir.rename, "/mAr.cov.B.45.IDs.C.Epidemic.Fasta.nwk"))
+      
+      mAr.cov.B.45.IDs.features.phylogenetic <- phylogenetic.features.study1(tree.topo=tree.cal.mAr.cov.B.45.IDs,
+                                                                             tree.calib.LTT = mAr.cov.B.45.IDs.tree.calib,
+                                                                             work.dir = work.dir,
+                                                                             sub.dir.rename = sub.dir.rename,
+                                                                             simpact.trans.net = simpact.trans.net,
+                                                                             fasta.file = "mAr.cov.B.45.IDs.C.Epidemic.Fasta",
+                                                                             tree.file = "mAr.cov.B.45.IDs.C.Epidemic.Fasta.nwk")
+      
+    }else{
+      
+      mAr.cov.B.45.IDs.features.phylogenetic <- rep(NA, length(mAr.cov.B.45.IDs.features.phylogenetic))
+    }
+    
+    
+    ### 4th Scenario: 50 ###
+    ########################
+    
+    mAr.cov.B.50.IDs <- IDs.Seq.Age.Groups(simpact.trans.net = simpact.trans.net,
+                                           limitTransmEvents = 7,
+                                           timewindow = c(10,40),
+                                           seq.cov = 50,
+                                           seq.gender.ratio = 0.3, # within same age group women have 70% of being sampled & men have only 30% 
+                                           age.group.15.25 = c(15,25),
+                                           age.group.25.40 = c(25,40),
+                                           age.group.40.50 = c(40,50))
+    
+    
+    if(length(mAr.cov.B.50.IDs)>=cut.val){
+      
+      choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.fas"),
+                          select.vec = mAr.cov.B.50.IDs, 
+                          name.file = paste0(sub.dir.rename, "/mAr.cov.B.50.IDs.C.Epidemic.Fasta"))
+      
+      
+      mAr.cov.B.50.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
+                                                                    sub.dir.rename = sub.dir.rename,
+                                                                    fasttree.tool = "FastTree",
+                                                                    calendar.dates = "samplingtimes.all.csv",
+                                                                    simseqfile = "mAr.cov.B.50.IDs.C.Epidemic.Fasta",
+                                                                    count.start = 1977,
+                                                                    endsim = 40,
+                                                                    clust = FALSE)
+      
+      tree.cal.mAr.cov.B.50.IDs <- read.tree(paste0(sub.dir.rename, "/mAr.cov.B.50.IDs.C.Epidemic.Fasta.nwk"))
+      
+      mAr.cov.B.50.IDs.features.phylogenetic <- phylogenetic.features.study1(tree.topo=tree.cal.mAr.cov.B.50.IDs,
+                                                                             tree.calib.LTT = mAr.cov.B.50.IDs.tree.calib,
+                                                                             work.dir = work.dir,
+                                                                             sub.dir.rename = sub.dir.rename,
+                                                                             simpact.trans.net = simpact.trans.net,
+                                                                             fasta.file = "mAr.cov.B.50.IDs.C.Epidemic.Fasta",
+                                                                             tree.file = "mAr.cov.B.50.IDs.C.Epidemic.Fasta.nwk")
+      
+    }else{
+      
+      mAr.cov.B.50.IDs.features.phylogenetic <- rep(NA, length(mAr.cov.B.50.IDs.features.phylogenetic))
+    }
+    
+    
+    ### 5th Scenario: 55 ###
+    ########################
+    
+    mAr.cov.B.55.IDs <- IDs.Seq.Age.Groups(simpact.trans.net = simpact.trans.net,
+                                           limitTransmEvents = 7,
+                                           timewindow = c(10,40),
+                                           seq.cov = 55,
+                                           seq.gender.ratio = 0.3, # within same age group women have 70% of being sampled & men have only 30% 
+                                           age.group.15.25 = c(15,25),
+                                           age.group.25.40 = c(25,40),
+                                           age.group.40.50 = c(40,50))
+    
+    
+    if(length(mAr.cov.B.55.IDs)>=cut.val){
+      
+      choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.fas"),
+                          select.vec = mAr.cov.B.55.IDs, 
+                          name.file = paste0(sub.dir.rename, "/mAr.cov.B.55.IDs.C.Epidemic.Fasta"))
+      
+      
+      mAr.cov.B.55.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
+                                                                    sub.dir.rename = sub.dir.rename,
+                                                                    fasttree.tool = "FastTree",
+                                                                    calendar.dates = "samplingtimes.all.csv",
+                                                                    simseqfile = "mAr.cov.B.55.IDs.C.Epidemic.Fasta",
+                                                                    count.start = 1977,
+                                                                    endsim = 40,
+                                                                    clust = FALSE)
+      
+      tree.cal.mAr.cov.B.55.IDs <- read.tree(paste0(sub.dir.rename, "/mAr.cov.B.55.IDs.C.Epidemic.Fasta.nwk"))
+      
+      mAr.cov.B.55.IDs.features.phylogenetic <- phylogenetic.features.study1(tree.topo=tree.cal.mAr.cov.B.55.IDs,
+                                                                             tree.calib.LTT = mAr.cov.B.55.IDs.tree.calib,
+                                                                             work.dir = work.dir,
+                                                                             sub.dir.rename = sub.dir.rename,
+                                                                             simpact.trans.net = simpact.trans.net,
+                                                                             fasta.file = "mAr.cov.B.55.IDs.C.Epidemic.Fasta",
+                                                                             tree.file = "mAr.cov.B.55.IDs.C.Epidemic.Fasta.nwk")
+      
+    }else{
+      
+      mAr.cov.B.55.IDs.features.phylogenetic <- rep(NA, length(mAr.cov.B.55.IDs.features.phylogenetic))
+    }
+    
+    
+    ### 6th Scenario: 60 ###
+    ########################
+    
+    mAr.cov.B.60.IDs <- IDs.Seq.Age.Groups(simpact.trans.net = simpact.trans.net,
+                                           limitTransmEvents = 7,
+                                           timewindow = c(10,40),
+                                           seq.cov = 60,
+                                           seq.gender.ratio = 0.3, # within same age group women have 70% of being sampled & men have only 30% 
+                                           age.group.15.25 = c(15,25),
+                                           age.group.25.40 = c(25,40),
+                                           age.group.40.50 = c(40,50))
+    
+    
+    if(length(mAr.cov.B.60.IDs)>=cut.val){
+      
+      choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.fas"),
+                          select.vec = mAr.cov.B.60.IDs, 
+                          name.file = paste0(sub.dir.rename, "/mAr.cov.B.60.IDs.C.Epidemic.Fasta"))
+      
+      
+      mAr.cov.B.60.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
+                                                                    sub.dir.rename = sub.dir.rename,
+                                                                    fasttree.tool = "FastTree",
+                                                                    calendar.dates = "samplingtimes.all.csv",
+                                                                    simseqfile = "mAr.cov.B.60.IDs.C.Epidemic.Fasta",
+                                                                    count.start = 1977,
+                                                                    endsim = 40,
+                                                                    clust = FALSE)
+      
+      tree.cal.mAr.cov.B.60.IDs <- read.tree(paste0(sub.dir.rename, "/mAr.cov.B.60.IDs.C.Epidemic.Fasta.nwk"))
+      
+      mAr.cov.B.60.IDs.features.phylogenetic <- phylogenetic.features.study1(tree.topo=tree.cal.mAr.cov.B.60.IDs,
+                                                                             tree.calib.LTT = mAr.cov.B.60.IDs.tree.calib,
+                                                                             work.dir = work.dir,
+                                                                             sub.dir.rename = sub.dir.rename,
+                                                                             simpact.trans.net = simpact.trans.net,
+                                                                             fasta.file = "mAr.cov.B.60.IDs.C.Epidemic.Fasta",
+                                                                             tree.file = "mAr.cov.B.60.IDs.C.Epidemic.Fasta.nwk")
+      
+    }else{
+      
+      mAr.cov.B.60.IDs.features.phylogenetic <- rep(NA, length(mAr.cov.B.60.IDs.features.phylogenetic))
+    }
+    
+    
+    ### 7th Scenario: 65 ###
+    ########################
+    
+    mAr.cov.B.65.IDs <- IDs.Seq.Age.Groups(simpact.trans.net = simpact.trans.net,
+                                           limitTransmEvents = 7,
+                                           timewindow = c(10,40),
+                                           seq.cov = 65,
+                                           seq.gender.ratio = 0.3, # within same age group women have 70% of being sampled & men have only 30% 
+                                           age.group.15.25 = c(15,25),
+                                           age.group.25.40 = c(25,40),
+                                           age.group.40.50 = c(40,50))
+    
+    
+    if(length(mAr.cov.B.65.IDs)>=cut.val){
+      
+      choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.fas"),
+                          select.vec = mAr.cov.B.65.IDs, 
+                          name.file = paste0(sub.dir.rename, "/mAr.cov.B.65.IDs.C.Epidemic.Fasta"))
+      
+      
+      mAr.cov.B.65.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
+                                                                    sub.dir.rename = sub.dir.rename,
+                                                                    fasttree.tool = "FastTree",
+                                                                    calendar.dates = "samplingtimes.all.csv",
+                                                                    simseqfile = "mAr.cov.B.65.IDs.C.Epidemic.Fasta",
+                                                                    count.start = 1977,
+                                                                    endsim = 40,
+                                                                    clust = FALSE)
+      
+      tree.cal.mAr.cov.B.65.IDs <- read.tree(paste0(sub.dir.rename, "/mAr.cov.B.65.IDs.C.Epidemic.Fasta.nwk"))
+      
+      mAr.cov.B.65.IDs.features.phylogenetic <- phylogenetic.features.study1(tree.topo=tree.cal.mAr.cov.B.65.IDs,
+                                                                             tree.calib.LTT = mAr.cov.B.65.IDs.tree.calib,
+                                                                             work.dir = work.dir,
+                                                                             sub.dir.rename = sub.dir.rename,
+                                                                             simpact.trans.net = simpact.trans.net,
+                                                                             fasta.file = "mAr.cov.B.65.IDs.C.Epidemic.Fasta",
+                                                                             tree.file = "mAr.cov.B.65.IDs.C.Epidemic.Fasta.nwk")
+      
+    }else{
+      
+      mAr.cov.B.65.IDs.features.phylogenetic <- rep(NA, length(mAr.cov.B.65.IDs.features.phylogenetic))
+    }
+    
+    
+    ### 8th Scenario: 70 ###
+    ########################
+    
+    mAr.cov.B.70.IDs <- IDs.Seq.Age.Groups(simpact.trans.net = simpact.trans.net,
+                                           limitTransmEvents = 7,
+                                           timewindow = c(10,40),
+                                           seq.cov = 70,
+                                           seq.gender.ratio = 0.3, # within same age group women have 70% of being sampled & men have only 30% 
+                                           age.group.15.25 = c(15,25),
+                                           age.group.25.40 = c(25,40),
+                                           age.group.40.50 = c(40,50))
+    
+    
+    if(length(mAr.cov.B.70.IDs)>=cut.val){
+      
+      choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.fas"),
+                          select.vec = mAr.cov.B.70.IDs, 
+                          name.file = paste0(sub.dir.rename, "/mAr.cov.B.70.IDs.C.Epidemic.Fasta"))
+      
+      
+      mAr.cov.B.70.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
+                                                                    sub.dir.rename = sub.dir.rename,
+                                                                    fasttree.tool = "FastTree",
+                                                                    calendar.dates = "samplingtimes.all.csv",
+                                                                    simseqfile = "mAr.cov.B.70.IDs.C.Epidemic.Fasta",
+                                                                    count.start = 1977,
+                                                                    endsim = 40,
+                                                                    clust = FALSE)
+      
+      tree.cal.mAr.cov.B.70.IDs <- read.tree(paste0(sub.dir.rename, "/mAr.cov.B.70.IDs.C.Epidemic.Fasta.nwk"))
+      
+      mAr.cov.B.70.IDs.features.phylogenetic <- phylogenetic.features.study1(tree.topo=tree.cal.mAr.cov.B.70.IDs,
+                                                                             tree.calib.LTT = mAr.cov.B.70.IDs.tree.calib,
+                                                                             work.dir = work.dir,
+                                                                             sub.dir.rename = sub.dir.rename,
+                                                                             simpact.trans.net = simpact.trans.net,
+                                                                             fasta.file = "mAr.cov.B.70.IDs.C.Epidemic.Fasta",
+                                                                             tree.file = "mAr.cov.B.70.IDs.C.Epidemic.Fasta.nwk")
+      
+    }else{
+      
+      mAr.cov.B.70.IDs.features.phylogenetic <- rep(NA, length(mAr.cov.B.70.IDs.features.phylogenetic))
+    }
+    
+    
+    ### 9th Scenario: 75 ###
+    ########################
+    
+    mAr.cov.B.75.IDs <- IDs.Seq.Age.Groups(simpact.trans.net = simpact.trans.net,
+                                           limitTransmEvents = 7,
+                                           timewindow = c(10,40),
+                                           seq.cov = 75,
+                                           seq.gender.ratio = 0.3, # within same age group women have 70% of being sampled & men have only 30% 
+                                           age.group.15.25 = c(15,25),
+                                           age.group.25.40 = c(25,40),
+                                           age.group.40.50 = c(40,50))
+    
+    
+    if(length(mAr.cov.B.75.IDs)>=cut.val){
+      
+      choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.fas"),
+                          select.vec = mAr.cov.B.75.IDs, 
+                          name.file = paste0(sub.dir.rename, "/mAr.cov.B.75.IDs.C.Epidemic.Fasta"))
+      
+      
+      mAr.cov.B.75.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
+                                                                    sub.dir.rename = sub.dir.rename,
+                                                                    fasttree.tool = "FastTree",
+                                                                    calendar.dates = "samplingtimes.all.csv",
+                                                                    simseqfile = "mAr.cov.B.75.IDs.C.Epidemic.Fasta",
+                                                                    count.start = 1977,
+                                                                    endsim = 40,
+                                                                    clust = FALSE)
+      
+      tree.cal.mAr.cov.B.75.IDs <- read.tree(paste0(sub.dir.rename, "/mAr.cov.B.75.IDs.C.Epidemic.Fasta.nwk"))
+      
+      mAr.cov.B.75.IDs.features.phylogenetic <- phylogenetic.features.study1(tree.topo=tree.cal.mAr.cov.B.75.IDs,
+                                                                             tree.calib.LTT = mAr.cov.B.75.IDs.tree.calib,
+                                                                             work.dir = work.dir,
+                                                                             sub.dir.rename = sub.dir.rename,
+                                                                             simpact.trans.net = simpact.trans.net,
+                                                                             fasta.file = "mAr.cov.B.75.IDs.C.Epidemic.Fasta",
+                                                                             tree.file = "mAr.cov.B.75.IDs.C.Epidemic.Fasta.nwk")
+      
+    }else{
+      
+      mAr.cov.B.75.IDs.features.phylogenetic <- rep(NA, length(mAr.cov.B.75.IDs.features.phylogenetic))
+    }
+    
+    
+    ### 10th Scenario: 80 ###
+    ########################
+    
+    mAr.cov.B.80.IDs <- IDs.Seq.Age.Groups(simpact.trans.net = simpact.trans.net,
+                                           limitTransmEvents = 7,
+                                           timewindow = c(10,40),
+                                           seq.cov = 80,
+                                           seq.gender.ratio = 0.3, # within same age group women have 70% of being sampled & men have only 30% 
+                                           age.group.15.25 = c(15,25),
+                                           age.group.25.40 = c(25,40),
+                                           age.group.40.50 = c(40,50))
+    
+    
+    if(length(mAr.cov.B.80.IDs)>=cut.val){
+      
+      choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.fas"),
+                          select.vec = mAr.cov.B.80.IDs, 
+                          name.file = paste0(sub.dir.rename, "/mAr.cov.B.80.IDs.C.Epidemic.Fasta"))
+      
+      
+      mAr.cov.B.80.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
+                                                                    sub.dir.rename = sub.dir.rename,
+                                                                    fasttree.tool = "FastTree",
+                                                                    calendar.dates = "samplingtimes.all.csv",
+                                                                    simseqfile = "mAr.cov.B.80.IDs.C.Epidemic.Fasta",
+                                                                    count.start = 1977,
+                                                                    endsim = 40,
+                                                                    clust = FALSE)
+      
+      tree.cal.mAr.cov.B.80.IDs <- read.tree(paste0(sub.dir.rename, "/mAr.cov.B.80.IDs.C.Epidemic.Fasta.nwk"))
+      
+      mAr.cov.B.80.IDs.features.phylogenetic <- phylogenetic.features.study1(tree.topo=tree.cal.mAr.cov.B.80.IDs,
+                                                                             tree.calib.LTT = mAr.cov.B.80.IDs.tree.calib,
+                                                                             work.dir = work.dir,
+                                                                             sub.dir.rename = sub.dir.rename,
+                                                                             simpact.trans.net = simpact.trans.net,
+                                                                             fasta.file = "mAr.cov.B.80.IDs.C.Epidemic.Fasta",
+                                                                             tree.file = "mAr.cov.B.80.IDs.C.Epidemic.Fasta.nwk")
+      
+    }else{
+      
+      mAr.cov.B.80.IDs.features.phylogenetic <- rep(NA, length(mAr.cov.B.80.IDs.features.phylogenetic))
+    }
+    
+    
+    ### 11th Scenario: 85 ###
+    ########################
+    
+    mAr.cov.B.85.IDs <- IDs.Seq.Age.Groups(simpact.trans.net = simpact.trans.net,
+                                           limitTransmEvents = 7,
+                                           timewindow = c(10,40),
+                                           seq.cov = 85,
+                                           seq.gender.ratio = 0.3, # within same age group women have 70% of being sampled & men have only 30% 
+                                           age.group.15.25 = c(15,25),
+                                           age.group.25.40 = c(25,40),
+                                           age.group.40.50 = c(40,50))
+    
+    
+    if(length(mAr.cov.B.85.IDs)>=cut.val){
+      
+      choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.fas"),
+                          select.vec = mAr.cov.B.85.IDs, 
+                          name.file = paste0(sub.dir.rename, "/mAr.cov.B.85.IDs.C.Epidemic.Fasta"))
+      
+      
+      mAr.cov.B.85.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
+                                                                    sub.dir.rename = sub.dir.rename,
+                                                                    fasttree.tool = "FastTree",
+                                                                    calendar.dates = "samplingtimes.all.csv",
+                                                                    simseqfile = "mAr.cov.B.85.IDs.C.Epidemic.Fasta",
+                                                                    count.start = 1977,
+                                                                    endsim = 40,
+                                                                    clust = FALSE)
+      
+      tree.cal.mAr.cov.B.85.IDs <- read.tree(paste0(sub.dir.rename, "/mAr.cov.B.85.IDs.C.Epidemic.Fasta.nwk"))
+      
+      mAr.cov.B.85.IDs.features.phylogenetic <- phylogenetic.features.study1(tree.topo=tree.cal.mAr.cov.B.85.IDs,
+                                                                             tree.calib.LTT = mAr.cov.B.85.IDs.tree.calib,
+                                                                             work.dir = work.dir,
+                                                                             sub.dir.rename = sub.dir.rename,
+                                                                             simpact.trans.net = simpact.trans.net,
+                                                                             fasta.file = "mAr.cov.B.85.IDs.C.Epidemic.Fasta",
+                                                                             tree.file = "mAr.cov.B.85.IDs.C.Epidemic.Fasta.nwk")
+      
+    }else{
+      
+      mAr.cov.B.85.IDs.features.phylogenetic <- rep(NA, length(mAr.cov.B.85.IDs.features.phylogenetic))
+    }
+    
+    
+    ### 12th Scenario: 90 ###
+    ########################
+    
+    mAr.cov.B.90.IDs <- IDs.Seq.Age.Groups(simpact.trans.net = simpact.trans.net,
+                                           limitTransmEvents = 7,
+                                           timewindow = c(10,40),
+                                           seq.cov = 90,
+                                           seq.gender.ratio = 0.3, # within same age group women have 70% of being sampled & men have only 30% 
+                                           age.group.15.25 = c(15,25),
+                                           age.group.25.40 = c(25,40),
+                                           age.group.40.50 = c(40,50))
+    
+    
+    if(length(mAr.cov.B.90.IDs)>=cut.val){
+      
+      choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.fas"),
+                          select.vec = mAr.cov.B.90.IDs, 
+                          name.file = paste0(sub.dir.rename, "/mAr.cov.B.90.IDs.C.Epidemic.Fasta"))
+      
+      
+      mAr.cov.B.90.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
+                                                                    sub.dir.rename = sub.dir.rename,
+                                                                    fasttree.tool = "FastTree",
+                                                                    calendar.dates = "samplingtimes.all.csv",
+                                                                    simseqfile = "mAr.cov.B.90.IDs.C.Epidemic.Fasta",
+                                                                    count.start = 1977,
+                                                                    endsim = 40,
+                                                                    clust = FALSE)
+      
+      tree.cal.mAr.cov.B.90.IDs <- read.tree(paste0(sub.dir.rename, "/mAr.cov.B.90.IDs.C.Epidemic.Fasta.nwk"))
+      
+      mAr.cov.B.90.IDs.features.phylogenetic <- phylogenetic.features.study1(tree.topo=tree.cal.mAr.cov.B.90.IDs,
+                                                                             tree.calib.LTT = mAr.cov.B.90.IDs.tree.calib,
+                                                                             work.dir = work.dir,
+                                                                             sub.dir.rename = sub.dir.rename,
+                                                                             simpact.trans.net = simpact.trans.net,
+                                                                             fasta.file = "mAr.cov.B.90.IDs.C.Epidemic.Fasta",
+                                                                             tree.file = "mAr.cov.B.90.IDs.C.Epidemic.Fasta.nwk")
+      
+    }else{
+      
+      mAr.cov.B.90.IDs.features.phylogenetic <- rep(NA, length(mAr.cov.B.90.IDs.features.phylogenetic))
+    }
+    
+    
+    ### 13th Scenario: 95 ###
+    ########################
+    
+    mAr.cov.B.95.IDs <- IDs.Seq.Age.Groups(simpact.trans.net = simpact.trans.net,
+                                           limitTransmEvents = 7,
+                                           timewindow = c(10,40),
+                                           seq.cov = 95,
+                                           seq.gender.ratio = 0.3, # within same age group women have 70% of being sampled & men have only 30% 
+                                           age.group.15.25 = c(15,25),
+                                           age.group.25.40 = c(25,40),
+                                           age.group.40.50 = c(40,50))
+    
+    
+    if(length(mAr.cov.B.95.IDs)>=cut.val){
+      
+      choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.fas"),
+                          select.vec = mAr.cov.B.95.IDs, 
+                          name.file = paste0(sub.dir.rename, "/mAr.cov.B.95.IDs.C.Epidemic.Fasta"))
+      
+      
+      mAr.cov.B.95.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
+                                                                    sub.dir.rename = sub.dir.rename,
+                                                                    fasttree.tool = "FastTree",
+                                                                    calendar.dates = "samplingtimes.all.csv",
+                                                                    simseqfile = "mAr.cov.B.95.IDs.C.Epidemic.Fasta",
+                                                                    count.start = 1977,
+                                                                    endsim = 40,
+                                                                    clust = FALSE)
+      
+      tree.cal.mAr.cov.B.95.IDs <- read.tree(paste0(sub.dir.rename, "/mAr.cov.B.95.IDs.C.Epidemic.Fasta.nwk"))
+      
+      mAr.cov.B.95.IDs.features.phylogenetic <- phylogenetic.features.study1(tree.topo=tree.cal.mAr.cov.B.95.IDs,
+                                                                             tree.calib.LTT = mAr.cov.B.95.IDs.tree.calib,
+                                                                             work.dir = work.dir,
+                                                                             sub.dir.rename = sub.dir.rename,
+                                                                             simpact.trans.net = simpact.trans.net,
+                                                                             fasta.file = "mAr.cov.B.95.IDs.C.Epidemic.Fasta",
+                                                                             tree.file = "mAr.cov.B.95.IDs.C.Epidemic.Fasta.nwk")
+      
+    }else{
+      
+      mAr.cov.B.95.IDs.features.phylogenetic <- rep(NA, length(mAr.cov.B.95.IDs.features.phylogenetic))
+    }
+    
+    
+    
+    
+    mAr.B.sim.features.phylogenetic <- c(mAr.cov.B.35.IDs.features.phylogenetic,
+                                         mAr.cov.B.40.IDs.features.phylogenetic,
+                                         mAr.cov.B.45.IDs.features.phylogenetic,
+                                         mAr.cov.B.50.IDs.features.phylogenetic,
+                                         mAr.cov.B.55.IDs.features.phylogenetic,
+                                         mAr.cov.B.60.IDs.features.phylogenetic,
+                                         mAr.cov.B.65.IDs.features.phylogenetic,
+                                         mAr.cov.B.70.IDs.features.phylogenetic,
+                                         mAr.cov.B.75.IDs.features.phylogenetic,
+                                         mAr.cov.B.80.IDs.features.phylogenetic,
+                                         mAr.cov.B.85.IDs.features.phylogenetic,
+                                         mAr.cov.B.95.IDs.features.phylogenetic,
+                                         mAr.cov.B.95.IDs.features.phylogenetic)
+    
+    name.mAr.cov.B.35.IDs.features.phylogenetic <- paste0("mAr.cov.B.35.",names(mAr.cov.B.35.IDs.features.phylogenetic))
+    name.mAr.cov.B.40.IDs.features.phylogenetic <- paste0("mAr.cov.B.40.",names(mAr.cov.B.40.IDs.features.phylogenetic))
+    name.mAr.cov.B.45.IDs.features.phylogenetic <- paste0("mAr.cov.B.45.",names(mAr.cov.B.45.IDs.features.phylogenetic))
+    name.mAr.cov.B.50.IDs.features.phylogenetic <- paste0("mAr.cov.B.50.",names(mAr.cov.B.50.IDs.features.phylogenetic))
+    name.mAr.cov.B.55.IDs.features.phylogenetic <- paste0("mAr.cov.B.55.",names(mAr.cov.B.55.IDs.features.phylogenetic))
+    name.mAr.cov.B.60.IDs.features.phylogenetic <- paste0("mAr.cov.B.60.",names(mAr.cov.B.60.IDs.features.phylogenetic))
+    name.mAr.cov.B.65.IDs.features.phylogenetic <- paste0("mAr.cov.B.65.",names(mAr.cov.B.65.IDs.features.phylogenetic))
+    name.mAr.cov.B.70.IDs.features.phylogenetic <- paste0("mAr.cov.B.70.",names(mAr.cov.B.70.IDs.features.phylogenetic))
+    name.mAr.cov.B.75.IDs.features.phylogenetic <- paste0("mAr.cov.B.75.",names(mAr.cov.B.75.IDs.features.phylogenetic))
+    name.mAr.cov.B.80.IDs.features.phylogenetic <- paste0("mAr.cov.B.80.",names(mAr.cov.B.80.IDs.features.phylogenetic))
+    name.mAr.cov.B.85.IDs.features.phylogenetic <- paste0("mAr.cov.B.85.",names(mAr.cov.B.85.IDs.features.phylogenetic))
+    name.mAr.cov.B.90.IDs.features.phylogenetic <- paste0("mAr.cov.B.90.",names(mAr.cov.B.90.IDs.features.phylogenetic))
+    name.mAr.cov.B.95.IDs.features.phylogenetic <- paste0("mAr.cov.B.95.",names(mAr.cov.B.95.IDs.features.phylogenetic))
+    
+    mAr.B.name.sim.features.phylogenetic <- c(name.mAr.cov.B.35.IDs.features.phylogenetic,
+                                              name.mAr.cov.B.40.IDs.features.phylogenetic,
+                                              name.mAr.cov.B.45.IDs.features.phylogenetic,
+                                              name.mAr.cov.B.50.IDs.features.phylogenetic,
+                                              name.mAr.cov.B.55.IDs.features.phylogenetic,
+                                              name.mAr.cov.B.60.IDs.features.phylogenetic,
+                                              name.mAr.cov.B.65.IDs.features.phylogenetic,
+                                              name.mAr.cov.B.70.IDs.features.phylogenetic,
+                                              name.mAr.cov.B.75.IDs.features.phylogenetic,
+                                              name.mAr.cov.B.80.IDs.features.phylogenetic,
+                                              name.mAr.cov.B.85.IDs.features.phylogenetic,
+                                              name.mAr.cov.B.90.IDs.features.phylogenetic,
+                                              name.mAr.cov.B.95.IDs.features.phylogenetic)
+    
+    names(mAr.B.sim.features.phylogenetic) <- mAr.B.name.sim.features.phylogenetic
+    
+    
+    
+    ### III Men and Women: 50 - 50
+    
+    ### 1st Scenario: 35 ###
+    ########################
+    
+    mAr.cov.C.35.IDs <- IDs.Seq.Age.Groups(simpact.trans.net = simpact.trans.net,
+                                           limitTransmEvents = 7,
+                                           timewindow = c(10,40),
+                                           seq.cov = 35,
+                                           seq.gender.ratio = 0.5, # within same age group women have 70% of being sampled & men have only 30% 
+                                           age.group.15.25 = c(15,25),
+                                           age.group.25.40 = c(25,40),
+                                           age.group.40.50 = c(40,50))
+    
+    
+    if(length(mAr.cov.C.35.IDs)>=cut.val){
+      
+      choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.fas"),
+                          select.vec = mAr.cov.C.35.IDs, 
+                          name.file = paste0(sub.dir.rename, "/mAr.cov.C.35.IDs.C.Epidemic.Fasta"))
+      
+      
+      mAr.cov.C.35.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
+                                                                    sub.dir.rename = sub.dir.rename,
+                                                                    fasttree.tool = "FastTree",
+                                                                    calendar.dates = "samplingtimes.all.csv",
+                                                                    simseqfile = "mAr.cov.C.35.IDs.C.Epidemic.Fasta",
+                                                                    count.start = 1977,
+                                                                    endsim = 40,
+                                                                    clust = FALSE)
+      
+      tree.cal.mAr.cov.C.35.IDs <- read.tree(paste0(sub.dir.rename, "/mAr.cov.C.35.IDs.C.Epidemic.Fasta.nwk"))
+      
+      mAr.cov.C.35.IDs.features.phylogenetic <- phylogenetic.features.study1(tree.topo=tree.cal.mAr.cov.C.35.IDs,
+                                                                             tree.calib.LTT = mAr.cov.C.35.IDs.tree.calib,
+                                                                             work.dir = work.dir,
+                                                                             sub.dir.rename = sub.dir.rename,
+                                                                             simpact.trans.net = simpact.trans.net,
+                                                                             fasta.file = "mAr.cov.C.35.IDs.C.Epidemic.Fasta",
+                                                                             tree.file = "mAr.cov.C.35.IDs.C.Epidemic.Fasta.nwk")
+      
+    }else{
+      
+      mAr.cov.C.35.IDs.features.phylogenetic <- rep(NA, length(mAr.cov.C.35.IDs.features.phylogenetic))
+    }
+    
+    
+    ### 2nd Scenario: 40 ###
+    ########################
+    
+    mAr.cov.C.40.IDs <- IDs.Seq.Age.Groups(simpact.trans.net = simpact.trans.net,
+                                           limitTransmEvents = 7,
+                                           timewindow = c(10,40),
+                                           seq.cov = 40,
+                                           seq.gender.ratio = 0.5, # within same age group women have 70% of being sampled & men have only 30% 
+                                           age.group.15.25 = c(15,25),
+                                           age.group.25.40 = c(25,40),
+                                           age.group.40.50 = c(40,50))
+    
+    
+    if(length(mAr.cov.C.40.IDs)>=cut.val){
+      
+      choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.fas"),
+                          select.vec = mAr.cov.C.40.IDs, 
+                          name.file = paste0(sub.dir.rename, "/mAr.cov.C.40.IDs.C.Epidemic.Fasta"))
+      
+      
+      mAr.cov.C.40.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
+                                                                    sub.dir.rename = sub.dir.rename,
+                                                                    fasttree.tool = "FastTree",
+                                                                    calendar.dates = "samplingtimes.all.csv",
+                                                                    simseqfile = "mAr.cov.C.40.IDs.C.Epidemic.Fasta",
+                                                                    count.start = 1977,
+                                                                    endsim = 40,
+                                                                    clust = FALSE)
+      
+      tree.cal.mAr.cov.C.40.IDs <- read.tree(paste0(sub.dir.rename, "/mAr.cov.C.40.IDs.C.Epidemic.Fasta.nwk"))
+      
+      mAr.cov.C.40.IDs.features.phylogenetic <- phylogenetic.features.study1(tree.topo=tree.cal.mAr.cov.C.40.IDs,
+                                                                             tree.calib.LTT = mAr.cov.C.40.IDs.tree.calib,
+                                                                             work.dir = work.dir,
+                                                                             sub.dir.rename = sub.dir.rename,
+                                                                             simpact.trans.net = simpact.trans.net,
+                                                                             fasta.file = "mAr.cov.C.40.IDs.C.Epidemic.Fasta",
+                                                                             tree.file = "mAr.cov.C.40.IDs.C.Epidemic.Fasta.nwk")
+      
+    }else{
+      
+      mAr.cov.C.40.IDs.features.phylogenetic <- rep(NA, length(mAr.cov.C.40.IDs.features.phylogenetic))
+    }
+    
+    
+    ### 3rd Scenario: 45 ###
+    ########################
+    
+    mAr.cov.C.45.IDs <- IDs.Seq.Age.Groups(simpact.trans.net = simpact.trans.net,
+                                           limitTransmEvents = 7,
+                                           timewindow = c(10,40),
+                                           seq.cov = 45,
+                                           seq.gender.ratio = 0.5, # within same age group women have 70% of being sampled & men have only 30% 
+                                           age.group.15.25 = c(15,25),
+                                           age.group.25.40 = c(25,40),
+                                           age.group.40.50 = c(40,50))
+    
+    
+    if(length(mAr.cov.C.45.IDs)>=cut.val){
+      
+      choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.fas"),
+                          select.vec = mAr.cov.C.45.IDs, 
+                          name.file = paste0(sub.dir.rename, "/mAr.cov.C.45.IDs.C.Epidemic.Fasta"))
+      
+      
+      mAr.cov.C.45.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
+                                                                    sub.dir.rename = sub.dir.rename,
+                                                                    fasttree.tool = "FastTree",
+                                                                    calendar.dates = "samplingtimes.all.csv",
+                                                                    simseqfile = "mAr.cov.C.45.IDs.C.Epidemic.Fasta",
+                                                                    count.start = 1977,
+                                                                    endsim = 40,
+                                                                    clust = FALSE)
+      
+      tree.cal.mAr.cov.C.45.IDs <- read.tree(paste0(sub.dir.rename, "/mAr.cov.C.45.IDs.C.Epidemic.Fasta.nwk"))
+      
+      mAr.cov.C.45.IDs.features.phylogenetic <- phylogenetic.features.study1(tree.topo=tree.cal.mAr.cov.C.45.IDs,
+                                                                             tree.calib.LTT = mAr.cov.C.45.IDs.tree.calib,
+                                                                             work.dir = work.dir,
+                                                                             sub.dir.rename = sub.dir.rename,
+                                                                             simpact.trans.net = simpact.trans.net,
+                                                                             fasta.file = "mAr.cov.C.45.IDs.C.Epidemic.Fasta",
+                                                                             tree.file = "mAr.cov.C.45.IDs.C.Epidemic.Fasta.nwk")
+      
+    }else{
+      
+      mAr.cov.C.45.IDs.features.phylogenetic <- rep(NA, length(mAr.cov.C.45.IDs.features.phylogenetic))
+    }
+    
+    
+    ### 4th Scenario: 50 ###
+    ########################
+    
+    mAr.cov.C.50.IDs <- IDs.Seq.Age.Groups(simpact.trans.net = simpact.trans.net,
+                                           limitTransmEvents = 7,
+                                           timewindow = c(10,40),
+                                           seq.cov = 50,
+                                           seq.gender.ratio = 0.5, # within same age group women have 70% of being sampled & men have only 30% 
+                                           age.group.15.25 = c(15,25),
+                                           age.group.25.40 = c(25,40),
+                                           age.group.40.50 = c(40,50))
+    
+    
+    if(length(mAr.cov.C.50.IDs)>=cut.val){
+      
+      choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.fas"),
+                          select.vec = mAr.cov.C.50.IDs, 
+                          name.file = paste0(sub.dir.rename, "/mAr.cov.C.50.IDs.C.Epidemic.Fasta"))
+      
+      
+      mAr.cov.C.50.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
+                                                                    sub.dir.rename = sub.dir.rename,
+                                                                    fasttree.tool = "FastTree",
+                                                                    calendar.dates = "samplingtimes.all.csv",
+                                                                    simseqfile = "mAr.cov.C.50.IDs.C.Epidemic.Fasta",
+                                                                    count.start = 1977,
+                                                                    endsim = 40,
+                                                                    clust = FALSE)
+      
+      tree.cal.mAr.cov.C.50.IDs <- read.tree(paste0(sub.dir.rename, "/mAr.cov.C.50.IDs.C.Epidemic.Fasta.nwk"))
+      
+      mAr.cov.C.50.IDs.features.phylogenetic <- phylogenetic.features.study1(tree.topo=tree.cal.mAr.cov.C.50.IDs,
+                                                                             tree.calib.LTT = mAr.cov.C.50.IDs.tree.calib,
+                                                                             work.dir = work.dir,
+                                                                             sub.dir.rename = sub.dir.rename,
+                                                                             simpact.trans.net = simpact.trans.net,
+                                                                             fasta.file = "mAr.cov.C.50.IDs.C.Epidemic.Fasta",
+                                                                             tree.file = "mAr.cov.C.50.IDs.C.Epidemic.Fasta.nwk")
+      
+    }else{
+      
+      mAr.cov.C.50.IDs.features.phylogenetic <- rep(NA, length(mAr.cov.C.50.IDs.features.phylogenetic))
+    }
+    
+    
+    ### 5th Scenario: 55 ###
+    ########################
+    
+    mAr.cov.C.55.IDs <- IDs.Seq.Age.Groups(simpact.trans.net = simpact.trans.net,
+                                           limitTransmEvents = 7,
+                                           timewindow = c(10,40),
+                                           seq.cov = 55,
+                                           seq.gender.ratio = 0.5, # within same age group women have 70% of being sampled & men have only 30% 
+                                           age.group.15.25 = c(15,25),
+                                           age.group.25.40 = c(25,40),
+                                           age.group.40.50 = c(40,50))
+    
+    
+    if(length(mAr.cov.C.55.IDs)>=cut.val){
+      
+      choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.fas"),
+                          select.vec = mAr.cov.C.55.IDs, 
+                          name.file = paste0(sub.dir.rename, "/mAr.cov.C.55.IDs.C.Epidemic.Fasta"))
+      
+      
+      mAr.cov.C.55.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
+                                                                    sub.dir.rename = sub.dir.rename,
+                                                                    fasttree.tool = "FastTree",
+                                                                    calendar.dates = "samplingtimes.all.csv",
+                                                                    simseqfile = "mAr.cov.C.55.IDs.C.Epidemic.Fasta",
+                                                                    count.start = 1977,
+                                                                    endsim = 40,
+                                                                    clust = FALSE)
+      
+      tree.cal.mAr.cov.C.55.IDs <- read.tree(paste0(sub.dir.rename, "/mAr.cov.C.55.IDs.C.Epidemic.Fasta.nwk"))
+      
+      mAr.cov.C.55.IDs.features.phylogenetic <- phylogenetic.features.study1(tree.topo=tree.cal.mAr.cov.C.55.IDs,
+                                                                             tree.calib.LTT = mAr.cov.C.55.IDs.tree.calib,
+                                                                             work.dir = work.dir,
+                                                                             sub.dir.rename = sub.dir.rename,
+                                                                             simpact.trans.net = simpact.trans.net,
+                                                                             fasta.file = "mAr.cov.C.55.IDs.C.Epidemic.Fasta",
+                                                                             tree.file = "mAr.cov.C.55.IDs.C.Epidemic.Fasta.nwk")
+      
+    }else{
+      
+      mAr.cov.C.55.IDs.features.phylogenetic <- rep(NA, length(mAr.cov.C.55.IDs.features.phylogenetic))
+    }
+    
+    
+    ### 6th Scenario: 60 ###
+    ########################
+    
+    mAr.cov.C.60.IDs <- IDs.Seq.Age.Groups(simpact.trans.net = simpact.trans.net,
+                                           limitTransmEvents = 7,
+                                           timewindow = c(10,40),
+                                           seq.cov = 60,
+                                           seq.gender.ratio = 0.5, # within same age group women have 70% of being sampled & men have only 30% 
+                                           age.group.15.25 = c(15,25),
+                                           age.group.25.40 = c(25,40),
+                                           age.group.40.50 = c(40,50))
+    
+    
+    if(length(mAr.cov.C.60.IDs)>=cut.val){
+      
+      choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.fas"),
+                          select.vec = mAr.cov.C.60.IDs, 
+                          name.file = paste0(sub.dir.rename, "/mAr.cov.C.60.IDs.C.Epidemic.Fasta"))
+      
+      
+      mAr.cov.C.60.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
+                                                                    sub.dir.rename = sub.dir.rename,
+                                                                    fasttree.tool = "FastTree",
+                                                                    calendar.dates = "samplingtimes.all.csv",
+                                                                    simseqfile = "mAr.cov.C.60.IDs.C.Epidemic.Fasta",
+                                                                    count.start = 1977,
+                                                                    endsim = 40,
+                                                                    clust = FALSE)
+      
+      tree.cal.mAr.cov.C.60.IDs <- read.tree(paste0(sub.dir.rename, "/mAr.cov.C.60.IDs.C.Epidemic.Fasta.nwk"))
+      
+      mAr.cov.C.60.IDs.features.phylogenetic <- phylogenetic.features.study1(tree.topo=tree.cal.mAr.cov.C.60.IDs,
+                                                                             tree.calib.LTT = mAr.cov.C.60.IDs.tree.calib,
+                                                                             work.dir = work.dir,
+                                                                             sub.dir.rename = sub.dir.rename,
+                                                                             simpact.trans.net = simpact.trans.net,
+                                                                             fasta.file = "mAr.cov.C.60.IDs.C.Epidemic.Fasta",
+                                                                             tree.file = "mAr.cov.C.60.IDs.C.Epidemic.Fasta.nwk")
+      
+    }else{
+      
+      mAr.cov.C.60.IDs.features.phylogenetic <- rep(NA, length(mAr.cov.C.60.IDs.features.phylogenetic))
+    }
+    
+    
+    ### 7th Scenario: 65 ###
+    ########################
+    
+    mAr.cov.C.65.IDs <- IDs.Seq.Age.Groups(simpact.trans.net = simpact.trans.net,
+                                           limitTransmEvents = 7,
+                                           timewindow = c(10,40),
+                                           seq.cov = 65,
+                                           seq.gender.ratio = 0.5, # within same age group women have 70% of being sampled & men have only 30% 
+                                           age.group.15.25 = c(15,25),
+                                           age.group.25.40 = c(25,40),
+                                           age.group.40.50 = c(40,50))
+    
+    
+    if(length(mAr.cov.C.65.IDs)>=cut.val){
+      
+      choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.fas"),
+                          select.vec = mAr.cov.C.65.IDs, 
+                          name.file = paste0(sub.dir.rename, "/mAr.cov.C.65.IDs.C.Epidemic.Fasta"))
+      
+      
+      mAr.cov.C.65.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
+                                                                    sub.dir.rename = sub.dir.rename,
+                                                                    fasttree.tool = "FastTree",
+                                                                    calendar.dates = "samplingtimes.all.csv",
+                                                                    simseqfile = "mAr.cov.C.65.IDs.C.Epidemic.Fasta",
+                                                                    count.start = 1977,
+                                                                    endsim = 40,
+                                                                    clust = FALSE)
+      
+      tree.cal.mAr.cov.C.65.IDs <- read.tree(paste0(sub.dir.rename, "/mAr.cov.C.65.IDs.C.Epidemic.Fasta.nwk"))
+      
+      mAr.cov.C.65.IDs.features.phylogenetic <- phylogenetic.features.study1(tree.topo=tree.cal.mAr.cov.C.65.IDs,
+                                                                             tree.calib.LTT = mAr.cov.C.65.IDs.tree.calib,
+                                                                             work.dir = work.dir,
+                                                                             sub.dir.rename = sub.dir.rename,
+                                                                             simpact.trans.net = simpact.trans.net,
+                                                                             fasta.file = "mAr.cov.C.65.IDs.C.Epidemic.Fasta",
+                                                                             tree.file = "mAr.cov.C.65.IDs.C.Epidemic.Fasta.nwk")
+      
+    }else{
+      
+      mAr.cov.C.65.IDs.features.phylogenetic <- rep(NA, length(mAr.cov.C.65.IDs.features.phylogenetic))
+    }
+    
+    
+    ### 8th Scenario: 70 ###
+    ########################
+    
+    mAr.cov.C.70.IDs <- IDs.Seq.Age.Groups(simpact.trans.net = simpact.trans.net,
+                                           limitTransmEvents = 7,
+                                           timewindow = c(10,40),
+                                           seq.cov = 70,
+                                           seq.gender.ratio = 0.5, # within same age group women have 70% of being sampled & men have only 30% 
+                                           age.group.15.25 = c(15,25),
+                                           age.group.25.40 = c(25,40),
+                                           age.group.40.50 = c(40,50))
+    
+    
+    if(length(mAr.cov.C.70.IDs)>=cut.val){
+      
+      choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.fas"),
+                          select.vec = mAr.cov.C.70.IDs, 
+                          name.file = paste0(sub.dir.rename, "/mAr.cov.C.70.IDs.C.Epidemic.Fasta"))
+      
+      
+      mAr.cov.C.70.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
+                                                                    sub.dir.rename = sub.dir.rename,
+                                                                    fasttree.tool = "FastTree",
+                                                                    calendar.dates = "samplingtimes.all.csv",
+                                                                    simseqfile = "mAr.cov.C.70.IDs.C.Epidemic.Fasta",
+                                                                    count.start = 1977,
+                                                                    endsim = 40,
+                                                                    clust = FALSE)
+      
+      tree.cal.mAr.cov.C.70.IDs <- read.tree(paste0(sub.dir.rename, "/mAr.cov.C.70.IDs.C.Epidemic.Fasta.nwk"))
+      
+      mAr.cov.C.70.IDs.features.phylogenetic <- phylogenetic.features.study1(tree.topo=tree.cal.mAr.cov.C.70.IDs,
+                                                                             tree.calib.LTT = mAr.cov.C.70.IDs.tree.calib,
+                                                                             work.dir = work.dir,
+                                                                             sub.dir.rename = sub.dir.rename,
+                                                                             simpact.trans.net = simpact.trans.net,
+                                                                             fasta.file = "mAr.cov.C.70.IDs.C.Epidemic.Fasta",
+                                                                             tree.file = "mAr.cov.C.70.IDs.C.Epidemic.Fasta.nwk")
+      
+    }else{
+      
+      mAr.cov.C.70.IDs.features.phylogenetic <- rep(NA, length(mAr.cov.C.70.IDs.features.phylogenetic))
+    }
+    
+    
+    ### 9th Scenario: 75 ###
+    ########################
+    
+    mAr.cov.C.75.IDs <- IDs.Seq.Age.Groups(simpact.trans.net = simpact.trans.net,
+                                           limitTransmEvents = 7,
+                                           timewindow = c(10,40),
+                                           seq.cov = 75,
+                                           seq.gender.ratio = 0.5, # within same age group women have 70% of being sampled & men have only 30% 
+                                           age.group.15.25 = c(15,25),
+                                           age.group.25.40 = c(25,40),
+                                           age.group.40.50 = c(40,50))
+    
+    
+    if(length(mAr.cov.C.75.IDs)>=cut.val){
+      
+      choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.fas"),
+                          select.vec = mAr.cov.C.75.IDs, 
+                          name.file = paste0(sub.dir.rename, "/mAr.cov.C.75.IDs.C.Epidemic.Fasta"))
+      
+      
+      mAr.cov.C.75.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
+                                                                    sub.dir.rename = sub.dir.rename,
+                                                                    fasttree.tool = "FastTree",
+                                                                    calendar.dates = "samplingtimes.all.csv",
+                                                                    simseqfile = "mAr.cov.C.75.IDs.C.Epidemic.Fasta",
+                                                                    count.start = 1977,
+                                                                    endsim = 40,
+                                                                    clust = FALSE)
+      
+      tree.cal.mAr.cov.C.75.IDs <- read.tree(paste0(sub.dir.rename, "/mAr.cov.C.75.IDs.C.Epidemic.Fasta.nwk"))
+      
+      mAr.cov.C.75.IDs.features.phylogenetic <- phylogenetic.features.study1(tree.topo=tree.cal.mAr.cov.C.75.IDs,
+                                                                             tree.calib.LTT = mAr.cov.C.75.IDs.tree.calib,
+                                                                             work.dir = work.dir,
+                                                                             sub.dir.rename = sub.dir.rename,
+                                                                             simpact.trans.net = simpact.trans.net,
+                                                                             fasta.file = "mAr.cov.C.75.IDs.C.Epidemic.Fasta",
+                                                                             tree.file = "mAr.cov.C.75.IDs.C.Epidemic.Fasta.nwk")
+      
+    }else{
+      
+      mAr.cov.C.75.IDs.features.phylogenetic <- rep(NA, length(mAr.cov.C.75.IDs.features.phylogenetic))
+    }
+    
+    
+    ### 10th Scenario: 80 ###
+    ########################
+    
+    mAr.cov.C.80.IDs <- IDs.Seq.Age.Groups(simpact.trans.net = simpact.trans.net,
+                                           limitTransmEvents = 7,
+                                           timewindow = c(10,40),
+                                           seq.cov = 80,
+                                           seq.gender.ratio = 0.5, # within same age group women have 70% of being sampled & men have only 30% 
+                                           age.group.15.25 = c(15,25),
+                                           age.group.25.40 = c(25,40),
+                                           age.group.40.50 = c(40,50))
+    
+    
+    if(length(mAr.cov.C.80.IDs)>=cut.val){
+      
+      choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.fas"),
+                          select.vec = mAr.cov.C.80.IDs, 
+                          name.file = paste0(sub.dir.rename, "/mAr.cov.C.80.IDs.C.Epidemic.Fasta"))
+      
+      
+      mAr.cov.C.80.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
+                                                                    sub.dir.rename = sub.dir.rename,
+                                                                    fasttree.tool = "FastTree",
+                                                                    calendar.dates = "samplingtimes.all.csv",
+                                                                    simseqfile = "mAr.cov.C.80.IDs.C.Epidemic.Fasta",
+                                                                    count.start = 1977,
+                                                                    endsim = 40,
+                                                                    clust = FALSE)
+      
+      tree.cal.mAr.cov.C.80.IDs <- read.tree(paste0(sub.dir.rename, "/mAr.cov.C.80.IDs.C.Epidemic.Fasta.nwk"))
+      
+      mAr.cov.C.80.IDs.features.phylogenetic <- phylogenetic.features.study1(tree.topo=tree.cal.mAr.cov.C.80.IDs,
+                                                                             tree.calib.LTT = mAr.cov.C.80.IDs.tree.calib,
+                                                                             work.dir = work.dir,
+                                                                             sub.dir.rename = sub.dir.rename,
+                                                                             simpact.trans.net = simpact.trans.net,
+                                                                             fasta.file = "mAr.cov.C.80.IDs.C.Epidemic.Fasta",
+                                                                             tree.file = "mAr.cov.C.80.IDs.C.Epidemic.Fasta.nwk")
+      
+    }else{
+      
+      mAr.cov.C.80.IDs.features.phylogenetic <- rep(NA, length(mAr.cov.C.80.IDs.features.phylogenetic))
+    }
+    
+    
+    ### 11th Scenario: 85 ###
+    ########################
+    
+    mAr.cov.C.85.IDs <- IDs.Seq.Age.Groups(simpact.trans.net = simpact.trans.net,
+                                           limitTransmEvents = 7,
+                                           timewindow = c(10,40),
+                                           seq.cov = 85,
+                                           seq.gender.ratio = 0.5, # within same age group women have 70% of being sampled & men have only 30% 
+                                           age.group.15.25 = c(15,25),
+                                           age.group.25.40 = c(25,40),
+                                           age.group.40.50 = c(40,50))
+    
+    
+    if(length(mAr.cov.C.85.IDs)>=cut.val){
+      
+      choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.fas"),
+                          select.vec = mAr.cov.C.85.IDs, 
+                          name.file = paste0(sub.dir.rename, "/mAr.cov.C.85.IDs.C.Epidemic.Fasta"))
+      
+      
+      mAr.cov.C.85.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
+                                                                    sub.dir.rename = sub.dir.rename,
+                                                                    fasttree.tool = "FastTree",
+                                                                    calendar.dates = "samplingtimes.all.csv",
+                                                                    simseqfile = "mAr.cov.C.85.IDs.C.Epidemic.Fasta",
+                                                                    count.start = 1977,
+                                                                    endsim = 40,
+                                                                    clust = FALSE)
+      
+      tree.cal.mAr.cov.C.85.IDs <- read.tree(paste0(sub.dir.rename, "/mAr.cov.C.85.IDs.C.Epidemic.Fasta.nwk"))
+      
+      mAr.cov.C.85.IDs.features.phylogenetic <- phylogenetic.features.study1(tree.topo=tree.cal.mAr.cov.C.85.IDs,
+                                                                             tree.calib.LTT = mAr.cov.C.85.IDs.tree.calib,
+                                                                             work.dir = work.dir,
+                                                                             sub.dir.rename = sub.dir.rename,
+                                                                             simpact.trans.net = simpact.trans.net,
+                                                                             fasta.file = "mAr.cov.C.85.IDs.C.Epidemic.Fasta",
+                                                                             tree.file = "mAr.cov.C.85.IDs.C.Epidemic.Fasta.nwk")
+      
+    }else{
+      
+      mAr.cov.C.85.IDs.features.phylogenetic <- rep(NA, length(mAr.cov.C.85.IDs.features.phylogenetic))
+    }
+    
+    
+    ### 12th Scenario: 90 ###
+    ########################
+    
+    mAr.cov.C.90.IDs <- IDs.Seq.Age.Groups(simpact.trans.net = simpact.trans.net,
+                                           limitTransmEvents = 7,
+                                           timewindow = c(10,40),
+                                           seq.cov = 90,
+                                           seq.gender.ratio = 0.5, # within same age group women have 70% of being sampled & men have only 30% 
+                                           age.group.15.25 = c(15,25),
+                                           age.group.25.40 = c(25,40),
+                                           age.group.40.50 = c(40,50))
+    
+    
+    if(length(mAr.cov.C.90.IDs)>=cut.val){
+      
+      choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.fas"),
+                          select.vec = mAr.cov.C.90.IDs, 
+                          name.file = paste0(sub.dir.rename, "/mAr.cov.C.90.IDs.C.Epidemic.Fasta"))
+      
+      
+      mAr.cov.C.90.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
+                                                                    sub.dir.rename = sub.dir.rename,
+                                                                    fasttree.tool = "FastTree",
+                                                                    calendar.dates = "samplingtimes.all.csv",
+                                                                    simseqfile = "mAr.cov.C.90.IDs.C.Epidemic.Fasta",
+                                                                    count.start = 1977,
+                                                                    endsim = 40,
+                                                                    clust = FALSE)
+      
+      tree.cal.mAr.cov.C.90.IDs <- read.tree(paste0(sub.dir.rename, "/mAr.cov.C.90.IDs.C.Epidemic.Fasta.nwk"))
+      
+      mAr.cov.C.90.IDs.features.phylogenetic <- phylogenetic.features.study1(tree.topo=tree.cal.mAr.cov.C.90.IDs,
+                                                                             tree.calib.LTT = mAr.cov.C.90.IDs.tree.calib,
+                                                                             work.dir = work.dir,
+                                                                             sub.dir.rename = sub.dir.rename,
+                                                                             simpact.trans.net = simpact.trans.net,
+                                                                             fasta.file = "mAr.cov.C.90.IDs.C.Epidemic.Fasta",
+                                                                             tree.file = "mAr.cov.C.90.IDs.C.Epidemic.Fasta.nwk")
+      
+    }else{
+      
+      mAr.cov.C.90.IDs.features.phylogenetic <- rep(NA, length(mAr.cov.C.90.IDs.features.phylogenetic))
+    }
+    
+    
+    ### 13th Scenario: 95 ###
+    ########################
+    
+    mAr.cov.C.95.IDs <- IDs.Seq.Age.Groups(simpact.trans.net = simpact.trans.net,
+                                           limitTransmEvents = 7,
+                                           timewindow = c(10,40),
+                                           seq.cov = 95,
+                                           seq.gender.ratio = 0.5, # within same age group women have 70% of being sampled & men have only 30% 
+                                           age.group.15.25 = c(15,25),
+                                           age.group.25.40 = c(25,40),
+                                           age.group.40.50 = c(40,50))
+    
+    
+    if(length(mAr.cov.C.95.IDs)>=cut.val){
+      
+      choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.fas"),
+                          select.vec = mAr.cov.C.95.IDs, 
+                          name.file = paste0(sub.dir.rename, "/mAr.cov.C.95.IDs.C.Epidemic.Fasta"))
+      
+      
+      mAr.cov.C.95.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
+                                                                    sub.dir.rename = sub.dir.rename,
+                                                                    fasttree.tool = "FastTree",
+                                                                    calendar.dates = "samplingtimes.all.csv",
+                                                                    simseqfile = "mAr.cov.C.95.IDs.C.Epidemic.Fasta",
+                                                                    count.start = 1977,
+                                                                    endsim = 40,
+                                                                    clust = FALSE)
+      
+      tree.cal.mAr.cov.C.95.IDs <- read.tree(paste0(sub.dir.rename, "/mAr.cov.C.95.IDs.C.Epidemic.Fasta.nwk"))
+      
+      mAr.cov.C.95.IDs.features.phylogenetic <- phylogenetic.features.study1(tree.topo=tree.cal.mAr.cov.C.95.IDs,
+                                                                             tree.calib.LTT = mAr.cov.C.95.IDs.tree.calib,
+                                                                             work.dir = work.dir,
+                                                                             sub.dir.rename = sub.dir.rename,
+                                                                             simpact.trans.net = simpact.trans.net,
+                                                                             fasta.file = "mAr.cov.C.95.IDs.C.Epidemic.Fasta",
+                                                                             tree.file = "mAr.cov.C.95.IDs.C.Epidemic.Fasta.nwk")
+      
+    }else{
+      
+      mAr.cov.C.95.IDs.features.phylogenetic <- rep(NA, length(mAr.cov.C.95.IDs.features.phylogenetic))
+    }
+    
+      
+    
+    
+    mAr.C.sim.features.phylogenetic <- c(mAr.cov.C.35.IDs.features.phylogenetic,
+                                         mAr.cov.C.40.IDs.features.phylogenetic,
+                                         mAr.cov.C.45.IDs.features.phylogenetic,
+                                         mAr.cov.C.50.IDs.features.phylogenetic,
+                                         mAr.cov.C.55.IDs.features.phylogenetic,
+                                         mAr.cov.C.60.IDs.features.phylogenetic,
+                                         mAr.cov.C.65.IDs.features.phylogenetic,
+                                         mAr.cov.C.70.IDs.features.phylogenetic,
+                                         mAr.cov.C.75.IDs.features.phylogenetic,
+                                         mAr.cov.C.80.IDs.features.phylogenetic,
+                                         mAr.cov.C.85.IDs.features.phylogenetic,
+                                         mAr.cov.C.95.IDs.features.phylogenetic,
+                                         mAr.cov.C.95.IDs.features.phylogenetic)
+    
+    name.mAr.cov.C.35.IDs.features.phylogenetic <- paste0("mAr.cov.C.35.",names(mAr.cov.C.35.IDs.features.phylogenetic))
+    name.mAr.cov.C.40.IDs.features.phylogenetic <- paste0("mAr.cov.C.40.",names(mAr.cov.C.40.IDs.features.phylogenetic))
+    name.mAr.cov.C.45.IDs.features.phylogenetic <- paste0("mAr.cov.C.45.",names(mAr.cov.C.45.IDs.features.phylogenetic))
+    name.mAr.cov.C.50.IDs.features.phylogenetic <- paste0("mAr.cov.C.50.",names(mAr.cov.C.50.IDs.features.phylogenetic))
+    name.mAr.cov.C.55.IDs.features.phylogenetic <- paste0("mAr.cov.C.55.",names(mAr.cov.C.55.IDs.features.phylogenetic))
+    name.mAr.cov.C.60.IDs.features.phylogenetic <- paste0("mAr.cov.C.60.",names(mAr.cov.C.60.IDs.features.phylogenetic))
+    name.mAr.cov.C.65.IDs.features.phylogenetic <- paste0("mAr.cov.C.65.",names(mAr.cov.C.65.IDs.features.phylogenetic))
+    name.mAr.cov.C.70.IDs.features.phylogenetic <- paste0("mAr.cov.C.70.",names(mAr.cov.C.70.IDs.features.phylogenetic))
+    name.mAr.cov.C.75.IDs.features.phylogenetic <- paste0("mAr.cov.C.75.",names(mAr.cov.C.75.IDs.features.phylogenetic))
+    name.mAr.cov.C.80.IDs.features.phylogenetic <- paste0("mAr.cov.C.80.",names(mAr.cov.C.80.IDs.features.phylogenetic))
+    name.mAr.cov.C.85.IDs.features.phylogenetic <- paste0("mAr.cov.C.85.",names(mAr.cov.C.85.IDs.features.phylogenetic))
+    name.mAr.cov.C.90.IDs.features.phylogenetic <- paste0("mAr.cov.C.90.",names(mAr.cov.C.90.IDs.features.phylogenetic))
+    name.mAr.cov.C.95.IDs.features.phylogenetic <- paste0("mAr.cov.C.95.",names(mAr.cov.C.95.IDs.features.phylogenetic))
+    
+    mAr.C.name.sim.features.phylogenetic <- c(name.mAr.cov.C.35.IDs.features.phylogenetic,
+                                              name.mAr.cov.C.40.IDs.features.phylogenetic,
+                                              name.mAr.cov.C.45.IDs.features.phylogenetic,
+                                              name.mAr.cov.C.50.IDs.features.phylogenetic,
+                                              name.mAr.cov.C.55.IDs.features.phylogenetic,
+                                              name.mAr.cov.C.60.IDs.features.phylogenetic,
+                                              name.mAr.cov.C.65.IDs.features.phylogenetic,
+                                              name.mAr.cov.C.70.IDs.features.phylogenetic,
+                                              name.mAr.cov.C.75.IDs.features.phylogenetic,
+                                              name.mAr.cov.C.80.IDs.features.phylogenetic,
+                                              name.mAr.cov.C.85.IDs.features.phylogenetic,
+                                              name.mAr.cov.C.90.IDs.features.phylogenetic,
+                                              name.mAr.cov.C.95.IDs.features.phylogenetic)
+    
+    names(mAr.C.sim.features.phylogenetic) <- mAr.C.name.sim.features.phylogenetic
+    
+    
     
     
     
@@ -1791,10 +3094,18 @@ wrapper.master.phylo.simpact.study.1 <- function(inputvector = input.vector){
     sim.features.phylogenetic <- rep(NA, 13*30)
     
     mAr.sim.features.phylogenetic <- rep(NA, 13*30)
+    
+    mAr.B.sim.features.phylogenetic <- rep(NA, 13*30)
+    
+    mAr.C.sim.features.phylogenetic <- rep(NA, 13*30)
+    
+    
   }
   #     c(name.epid.metrics, name.true.features.classic, name.true.features.phylogenetic)
   
-  epi.metrics.features <- c(epid.metrics, true.features.classic, sim.features.phylogenetic, mAr.sim.features.phylogenetic)
+  epi.metrics.features <- c(epid.metrics, true.features.classic, sim.features.phylogenetic,
+                            mAr.sim.features.phylogenetic, mAr.B.sim.features.phylogenetic,
+                            mAr.C.sim.features.phylogenetic)
   
   return(epi.metrics.features)
   
