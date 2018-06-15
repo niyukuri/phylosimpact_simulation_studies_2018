@@ -78,14 +78,22 @@ wrapper.test.study.1 <- function(inputvector){
   # ###################
   #
   
+  inputvector <- c(-0.52, -0.05, 2.8, 0, 3, 0.25, -0.3, -0.1, 0.2,
+                   -1, -90, 0.5, 0.05, -0.14, 5, 7, 12, -2.7)
+  
   cfg.list["hivtransmission.param.a"] <- inputvector[11] # [10] # -1 c("unif", -2, 0)
   cfg.list["hivtransmission.param.b"] <- inputvector[12] # [11] # -90 c("unif", -100, -80)
   cfg.list["hivtransmission.param.c"] <- inputvector[13] # [12] # 0.5 c("unif", 0, 1)
   cfg.list["hivtransmission.param.f1"] <- inputvector[14] # [13] # 0.04879016 c("unif", 0, 0.5)
   cfg.list["hivtransmission.param.f2"] <- inputvector[15] # [14] # -0.1386294 c("unif", -0.5, 0)
+
+  # Disease progression > may be remove in parameter to estimates
+  
   cfg.list["person.vsp.toacute.x"] <- inputvector[16] # [15] # 5 c("unif", 3, 7)
   cfg.list["person.vsp.toaids.x"] <- inputvector[17] # [16] # 7 c("unif", 5, 9)
   cfg.list["person.vsp.tofinalaids.x"] <- inputvector[18] # [17] # 12 c("unif", 10, 14)
+  
+  
   #
   # # Demographic
   # ##############
@@ -274,3 +282,72 @@ wrapper.test.study.1 <- function(inputvector){
 # 
 # inputvector <- c(124,d$x)
 # f <- wrapper.test.study.1(inputvector = inputvector)
+
+
+df <- agemixing.trans.df(trans.network = trans.network,
+                         limitTransmEvents = 7)
+
+
+datatable <- df
+
+datatable.men <- datatable
+datatable.men$AgeInfecDon <- datatable.men$AgeInfecDon-15
+
+men.lmer <- lmer(AgeInfecDon ~ AgeInfecRec + (1 | DonId),
+                 data = dplyr::filter(datatable, GenderDon =="0"),
+                 REML = TRUE,
+                 control=lmerControl(check.nobs.vs.nlev = "ignore",
+                                     check.nobs.vs.rankZ = "ignore",
+                                     check.nobs.vs.nRE="ignore"))
+
+coef.men <- coef(men.lmer)$DonId
+
+coef.men.fix <- coef(summary(men.lmer))[, "Estimate"]
+
+# data.men <- dplyr::filter(datatable, GenderDon =="0")
+
+g.men <- ggplot(datatable.men, aes(AgeInfecDon, AgeInfecRec))
+
+# Scatterplot
+g.men + geom_point() + 
+  geom_abline(slope = coef.men.fix[[2]], intercept = coef.men.fix[[1]], color="red") +
+  labs(subtitle="Heterosexual transmission: men to women", 
+       y="AgeInfecDon: Men", 
+       x="AgeInfecRec: Women", 
+       title="Age mixing in transmission")#, 
+#caption="Source: midwest")
+
+
+datatable.women <- datatable
+datatable.women$AgeInfecDon <- datatable.women$AgeInfecDon-15
+
+women.lmer <- lmer(AgeInfecDon ~ AgeInfecRec + (1 | DonId),
+                   data = dplyr::filter(datatable, GenderDon =="1"),
+                   REML = TRUE,
+                   control=lmerControl(check.nobs.vs.nlev = "ignore",
+                                       check.nobs.vs.rankZ = "ignore",
+                                       check.nobs.vs.nRE="ignore"))
+
+# data.women <- dplyr::filter(datatable, GenderDon =="1")
+
+g.women <- ggplot(datatable.women, aes(AgeInfecDon, AgeInfecRec))
+
+# Scatterplot
+g.women + geom_point() + 
+  geom_smooth(method="lm", se=F) +
+  labs(subtitle="Heterosexual transmission: women to men", 
+       y="AgeInfecDon: Women", 
+       x="AgeInfecRec: Men", 
+       title="Age mixing in transmission")#, 
+#caption="Source: midwest")
+
+
+# # Scatterplot
+# g.men + geom_point() + 
+#   geom_smooth(method="lm", se=F) +
+#   labs(subtitle="Heterosexual transmission: men to women", 
+#        y="AgeInfecDon: Men", 
+#        x="AgeInfecRec: Women", 
+#        title="Age mixing in transmission")#, 
+# #caption="Source: midwest")
+
