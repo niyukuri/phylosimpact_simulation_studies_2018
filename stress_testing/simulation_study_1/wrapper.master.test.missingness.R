@@ -251,6 +251,8 @@ wrapper.master.phylo.simpact.study.1 <- function(inputvector = input.vector){
   
   
   
+  
+  
   age.distr <- agedistr.creator(shape = 5, scale = 65)
   #
   cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
@@ -433,7 +435,6 @@ wrapper.master.phylo.simpact.study.1 <- function(inputvector = input.vector){
   }
   
   sub.dir.rename <- paste0(work.dir,"/temp/",generate.filename(10))
-  
   
   # Run Simpact
   ##############
@@ -3124,10 +3125,10 @@ wrapper.master.phylo.simpact.study.1 <- function(inputvector = input.vector){
 # 
 # test.all <- wrapper.phylo.simpact.study.1(inputvector = inputvector) # L = 437
 
-inputvector <- c(1.05, 0.25, 0, 3, 0.23, 0.23, 45, 45, -0.7, 2.8,
-                 -0.3, -0.3,
-                 -2.7, # conception
-                 -0.52, -0.05)
+inputvector <- c(-0.52, -0.05, 2.8, 0, 3, 0.25, -0.3, -0.1, 0.2,
+                 -1, -90, 0.5, 0.05, -0.14, 5, 7, 12, -2.7) # length(inputvector) = 18
+# 
+# 
 # 
 # 
 # 
@@ -3151,11 +3152,13 @@ inputmatrix <- matrix(rep(inputvector, reps), byrow = TRUE, nrow = reps)
 # 
 # sim.start.time <- proc.time()[3] # ! IDs.gender.men50.women50.age.group.features
 # 
-features.matrix <- phylo.simpact.parallel(model = wrapper.master.phylo.simpact.study.1,
+features.matrix <- simpact.parallel(model = wrapper.master.phylo.simpact.study.1,
                                           actual.input.matrix = inputmatrix,
                                           seed_count = 124,
                                           n_cluster = 4)
-                                                                                                                                                                                                                                                                                                                                                                                                                                    # 
+                                                                                                                                                                                                                                                                                                                                                                                                                        
+
+# 
 # sim.end.time <- proc.time()[3] - sim.start.time
 # 
 # print(paste0("Simulation time: ", round(sim.end.time/60,2), " minutes"))

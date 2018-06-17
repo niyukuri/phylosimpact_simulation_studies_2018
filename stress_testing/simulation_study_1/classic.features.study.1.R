@@ -131,12 +131,14 @@ classic.features.study.1 <- function(datalist = datalist.agemix,
     # (v) Age mixing in relationships
     
     # 
-    agemix.df <- agemix.df.maker(datalist.agemix)
+    
+    agemix.rels.df <- agemix.df.maker(datalist.agemix)
+    
     # 
-    agemix.model <- pattern.modeller(dataframe = agemix.df,
+    agemix.model <- pattern.modeller(dataframe = agemix.rels.df,
                                      agegroup = c(15, 50),
                                      timepoint = 40, # datalist.agemix$itable$population.simtime[1],
-                                     timewindow = 5)#1)#3)
+                                     timewindow = 20)#1)#3)
     # 
     # # men.lme <- tryCatch(agemixing.lme.fitter(data = dplyr::filter(agemix.model[[1]], Gender =="male")),
     # #                     error = agemixing.lme.errFunction) # Returns an empty list if the lme model can't be fitted
@@ -224,7 +226,7 @@ classic.features.study.1 <- function(datalist = datalist.agemix,
                         
                         "pp.cp.6months.male")
     
-    summary.df <- rep(NA, length(features.names))
+    summary.df <- rep(0, length(features.names)) # NA -> 0
     
     names(summary.df) <- features.names # > length(features.names) [1] 16
     

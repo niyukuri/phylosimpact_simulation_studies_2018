@@ -3,6 +3,7 @@
 
 wrapper.test.study.1 <- function(inputvector){
   
+  
   source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
   
   
@@ -14,38 +15,50 @@ wrapper.test.study.1 <- function(inputvector){
   
   # destDir <- "/home/niyukuri/Desktop/mastermodeltest/temp" # on PC
   
+  # 
+  # library(RSimpactCyan)
+  # library(RSimpactHelper)
+  # library(Rcpp)
+  # library(ape)
+  # library(expoTree)
+  # library(data.table)
+  # library(readr)
+  # library(phangorn)
+  # library(lme4)
+  # library(nlme)
+  # library(dplyr)
+  # library(adephylo)
+  # library(treedater)
+  # library(geiger)
+  # library(picante)
+  # library(igraph)
+  # library(phyloTop)
+  # library(phytools)
+  # library(Rsamtools)
+  # library(robustbase)
+  # 
+  
+  
   
   library(RSimpactCyan)
   library(RSimpactHelper)
   library(Rcpp)
-  library(ape)
   library(expoTree)
   library(data.table)
-  library(readr)
-  library(phangorn)
   library(lme4)
   library(nlme)
   library(dplyr)
-  library(adephylo)
-  library(treedater)
   library(geiger)
-  library(picante)
   library(igraph)
-  library(phyloTop)
-  library(phytools)
-  
-  library(Rsamtools)
-  
   library(robustbase)
-  
   
   
   age.distr <- agedistr.creator(shape = 5, scale = 65)
   #
   cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
                                    population.simtime = 50, 
-                                   population.nummen = 600, 
-                                   population.numwomen = 600,
+                                   population.nummen = 400, 
+                                   population.numwomen = 400,
                                    hivseed.time = 10, 
                                    hivseed.type = "amount",
                                    hivseed.amount = 20, 
@@ -78,15 +91,13 @@ wrapper.test.study.1 <- function(inputvector){
   # ###################
   #
   
-  inputvector <- c(-0.52, -0.05, 2.8, 0, 3, 0.25, -0.3, -0.1, 0.2,
-                   -1, -90, 0.5, 0.05, -0.14, 5, 7, 12, -2.7)
   
   cfg.list["hivtransmission.param.a"] <- inputvector[11] # [10] # -1 c("unif", -2, 0)
   cfg.list["hivtransmission.param.b"] <- inputvector[12] # [11] # -90 c("unif", -100, -80)
   cfg.list["hivtransmission.param.c"] <- inputvector[13] # [12] # 0.5 c("unif", 0, 1)
   cfg.list["hivtransmission.param.f1"] <- inputvector[14] # [13] # 0.04879016 c("unif", 0, 0.5)
   cfg.list["hivtransmission.param.f2"] <- inputvector[15] # [14] # -0.1386294 c("unif", -0.5, 0)
-
+  
   # Disease progression > may be remove in parameter to estimates
   
   cfg.list["person.vsp.toacute.x"] <- inputvector[16] # [15] # 5 c("unif", 3, 7)
@@ -202,10 +213,6 @@ wrapper.test.study.1 <- function(inputvector){
   cfg.list["population.maxevents"] <- as.numeric(cfg.list["population.simtime"][1]) * as.numeric(cfg.list["population.nummen"][1]) * 3
   
   
-  # XXXXX
-  # XXXXXXXXXXXXXXXX
-  
-  
   # Avoid overlaping in same directory
   
   #creating subfolder with unique name for each simulation
@@ -228,6 +235,7 @@ wrapper.test.study.1 <- function(inputvector){
   }
   
   sub.dir.rename <- paste0(work.dir,"/temp/",generate.filename(10))
+  
   
   
   # Run Simpact
@@ -253,7 +261,7 @@ wrapper.test.study.1 <- function(inputvector){
   
   
   
-  simpact.trans.net <- transmission.network.builder(datalist = datalist.agemix, endpoint = 40)
+  # simpact.trans.net <- transmission.network.builder(datalist = datalist.agemix, endpoint = 40)
   
   # simpact.trans.net.projection <- transmission.network.builder(datalist = datalist.agemix, endpoint = 45)
   
@@ -277,77 +285,77 @@ wrapper.test.study.1 <- function(inputvector){
   
 }
 
-
-# d <- read.csv("inputvector.csv")
 # 
-# inputvector <- c(124,d$x)
-# f <- wrapper.test.study.1(inputvector = inputvector)
-
-
-df <- agemixing.trans.df(trans.network = trans.network,
-                         limitTransmEvents = 7)
-
-
-datatable <- df
-
-datatable.men <- datatable
-datatable.men$AgeInfecDon <- datatable.men$AgeInfecDon-15
-
-men.lmer <- lmer(AgeInfecDon ~ AgeInfecRec + (1 | DonId),
-                 data = dplyr::filter(datatable, GenderDon =="0"),
-                 REML = TRUE,
-                 control=lmerControl(check.nobs.vs.nlev = "ignore",
-                                     check.nobs.vs.rankZ = "ignore",
-                                     check.nobs.vs.nRE="ignore"))
-
-coef.men <- coef(men.lmer)$DonId
-
-coef.men.fix <- coef(summary(men.lmer))[, "Estimate"]
-
-# data.men <- dplyr::filter(datatable, GenderDon =="0")
-
-g.men <- ggplot(datatable.men, aes(AgeInfecDon, AgeInfecRec))
-
-# Scatterplot
-g.men + geom_point() + 
-  geom_abline(slope = coef.men.fix[[2]], intercept = coef.men.fix[[1]], color="red") +
-  labs(subtitle="Heterosexual transmission: men to women", 
-       y="AgeInfecDon: Men", 
-       x="AgeInfecRec: Women", 
-       title="Age mixing in transmission")#, 
-#caption="Source: midwest")
-
-
-datatable.women <- datatable
-datatable.women$AgeInfecDon <- datatable.women$AgeInfecDon-15
-
-women.lmer <- lmer(AgeInfecDon ~ AgeInfecRec + (1 | DonId),
-                   data = dplyr::filter(datatable, GenderDon =="1"),
-                   REML = TRUE,
-                   control=lmerControl(check.nobs.vs.nlev = "ignore",
-                                       check.nobs.vs.rankZ = "ignore",
-                                       check.nobs.vs.nRE="ignore"))
-
-# data.women <- dplyr::filter(datatable, GenderDon =="1")
-
-g.women <- ggplot(datatable.women, aes(AgeInfecDon, AgeInfecRec))
-
-# Scatterplot
-g.women + geom_point() + 
-  geom_smooth(method="lm", se=F) +
-  labs(subtitle="Heterosexual transmission: women to men", 
-       y="AgeInfecDon: Women", 
-       x="AgeInfecRec: Men", 
-       title="Age mixing in transmission")#, 
-#caption="Source: midwest")
-
-
+# # d <- read.csv("inputvector.csv")
+# # 
+# # inputvector <- c(124,d$x)
+# # f <- wrapper.test.study.1(inputvector = inputvector)
+# 
+# 
+# df <- agemixing.trans.df(trans.network = trans.network,
+#                          limitTransmEvents = 7)
+# 
+# 
+# datatable <- df
+# 
+# datatable.men <- datatable
+# datatable.men$AgeInfecDon <- datatable.men$AgeInfecDon-15
+# 
+# men.lmer <- lmer(AgeInfecDon ~ AgeInfecRec + (1 | DonId),
+#                  data = dplyr::filter(datatable, GenderDon =="0"),
+#                  REML = TRUE,
+#                  control=lmerControl(check.nobs.vs.nlev = "ignore",
+#                                      check.nobs.vs.rankZ = "ignore",
+#                                      check.nobs.vs.nRE="ignore"))
+# 
+# coef.men <- coef(men.lmer)$DonId
+# 
+# coef.men.fix <- coef(summary(men.lmer))[, "Estimate"]
+# 
+# # data.men <- dplyr::filter(datatable, GenderDon =="0")
+# 
+# g.men <- ggplot(datatable.men, aes(AgeInfecDon, AgeInfecRec))
+# 
 # # Scatterplot
 # g.men + geom_point() + 
-#   geom_smooth(method="lm", se=F) +
+#   geom_abline(slope = coef.men.fix[[2]], intercept = coef.men.fix[[1]], color="red") +
 #   labs(subtitle="Heterosexual transmission: men to women", 
 #        y="AgeInfecDon: Men", 
 #        x="AgeInfecRec: Women", 
 #        title="Age mixing in transmission")#, 
 # #caption="Source: midwest")
-
+# 
+# 
+# datatable.women <- datatable
+# datatable.women$AgeInfecDon <- datatable.women$AgeInfecDon-15
+# 
+# women.lmer <- lmer(AgeInfecDon ~ AgeInfecRec + (1 | DonId),
+#                    data = dplyr::filter(datatable, GenderDon =="1"),
+#                    REML = TRUE,
+#                    control=lmerControl(check.nobs.vs.nlev = "ignore",
+#                                        check.nobs.vs.rankZ = "ignore",
+#                                        check.nobs.vs.nRE="ignore"))
+# 
+# # data.women <- dplyr::filter(datatable, GenderDon =="1")
+# 
+# g.women <- ggplot(datatable.women, aes(AgeInfecDon, AgeInfecRec))
+# 
+# # Scatterplot
+# g.women + geom_point() + 
+#   geom_smooth(method="lm", se=F) +
+#   labs(subtitle="Heterosexual transmission: women to men", 
+#        y="AgeInfecDon: Women", 
+#        x="AgeInfecRec: Men", 
+#        title="Age mixing in transmission")#, 
+# #caption="Source: midwest")
+# 
+# 
+# # # Scatterplot
+# # g.men + geom_point() + 
+# #   geom_smooth(method="lm", se=F) +
+# #   labs(subtitle="Heterosexual transmission: men to women", 
+# #        y="AgeInfecDon: Men", 
+# #        x="AgeInfecRec: Women", 
+# #        title="Age mixing in transmission")#, 
+# # #caption="Source: midwest")
+# 
