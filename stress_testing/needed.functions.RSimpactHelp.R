@@ -138,19 +138,20 @@ ampmodel <- function(data = dplyr::filter(agemix.model[[1]], Gender =="male")) {
 ####################################################################
 
 
-concurr.pointprev.calculator <- function(datalist,
+concurr.pointprev.calculator <- function(datalist = datalist,
                                          timepoint = datalist$itable$population.simtime[1] - 0.5){
   
   output <- data.table()
   DTalive.infected <- alive.infected(datalist = datalist,
                                      timepoint = timepoint, site = "All") # First we only take the data of people who were alive at time_i
+  
   agemix.df <- agemix.df.maker(datalist)
   
-  degrees.df <- degree.df.maker(dataframe.df = agemix.df,
+  degrees.df <- degree.df.maker(df = agemix.df,
                                 agegroup = c(15, 50),
                                 hivstatus = 2,
-                                survey.time = timepoint,
-                                window.width = 0,
+                                survey.time = 40, # timepoint,
+                                window.width = 1,
                                 gender.degree = "male",
                                 only.new = FALSE)
   
@@ -244,7 +245,6 @@ agemixing.trans.df <- function(trans.network = trans.network,
   } # Y for
   
   if(length(ID.select)>=1){
-    # blal
     
     infectionTable <- vector("list", length(ID.select))
     
@@ -269,11 +269,11 @@ agemixing.trans.df <- function(trans.network = trans.network,
     
     infecttable <- rbindlist(infectionTable)
     
-    return(infecttable)
-    
+  }else{
+    infecttable <- NULL
   }
-
-
+  
+  return(infecttable)
   
 }
 
@@ -305,11 +305,11 @@ fit.agemix.trans.women <- function(datatable = agemix.df){
   datatable <- datatable
   
   women.lmer <- lmer(AgeInfecDon ~ AgeInfecRec + (1 | DonId),
-                   data = dplyr::filter(datatable, GenderDon =="1"),
-                   REML = TRUE,
-                   control=lmerControl(check.nobs.vs.nlev = "ignore",
-                                       check.nobs.vs.rankZ = "ignore",
-                                       check.nobs.vs.nRE="ignore"))
+                     data = dplyr::filter(datatable, GenderDon =="1"),
+                     REML = TRUE,
+                     control=lmerControl(check.nobs.vs.nlev = "ignore",
+                                         check.nobs.vs.rankZ = "ignore",
+                                         check.nobs.vs.nRE="ignore"))
   agemix.inter.women <- women.lmer
   
   return(agemix.inter.women)
@@ -347,7 +347,7 @@ onwardtransmissions.dat <- function(datalist = datalist,
     
     trans.network.j <- trans.network.j[-1,] # remove the universal infector
     
-    if(nrow(trans.network.j) >= limitTransmEvents){ # consider transmission networks with at least one onward transmission
+    if(nrow(trans.network.j) >= 1){ # consider transmission networks with at least one onward transmission
       
       d.j <- table(trans.network.j$DonId) # in the transmission table, the number of times DonId appears is the number of Onward transmissions after acuiring the infection 
       
