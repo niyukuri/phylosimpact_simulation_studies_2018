@@ -1,78 +1,58 @@
-#######   CALIBRATION    WITH CLASSIC FEATURES  ##########
-
-library(EasyABC)
-library(RSimpactCyan)
-library(RSimpactHelper)
-library(Rcpp)
-library(ape)
-library(expoTree)
-library(data.table)
-library(readr)
-library(phangorn)
-library(lme4)
-library(nlme)
-library(minque) # with lmer
-library(dplyr)
-library(adephylo)
-library(treedater)
-library(geiger)
-library(picante)
-library(igraph)
-library(phyloTop)
-library(phytools)
-library(Rsamtools)
-library(robustbase)
-
-
-targets.stat <- read.csv("~/Desktop/mastermodeltest/features.matrix.csv")
-
-median.targets.stat <-  colMedians(as.matrix(targets.stat))  # Ok # library(robustbase)
-
-classic.target <- colMedians(as.matrix(targets.stat[,12:27]))
-
-
-work.dir <- "/home/david/Desktop/calibration" # on laptop
-
-# work.dir <- "/home/niyukuri/Desktop/calibration" # on PC
-
-
-setwd(paste0(work.dir))
-
-# ABC_DestDir <- "/home/david/Desktop/mastermodeltest/calibration"
-
-# Avoid overlaping in same directory
-
-#creating subfolder with unique name for each simulation
-generate.filename <- function(how.long){
-  
-  rn <- sample(1:100,1)
-  t <- as.numeric(Sys.time())
-  set.seed((t - floor(t)) * 1e8)
-  chars <- c(letters, LETTERS)
-  sub.dir.sim.id <-  paste0(sample(chars,how.long), collapse = "")
-  
-  noise.sample1 <- sample(8:15,1, replace = TRUE)
-  sub.dir.sim.id.ext <- paste0(sample(chars,noise.sample1), collapse = "")
-  noise.sample <- sample(1:1000,1)
-  noise.sample2 <- sample(8:17,1, replace = TRUE)
-  sub.dir.sim.id <- paste0(sub.dir.sim.id.ext,
-                           paste0(sample(chars,noise.sample2), collapse = ""),noise.sample, rn)
-  
-  return(sub.dir.sim.id)
-}
-
-
-
-###########################################################################################
-################################### classic features ######################################
-###########################################################################################
-
-
-ABC_DestDir.classic <- paste0(work.dir,"/temp/",generate.filename(10))
-
+#######   CALIBRATION    WITH EPIDEMIOLOGICAL AND BEHAVIOURAL FEATURES  ##########
 
 
 simpact4ABC.classic <- function(inputvector){
+  
+  work.dir <- "/home/david/Desktop/calibration" # on laptop
+  
+  # work.dir <- "/home/niyukuri/Desktop/calibration" # on PC
+  
+  setwd(paste0(work.dir))
+  
+  
+  set.seed(inputvector[1])
+  
+  library(EasyABC)
+  library(RSimpactCyan)
+  library(RSimpactHelper)
+  library(Rcpp)
+  library(expoTree)
+  library(data.table)
+  library(readr)
+  library(lme4)
+  library(nlme)
+  library(minque) # with lmer
+  library(dplyr)
+  library(igraph)
+  library(robustbase)
+  
+  # Avoid overlaping in same directory
+  
+  #creating subfolder with unique name for each simulation
+  generate.filename <- function(how.long){
+    
+    rn <- sample(1:100,1)
+    t <- as.numeric(Sys.time())
+    set.seed((t - floor(t)) * 1e8)
+    chars <- c(letters, LETTERS)
+    sub.dir.sim.id <-  paste0(sample(chars,how.long), collapse = "")
+    
+    noise.sample1 <- sample(8:15,1, replace = TRUE)
+    sub.dir.sim.id.ext <- paste0(sample(chars,noise.sample1), collapse = "")
+    noise.sample <- sample(1:1000,1)
+    noise.sample2 <- sample(8:17,1, replace = TRUE)
+    sub.dir.sim.id <- paste0(sub.dir.sim.id.ext,
+                             paste0(sample(chars,noise.sample2), collapse = ""),noise.sample, rn)
+    
+    return(sub.dir.sim.id)
+  }
+  
+  
+  ABC_DestDir.classic <- paste0(work.dir,"/temp/",generate.filename(10))
+  
+  
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
   
   source("~/phylosimpact_simulation_studies_2018/stress_testing/simulation_study_1/classic.features.study.1.R")
   
@@ -91,41 +71,42 @@ simpact4ABC.classic <- function(inputvector){
                                    debut.debutage = 15
   )
   
+  
   # # Sexual behaviour
   # ###################
   #
-  cfg.list["dissolution.alpha_0"] <- inputvector[1] # -0.52 c("unif", -1, 0)
-  cfg.list["dissolution.alpha_4"] <- inputvector[2] # -0.05 c("unif", -0.5, 0)
-  cfg.list["formation.hazard.agegapry.baseline"] <- inputvector[3] # 2 c("unif", 1, 3)
-  cfg.list["person.agegap.man.dist.normal.mu"] <- inputvector[4] # 0 c("unif", -0.5, 0.5)
-  cfg.list["person.agegap.woman.dist.normal.mu"] <- inputvector[4] # 0
-  cfg.list["person.agegap.man.dist.normal.sigma"] <- inputvector[5] # 3 c("unif", 2, 4)
-  cfg.list["person.agegap.woman.dist.normal.sigma"] <- inputvector[5] # 3 
-  cfg.list["formation.hazard.agegapry.gap_agescale_man"] <- inputvector[6] # 0.25 c("unif", 0, 1)
-  cfg.list["formation.hazard.agegapry.gap_agescale_woman"] <- inputvector[6] # 0.25
-  cfg.list["formation.hazard.agegapry.numrel_man"] <- inputvector[7] # -0.3 c("unif", -1, 0)
-  cfg.list["formation.hazard.agegapry.numrel_woman"] <- inputvector[7] # -0.3
-  cfg.list["formation.hazard.agegapry.numrel_diff"] <- inputvector[8] # -0.1 c("unif", -0.9, 0)
-  cfg.list["population.eyecap.fraction"] <- inputvector[9] # 0.2 c("unif", 0, 0.5)
+  cfg.list["dissolution.alpha_0"] <- inputvector[2] # -0.52 c("unif", -1, 0)
+  cfg.list["dissolution.alpha_4"] <- inputvector[3] # -0.05 c("unif", -0.5, 0)
+  cfg.list["formation.hazard.agegapry.baseline"] <- inputvector[4] # 2 c("unif", 1, 3)
+  cfg.list["person.agegap.man.dist.normal.mu"] <- inputvector[5] # 0 c("unif", -0.5, 0.5)
+  cfg.list["person.agegap.woman.dist.normal.mu"] <- inputvector[5] # 0
+  cfg.list["person.agegap.man.dist.normal.sigma"] <- inputvector[6] # 3 c("unif", 2, 4)
+  cfg.list["person.agegap.woman.dist.normal.sigma"] <- inputvector[6] # 3 
+  cfg.list["formation.hazard.agegapry.gap_agescale_man"] <- inputvector[7] # 0.25 c("unif", 0, 1)
+  cfg.list["formation.hazard.agegapry.gap_agescale_woman"] <- inputvector[7] # 0.25
+  cfg.list["formation.hazard.agegapry.numrel_man"] <- inputvector[8] # -0.3 c("unif", -1, 0)
+  cfg.list["formation.hazard.agegapry.numrel_woman"] <- inputvector[8] # -0.3
+  cfg.list["formation.hazard.agegapry.numrel_diff"] <- inputvector[9] # -0.1 c("unif", -0.9, 0)
+  cfg.list["population.eyecap.fraction"] <- inputvector[10] # 0.2 c("unif", 0, 0.5)
   #
   # # HIV transmission
   # ###################
   #
   
-  cfg.list["hivtransmission.param.a"] <- inputvector[10] # -1 c("unif", -2, 0)
-  cfg.list["hivtransmission.param.b"] <- inputvector[11] # -90 c("unif", -100, -80)
-  cfg.list["hivtransmission.param.c"] <- inputvector[12] # 0.5 c("unif", 0, 1)
-  cfg.list["hivtransmission.param.f1"] <- inputvector[13] # 0.04879016 c("unif", 0, 0.5)
-  cfg.list["hivtransmission.param.f2"] <- inputvector[14] # -0.1386294 c("unif", -0.5, 0)
-  cfg.list["person.vsp.toacute.x"] <- inputvector[15] # 5 c("unif", 3, 7)
-  cfg.list["person.vsp.toaids.x"] <- inputvector[16] # 7 c("unif", 5, 9)
-  cfg.list["person.vsp.tofinalaids.x"] <- inputvector[17] # 12 c("unif", 10, 14)
+  cfg.list["hivtransmission.param.a"] <- inputvector[11] # -1 c("unif", -2, 0)
+  cfg.list["hivtransmission.param.b"] <- inputvector[12] # -90 c("unif", -100, -80)
+  cfg.list["hivtransmission.param.c"] <- inputvector[13] # 0.5 c("unif", 0, 1)
+  cfg.list["hivtransmission.param.f1"] <- inputvector[14] # 0.04879016 c("unif", 0, 0.5)
+  cfg.list["hivtransmission.param.f2"] <- inputvector[15] # -0.1386294 c("unif", -0.5, 0)
+  cfg.list["person.vsp.toacute.x"] <- inputvector[16] # 5 c("unif", 3, 7)
+  cfg.list["person.vsp.toaids.x"] <- inputvector[17] # 7 c("unif", 5, 9)
+  cfg.list["person.vsp.tofinalaids.x"] <- inputvector[18] # 12 c("unif", 10, 14)
   #
   # # Demographic
   # ##############
   #
   
-  cfg.list["conception.alpha_base"] <- inputvector[18] # -2.7 c("unif", -3.5, -1.7)
+  cfg.list["conception.alpha_base"] <- inputvector[19] # -2.7 c("unif", -3.5, -1.7)
   
   #
   #
@@ -230,40 +211,26 @@ simpact4ABC.classic <- function(inputvector){
   cfg <- cfg.list
   
   
-  results <- simpact.run(cfg, ABC_DestDir.classic) #simpact.run(cfg, ABC_DestDir, identifierFormat = ABC_identifier)  
+  results <- simpact.run(cfg, 
+                         destDir = ABC_DestDir.classic) #simpact.run(cfg, ABC_DestDir, identifierFormat = ABC_identifier)  
   
   datalist <- readthedata(results)
   
-  
-  # summary.stat <- compute.summary.statistics.classic(datalist = datalist,
-  #                                                    work.dir = work.dir,
-  #                                                    sub.dir.rename = ABC_DestDir.classic)
   
   summary.stat <- classic.features.study.1(datalist = datalist,
                                            work.dir = work.dir,
                                            sub.dir.rename = ABC_DestDir.classic)
   
-  # relsperpersonperyear <- nrow(datalist$rtable) / (nrow(datalist$ptable)/2) / cfg$population.simtime
-  # agegapsd <- sd(datalist$rtable$AgeGap)
-  # outputvector <- c(relsperpersonperyear, agegapsd)
   
-  outputvector <- as.numeric(summary.stat) # names.class , Length = 47
+  outputvector <- as.numeric(summary.stat) 
   
-  # outputvector <- outputvector[1]
   
   return(outputvector)
+  
 }
 
 
-#We specify the prior distributions for the input parameters
-# The relationship formation rate must roughly double: hF' = 2hF
-# hF = exp(a0 + a1X1 + a2X2 + .... anXn)
-# 2hF = exp(a0 + a1X1 + a2X2 + .... anXn) * 2
-# 2hF = exp(a0 + a1X1 + a2X2 + .... anXn) * exp(log(2))
-# 2hF = exp(a0 + log(2) + a1X1 + a2X2 + .... anXn)
-# So we would naively expect that the baseline parameter (0.1) should be increased by log(2) ~ 0.7 to 0.8
-# However, we are also adjusting the "gap factors" and making relationships with large age gaps less
-# likely will result in an overall decrease in the number of relationships formed per time unit.
+# Priors
 
 simpact_prior <- list(c("unif", -1, 0), c("unif", -0.5, 0), c("unif", 1, 3), c("unif", -0.5, 0.5),
                       c("unif", 2, 4), c("unif", 0, 1), c("unif", -1, 0), c("unif", -0.9, 0), 
@@ -271,48 +238,32 @@ simpact_prior <- list(c("unif", -1, 0), c("unif", -0.5, 0), c("unif", 1, 3), c("
                       c("unif", 0, 0.5), c("unif", -0.5, 0), c("unif", 3, 7), c("unif", 5, 9),
                       c("unif", 10, 14),  c("unif", -3.5, -1.7))
 
-# list(c("unif", -1, 0), c("unif", -0.5, 0), c("unif", 1, 3), c("unif", -0.5, 0.5), 
-#      c("unif", 2, 4), c("unif", 0, 1), c("unif", -1, 0), c("unif", -0.9, 0), 
-#      c("unif", 0, 0.5), c("unif", -2, 0), c("unif", -100, -80), c("unif", 0, 1), 
-#      c("unif", 0, 0.5), c("unif", -0.5, 0), c("unif", 3, 7), c("unif", 5, 9), 
-#      c("unif", 10, 14), c("unif", -3.5, -1.7)) 
 
-# Lastly, we specify the target summary statistic
-# sum_stat_obs <- c(0.003916345 , 0.000000000 , 0.000000000 , 0.000000000 , 0.000000000 , 0.083333333 , 0.000000000 , 2.033333333, 22.050000000,
-#                   0.066818182 , 5.006713645 , 4.920962084 , 3.942774744 , 0.613515378 , 2.449657529 , 1.033541863 , -1.386704665,  0.062130178,
-#                   6.003394756 , 0.285714286 , 0.588235294 , 4.666666667 , 3.000000000 , 0.428571429 , 1.142857143 , 1.000000000)
+# Observed features
 
+library(robustbase)
 
-sum_stat_obs <- classic.target
+targets.stat <- read.csv("~/Desktop/mastermodeltest/features.matrix.csv")
+
+median.targets.stat <-  colMedians(as.matrix(targets.stat))  # Ok # library(robustbase)
+
+classic.target <- colMedians(as.matrix(targets.stat[,12:27]))
 
 
-# sum_stat_obs <- c(0.003916345)
-# Now we try to run a sequential ABC scheme, according to the method proposed by Lenormand et al. 2013
-# Maxime Lenormand, Franck Jabot and Guillaume Deffuant. Adaptive approximate Bayesian computation for complex models. Comput Stat (2013) 28:2777–2796 DOI 10.1007/s00180-013-0428-3
+sum_stat_obs <- as.numeric(classic.target)
 
+# ABC approach
 
-# Initial number of simulations
-# n_init <- 4 #40
-# alpha <- 0.75 #0.5 # This is the proportion of particles kept at each step
-# pacc <- 0.9 #0.5 # This is the stopping criterion of the algorithm: a small number ensures a better convergence of the algorithm, but at a cost in computing time. Must be 0 < p_acc_min < 1. The smaller, the more strict the criterion.
-# 
-# ABC_LenormandResult0 <- ABC_sequential(method="Lenormand",
-#                                        model=simpact4ABC,
-#                                        prior=simpact_prior,
-#                                        nb_simul=n_init,
-#                                        summary_stat_target=sum_stat_obs,
-#                                        alpha=alpha,
-#                                        p_acc_min=pacc,
-#                                        verbose=FALSE)
-# 
-# # Time to get a coffee and a biscuit, this will take a while.
-# 
-# ABC_LenormandResult0
+library(EasyABC)
 
-n=3
-p=0.7
-ABC_rej.classic <-ABC_rejection(model=simpact4ABC.classic, prior=simpact_prior, nb_simul=n,
-                                summary_stat_target=sum_stat_obs, tol=p)
+ABC_rej.classic <- ABC_rejection(model = simpact4ABC.classic,
+                                 prior = simpact_prior,
+                                 summary_stat_target = sum_stat_obs,
+                                 nb_simul = 12,
+                                 use_seed = TRUE,
+                                 seed_count = 1,
+                                 n_cluster = 4,
+                                 tol = 2/12)
 
 output.params.classic <- as.data.table(ABC_rej.classic$param)
 write.csv(output.params.classic, file = "output.params.classic.csv")
@@ -320,7 +271,51 @@ write.csv(output.params.classic, file = "output.params.classic.csv")
 median.targets.stat <-  colMedians(as.matrix(output.params.classic))  # Ok # library(robustbase)
 
 
+Seq.simp <- ABC_sequential(model = simpact4ABC.classic,
+                          method = "Lenormand",
+                          prior = simpact_prior,
+                          summary_stat_target = sum_stat_obs,
+                          nb_simul = 4,
+                          alpha = 0.1,
+                          p_acc_min = 0.03,
+                          use_seed = TRUE,
+                          seed_count = 1,
+                          n_cluster = 4,
+                          inside_prior = FALSE)
 
+
+## MaC approach
+
+library(RSimpactHelper)
+library(mice)
+library(gsubfn)
+library(data.table)
+library(readcsvcolumns)
+library(randtoolbox)
+library(pcaPP)
+library(glmnet)
+
+lls <- c(-1, -0.5, 1, -0.5, 2, 0, -1, -0.9, 0, -2, -100, 0, 0, -0.5, 3, 5, 10, -3.5)
+
+uls <- c(0, 0, 3, 0.5, 4, 1, 0, 0, 0.5, 0, -80, 1, 0.5, 0, 7, 9, 14, -1.7)
+
+obs.targets <- as.numeric(sum_stat_obs)
+
+
+MaC.simp <- MaC(targets.empirical = obs.targets,
+                RMSD.tol.max = 2,
+                min.givetomice = 2,
+                n.experiments = 20,
+                lls = lls,
+                uls = uls,
+                model = simpact4ABC.classic,
+                strict.positive.params = 0,
+                probability.params = 0,
+                method = "norm",
+                predictorMatrix = "complete",
+                maxit = 20,
+                maxwaves = 1,
+                n_cluster = 8)
 
 # Run default model with parameters values from calibration
 
@@ -367,6 +362,6 @@ features.matrix.calibrates <- phylo.simpact.parallel(model = wrapper.test.study.
 # 
 # # save features in the working directory
 
-write.csv(features.matrix.calibrates, file = paste0(work.dir,"/features.matrix.csv"))
+write.csv(features.matrix.calibrates, file = paste0(work.dir,"/features.matrix.calibrates"))
 
 
