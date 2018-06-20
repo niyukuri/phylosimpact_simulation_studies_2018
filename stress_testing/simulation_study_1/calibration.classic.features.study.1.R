@@ -243,11 +243,14 @@ simpact_prior <- list(c("unif", -1, 0), c("unif", -0.5, 0), c("unif", 1, 3), c("
 
 library(robustbase)
 
+
 targets.stat <- read.csv("~/Desktop/mastermodeltest/features.matrix.csv")
 
-median.targets.stat <-  colMedians(as.matrix(targets.stat))  # Ok # library(robustbase)
+targets.stat <- targets.stat[,2:length(targets.stat)]
 
-classic.target <- colMedians(as.matrix(targets.stat[,12:27]))
+median.targets.stat <-  colMedians(targets.stat)  # Ok # library(robustbase)
+
+classic.target <- colMedians(targets.stat[,12:27])
 
 
 sum_stat_obs <- as.numeric(classic.target)

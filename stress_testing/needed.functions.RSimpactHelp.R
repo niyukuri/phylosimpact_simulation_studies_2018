@@ -141,7 +141,8 @@ ampmodel <- function(data = dplyr::filter(agemix.model[[1]], Gender =="male")) {
 concurr.pointprev.calculator <- function(datalist = datalist,
                                          timepoint = datalist$itable$population.simtime[1] - 0.5){
   
-  output <- data.table()
+  #  output <- data.table()
+  
   DTalive.infected <- alive.infected(datalist = datalist,
                                      timepoint = timepoint, site = "All") # First we only take the data of people who were alive at time_i
   
@@ -471,4 +472,26 @@ phylogenetic.features.fun <- function(tree.topo=tree,
   return(phylo.faetures.summary)
   
 }
+
+
+colMedians <- function(matrixdata){
+  
+  names.col <- names(matrixdata)
+  
+  med.vector <- vector()
+  
+  for(i in 1:length(names.col)){
+    
+    med.i <- median(matrixdata[,i])
+    
+    med.vector <- c(med.vector, med.i)
+    
+  }
+  
+  names(med.vector) <- names.col
+  
+  return(med.vector)
+  
+}
+
 

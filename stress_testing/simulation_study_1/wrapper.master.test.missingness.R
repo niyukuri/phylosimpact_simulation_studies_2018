@@ -587,8 +587,8 @@ wrapper.master.phylo.simpact.study.1 <- function(inputvector = input.vector){
     #### BEGIN Sequence Coverage Scenarios for MCAR ####
     
     cut.val <- 5 # consider at least 5 sequences
-  
-      
+    
+    
     ### 1st Scenario: 35 ###
     ########################
     
@@ -3037,7 +3037,7 @@ wrapper.master.phylo.simpact.study.1 <- function(inputvector = input.vector){
       mAr.cov.C.95.IDs.features.phylogenetic <- rep(NA, length(mAr.cov.C.95.IDs.features.phylogenetic))
     }
     
-      
+    
     
     
     mAr.C.sim.features.phylogenetic <- c(mAr.cov.C.35.IDs.features.phylogenetic,
@@ -3153,10 +3153,10 @@ inputmatrix <- matrix(rep(inputvector, reps), byrow = TRUE, nrow = reps)
 # sim.start.time <- proc.time()[3] # ! IDs.gender.men50.women50.age.group.features
 # 
 features.matrix <- simpact.parallel(model = wrapper.master.phylo.simpact.study.1,
-                                          actual.input.matrix = inputmatrix,
-                                          seed_count = 124,
-                                          n_cluster = 4)
-                                                                                                                                                                                                                                                                                                                                                                                                                        
+                                    actual.input.matrix = inputmatrix,
+                                    seed_count = 124,
+                                    n_cluster = 4)
+
 
 # 
 # sim.end.time <- proc.time()[3] - sim.start.time

@@ -220,11 +220,13 @@ phylogenetic.features.study1 <- function(tree.topo=tree,
   }
   
   
-  clust.stat.table <- rbindlist(stat.clust.list)
+  clust.stat.table <- rbindlist(stat.clust.list) # data.table & data.frame
+  
+  clust.stat.table <- as.data.frame(as.matrix(clust.stat.table)) # make it data.frame ONLY to be handled by colMedians
   
   # sum.clust.stat <- sapply(clust.stat.table, sum)
   mean.clust.stat <- sapply(clust.stat.table, mean)  # Ok
-  median.clust.stat <- colMedians(as.matrix(clust.stat.table))  # Ok # library(robustbase)
+  median.clust.stat <- colMedians(clust.stat.table)  # Ok # library(robustbase)
   sd.clust.stat <- sapply(clust.stat.table, sd)  # Ok
   
   
