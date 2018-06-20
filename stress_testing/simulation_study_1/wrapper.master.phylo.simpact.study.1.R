@@ -2,10 +2,10 @@
 # Define directory
 # check loaded packages length(getLoadedDLLs())                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
 
-work.dir <- "/home/david/Desktop/mastermodeltest" # on laptop
+# work.dir <- "/home/david/Desktop/mastermodeltest" # on laptop
 
 
-# work.dir <- "/home/niyukuri/Desktop/mastermodeltest" on PC
+work.dir <- "/home/niyukuri/Desktop/mastermodeltest" # on PC
 
 
 setwd(paste0(work.dir))
@@ -27,13 +27,13 @@ wrapper.master.phylo.simpact.study.1 <- function(inputvector = input.vector){
   source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
   
   
-  work.dir <- "/home/david/Desktop/mastermodeltest" # on laptop
+  # work.dir <- "/home/david/Desktop/mastermodeltest" # on laptop
   
-  # work.dir <- "/home/niyukuri/Desktop/mastermodeltest" # on PC
+  work.dir <- "/home/niyukuri/Desktop/mastermodeltest" # on PC
   
-  destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
   
-  # destDir <- "/home/niyukuri/Desktop/mastermodeltest/temp" # on PC
+  destDir <- "/home/niyukuri/Desktop/mastermodeltest/temp" # on PC
   
   
   library(RSimpactCyan)
@@ -1196,18 +1196,7 @@ wrapper.master.phylo.simpact.study.1 <- function(inputvector = input.vector){
 
 # unlink(paste0("temp"), recursive = TRUE)
 
-# 
-# inputvector <- c(101,1.05, 0.25, 0, 3, 0.23, 0.23, 45, 45, -0.7, 2.8,
-#                  -0.3, -0.3,
-#                  -2.7, # conception
-#                  -0.52, -0.05)
-# 
-# test.all <- wrapper.phylo.simpact.study.1(inputvector = inputvector) # L = 437
 
-# inputvector <- c(1.05, 0.25, 0, 3, 0.23, 0.23, 45, 45, -0.7, 2.8,
-#                  -0.3, -0.3,
-#                  -2.7, # conception
-#                  -0.52, -0.05) # length(inputvector) = 15
 
 
 inputvector <- c(-0.52, -0.05, 2.8, 0, 3, 0.25, -0.3, -0.1, 0.2,
