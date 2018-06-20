@@ -3,9 +3,9 @@
 
 simpact4ABC.classic <- function(inputvector){
   
-  work.dir <- "/home/david/Desktop/calibration" # on laptop
+  # work.dir <- "/home/david/Desktop/calibration" # on laptop
   
-  # work.dir <- "/home/niyukuri/Desktop/calibration" # on PC
+  work.dir <- "/home/niyukuri/Desktop/calibration" # on PC
   
   setwd(paste0(work.dir))
   
@@ -241,8 +241,9 @@ simpact_prior <- list(c("unif", -1, 0), c("unif", -0.5, 0), c("unif", 1, 3), c("
 
 # Observed features
 
-library(robustbase)
+# library(robustbase)
 
+source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
 
 targets.stat <- read.csv("~/Desktop/mastermodeltest/features.matrix.csv")
 
@@ -250,7 +251,7 @@ targets.stat <- targets.stat[,2:length(targets.stat)]
 
 median.targets.stat <-  colMedians(targets.stat)  # Ok # library(robustbase)
 
-classic.target <- colMedians(targets.stat[,12:27])
+classic.target <- colMedians(targets.stat[,11:26])
 
 
 sum_stat_obs <- as.numeric(classic.target)
@@ -271,23 +272,25 @@ ABC_rej.classic <- ABC_rejection(model = simpact4ABC.classic,
 output.params.classic <- as.data.table(ABC_rej.classic$param)
 write.csv(output.params.classic, file = "output.params.classic.csv")
 
-median.targets.stat <-  colMedians(as.matrix(output.params.classic))  # Ok # library(robustbase)
+output.params.classic <- as.data.frame(as.matrix(output.params.classic))
 
+median.targets.stat.classic <-  colMedians((output.params.classic))  # Ok # library(robustbase)
 
-Seq.simp <- ABC_sequential(model = simpact4ABC.classic,
-                          method = "Lenormand",
-                          prior = simpact_prior,
-                          summary_stat_target = sum_stat_obs,
-                          nb_simul = 4,
-                          alpha = 0.1,
-                          p_acc_min = 0.03,
-                          use_seed = TRUE,
-                          seed_count = 1,
-                          n_cluster = 4,
-                          inside_prior = FALSE)
-
-
-## MaC approach
+# 
+# Seq.simp <- ABC_sequential(model = simpact4ABC.classic,
+#                           method = "Lenormand",
+#                           prior = simpact_prior,
+#                           summary_stat_target = sum_stat_obs,
+#                           nb_simul = 4,
+#                           alpha = 0.1,
+#                           p_acc_min = 0.03,
+#                           use_seed = TRUE,
+#                           seed_count = 1,
+#                           n_cluster = 4,
+#                           inside_prior = FALSE)
+# 
+# 
+# ## MaC approach
 
 library(RSimpactHelper)
 library(mice)
@@ -308,7 +311,7 @@ obs.targets <- as.numeric(sum_stat_obs)
 MaC.simp <- MaC(targets.empirical = obs.targets,
                 RMSD.tol.max = 2,
                 min.givetomice = 2,
-                n.experiments = 20,
+                n.experiments = 2000,
                 lls = lls,
                 uls = uls,
                 model = simpact4ABC.classic,
@@ -320,14 +323,16 @@ MaC.simp <- MaC(targets.empirical = obs.targets,
                 maxwaves = 1,
                 n_cluster = 8)
 
+
+
 # Run default model with parameters values from calibration
 
 source("~/phylosimpact_simulation_studies_2018/stress_testing/simulation_study_1/wrapper.test.study.1.R")
 
-work.dir <- "/home/david/Desktop/mastermodeltest" # on laptop
+# work.dir <- "/home/david/Desktop/mastermodeltest" # on laptop
 
 
-# work.dir <- "/home/niyukuri/Desktop/mastermodeltest" on PC
+work.dir <- "/home/niyukuri/Desktop/mastermodeltest" # on PC
 
 
 setwd(paste0(work.dir))
@@ -336,35 +341,24 @@ setwd(paste0(work.dir))
 
 pacman::p_load(snow, parallel, RSimpactCyan, RSimpactHelper, ape, Rsamtools)
 
-inputvector <- as.numeric(median.targets.stat)
+inputvector.classic <- as.numeric(median.targets.stat.classic)
 
 reps <- 4
 
-# 
-# 
 # # Input parameters in matrix form reps times (rows).
 
-inputmatrix <- matrix(rep(inputvector, reps), byrow = TRUE, nrow = reps)
+inputmatrix.classic <- matrix(rep(inputvector.classic, reps), byrow = TRUE, nrow = reps)
 
-# 
-# 
-# 
-# sim.start.time <- proc.time()[3] # ! IDs.gender.men50.women50.age.group.features
-# 
 
-features.matrix.calibrates <- phylo.simpact.parallel(model = wrapper.test.study.1,
-                                                     actual.input.matrix = inputmatrix,
-                                                     seed_count = 124,
-                                                     n_cluster = 4)
+epi.metric.calibrates.classic <- simpact.parallel(model = wrapper.test.study.1,
+                                               actual.input.matrix = inputmatrix.classic,
+                                               seed_count = 124,
+                                               n_cluster = 4)
 
-# sim.end.time <- proc.time()[3] - sim.start.time
-# 
-# print(paste0("Simulation time: ", round(sim.end.time/60,2), " minutes"))
-# 
-# 
+
 # 
 # # save features in the working directory
 
-write.csv(features.matrix.calibrates, file = paste0(work.dir,"/features.matrix.calibrates"))
+write.csv(epi.metric.calibrates.classic, file = paste0(work.dir,"/epi.metric.calibrates.classic.csv"))
 
 
