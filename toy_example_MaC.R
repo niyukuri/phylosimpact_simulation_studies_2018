@@ -113,3 +113,63 @@ points(sum_stat_obs[1],
 MaC.toy$secondspassed[3]
 Rej.toy$computime
 Seq.toy$computime
+
+
+
+sum_stat_obs.MCAR.cov.35 <- c(as.numeric(classic.target), as.numeric(phylo.target.MCAR.cov.35))
+
+
+ABC_rej.classic.phylo.MCAR.cov.35 <-  ABC_rejection(model = simpact4ABC.classic.phylo.MCAR.cov.35,
+                                                    prior = simpact_prior,
+                                                    summary_stat_target = sum_stat_obs.MCAR.cov.35,
+                                                    nb_simul = 12,
+                                                    use_seed = TRUE,
+                                                    seed_count = 1,
+                                                    n_cluster = 4,
+                                                    tol = 2/12)
+
+
+lls.simp <- function(simpact_prior){
+  
+  l <- vector()
+  #u <- vector()
+  for(i in 1:length(simpact_prior)){
+    l.i <- simpact_prior[[i]][2]
+    #u.i <- simpact_prior[[i]][3]
+    l <- c(l, l.i)
+    #u <- c(u, u.i)
+  }
+  return(l)
+}
+
+uls.simp <- function(simpact_prior){
+  
+  #l <- vector()
+  u <- vector()
+  for(i in 1:length(simpact_prior)){
+    #l.i <- simpact_prior[[i]][2]
+    u.i <- simpact_prior[[i]][3]
+    #l <- c(l, l.i)
+    u <- c(u, u.i)
+  }
+  return(u)
+}
+
+
+lls <- as.numeric(lls.simp(simpact_prior))
+uls <- as.numeric(uls.simp(simpact_prior))
+
+MaC.simpact <- MaC(targets.empirical = sum_stat_obs.MCAR.cov.35,
+                   RMSD.tol.max = 2,
+                   min.givetomice = 20,
+                   n.experiments = 200,
+                   lls = lls,
+                   uls = uls,
+                   model = simpact4ABC.classic.phylo.MCAR.cov.35,
+                   strict.positive.params = 0,
+                   probability.params = 0,
+                   method = "norm",
+                   predictorMatrix = "complete",
+                   maxit = 20,
+                   maxwaves = 1,
+                   n_cluster = 8)
