@@ -1,10 +1,10 @@
 
 # Define directory
 
-work.dir <- "/home/david/Desktop/mastermodeltest" # on laptop
+# work.dir <- "/home/david/Desktop/mastermodeltest" # on laptop
 
 
-# work.dir <- "/home/niyukuri/Desktop/mastermodeltest" on PC
+work.dir <- "/home/niyukuri/Desktop/mastermodeltest" # on PC
 
 
 setwd(paste0(work.dir))
@@ -27,13 +27,13 @@ wrapper.master.phylo.simpact.study.1 <- function(inputvector = input.vector){
   source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
   
   
-  work.dir <- "/home/david/Desktop/mastermodeltest" # on laptop
+  # work.dir <- "/home/david/Desktop/mastermodeltest" # on laptop
   
-  # work.dir <- "/home/niyukuri/Desktop/mastermodeltest" # on PC
+  work.dir <- "/home/niyukuri/Desktop/mastermodeltest" # on PC
   
-  destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
   
-  # destDir <- "/home/niyukuri/Desktop/mastermodeltest/temp" # on PC
+  destDir <- "/home/niyukuri/Desktop/mastermodeltest/temp" # on PC
   
   
   library(RSimpactCyan)
