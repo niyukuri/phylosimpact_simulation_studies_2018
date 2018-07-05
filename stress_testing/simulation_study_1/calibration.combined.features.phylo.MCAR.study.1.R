@@ -4390,31 +4390,31 @@ classic.target <- as.numeric(classic.target)
 
 # Phylo stats
 
-phylo.target.cov.35 <-  colMedians(targets.stat[,27:56])
+phylo.target.MCAR.cov.35 <-  colMedians(targets.stat[,27:56])
 
-phylo.target.cov.40 <-  colMedians(targets.stat[,57:86])
+phylo.target.MCAR.cov.40 <-  colMedians(targets.stat[,57:86])
 
-phylo.target.cov.45 <-  colMedians(targets.stat[,87:116])
+phylo.target.MCAR.cov.45 <-  colMedians(targets.stat[,87:116])
 
-phylo.target.cov.50 <-  colMedians(targets.stat[,117:146])
+phylo.target.MCAR.cov.50 <-  colMedians(targets.stat[,117:146])
 
-phylo.target.cov.55 <-  colMedians(targets.stat[,147:176])
+phylo.target.MCAR.cov.55 <-  colMedians(targets.stat[,147:176])
 
-phylo.target.cov.60 <-  colMedians(targets.stat[,176:206])
+phylo.target.MCAR.cov.60 <-  colMedians(targets.stat[,176:206])
 
-phylo.target.cov.65 <-  colMedians(targets.stat[,207:236])
+phylo.target.MCAR.cov.65 <-  colMedians(targets.stat[,207:236])
 
-phylo.target.cov.70 <-  colMedians(targets.stat[,237:266])
+phylo.target.MCAR.cov.70 <-  colMedians(targets.stat[,237:266])
 
-phylo.target.cov.75 <-  colMedians(targets.stat[,267:296])
+phylo.target.MCAR.cov.75 <-  colMedians(targets.stat[,267:296])
 
-phylo.target.cov.80 <-  colMedians(targets.stat[,297:326])
+phylo.target.MCAR.cov.80 <-  colMedians(targets.stat[,297:326])
 
-phylo.target.cov.85 <-  colMedians(targets.stat[,327:356])
+phylo.target.MCAR.cov.85 <-  colMedians(targets.stat[,327:356])
 
-phylo.target.cov.90 <-  colMedians(targets.stat[,357:386])
+phylo.target.MCAR.cov.90 <-  colMedians(targets.stat[,357:386])
 
-phylo.target.cov.95 <-  colMedians(targets.stat[,387:416])
+phylo.target.MCAR.cov.95 <-  colMedians(targets.stat[,387:416])
 
 
 
