@@ -1,7 +1,7 @@
 
 
 
-inputvector <- c(123,1.05, 0.25, 0, 3, 0.23, 0.23, 45, 45, -0.7, 2.8,
+inputvector <- c(1.05, 0.25, 0, 3, 0.23, 0.23, 45, 45, -0.7, 2.8,
                  -0.3, -0.3,
                  -2.7, # conception
                  -0.52, -0.05)
@@ -103,18 +103,18 @@ interventionlist <- list(art.intro, art.intro1, art.intro2, art.intro3, art.intr
 
 intervention <- interventionlist # scenario(interventionlist, tasp.indicator)
 
-cfg.list["hivtransmission.param.f1"] <- log(inputvector[2])
-cfg.list["hivtransmission.param.f2"] <- log(log(sqrt(inputvector[2])) / log(inputvector[2])) / 5
-cfg.list["formation.hazard.agegapry.gap_agescale_man"] <- inputvector[3]
-cfg.list["formation.hazard.agegapry.gap_agescale_woman"] <- inputvector[3]
-cfg.list["person.agegap.man.dist.normal.mu"] <- inputvector[4]
-cfg.list["person.agegap.woman.dist.normal.mu"] <- inputvector[4]
-cfg.list["person.agegap.man.dist.normal.sigma"] <- inputvector[5]
-cfg.list["person.agegap.woman.dist.normal.sigma"] <- inputvector[5]
-cfg.list["person.eagerness.man.dist.gamma.a"] <- inputvector[6]
-cfg.list["person.eagerness.woman.dist.gamma.a"] <- inputvector[7]
-cfg.list["person.eagerness.man.dist.gamma.b"] <- inputvector[8]
-cfg.list["person.eagerness.woman.dist.gamma.b"] <- inputvector[9]
+cfg.list["hivtransmission.param.f1"] <- log(inputvector[1])
+cfg.list["hivtransmission.param.f2"] <- log(log(sqrt(inputvector[1])) / log(inputvector[1])) / 5
+cfg.list["formation.hazard.agegapry.gap_agescale_man"] <- inputvector[2]
+cfg.list["formation.hazard.agegapry.gap_agescale_woman"] <- inputvector[2]
+cfg.list["person.agegap.man.dist.normal.mu"] <- inputvector[3]
+cfg.list["person.agegap.woman.dist.normal.mu"] <- inputvector[3]
+cfg.list["person.agegap.man.dist.normal.sigma"] <- inputvector[4]
+cfg.list["person.agegap.woman.dist.normal.sigma"] <- inputvector[4]
+cfg.list["person.eagerness.man.dist.gamma.a"] <- inputvector[5]
+cfg.list["person.eagerness.woman.dist.gamma.a"] <- inputvector[6]
+cfg.list["person.eagerness.man.dist.gamma.b"] <- inputvector[7]
+cfg.list["person.eagerness.woman.dist.gamma.b"] <- inputvector[8]
 
 #cfg <- cfg.list
 
@@ -122,15 +122,16 @@ cfg.list["population.maxevents"] <- as.numeric(cfg.list["population.simtime"][1]
 # cfg["monitoring.fraction.log_viralload"] <- 0.3
 cfg.list["person.vsp.toacute.x"] <- 5 # See Bellan PLoS Medicine
 
-seedid <- inputvector[1]
+seedid <- inputvector[1]*10000
 #cfg.list["person.agegap.man.dist.fixed.value"] <- -2 # inputvector[2]
 #cfg.list["person.agegap.woman.dist.fixed.value"] <- -2 # inputvector[2]
-cfg.list["formation.hazard.agegapry.gap_factor_man_exp"] <- inputvector[10] ######### -0.5
-cfg.list["formation.hazard.agegapry.gap_factor_woman_exp"] <- inputvector[10] ######### -0.5
-cfg.list["formation.hazard.agegapry.baseline"] <- inputvector[11]
+cfg.list["formation.hazard.agegapry.gap_factor_man_exp"] <- inputvector[9] ######### -0.5
+cfg.list["formation.hazard.agegapry.gap_factor_woman_exp"] <- inputvector[9] ######### -0.5
+cfg.list["formation.hazard.agegapry.baseline"] <- inputvector[10]
 
-cfg.list["formation.hazard.agegapry.numrel_man"] <- inputvector[12]
-cfg.list["formation.hazard.agegapry.numrel_woman"] <- inputvector[13]
-cfg.list["conception.alpha_base"] <- inputvector[14] #is conception.alpha.base (higher up)
-cfg.list["dissolution.alpha_0"] <- inputvector[15]
-cfg.list["dissolution.alpha_4"] <- inputvector[16]
+cfg.list["formation.hazard.agegapry.numrel_man"] <- inputvector[11]
+cfg.list["formation.hazard.agegapry.numrel_woman"] <- inputvector[12]
+cfg.list["conception.alpha_base"] <- inputvector[13] #is conception.alpha.base (higher up)
+cfg.list["dissolution.alpha_0"] <- inputvector[14]
+cfg.list["dissolution.alpha_4"] <- inputvector[15]
+
