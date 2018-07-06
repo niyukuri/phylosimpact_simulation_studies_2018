@@ -2,9 +2,9 @@
 
 
 
-phylogenetic.features.fun <- function(tree.topo=tree
-                                      # tree.calib.LTT = tree.calib.LTT
-                                      ){
+phylogenetic.features.fun <- function(tree.topo=tree)
+  # tree.calib.LTT = tree.calib.LTT
+{
   
   ########################################
   ### FEATURES FROM PHYLOGENETIC TREE ####
@@ -17,9 +17,8 @@ phylogenetic.features.fun <- function(tree.topo=tree
   
   # tree.cal <- read.tree(paste0(sub.dir.rename, "/calibrated.tree.nwk"))
   
-  tree.cal <- read.tree(paste0(tree.topo))
-
-  # tree <- read.tree("calibrated.tree.save.nwk")
+  tree.cal <- tree.topo # read.tree(paste0(tree.topo))
+  
   
   # Mean height of internal nodes
   
@@ -63,8 +62,8 @@ phylogenetic.features.fun <- function(tree.topo=tree
   
   phylo.features.summary <- c(mean.feature, colless.feature, sackin.feature, mean.tipsDepths.feature, mean.nodesDepths.feature,
                               maxHeight.feature)
-                              # lb.mean.feature, lb.median.feature, ub.mean.feature, ub.median.feature,
-                              # median.mean.feature, median.median.feature)
+  # lb.mean.feature, lb.median.feature, ub.mean.feature, ub.median.feature,
+  # median.mean.feature, median.median.feature)
   
   features.names <- c("meanHeight.feature", "colless.feature", "sackin.feature", "mean.tipsDepths.feature", "mean.nodesDepths.feature",
                       "maxHeight.feature")
