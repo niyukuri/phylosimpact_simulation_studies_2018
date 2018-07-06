@@ -60,7 +60,7 @@ cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
 # #
 
 inputvector <- c(123, # seed.id
-                 -052, # dissolution.alpha_0
+                 -0.52, # dissolution.alpha_0
                  -0.52, # dissolution.alpha_4
                  2, # formation.hazard.agegapry.baseline
                  0, # person.agegap.man.dist.normal.mu
