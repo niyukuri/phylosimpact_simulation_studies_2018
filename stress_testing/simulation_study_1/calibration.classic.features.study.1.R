@@ -241,8 +241,9 @@ simpact_prior <- list(c("unif", -1, 0), c("unif", -0.5, 0), c("unif", 1, 3), c("
 
 # Observed features
 
-library(robustbase)
+# library(robustbase)
 
+source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
 
 targets.stat <- read.csv("~/Desktop/mastermodeltest/features.matrix.csv")
 
@@ -273,52 +274,52 @@ write.csv(output.params.classic, file = "output.params.classic.csv")
 
 median.targets.stat <-  colMedians(as.matrix(output.params.classic))  # Ok # library(robustbase)
 
-
-Seq.simp <- ABC_sequential(model = simpact4ABC.classic,
-                          method = "Lenormand",
-                          prior = simpact_prior,
-                          summary_stat_target = sum_stat_obs,
-                          nb_simul = 4,
-                          alpha = 0.1,
-                          p_acc_min = 0.03,
-                          use_seed = TRUE,
-                          seed_count = 1,
-                          n_cluster = 4,
-                          inside_prior = FALSE)
-
-
-## MaC approach
-
-library(RSimpactHelper)
-library(mice)
-library(gsubfn)
-library(data.table)
-library(readcsvcolumns)
-library(randtoolbox)
-library(pcaPP)
-library(glmnet)
-
-lls <- c(-1, -0.5, 1, -0.5, 2, 0, -1, -0.9, 0, -2, -100, 0, 0, -0.5, 3, 5, 10, -3.5)
-
-uls <- c(0, 0, 3, 0.5, 4, 1, 0, 0, 0.5, 0, -80, 1, 0.5, 0, 7, 9, 14, -1.7)
-
-obs.targets <- as.numeric(sum_stat_obs)
-
-
-MaC.simp <- MaC(targets.empirical = obs.targets,
-                RMSD.tol.max = 2,
-                min.givetomice = 2,
-                n.experiments = 20,
-                lls = lls,
-                uls = uls,
-                model = simpact4ABC.classic,
-                strict.positive.params = 0,
-                probability.params = 0,
-                method = "norm",
-                predictorMatrix = "complete",
-                maxit = 20,
-                maxwaves = 1,
-                n_cluster = 8)
+# 
+# Seq.simp <- ABC_sequential(model = simpact4ABC.classic,
+#                           method = "Lenormand",
+#                           prior = simpact_prior,
+#                           summary_stat_target = sum_stat_obs,
+#                           nb_simul = 4,
+#                           alpha = 0.1,
+#                           p_acc_min = 0.03,
+#                           use_seed = TRUE,
+#                           seed_count = 1,
+#                           n_cluster = 4,
+#                           inside_prior = FALSE)
+# 
+# 
+# ## MaC approach
+# 
+# library(RSimpactHelper)
+# library(mice)
+# library(gsubfn)
+# library(data.table)
+# library(readcsvcolumns)
+# library(randtoolbox)
+# library(pcaPP)
+# library(glmnet)
+# 
+# lls <- c(-1, -0.5, 1, -0.5, 2, 0, -1, -0.9, 0, -2, -100, 0, 0, -0.5, 3, 5, 10, -3.5)
+# 
+# uls <- c(0, 0, 3, 0.5, 4, 1, 0, 0, 0.5, 0, -80, 1, 0.5, 0, 7, 9, 14, -1.7)
+# 
+# obs.targets <- as.numeric(sum_stat_obs)
+# 
+# 
+# MaC.simp <- MaC(targets.empirical = obs.targets,
+#                 RMSD.tol.max = 2,
+#                 min.givetomice = 2,
+#                 n.experiments = 20,
+#                 lls = lls,
+#                 uls = uls,
+#                 model = simpact4ABC.classic,
+#                 strict.positive.params = 0,
+#                 probability.params = 0,
+#                 method = "norm",
+#                 predictorMatrix = "complete",
+#                 maxit = 20,
+#                 maxwaves = 1,
+#                 n_cluster = 8)
 
 # Run default model with parameters values from calibration
 
