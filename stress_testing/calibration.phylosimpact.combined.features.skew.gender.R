@@ -26,6 +26,15 @@ library(phytools)
 library(Rsamtools) # select IDs sequences in a file
 library(robustbase) # colMedians
 
+err.functionGEN <- function(e){
+    return(sum_stat_obs = rep(NA,length(sum_stat_obs)))
+  stop(e)
+}
+
+
+# chunk.summary.stats <- tryCatch(simpact.chunk.run(simpact.chunk.prior),
+#                                error = err.functionGEN)
+
 
 # work.dir <- "/home/david/Desktop/calibration" # on laptop
 
@@ -225,9 +234,10 @@ simpact4ABC.men.50.women50.35 <- function(inputvector){
   datalist <- readthedata(results)
   
   
-  summary.stat <- gender.men50.women50.compute.summary.statistics.combined.35(datalist = datalist,
+  summary.stat <- tryCatch(gender.men50.women50.compute.summary.statistics.combined.35(datalist = datalist,
                                                                               work.dir = work.dir,
-                                                                              sub.dir.rename = ABC_DestDir.men.50.women50.35)
+                                                                              sub.dir.rename = ABC_DestDir.men.50.women50.35),
+                           error = err.functionGEN)
   
   
   # relsperpersonperyear <- nrow(datalist$rtable) / (nrow(datalist$ptable)/2) / cfg$population.simtime
@@ -282,23 +292,23 @@ sum_stat_obs <- c(0.003916345 , 0.000000000 , 0.000000000 , 0.000000000 ,
 
 # Initial number of simulations
 # n_init <- 4 #40
-# alpha <- 0.75 #0.5 # This is the proportion of particles kept at each step
-# pacc <- 0.9 #0.5 # This is the stopping criterion of the algorithm: a small number ensures a better convergence of the algorithm, but at a cost in computing time. Must be 0 < p_acc_min < 1. The smaller, the more strict the criterion.
+# alpha <- 0.5 # This is the proportion of particles kept at each step
+# pacc <- 0.5 # This is the stopping criterion of the algorithm: a small number ensures a better convergence of the algorithm, but at a cost in computing time. Must be 0 < p_acc_min < 1. The smaller, the more strict the criterion.
 # 
-# ABC_LenormandResult0 <- ABC_sequential(method="Lenormand",
-#                                        model=simpact4ABC,
-#                                        prior=simpact_prior,
-#                                        nb_simul=n_init,
-#                                        summary_stat_target=sum_stat_obs,
-#                                        alpha=alpha,
-#                                        p_acc_min=pacc,
-#                                        verbose=FALSE)
+ABC_LenormandResult0 <- ABC_sequential(method="Lenormand",
+                                       model=simpact4ABC.men.50.women50.35,
+                                       prior=simpact_prior,
+                                       nb_simul=n_init,
+                                       summary_stat_target=sum_stat_obs,
+                                       alpha=alpha,
+                                       p_acc_min=pacc,
+                                       verbose=FALSE)
 # 
 # # Time to get a coffee and a biscuit, this will take a while.
 # 
 # ABC_LenormandResult0
 
-n=3
+n=10
 p=0.7
 ABC_rej.men.50.women50.35 <-ABC_rejection(model=simpact4ABC.men.50.women50.35, prior=simpact_prior, nb_simul=n,
                                           summary_stat_target=sum_stat_obs, tol=p)

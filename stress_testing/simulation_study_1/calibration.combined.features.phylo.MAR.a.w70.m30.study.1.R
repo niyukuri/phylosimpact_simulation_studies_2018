@@ -1,12 +1,17 @@
 #######   CALIBRATION    WITH COMBINED CLASSIC  & PHYLO FEATURES  ##########
 
 
+# I.a. MAR
 
-# MCAR
+# Missing at random
 
-# Missing Completly at Random
 
-# Sequenced individulas are chosen randomly 
+# Sequenced individulas are chosen based on age and gender
+# Specifically: 30% men and 70 % women
+# age.group.15.25 = c(15,25),
+# age.group.25.40 = c(25,40),
+# age.group.40.50 = c(40,50)
+
 
 
 ##############
@@ -14,9 +19,11 @@
 ##############
 
 
+
 # 35%
 
-simpact4ABC.classic.phylo.MCAR.cov.35 <- function(inputvector){
+
+simpact4ABC.classic.phylo.mAr.cov.35 <- function(inputvector){
   
   
   library(EasyABC)
@@ -73,7 +80,7 @@ simpact4ABC.classic.phylo.MCAR.cov.35 <- function(inputvector){
     return(sub.dir.sim.id)
   }
   
-  ABC_DestDir.classic.phylo.MCAR.cov.35 <- paste0(work.dir,"/temp/",generate.filename(10))
+  ABC_DestDir.classic.phylo.mAr.cov.35 <- paste0(work.dir,"/temp/",generate.filename(10))
   
   source("~/phylosimpact_simulation_studies_2018/stress_testing/simulation_study_1/classic.features.study.1.R")
   source("~/phylosimpact_simulation_studies_2018/stress_testing/simulation_study_1/phylogenetic.features.study.1.R")
@@ -234,14 +241,14 @@ simpact4ABC.classic.phylo.MCAR.cov.35 <- function(inputvector){
   cfg <- cfg.list
   
   
-  results <- simpact.run(cfg, ABC_DestDir.classic.phylo.MCAR.cov.35) #simpact.run(cfg, ABC_DestDir, identifierFormat = ABC_identifier)  
+  results <- simpact.run(cfg, ABC_DestDir.classic.phylo.mAr.cov.35) #simpact.run(cfg, ABC_DestDir, identifierFormat = ABC_identifier)  
   
   datalist <- readthedata(results)
   
   
   classic.stat <- classic.features.study.1(datalist = datalist,
                                            work.dir = work.dir,
-                                           sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.35)
+                                           sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.35)
   
   
   ## Phylodynamics components
@@ -274,7 +281,7 @@ simpact4ABC.classic.phylo.MCAR.cov.35 <- function(inputvector){
     # This means that limitTransmEvents equal at least 7
     
     sequence.simulation.seqgen.par(dir.seq = dirseqgen,
-                                   sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.35,
+                                   sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.35,
                                    simpact.trans.net = simpact.trans.net,
                                    seq.gen.tool = "seq-gen",
                                    seeds.num = seeds.num,
@@ -284,14 +291,14 @@ simpact4ABC.classic.phylo.MCAR.cov.35 <- function(inputvector){
                                    clust = FALSE) # hiv.seq.file lodged in work.dir
     
     # Transform the sequence format to be handled by ClusterPicker
-    sequ.dna <- read.dna(file = paste0(ABC_DestDir.classic.phylo.MCAR.cov.35,"/C.Epidemic_seed.seq.bis.sim.nwk.fasta"), format = "interleaved")
-    write.dna(sequ.dna, file = paste0(ABC_DestDir.classic.phylo.MCAR.cov.35,"/C.Epidemic.fas") , format = "fasta")
+    sequ.dna <- read.dna(file = paste0(ABC_DestDir.classic.phylo.mAr.cov.35,"/C.Epidemic_seed.seq.bis.sim.nwk.fasta"), format = "interleaved")
+    write.dna(sequ.dna, file = paste0(ABC_DestDir.classic.phylo.mAr.cov.35,"/C.Epidemic.fas") , format = "fasta")
     
     
     dirfasttree <- work.dir
     
     tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
-                                                 sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.35,
+                                                 sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.35,
                                                  fasttree.tool = "FastTree",
                                                  calendar.dates = "samplingtimes.all.csv",
                                                  simseqfile = "C.Epidemic_seed.seq.bis.sim.nwk.fasta",
@@ -301,7 +308,7 @@ simpact4ABC.classic.phylo.MCAR.cov.35 <- function(inputvector){
     
     tree.calib.LTT <- tree.calib
     
-    write.tree(tree.calib, file = paste0(ABC_DestDir.classic.phylo.MCAR.cov.35,"/calibrated.tree.nwk"))
+    write.tree(tree.calib, file = paste0(ABC_DestDir.classic.phylo.mAr.cov.35,"/calibrated.tree.nwk"))
     
     
     N <- node.age(tree.calib)
@@ -311,7 +318,7 @@ simpact4ABC.classic.phylo.MCAR.cov.35 <- function(inputvector){
     latest.samp <- N$timeToMRCA+N$timeOfMRCA # latest sampling date
     
     
-    tree.cal <- read.tree(paste0(ABC_DestDir.classic.phylo.MCAR.cov.35, "/calibrated.tree.nwk"))
+    tree.cal <- read.tree(paste0(ABC_DestDir.classic.phylo.mAr.cov.35, "/calibrated.tree.nwk"))
     
     
     
@@ -320,14 +327,14 @@ simpact4ABC.classic.phylo.MCAR.cov.35 <- function(inputvector){
     phlyo.stat <- phylogenetic.features.study1(tree.topo=tree.cal,
                                                tree.calib.LTT = tree.calib.LTT,
                                                work.dir = work.dir,
-                                               sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.35,
+                                               sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.35,
                                                simpact.trans.net = simpact.trans.net,
                                                fasta.file = "C.Epidemic.fas",
                                                tree.file = "C.Epidemic_seed.seq.bis.sim.nwk.fasta.nwk")
     
   }else{
     
-    phlyo.stat <- rep(NA,30) # length(phylo.target.cov.35) =30
+    phlyo.stat <- rep(NA,30) # length(phylo.target.mAr.cov.35) =30
     
   }
   
@@ -351,7 +358,7 @@ simpact4ABC.classic.phylo.MCAR.cov.35 <- function(inputvector){
 # 40%
 
 
-simpact4ABC.classic.phylo.MCAR.cov.40 <- function(inputvector){
+simpact4ABC.classic.phylo.mAr.cov.40 <- function(inputvector){
   
   
   library(EasyABC)
@@ -408,7 +415,7 @@ simpact4ABC.classic.phylo.MCAR.cov.40 <- function(inputvector){
     return(sub.dir.sim.id)
   }
   
-  ABC_DestDir.classic.phylo.MCAR.cov.40 <- paste0(work.dir,"/temp/",generate.filename(10))
+  ABC_DestDir.classic.phylo.mAr.cov.40 <- paste0(work.dir,"/temp/",generate.filename(10))
   
   source("~/phylosimpact_simulation_studies_2018/stress_testing/simulation_study_1/classic.features.study.1.R")
   source("~/phylosimpact_simulation_studies_2018/stress_testing/simulation_study_1/phylogenetic.features.study.1.R")
@@ -569,14 +576,14 @@ simpact4ABC.classic.phylo.MCAR.cov.40 <- function(inputvector){
   cfg <- cfg.list
   
   
-  results <- simpact.run(cfg, ABC_DestDir.classic.phylo.MCAR.cov.40) #simpact.run(cfg, ABC_DestDir, identifierFormat = ABC_identifier)  
+  results <- simpact.run(cfg, ABC_DestDir.classic.phylo.mAr.cov.40) #simpact.run(cfg, ABC_DestDir, identifierFormat = ABC_identifier)  
   
   datalist <- readthedata(results)
   
   
   classic.stat <- classic.features.study.1(datalist = datalist,
                                            work.dir = work.dir,
-                                           sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.40)
+                                           sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.40)
   
   
   ## Phylodynamics components
@@ -609,7 +616,7 @@ simpact4ABC.classic.phylo.MCAR.cov.40 <- function(inputvector){
     # This means that limitTransmEvents equal at least 7
     
     sequence.simulation.seqgen.par(dir.seq = dirseqgen,
-                                   sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.40,
+                                   sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.40,
                                    simpact.trans.net = simpact.trans.net,
                                    seq.gen.tool = "seq-gen",
                                    seeds.num = seeds.num,
@@ -619,14 +626,14 @@ simpact4ABC.classic.phylo.MCAR.cov.40 <- function(inputvector){
                                    clust = FALSE) # hiv.seq.file lodged in work.dir
     
     # Transform the sequence format to be handled by ClusterPicker
-    sequ.dna <- read.dna(file = paste0(ABC_DestDir.classic.phylo.MCAR.cov.40,"/C.Epidemic_seed.seq.bis.sim.nwk.fasta"), format = "interleaved")
-    write.dna(sequ.dna, file = paste0(ABC_DestDir.classic.phylo.MCAR.cov.40,"/C.Epidemic.fas") , format = "fasta")
+    sequ.dna <- read.dna(file = paste0(ABC_DestDir.classic.phylo.mAr.cov.40,"/C.Epidemic_seed.seq.bis.sim.nwk.fasta"), format = "interleaved")
+    write.dna(sequ.dna, file = paste0(ABC_DestDir.classic.phylo.mAr.cov.40,"/C.Epidemic.fas") , format = "fasta")
     
     
     dirfasttree <- work.dir
     
     tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
-                                                 sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.40,
+                                                 sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.40,
                                                  fasttree.tool = "FastTree",
                                                  calendar.dates = "samplingtimes.all.csv",
                                                  simseqfile = "C.Epidemic_seed.seq.bis.sim.nwk.fasta",
@@ -636,7 +643,7 @@ simpact4ABC.classic.phylo.MCAR.cov.40 <- function(inputvector){
     
     tree.calib.LTT <- tree.calib
     
-    write.tree(tree.calib, file = paste0(ABC_DestDir.classic.phylo.MCAR.cov.40,"/calibrated.tree.nwk"))
+    write.tree(tree.calib, file = paste0(ABC_DestDir.classic.phylo.mAr.cov.40,"/calibrated.tree.nwk"))
     
     
     N <- node.age(tree.calib)
@@ -646,7 +653,7 @@ simpact4ABC.classic.phylo.MCAR.cov.40 <- function(inputvector){
     latest.samp <- N$timeToMRCA+N$timeOfMRCA # latest sampling date
     
     
-    tree.cal <- read.tree(paste0(ABC_DestDir.classic.phylo.MCAR.cov.40, "/calibrated.tree.nwk"))
+    tree.cal <- read.tree(paste0(ABC_DestDir.classic.phylo.mAr.cov.40, "/calibrated.tree.nwk"))
     
     
     
@@ -655,14 +662,14 @@ simpact4ABC.classic.phylo.MCAR.cov.40 <- function(inputvector){
     phlyo.stat <- phylogenetic.features.study1(tree.topo=tree.cal,
                                                tree.calib.LTT = tree.calib.LTT,
                                                work.dir = work.dir,
-                                               sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.40,
+                                               sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.40,
                                                simpact.trans.net = simpact.trans.net,
                                                fasta.file = "C.Epidemic.fas",
                                                tree.file = "C.Epidemic_seed.seq.bis.sim.nwk.fasta.nwk")
     
   }else{
     
-    phlyo.stat <- rep(NA,30) # length(phylo.target.cov.40) =30
+    phlyo.stat <- rep(NA,30) # length(phylo.target.mAr.cov.40) =30
     
   }
   
@@ -685,7 +692,7 @@ simpact4ABC.classic.phylo.MCAR.cov.40 <- function(inputvector){
 # 45%
 
 
-simpact4ABC.classic.phylo.MCAR.cov.45 <- function(inputvector){
+simpact4ABC.classic.phylo.mAr.cov.45 <- function(inputvector){
   
   
   library(EasyABC)
@@ -742,7 +749,7 @@ simpact4ABC.classic.phylo.MCAR.cov.45 <- function(inputvector){
     return(sub.dir.sim.id)
   }
   
-  ABC_DestDir.classic.phylo.MCAR.cov.45 <- paste0(work.dir,"/temp/",generate.filename(10))
+  ABC_DestDir.classic.phylo.mAr.cov.45 <- paste0(work.dir,"/temp/",generate.filename(10))
   
   source("~/phylosimpact_simulation_studies_2018/stress_testing/simulation_study_1/classic.features.study.1.R")
   source("~/phylosimpact_simulation_studies_2018/stress_testing/simulation_study_1/phylogenetic.features.study.1.R")
@@ -903,14 +910,14 @@ simpact4ABC.classic.phylo.MCAR.cov.45 <- function(inputvector){
   cfg <- cfg.list
   
   
-  results <- simpact.run(cfg, ABC_DestDir.classic.phylo.MCAR.cov.45) #simpact.run(cfg, ABC_DestDir, identifierFormat = ABC_identifier)  
+  results <- simpact.run(cfg, ABC_DestDir.classic.phylo.mAr.cov.45) #simpact.run(cfg, ABC_DestDir, identifierFormat = ABC_identifier)  
   
   datalist <- readthedata(results)
   
   
   classic.stat <- classic.features.study.1(datalist = datalist,
                                            work.dir = work.dir,
-                                           sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.45)
+                                           sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.45)
   
   
   ## Phylodynamics components
@@ -943,7 +950,7 @@ simpact4ABC.classic.phylo.MCAR.cov.45 <- function(inputvector){
     # This means that limitTransmEvents equal at least 7
     
     sequence.simulation.seqgen.par(dir.seq = dirseqgen,
-                                   sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.45,
+                                   sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.45,
                                    simpact.trans.net = simpact.trans.net,
                                    seq.gen.tool = "seq-gen",
                                    seeds.num = seeds.num,
@@ -953,14 +960,14 @@ simpact4ABC.classic.phylo.MCAR.cov.45 <- function(inputvector){
                                    clust = FALSE) # hiv.seq.file lodged in work.dir
     
     # Transform the sequence format to be handled by ClusterPicker
-    sequ.dna <- read.dna(file = paste0(ABC_DestDir.classic.phylo.MCAR.cov.45,"/C.Epidemic_seed.seq.bis.sim.nwk.fasta"), format = "interleaved")
-    write.dna(sequ.dna, file = paste0(ABC_DestDir.classic.phylo.MCAR.cov.45,"/C.Epidemic.fas") , format = "fasta")
+    sequ.dna <- read.dna(file = paste0(ABC_DestDir.classic.phylo.mAr.cov.45,"/C.Epidemic_seed.seq.bis.sim.nwk.fasta"), format = "interleaved")
+    write.dna(sequ.dna, file = paste0(ABC_DestDir.classic.phylo.mAr.cov.45,"/C.Epidemic.fas") , format = "fasta")
     
     
     dirfasttree <- work.dir
     
     tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
-                                                 sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.45,
+                                                 sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.45,
                                                  fasttree.tool = "FastTree",
                                                  calendar.dates = "samplingtimes.all.csv",
                                                  simseqfile = "C.Epidemic_seed.seq.bis.sim.nwk.fasta",
@@ -970,7 +977,7 @@ simpact4ABC.classic.phylo.MCAR.cov.45 <- function(inputvector){
     
     tree.calib.LTT <- tree.calib
     
-    write.tree(tree.calib, file = paste0(ABC_DestDir.classic.phylo.MCAR.cov.45,"/calibrated.tree.nwk"))
+    write.tree(tree.calib, file = paste0(ABC_DestDir.classic.phylo.mAr.cov.45,"/calibrated.tree.nwk"))
     
     
     N <- node.age(tree.calib)
@@ -980,7 +987,7 @@ simpact4ABC.classic.phylo.MCAR.cov.45 <- function(inputvector){
     latest.samp <- N$timeToMRCA+N$timeOfMRCA # latest sampling date
     
     
-    tree.cal <- read.tree(paste0(ABC_DestDir.classic.phylo.MCAR.cov.45, "/calibrated.tree.nwk"))
+    tree.cal <- read.tree(paste0(ABC_DestDir.classic.phylo.mAr.cov.45, "/calibrated.tree.nwk"))
     
     
     
@@ -989,14 +996,14 @@ simpact4ABC.classic.phylo.MCAR.cov.45 <- function(inputvector){
     phlyo.stat <- phylogenetic.features.study1(tree.topo=tree.cal,
                                                tree.calib.LTT = tree.calib.LTT,
                                                work.dir = work.dir,
-                                               sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.45,
+                                               sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.45,
                                                simpact.trans.net = simpact.trans.net,
                                                fasta.file = "C.Epidemic.fas",
                                                tree.file = "C.Epidemic_seed.seq.bis.sim.nwk.fasta.nwk")
     
   }else{
     
-    phlyo.stat <- rep(NA,30) # length(phylo.target.cov.45) =30
+    phlyo.stat <- rep(NA,30) # length(phylo.target.mAr.cov.45) =30
     
   }
   
@@ -1019,7 +1026,7 @@ simpact4ABC.classic.phylo.MCAR.cov.45 <- function(inputvector){
 # 50%
 
 
-simpact4ABC.classic.phylo.MCAR.cov.50 <- function(inputvector){
+simpact4ABC.classic.phylo.mAr.cov.50 <- function(inputvector){
   
   
   library(EasyABC)
@@ -1076,7 +1083,7 @@ simpact4ABC.classic.phylo.MCAR.cov.50 <- function(inputvector){
     return(sub.dir.sim.id)
   }
   
-  ABC_DestDir.classic.phylo.MCAR.cov.50 <- paste0(work.dir,"/temp/",generate.filename(10))
+  ABC_DestDir.classic.phylo.mAr.cov.50 <- paste0(work.dir,"/temp/",generate.filename(10))
   
   source("~/phylosimpact_simulation_studies_2018/stress_testing/simulation_study_1/classic.features.study.1.R")
   source("~/phylosimpact_simulation_studies_2018/stress_testing/simulation_study_1/phylogenetic.features.study.1.R")
@@ -1237,14 +1244,14 @@ simpact4ABC.classic.phylo.MCAR.cov.50 <- function(inputvector){
   cfg <- cfg.list
   
   
-  results <- simpact.run(cfg, ABC_DestDir.classic.phylo.MCAR.cov.50) #simpact.run(cfg, ABC_DestDir, identifierFormat = ABC_identifier)  
+  results <- simpact.run(cfg, ABC_DestDir.classic.phylo.mAr.cov.50) #simpact.run(cfg, ABC_DestDir, identifierFormat = ABC_identifier)  
   
   datalist <- readthedata(results)
   
   
   classic.stat <- classic.features.study.1(datalist = datalist,
                                            work.dir = work.dir,
-                                           sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.50)
+                                           sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.50)
   
   
   ## Phylodynamics components
@@ -1277,7 +1284,7 @@ simpact4ABC.classic.phylo.MCAR.cov.50 <- function(inputvector){
     # This means that limitTransmEvents equal at least 7
     
     sequence.simulation.seqgen.par(dir.seq = dirseqgen,
-                                   sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.50,
+                                   sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.50,
                                    simpact.trans.net = simpact.trans.net,
                                    seq.gen.tool = "seq-gen",
                                    seeds.num = seeds.num,
@@ -1287,14 +1294,14 @@ simpact4ABC.classic.phylo.MCAR.cov.50 <- function(inputvector){
                                    clust = FALSE) # hiv.seq.file lodged in work.dir
     
     # Transform the sequence format to be handled by ClusterPicker
-    sequ.dna <- read.dna(file = paste0(ABC_DestDir.classic.phylo.MCAR.cov.50,"/C.Epidemic_seed.seq.bis.sim.nwk.fasta"), format = "interleaved")
-    write.dna(sequ.dna, file = paste0(ABC_DestDir.classic.phylo.MCAR.cov.50,"/C.Epidemic.fas") , format = "fasta")
+    sequ.dna <- read.dna(file = paste0(ABC_DestDir.classic.phylo.mAr.cov.50,"/C.Epidemic_seed.seq.bis.sim.nwk.fasta"), format = "interleaved")
+    write.dna(sequ.dna, file = paste0(ABC_DestDir.classic.phylo.mAr.cov.50,"/C.Epidemic.fas") , format = "fasta")
     
     
     dirfasttree <- work.dir
     
     tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
-                                                 sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.50,
+                                                 sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.50,
                                                  fasttree.tool = "FastTree",
                                                  calendar.dates = "samplingtimes.all.csv",
                                                  simseqfile = "C.Epidemic_seed.seq.bis.sim.nwk.fasta",
@@ -1304,7 +1311,7 @@ simpact4ABC.classic.phylo.MCAR.cov.50 <- function(inputvector){
     
     tree.calib.LTT <- tree.calib
     
-    write.tree(tree.calib, file = paste0(ABC_DestDir.classic.phylo.MCAR.cov.50,"/calibrated.tree.nwk"))
+    write.tree(tree.calib, file = paste0(ABC_DestDir.classic.phylo.mAr.cov.50,"/calibrated.tree.nwk"))
     
     
     N <- node.age(tree.calib)
@@ -1314,7 +1321,7 @@ simpact4ABC.classic.phylo.MCAR.cov.50 <- function(inputvector){
     latest.samp <- N$timeToMRCA+N$timeOfMRCA # latest sampling date
     
     
-    tree.cal <- read.tree(paste0(ABC_DestDir.classic.phylo.MCAR.cov.50, "/calibrated.tree.nwk"))
+    tree.cal <- read.tree(paste0(ABC_DestDir.classic.phylo.mAr.cov.50, "/calibrated.tree.nwk"))
     
     
     
@@ -1323,14 +1330,14 @@ simpact4ABC.classic.phylo.MCAR.cov.50 <- function(inputvector){
     phlyo.stat <- phylogenetic.features.study1(tree.topo=tree.cal,
                                                tree.calib.LTT = tree.calib.LTT,
                                                work.dir = work.dir,
-                                               sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.50,
+                                               sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.50,
                                                simpact.trans.net = simpact.trans.net,
                                                fasta.file = "C.Epidemic.fas",
                                                tree.file = "C.Epidemic_seed.seq.bis.sim.nwk.fasta.nwk")
     
   }else{
     
-    phlyo.stat <- rep(NA,30) # length(phylo.target.cov.50) =30
+    phlyo.stat <- rep(NA,30) # length(phylo.target.mAr.cov.50) =30
     
   }
   
@@ -1353,7 +1360,7 @@ simpact4ABC.classic.phylo.MCAR.cov.50 <- function(inputvector){
 # 55 %
 
 
-simpact4ABC.classic.phylo.MCAR.cov.55 <- function(inputvector){
+simpact4ABC.classic.phylo.mAr.cov.55 <- function(inputvector){
   
   
   library(EasyABC)
@@ -1410,7 +1417,7 @@ simpact4ABC.classic.phylo.MCAR.cov.55 <- function(inputvector){
     return(sub.dir.sim.id)
   }
   
-  ABC_DestDir.classic.phylo.MCAR.cov.55 <- paste0(work.dir,"/temp/",generate.filename(10))
+  ABC_DestDir.classic.phylo.mAr.cov.55 <- paste0(work.dir,"/temp/",generate.filename(10))
   
   source("~/phylosimpact_simulation_studies_2018/stress_testing/simulation_study_1/classic.features.study.1.R")
   source("~/phylosimpact_simulation_studies_2018/stress_testing/simulation_study_1/phylogenetic.features.study.1.R")
@@ -1571,14 +1578,14 @@ simpact4ABC.classic.phylo.MCAR.cov.55 <- function(inputvector){
   cfg <- cfg.list
   
   
-  results <- simpact.run(cfg, ABC_DestDir.classic.phylo.MCAR.cov.55) #simpact.run(cfg, ABC_DestDir, identifierFormat = ABC_identifier)  
+  results <- simpact.run(cfg, ABC_DestDir.classic.phylo.mAr.cov.55) #simpact.run(cfg, ABC_DestDir, identifierFormat = ABC_identifier)  
   
   datalist <- readthedata(results)
   
   
   classic.stat <- classic.features.study.1(datalist = datalist,
                                            work.dir = work.dir,
-                                           sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.55)
+                                           sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.55)
   
   
   ## Phylodynamics components
@@ -1611,7 +1618,7 @@ simpact4ABC.classic.phylo.MCAR.cov.55 <- function(inputvector){
     # This means that limitTransmEvents equal at least 7
     
     sequence.simulation.seqgen.par(dir.seq = dirseqgen,
-                                   sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.55,
+                                   sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.55,
                                    simpact.trans.net = simpact.trans.net,
                                    seq.gen.tool = "seq-gen",
                                    seeds.num = seeds.num,
@@ -1621,14 +1628,14 @@ simpact4ABC.classic.phylo.MCAR.cov.55 <- function(inputvector){
                                    clust = FALSE) # hiv.seq.file lodged in work.dir
     
     # Transform the sequence format to be handled by ClusterPicker
-    sequ.dna <- read.dna(file = paste0(ABC_DestDir.classic.phylo.MCAR.cov.55,"/C.Epidemic_seed.seq.bis.sim.nwk.fasta"), format = "interleaved")
-    write.dna(sequ.dna, file = paste0(ABC_DestDir.classic.phylo.MCAR.cov.55,"/C.Epidemic.fas") , format = "fasta")
+    sequ.dna <- read.dna(file = paste0(ABC_DestDir.classic.phylo.mAr.cov.55,"/C.Epidemic_seed.seq.bis.sim.nwk.fasta"), format = "interleaved")
+    write.dna(sequ.dna, file = paste0(ABC_DestDir.classic.phylo.mAr.cov.55,"/C.Epidemic.fas") , format = "fasta")
     
     
     dirfasttree <- work.dir
     
     tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
-                                                 sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.55,
+                                                 sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.55,
                                                  fasttree.tool = "FastTree",
                                                  calendar.dates = "samplingtimes.all.csv",
                                                  simseqfile = "C.Epidemic_seed.seq.bis.sim.nwk.fasta",
@@ -1638,7 +1645,7 @@ simpact4ABC.classic.phylo.MCAR.cov.55 <- function(inputvector){
     
     tree.calib.LTT <- tree.calib
     
-    write.tree(tree.calib, file = paste0(ABC_DestDir.classic.phylo.MCAR.cov.55,"/calibrated.tree.nwk"))
+    write.tree(tree.calib, file = paste0(ABC_DestDir.classic.phylo.mAr.cov.55,"/calibrated.tree.nwk"))
     
     
     N <- node.age(tree.calib)
@@ -1648,7 +1655,7 @@ simpact4ABC.classic.phylo.MCAR.cov.55 <- function(inputvector){
     latest.samp <- N$timeToMRCA+N$timeOfMRCA # latest sampling date
     
     
-    tree.cal <- read.tree(paste0(ABC_DestDir.classic.phylo.MCAR.cov.55, "/calibrated.tree.nwk"))
+    tree.cal <- read.tree(paste0(ABC_DestDir.classic.phylo.mAr.cov.55, "/calibrated.tree.nwk"))
     
     
     
@@ -1657,14 +1664,14 @@ simpact4ABC.classic.phylo.MCAR.cov.55 <- function(inputvector){
     phlyo.stat <- phylogenetic.features.study1(tree.topo=tree.cal,
                                                tree.calib.LTT = tree.calib.LTT,
                                                work.dir = work.dir,
-                                               sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.55,
+                                               sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.55,
                                                simpact.trans.net = simpact.trans.net,
                                                fasta.file = "C.Epidemic.fas",
                                                tree.file = "C.Epidemic_seed.seq.bis.sim.nwk.fasta.nwk")
     
   }else{
     
-    phlyo.stat <- rep(NA,30) # length(phylo.target.cov.55) =30
+    phlyo.stat <- rep(NA,30) # length(phylo.target.mAr.cov.55) =30
     
   }
   
@@ -1687,7 +1694,7 @@ simpact4ABC.classic.phylo.MCAR.cov.55 <- function(inputvector){
 # 60%
 
 
-simpact4ABC.classic.phylo.MCAR.cov.60 <- function(inputvector){
+simpact4ABC.classic.phylo.mAr.cov.60 <- function(inputvector){
   
   
   library(EasyABC)
@@ -1744,7 +1751,7 @@ simpact4ABC.classic.phylo.MCAR.cov.60 <- function(inputvector){
     return(sub.dir.sim.id)
   }
   
-  ABC_DestDir.classic.phylo.MCAR.cov.60 <- paste0(work.dir,"/temp/",generate.filename(10))
+  ABC_DestDir.classic.phylo.mAr.cov.60 <- paste0(work.dir,"/temp/",generate.filename(10))
   
   source("~/phylosimpact_simulation_studies_2018/stress_testing/simulation_study_1/classic.features.study.1.R")
   source("~/phylosimpact_simulation_studies_2018/stress_testing/simulation_study_1/phylogenetic.features.study.1.R")
@@ -1905,14 +1912,14 @@ simpact4ABC.classic.phylo.MCAR.cov.60 <- function(inputvector){
   cfg <- cfg.list
   
   
-  results <- simpact.run(cfg, ABC_DestDir.classic.phylo.MCAR.cov.60) #simpact.run(cfg, ABC_DestDir, identifierFormat = ABC_identifier)  
+  results <- simpact.run(cfg, ABC_DestDir.classic.phylo.mAr.cov.60) #simpact.run(cfg, ABC_DestDir, identifierFormat = ABC_identifier)  
   
   datalist <- readthedata(results)
   
   
   classic.stat <- classic.features.study.1(datalist = datalist,
                                            work.dir = work.dir,
-                                           sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.60)
+                                           sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.60)
   
   
   ## Phylodynamics components
@@ -1945,7 +1952,7 @@ simpact4ABC.classic.phylo.MCAR.cov.60 <- function(inputvector){
     # This means that limitTransmEvents equal at least 7
     
     sequence.simulation.seqgen.par(dir.seq = dirseqgen,
-                                   sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.60,
+                                   sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.60,
                                    simpact.trans.net = simpact.trans.net,
                                    seq.gen.tool = "seq-gen",
                                    seeds.num = seeds.num,
@@ -1955,14 +1962,14 @@ simpact4ABC.classic.phylo.MCAR.cov.60 <- function(inputvector){
                                    clust = FALSE) # hiv.seq.file lodged in work.dir
     
     # Transform the sequence format to be handled by ClusterPicker
-    sequ.dna <- read.dna(file = paste0(ABC_DestDir.classic.phylo.MCAR.cov.60,"/C.Epidemic_seed.seq.bis.sim.nwk.fasta"), format = "interleaved")
-    write.dna(sequ.dna, file = paste0(ABC_DestDir.classic.phylo.MCAR.cov.60,"/C.Epidemic.fas") , format = "fasta")
+    sequ.dna <- read.dna(file = paste0(ABC_DestDir.classic.phylo.mAr.cov.60,"/C.Epidemic_seed.seq.bis.sim.nwk.fasta"), format = "interleaved")
+    write.dna(sequ.dna, file = paste0(ABC_DestDir.classic.phylo.mAr.cov.60,"/C.Epidemic.fas") , format = "fasta")
     
     
     dirfasttree <- work.dir
     
     tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
-                                                 sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.60,
+                                                 sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.60,
                                                  fasttree.tool = "FastTree",
                                                  calendar.dates = "samplingtimes.all.csv",
                                                  simseqfile = "C.Epidemic_seed.seq.bis.sim.nwk.fasta",
@@ -1972,7 +1979,7 @@ simpact4ABC.classic.phylo.MCAR.cov.60 <- function(inputvector){
     
     tree.calib.LTT <- tree.calib
     
-    write.tree(tree.calib, file = paste0(ABC_DestDir.classic.phylo.MCAR.cov.60,"/calibrated.tree.nwk"))
+    write.tree(tree.calib, file = paste0(ABC_DestDir.classic.phylo.mAr.cov.60,"/calibrated.tree.nwk"))
     
     
     N <- node.age(tree.calib)
@@ -1982,7 +1989,7 @@ simpact4ABC.classic.phylo.MCAR.cov.60 <- function(inputvector){
     latest.samp <- N$timeToMRCA+N$timeOfMRCA # latest sampling date
     
     
-    tree.cal <- read.tree(paste0(ABC_DestDir.classic.phylo.MCAR.cov.60, "/calibrated.tree.nwk"))
+    tree.cal <- read.tree(paste0(ABC_DestDir.classic.phylo.mAr.cov.60, "/calibrated.tree.nwk"))
     
     
     
@@ -1991,14 +1998,14 @@ simpact4ABC.classic.phylo.MCAR.cov.60 <- function(inputvector){
     phlyo.stat <- phylogenetic.features.study1(tree.topo=tree.cal,
                                                tree.calib.LTT = tree.calib.LTT,
                                                work.dir = work.dir,
-                                               sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.60,
+                                               sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.60,
                                                simpact.trans.net = simpact.trans.net,
                                                fasta.file = "C.Epidemic.fas",
                                                tree.file = "C.Epidemic_seed.seq.bis.sim.nwk.fasta.nwk")
     
   }else{
     
-    phlyo.stat <- rep(NA,30) # length(phylo.target.cov.60) =30
+    phlyo.stat <- rep(NA,30) # length(phylo.target.mAr.cov.60) =30
     
   }
   
@@ -2021,7 +2028,7 @@ simpact4ABC.classic.phylo.MCAR.cov.60 <- function(inputvector){
 # 65%
 
 
-simpact4ABC.classic.phylo.MCAR.cov.65 <- function(inputvector){
+simpact4ABC.classic.phylo.mAr.cov.65 <- function(inputvector){
   
   
   library(EasyABC)
@@ -2078,7 +2085,7 @@ simpact4ABC.classic.phylo.MCAR.cov.65 <- function(inputvector){
     return(sub.dir.sim.id)
   }
   
-  ABC_DestDir.classic.phylo.MCAR.cov.65 <- paste0(work.dir,"/temp/",generate.filename(10))
+  ABC_DestDir.classic.phylo.mAr.cov.65 <- paste0(work.dir,"/temp/",generate.filename(10))
   
   source("~/phylosimpact_simulation_studies_2018/stress_testing/simulation_study_1/classic.features.study.1.R")
   source("~/phylosimpact_simulation_studies_2018/stress_testing/simulation_study_1/phylogenetic.features.study.1.R")
@@ -2239,14 +2246,14 @@ simpact4ABC.classic.phylo.MCAR.cov.65 <- function(inputvector){
   cfg <- cfg.list
   
   
-  results <- simpact.run(cfg, ABC_DestDir.classic.phylo.MCAR.cov.65) #simpact.run(cfg, ABC_DestDir, identifierFormat = ABC_identifier)  
+  results <- simpact.run(cfg, ABC_DestDir.classic.phylo.mAr.cov.65) #simpact.run(cfg, ABC_DestDir, identifierFormat = ABC_identifier)  
   
   datalist <- readthedata(results)
   
   
   classic.stat <- classic.features.study.1(datalist = datalist,
                                            work.dir = work.dir,
-                                           sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.65)
+                                           sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.65)
   
   
   ## Phylodynamics components
@@ -2279,7 +2286,7 @@ simpact4ABC.classic.phylo.MCAR.cov.65 <- function(inputvector){
     # This means that limitTransmEvents equal at least 7
     
     sequence.simulation.seqgen.par(dir.seq = dirseqgen,
-                                   sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.65,
+                                   sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.65,
                                    simpact.trans.net = simpact.trans.net,
                                    seq.gen.tool = "seq-gen",
                                    seeds.num = seeds.num,
@@ -2289,14 +2296,14 @@ simpact4ABC.classic.phylo.MCAR.cov.65 <- function(inputvector){
                                    clust = FALSE) # hiv.seq.file lodged in work.dir
     
     # Transform the sequence format to be handled by ClusterPicker
-    sequ.dna <- read.dna(file = paste0(ABC_DestDir.classic.phylo.MCAR.cov.65,"/C.Epidemic_seed.seq.bis.sim.nwk.fasta"), format = "interleaved")
-    write.dna(sequ.dna, file = paste0(ABC_DestDir.classic.phylo.MCAR.cov.65,"/C.Epidemic.fas") , format = "fasta")
+    sequ.dna <- read.dna(file = paste0(ABC_DestDir.classic.phylo.mAr.cov.65,"/C.Epidemic_seed.seq.bis.sim.nwk.fasta"), format = "interleaved")
+    write.dna(sequ.dna, file = paste0(ABC_DestDir.classic.phylo.mAr.cov.65,"/C.Epidemic.fas") , format = "fasta")
     
     
     dirfasttree <- work.dir
     
     tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
-                                                 sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.65,
+                                                 sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.65,
                                                  fasttree.tool = "FastTree",
                                                  calendar.dates = "samplingtimes.all.csv",
                                                  simseqfile = "C.Epidemic_seed.seq.bis.sim.nwk.fasta",
@@ -2306,7 +2313,7 @@ simpact4ABC.classic.phylo.MCAR.cov.65 <- function(inputvector){
     
     tree.calib.LTT <- tree.calib
     
-    write.tree(tree.calib, file = paste0(ABC_DestDir.classic.phylo.MCAR.cov.65,"/calibrated.tree.nwk"))
+    write.tree(tree.calib, file = paste0(ABC_DestDir.classic.phylo.mAr.cov.65,"/calibrated.tree.nwk"))
     
     
     N <- node.age(tree.calib)
@@ -2316,7 +2323,7 @@ simpact4ABC.classic.phylo.MCAR.cov.65 <- function(inputvector){
     latest.samp <- N$timeToMRCA+N$timeOfMRCA # latest sampling date
     
     
-    tree.cal <- read.tree(paste0(ABC_DestDir.classic.phylo.MCAR.cov.65, "/calibrated.tree.nwk"))
+    tree.cal <- read.tree(paste0(ABC_DestDir.classic.phylo.mAr.cov.65, "/calibrated.tree.nwk"))
     
     
     
@@ -2325,14 +2332,14 @@ simpact4ABC.classic.phylo.MCAR.cov.65 <- function(inputvector){
     phlyo.stat <- phylogenetic.features.study1(tree.topo=tree.cal,
                                                tree.calib.LTT = tree.calib.LTT,
                                                work.dir = work.dir,
-                                               sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.65,
+                                               sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.65,
                                                simpact.trans.net = simpact.trans.net,
                                                fasta.file = "C.Epidemic.fas",
                                                tree.file = "C.Epidemic_seed.seq.bis.sim.nwk.fasta.nwk")
     
   }else{
     
-    phlyo.stat <- rep(NA,30) # length(phylo.target.cov.65) =30
+    phlyo.stat <- rep(NA,30) # length(phylo.target.mAr.cov.65) =30
     
   }
   
@@ -2355,7 +2362,7 @@ simpact4ABC.classic.phylo.MCAR.cov.65 <- function(inputvector){
 # 70%
 
 
-simpact4ABC.classic.phylo.MCAR.cov.70 <- function(inputvector){
+simpact4ABC.classic.phylo.mAr.cov.70 <- function(inputvector){
   
   
   library(EasyABC)
@@ -2412,7 +2419,7 @@ simpact4ABC.classic.phylo.MCAR.cov.70 <- function(inputvector){
     return(sub.dir.sim.id)
   }
   
-  ABC_DestDir.classic.phylo.MCAR.cov.70 <- paste0(work.dir,"/temp/",generate.filename(10))
+  ABC_DestDir.classic.phylo.mAr.cov.70 <- paste0(work.dir,"/temp/",generate.filename(10))
   
   source("~/phylosimpact_simulation_studies_2018/stress_testing/simulation_study_1/classic.features.study.1.R")
   source("~/phylosimpact_simulation_studies_2018/stress_testing/simulation_study_1/phylogenetic.features.study.1.R")
@@ -2573,14 +2580,14 @@ simpact4ABC.classic.phylo.MCAR.cov.70 <- function(inputvector){
   cfg <- cfg.list
   
   
-  results <- simpact.run(cfg, ABC_DestDir.classic.phylo.MCAR.cov.70) #simpact.run(cfg, ABC_DestDir, identifierFormat = ABC_identifier)  
+  results <- simpact.run(cfg, ABC_DestDir.classic.phylo.mAr.cov.70) #simpact.run(cfg, ABC_DestDir, identifierFormat = ABC_identifier)  
   
   datalist <- readthedata(results)
   
   
   classic.stat <- classic.features.study.1(datalist = datalist,
                                            work.dir = work.dir,
-                                           sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.70)
+                                           sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.70)
   
   
   ## Phylodynamics components
@@ -2613,7 +2620,7 @@ simpact4ABC.classic.phylo.MCAR.cov.70 <- function(inputvector){
     # This means that limitTransmEvents equal at least 7
     
     sequence.simulation.seqgen.par(dir.seq = dirseqgen,
-                                   sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.70,
+                                   sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.70,
                                    simpact.trans.net = simpact.trans.net,
                                    seq.gen.tool = "seq-gen",
                                    seeds.num = seeds.num,
@@ -2623,14 +2630,14 @@ simpact4ABC.classic.phylo.MCAR.cov.70 <- function(inputvector){
                                    clust = FALSE) # hiv.seq.file lodged in work.dir
     
     # Transform the sequence format to be handled by ClusterPicker
-    sequ.dna <- read.dna(file = paste0(ABC_DestDir.classic.phylo.MCAR.cov.70,"/C.Epidemic_seed.seq.bis.sim.nwk.fasta"), format = "interleaved")
-    write.dna(sequ.dna, file = paste0(ABC_DestDir.classic.phylo.MCAR.cov.70,"/C.Epidemic.fas") , format = "fasta")
+    sequ.dna <- read.dna(file = paste0(ABC_DestDir.classic.phylo.mAr.cov.70,"/C.Epidemic_seed.seq.bis.sim.nwk.fasta"), format = "interleaved")
+    write.dna(sequ.dna, file = paste0(ABC_DestDir.classic.phylo.mAr.cov.70,"/C.Epidemic.fas") , format = "fasta")
     
     
     dirfasttree <- work.dir
     
     tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
-                                                 sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.70,
+                                                 sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.70,
                                                  fasttree.tool = "FastTree",
                                                  calendar.dates = "samplingtimes.all.csv",
                                                  simseqfile = "C.Epidemic_seed.seq.bis.sim.nwk.fasta",
@@ -2640,7 +2647,7 @@ simpact4ABC.classic.phylo.MCAR.cov.70 <- function(inputvector){
     
     tree.calib.LTT <- tree.calib
     
-    write.tree(tree.calib, file = paste0(ABC_DestDir.classic.phylo.MCAR.cov.70,"/calibrated.tree.nwk"))
+    write.tree(tree.calib, file = paste0(ABC_DestDir.classic.phylo.mAr.cov.70,"/calibrated.tree.nwk"))
     
     
     N <- node.age(tree.calib)
@@ -2650,7 +2657,7 @@ simpact4ABC.classic.phylo.MCAR.cov.70 <- function(inputvector){
     latest.samp <- N$timeToMRCA+N$timeOfMRCA # latest sampling date
     
     
-    tree.cal <- read.tree(paste0(ABC_DestDir.classic.phylo.MCAR.cov.70, "/calibrated.tree.nwk"))
+    tree.cal <- read.tree(paste0(ABC_DestDir.classic.phylo.mAr.cov.70, "/calibrated.tree.nwk"))
     
     
     
@@ -2659,14 +2666,14 @@ simpact4ABC.classic.phylo.MCAR.cov.70 <- function(inputvector){
     phlyo.stat <- phylogenetic.features.study1(tree.topo=tree.cal,
                                                tree.calib.LTT = tree.calib.LTT,
                                                work.dir = work.dir,
-                                               sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.70,
+                                               sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.70,
                                                simpact.trans.net = simpact.trans.net,
                                                fasta.file = "C.Epidemic.fas",
                                                tree.file = "C.Epidemic_seed.seq.bis.sim.nwk.fasta.nwk")
     
   }else{
     
-    phlyo.stat <- rep(NA,30) # length(phylo.target.cov.70) =30
+    phlyo.stat <- rep(NA,30) # length(phylo.target.mAr.cov.70) =30
     
   }
   
@@ -2689,7 +2696,7 @@ simpact4ABC.classic.phylo.MCAR.cov.70 <- function(inputvector){
 # 75%
 
 
-simpact4ABC.classic.phylo.MCAR.cov.75 <- function(inputvector){
+simpact4ABC.classic.phylo.mAr.cov.75 <- function(inputvector){
   
   
   library(EasyABC)
@@ -2746,7 +2753,7 @@ simpact4ABC.classic.phylo.MCAR.cov.75 <- function(inputvector){
     return(sub.dir.sim.id)
   }
   
-  ABC_DestDir.classic.phylo.MCAR.cov.75 <- paste0(work.dir,"/temp/",generate.filename(10))
+  ABC_DestDir.classic.phylo.mAr.cov.75 <- paste0(work.dir,"/temp/",generate.filename(10))
   
   source("~/phylosimpact_simulation_studies_2018/stress_testing/simulation_study_1/classic.features.study.1.R")
   source("~/phylosimpact_simulation_studies_2018/stress_testing/simulation_study_1/phylogenetic.features.study.1.R")
@@ -2907,14 +2914,14 @@ simpact4ABC.classic.phylo.MCAR.cov.75 <- function(inputvector){
   cfg <- cfg.list
   
   
-  results <- simpact.run(cfg, ABC_DestDir.classic.phylo.MCAR.cov.75) #simpact.run(cfg, ABC_DestDir, identifierFormat = ABC_identifier)  
+  results <- simpact.run(cfg, ABC_DestDir.classic.phylo.mAr.cov.75) #simpact.run(cfg, ABC_DestDir, identifierFormat = ABC_identifier)  
   
   datalist <- readthedata(results)
   
   
   classic.stat <- classic.features.study.1(datalist = datalist,
                                            work.dir = work.dir,
-                                           sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.75)
+                                           sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.75)
   
   
   ## Phylodynamics components
@@ -2947,7 +2954,7 @@ simpact4ABC.classic.phylo.MCAR.cov.75 <- function(inputvector){
     # This means that limitTransmEvents equal at least 7
     
     sequence.simulation.seqgen.par(dir.seq = dirseqgen,
-                                   sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.75,
+                                   sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.75,
                                    simpact.trans.net = simpact.trans.net,
                                    seq.gen.tool = "seq-gen",
                                    seeds.num = seeds.num,
@@ -2957,14 +2964,14 @@ simpact4ABC.classic.phylo.MCAR.cov.75 <- function(inputvector){
                                    clust = FALSE) # hiv.seq.file lodged in work.dir
     
     # Transform the sequence format to be handled by ClusterPicker
-    sequ.dna <- read.dna(file = paste0(ABC_DestDir.classic.phylo.MCAR.cov.75,"/C.Epidemic_seed.seq.bis.sim.nwk.fasta"), format = "interleaved")
-    write.dna(sequ.dna, file = paste0(ABC_DestDir.classic.phylo.MCAR.cov.75,"/C.Epidemic.fas") , format = "fasta")
+    sequ.dna <- read.dna(file = paste0(ABC_DestDir.classic.phylo.mAr.cov.75,"/C.Epidemic_seed.seq.bis.sim.nwk.fasta"), format = "interleaved")
+    write.dna(sequ.dna, file = paste0(ABC_DestDir.classic.phylo.mAr.cov.75,"/C.Epidemic.fas") , format = "fasta")
     
     
     dirfasttree <- work.dir
     
     tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
-                                                 sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.75,
+                                                 sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.75,
                                                  fasttree.tool = "FastTree",
                                                  calendar.dates = "samplingtimes.all.csv",
                                                  simseqfile = "C.Epidemic_seed.seq.bis.sim.nwk.fasta",
@@ -2974,7 +2981,7 @@ simpact4ABC.classic.phylo.MCAR.cov.75 <- function(inputvector){
     
     tree.calib.LTT <- tree.calib
     
-    write.tree(tree.calib, file = paste0(ABC_DestDir.classic.phylo.MCAR.cov.75,"/calibrated.tree.nwk"))
+    write.tree(tree.calib, file = paste0(ABC_DestDir.classic.phylo.mAr.cov.75,"/calibrated.tree.nwk"))
     
     
     N <- node.age(tree.calib)
@@ -2984,7 +2991,7 @@ simpact4ABC.classic.phylo.MCAR.cov.75 <- function(inputvector){
     latest.samp <- N$timeToMRCA+N$timeOfMRCA # latest sampling date
     
     
-    tree.cal <- read.tree(paste0(ABC_DestDir.classic.phylo.MCAR.cov.75, "/calibrated.tree.nwk"))
+    tree.cal <- read.tree(paste0(ABC_DestDir.classic.phylo.mAr.cov.75, "/calibrated.tree.nwk"))
     
     
     
@@ -2993,14 +3000,14 @@ simpact4ABC.classic.phylo.MCAR.cov.75 <- function(inputvector){
     phlyo.stat <- phylogenetic.features.study1(tree.topo=tree.cal,
                                                tree.calib.LTT = tree.calib.LTT,
                                                work.dir = work.dir,
-                                               sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.75,
+                                               sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.75,
                                                simpact.trans.net = simpact.trans.net,
                                                fasta.file = "C.Epidemic.fas",
                                                tree.file = "C.Epidemic_seed.seq.bis.sim.nwk.fasta.nwk")
     
   }else{
     
-    phlyo.stat <- rep(NA,30) # length(phylo.target.cov.75) =30
+    phlyo.stat <- rep(NA,30) # length(phylo.target.mAr.cov.75) =30
     
   }
   
@@ -3023,7 +3030,7 @@ simpact4ABC.classic.phylo.MCAR.cov.75 <- function(inputvector){
 # 80%
 
 
-simpact4ABC.classic.phylo.MCAR.cov.80 <- function(inputvector){
+simpact4ABC.classic.phylo.mAr.cov.80 <- function(inputvector){
   
   
   library(EasyABC)
@@ -3080,7 +3087,7 @@ simpact4ABC.classic.phylo.MCAR.cov.80 <- function(inputvector){
     return(sub.dir.sim.id)
   }
   
-  ABC_DestDir.classic.phylo.MCAR.cov.80 <- paste0(work.dir,"/temp/",generate.filename(10))
+  ABC_DestDir.classic.phylo.mAr.cov.80 <- paste0(work.dir,"/temp/",generate.filename(10))
   
   source("~/phylosimpact_simulation_studies_2018/stress_testing/simulation_study_1/classic.features.study.1.R")
   source("~/phylosimpact_simulation_studies_2018/stress_testing/simulation_study_1/phylogenetic.features.study.1.R")
@@ -3241,14 +3248,14 @@ simpact4ABC.classic.phylo.MCAR.cov.80 <- function(inputvector){
   cfg <- cfg.list
   
   
-  results <- simpact.run(cfg, ABC_DestDir.classic.phylo.MCAR.cov.80) #simpact.run(cfg, ABC_DestDir, identifierFormat = ABC_identifier)  
+  results <- simpact.run(cfg, ABC_DestDir.classic.phylo.mAr.cov.80) #simpact.run(cfg, ABC_DestDir, identifierFormat = ABC_identifier)  
   
   datalist <- readthedata(results)
   
   
   classic.stat <- classic.features.study.1(datalist = datalist,
                                            work.dir = work.dir,
-                                           sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.80)
+                                           sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.80)
   
   
   ## Phylodynamics components
@@ -3281,7 +3288,7 @@ simpact4ABC.classic.phylo.MCAR.cov.80 <- function(inputvector){
     # This means that limitTransmEvents equal at least 7
     
     sequence.simulation.seqgen.par(dir.seq = dirseqgen,
-                                   sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.80,
+                                   sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.80,
                                    simpact.trans.net = simpact.trans.net,
                                    seq.gen.tool = "seq-gen",
                                    seeds.num = seeds.num,
@@ -3291,14 +3298,14 @@ simpact4ABC.classic.phylo.MCAR.cov.80 <- function(inputvector){
                                    clust = FALSE) # hiv.seq.file lodged in work.dir
     
     # Transform the sequence format to be handled by ClusterPicker
-    sequ.dna <- read.dna(file = paste0(ABC_DestDir.classic.phylo.MCAR.cov.80,"/C.Epidemic_seed.seq.bis.sim.nwk.fasta"), format = "interleaved")
-    write.dna(sequ.dna, file = paste0(ABC_DestDir.classic.phylo.MCAR.cov.80,"/C.Epidemic.fas") , format = "fasta")
+    sequ.dna <- read.dna(file = paste0(ABC_DestDir.classic.phylo.mAr.cov.80,"/C.Epidemic_seed.seq.bis.sim.nwk.fasta"), format = "interleaved")
+    write.dna(sequ.dna, file = paste0(ABC_DestDir.classic.phylo.mAr.cov.80,"/C.Epidemic.fas") , format = "fasta")
     
     
     dirfasttree <- work.dir
     
     tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
-                                                 sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.80,
+                                                 sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.80,
                                                  fasttree.tool = "FastTree",
                                                  calendar.dates = "samplingtimes.all.csv",
                                                  simseqfile = "C.Epidemic_seed.seq.bis.sim.nwk.fasta",
@@ -3308,7 +3315,7 @@ simpact4ABC.classic.phylo.MCAR.cov.80 <- function(inputvector){
     
     tree.calib.LTT <- tree.calib
     
-    write.tree(tree.calib, file = paste0(ABC_DestDir.classic.phylo.MCAR.cov.80,"/calibrated.tree.nwk"))
+    write.tree(tree.calib, file = paste0(ABC_DestDir.classic.phylo.mAr.cov.80,"/calibrated.tree.nwk"))
     
     
     N <- node.age(tree.calib)
@@ -3318,7 +3325,7 @@ simpact4ABC.classic.phylo.MCAR.cov.80 <- function(inputvector){
     latest.samp <- N$timeToMRCA+N$timeOfMRCA # latest sampling date
     
     
-    tree.cal <- read.tree(paste0(ABC_DestDir.classic.phylo.MCAR.cov.80, "/calibrated.tree.nwk"))
+    tree.cal <- read.tree(paste0(ABC_DestDir.classic.phylo.mAr.cov.80, "/calibrated.tree.nwk"))
     
     
     
@@ -3327,14 +3334,14 @@ simpact4ABC.classic.phylo.MCAR.cov.80 <- function(inputvector){
     phlyo.stat <- phylogenetic.features.study1(tree.topo=tree.cal,
                                                tree.calib.LTT = tree.calib.LTT,
                                                work.dir = work.dir,
-                                               sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.80,
+                                               sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.80,
                                                simpact.trans.net = simpact.trans.net,
                                                fasta.file = "C.Epidemic.fas",
                                                tree.file = "C.Epidemic_seed.seq.bis.sim.nwk.fasta.nwk")
     
   }else{
     
-    phlyo.stat <- rep(NA,30) # length(phylo.target.cov.80) =30
+    phlyo.stat <- rep(NA,30) # length(phylo.target.mAr.cov.80) =30
     
   }
   
@@ -3357,7 +3364,7 @@ simpact4ABC.classic.phylo.MCAR.cov.80 <- function(inputvector){
 # 85%
 
 
-simpact4ABC.classic.phylo.MCAR.cov.85 <- function(inputvector){
+simpact4ABC.classic.phylo.mAr.cov.85 <- function(inputvector){
   
   
   library(EasyABC)
@@ -3414,7 +3421,7 @@ simpact4ABC.classic.phylo.MCAR.cov.85 <- function(inputvector){
     return(sub.dir.sim.id)
   }
   
-  ABC_DestDir.classic.phylo.MCAR.cov.85 <- paste0(work.dir,"/temp/",generate.filename(10))
+  ABC_DestDir.classic.phylo.mAr.cov.85 <- paste0(work.dir,"/temp/",generate.filename(10))
   
   source("~/phylosimpact_simulation_studies_2018/stress_testing/simulation_study_1/classic.features.study.1.R")
   source("~/phylosimpact_simulation_studies_2018/stress_testing/simulation_study_1/phylogenetic.features.study.1.R")
@@ -3575,14 +3582,14 @@ simpact4ABC.classic.phylo.MCAR.cov.85 <- function(inputvector){
   cfg <- cfg.list
   
   
-  results <- simpact.run(cfg, ABC_DestDir.classic.phylo.MCAR.cov.85) #simpact.run(cfg, ABC_DestDir, identifierFormat = ABC_identifier)  
+  results <- simpact.run(cfg, ABC_DestDir.classic.phylo.mAr.cov.85) #simpact.run(cfg, ABC_DestDir, identifierFormat = ABC_identifier)  
   
   datalist <- readthedata(results)
   
   
   classic.stat <- classic.features.study.1(datalist = datalist,
                                            work.dir = work.dir,
-                                           sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.85)
+                                           sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.85)
   
   
   ## Phylodynamics components
@@ -3615,7 +3622,7 @@ simpact4ABC.classic.phylo.MCAR.cov.85 <- function(inputvector){
     # This means that limitTransmEvents equal at least 7
     
     sequence.simulation.seqgen.par(dir.seq = dirseqgen,
-                                   sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.85,
+                                   sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.85,
                                    simpact.trans.net = simpact.trans.net,
                                    seq.gen.tool = "seq-gen",
                                    seeds.num = seeds.num,
@@ -3625,14 +3632,14 @@ simpact4ABC.classic.phylo.MCAR.cov.85 <- function(inputvector){
                                    clust = FALSE) # hiv.seq.file lodged in work.dir
     
     # Transform the sequence format to be handled by ClusterPicker
-    sequ.dna <- read.dna(file = paste0(ABC_DestDir.classic.phylo.MCAR.cov.85,"/C.Epidemic_seed.seq.bis.sim.nwk.fasta"), format = "interleaved")
-    write.dna(sequ.dna, file = paste0(ABC_DestDir.classic.phylo.MCAR.cov.85,"/C.Epidemic.fas") , format = "fasta")
+    sequ.dna <- read.dna(file = paste0(ABC_DestDir.classic.phylo.mAr.cov.85,"/C.Epidemic_seed.seq.bis.sim.nwk.fasta"), format = "interleaved")
+    write.dna(sequ.dna, file = paste0(ABC_DestDir.classic.phylo.mAr.cov.85,"/C.Epidemic.fas") , format = "fasta")
     
     
     dirfasttree <- work.dir
     
     tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
-                                                 sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.85,
+                                                 sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.85,
                                                  fasttree.tool = "FastTree",
                                                  calendar.dates = "samplingtimes.all.csv",
                                                  simseqfile = "C.Epidemic_seed.seq.bis.sim.nwk.fasta",
@@ -3642,7 +3649,7 @@ simpact4ABC.classic.phylo.MCAR.cov.85 <- function(inputvector){
     
     tree.calib.LTT <- tree.calib
     
-    write.tree(tree.calib, file = paste0(ABC_DestDir.classic.phylo.MCAR.cov.85,"/calibrated.tree.nwk"))
+    write.tree(tree.calib, file = paste0(ABC_DestDir.classic.phylo.mAr.cov.85,"/calibrated.tree.nwk"))
     
     
     N <- node.age(tree.calib)
@@ -3652,7 +3659,7 @@ simpact4ABC.classic.phylo.MCAR.cov.85 <- function(inputvector){
     latest.samp <- N$timeToMRCA+N$timeOfMRCA # latest sampling date
     
     
-    tree.cal <- read.tree(paste0(ABC_DestDir.classic.phylo.MCAR.cov.85, "/calibrated.tree.nwk"))
+    tree.cal <- read.tree(paste0(ABC_DestDir.classic.phylo.mAr.cov.85, "/calibrated.tree.nwk"))
     
     
     
@@ -3661,14 +3668,14 @@ simpact4ABC.classic.phylo.MCAR.cov.85 <- function(inputvector){
     phlyo.stat <- phylogenetic.features.study1(tree.topo=tree.cal,
                                                tree.calib.LTT = tree.calib.LTT,
                                                work.dir = work.dir,
-                                               sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.85,
+                                               sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.85,
                                                simpact.trans.net = simpact.trans.net,
                                                fasta.file = "C.Epidemic.fas",
                                                tree.file = "C.Epidemic_seed.seq.bis.sim.nwk.fasta.nwk")
     
   }else{
     
-    phlyo.stat <- rep(NA,30) # length(phylo.target.cov.85) =30
+    phlyo.stat <- rep(NA,30) # length(phylo.target.mAr.cov.85) =30
     
   }
   
@@ -3691,7 +3698,7 @@ simpact4ABC.classic.phylo.MCAR.cov.85 <- function(inputvector){
 # 90%
 
 
-simpact4ABC.classic.phylo.MCAR.cov.90 <- function(inputvector){
+simpact4ABC.classic.phylo.mAr.cov.90 <- function(inputvector){
   
   
   library(EasyABC)
@@ -3748,7 +3755,7 @@ simpact4ABC.classic.phylo.MCAR.cov.90 <- function(inputvector){
     return(sub.dir.sim.id)
   }
   
-  ABC_DestDir.classic.phylo.MCAR.cov.90 <- paste0(work.dir,"/temp/",generate.filename(10))
+  ABC_DestDir.classic.phylo.mAr.cov.90 <- paste0(work.dir,"/temp/",generate.filename(10))
   
   source("~/phylosimpact_simulation_studies_2018/stress_testing/simulation_study_1/classic.features.study.1.R")
   source("~/phylosimpact_simulation_studies_2018/stress_testing/simulation_study_1/phylogenetic.features.study.1.R")
@@ -3909,14 +3916,14 @@ simpact4ABC.classic.phylo.MCAR.cov.90 <- function(inputvector){
   cfg <- cfg.list
   
   
-  results <- simpact.run(cfg, ABC_DestDir.classic.phylo.MCAR.cov.90) #simpact.run(cfg, ABC_DestDir, identifierFormat = ABC_identifier)  
+  results <- simpact.run(cfg, ABC_DestDir.classic.phylo.mAr.cov.90) #simpact.run(cfg, ABC_DestDir, identifierFormat = ABC_identifier)  
   
   datalist <- readthedata(results)
   
   
   classic.stat <- classic.features.study.1(datalist = datalist,
                                            work.dir = work.dir,
-                                           sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.90)
+                                           sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.90)
   
   
   ## Phylodynamics components
@@ -3949,7 +3956,7 @@ simpact4ABC.classic.phylo.MCAR.cov.90 <- function(inputvector){
     # This means that limitTransmEvents equal at least 7
     
     sequence.simulation.seqgen.par(dir.seq = dirseqgen,
-                                   sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.90,
+                                   sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.90,
                                    simpact.trans.net = simpact.trans.net,
                                    seq.gen.tool = "seq-gen",
                                    seeds.num = seeds.num,
@@ -3959,14 +3966,14 @@ simpact4ABC.classic.phylo.MCAR.cov.90 <- function(inputvector){
                                    clust = FALSE) # hiv.seq.file lodged in work.dir
     
     # Transform the sequence format to be handled by ClusterPicker
-    sequ.dna <- read.dna(file = paste0(ABC_DestDir.classic.phylo.MCAR.cov.90,"/C.Epidemic_seed.seq.bis.sim.nwk.fasta"), format = "interleaved")
-    write.dna(sequ.dna, file = paste0(ABC_DestDir.classic.phylo.MCAR.cov.90,"/C.Epidemic.fas") , format = "fasta")
+    sequ.dna <- read.dna(file = paste0(ABC_DestDir.classic.phylo.mAr.cov.90,"/C.Epidemic_seed.seq.bis.sim.nwk.fasta"), format = "interleaved")
+    write.dna(sequ.dna, file = paste0(ABC_DestDir.classic.phylo.mAr.cov.90,"/C.Epidemic.fas") , format = "fasta")
     
     
     dirfasttree <- work.dir
     
     tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
-                                                 sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.90,
+                                                 sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.90,
                                                  fasttree.tool = "FastTree",
                                                  calendar.dates = "samplingtimes.all.csv",
                                                  simseqfile = "C.Epidemic_seed.seq.bis.sim.nwk.fasta",
@@ -3976,7 +3983,7 @@ simpact4ABC.classic.phylo.MCAR.cov.90 <- function(inputvector){
     
     tree.calib.LTT <- tree.calib
     
-    write.tree(tree.calib, file = paste0(ABC_DestDir.classic.phylo.MCAR.cov.90,"/calibrated.tree.nwk"))
+    write.tree(tree.calib, file = paste0(ABC_DestDir.classic.phylo.mAr.cov.90,"/calibrated.tree.nwk"))
     
     
     N <- node.age(tree.calib)
@@ -3986,7 +3993,7 @@ simpact4ABC.classic.phylo.MCAR.cov.90 <- function(inputvector){
     latest.samp <- N$timeToMRCA+N$timeOfMRCA # latest sampling date
     
     
-    tree.cal <- read.tree(paste0(ABC_DestDir.classic.phylo.MCAR.cov.90, "/calibrated.tree.nwk"))
+    tree.cal <- read.tree(paste0(ABC_DestDir.classic.phylo.mAr.cov.90, "/calibrated.tree.nwk"))
     
     
     
@@ -3995,14 +4002,14 @@ simpact4ABC.classic.phylo.MCAR.cov.90 <- function(inputvector){
     phlyo.stat <- phylogenetic.features.study1(tree.topo=tree.cal,
                                                tree.calib.LTT = tree.calib.LTT,
                                                work.dir = work.dir,
-                                               sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.90,
+                                               sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.90,
                                                simpact.trans.net = simpact.trans.net,
                                                fasta.file = "C.Epidemic.fas",
                                                tree.file = "C.Epidemic_seed.seq.bis.sim.nwk.fasta.nwk")
     
   }else{
     
-    phlyo.stat <- rep(NA,30) # length(phylo.target.cov.90) =30
+    phlyo.stat <- rep(NA,30) # length(phylo.target.mAr.cov.90) =30
     
   }
   
@@ -4025,7 +4032,7 @@ simpact4ABC.classic.phylo.MCAR.cov.90 <- function(inputvector){
 # 95%
 
 
-simpact4ABC.classic.phylo.MCAR.cov.95 <- function(inputvector){
+simpact4ABC.classic.phylo.mAr.cov.95 <- function(inputvector){
   
   
   library(EasyABC)
@@ -4082,7 +4089,7 @@ simpact4ABC.classic.phylo.MCAR.cov.95 <- function(inputvector){
     return(sub.dir.sim.id)
   }
   
-  ABC_DestDir.classic.phylo.MCAR.cov.95 <- paste0(work.dir,"/temp/",generate.filename(10))
+  ABC_DestDir.classic.phylo.mAr.cov.95 <- paste0(work.dir,"/temp/",generate.filename(10))
   
   source("~/phylosimpact_simulation_studies_2018/stress_testing/simulation_study_1/classic.features.study.1.R")
   source("~/phylosimpact_simulation_studies_2018/stress_testing/simulation_study_1/phylogenetic.features.study.1.R")
@@ -4243,14 +4250,14 @@ simpact4ABC.classic.phylo.MCAR.cov.95 <- function(inputvector){
   cfg <- cfg.list
   
   
-  results <- simpact.run(cfg, ABC_DestDir.classic.phylo.MCAR.cov.95) #simpact.run(cfg, ABC_DestDir, identifierFormat = ABC_identifier)  
+  results <- simpact.run(cfg, ABC_DestDir.classic.phylo.mAr.cov.95) #simpact.run(cfg, ABC_DestDir, identifierFormat = ABC_identifier)  
   
   datalist <- readthedata(results)
   
   
   classic.stat <- classic.features.study.1(datalist = datalist,
                                            work.dir = work.dir,
-                                           sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.95)
+                                           sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.95)
   
   
   ## Phylodynamics components
@@ -4283,7 +4290,7 @@ simpact4ABC.classic.phylo.MCAR.cov.95 <- function(inputvector){
     # This means that limitTransmEvents equal at least 7
     
     sequence.simulation.seqgen.par(dir.seq = dirseqgen,
-                                   sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.95,
+                                   sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.95,
                                    simpact.trans.net = simpact.trans.net,
                                    seq.gen.tool = "seq-gen",
                                    seeds.num = seeds.num,
@@ -4293,14 +4300,14 @@ simpact4ABC.classic.phylo.MCAR.cov.95 <- function(inputvector){
                                    clust = FALSE) # hiv.seq.file lodged in work.dir
     
     # Transform the sequence format to be handled by ClusterPicker
-    sequ.dna <- read.dna(file = paste0(ABC_DestDir.classic.phylo.MCAR.cov.95,"/C.Epidemic_seed.seq.bis.sim.nwk.fasta"), format = "interleaved")
-    write.dna(sequ.dna, file = paste0(ABC_DestDir.classic.phylo.MCAR.cov.95,"/C.Epidemic.fas") , format = "fasta")
+    sequ.dna <- read.dna(file = paste0(ABC_DestDir.classic.phylo.mAr.cov.95,"/C.Epidemic_seed.seq.bis.sim.nwk.fasta"), format = "interleaved")
+    write.dna(sequ.dna, file = paste0(ABC_DestDir.classic.phylo.mAr.cov.95,"/C.Epidemic.fas") , format = "fasta")
     
     
     dirfasttree <- work.dir
     
     tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
-                                                 sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.95,
+                                                 sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.95,
                                                  fasttree.tool = "FastTree",
                                                  calendar.dates = "samplingtimes.all.csv",
                                                  simseqfile = "C.Epidemic_seed.seq.bis.sim.nwk.fasta",
@@ -4310,7 +4317,7 @@ simpact4ABC.classic.phylo.MCAR.cov.95 <- function(inputvector){
     
     tree.calib.LTT <- tree.calib
     
-    write.tree(tree.calib, file = paste0(ABC_DestDir.classic.phylo.MCAR.cov.95,"/calibrated.tree.nwk"))
+    write.tree(tree.calib, file = paste0(ABC_DestDir.classic.phylo.mAr.cov.95,"/calibrated.tree.nwk"))
     
     
     N <- node.age(tree.calib)
@@ -4320,7 +4327,7 @@ simpact4ABC.classic.phylo.MCAR.cov.95 <- function(inputvector){
     latest.samp <- N$timeToMRCA+N$timeOfMRCA # latest sampling date
     
     
-    tree.cal <- read.tree(paste0(ABC_DestDir.classic.phylo.MCAR.cov.95, "/calibrated.tree.nwk"))
+    tree.cal <- read.tree(paste0(ABC_DestDir.classic.phylo.mAr.cov.95, "/calibrated.tree.nwk"))
     
     
     
@@ -4329,14 +4336,14 @@ simpact4ABC.classic.phylo.MCAR.cov.95 <- function(inputvector){
     phlyo.stat <- phylogenetic.features.study1(tree.topo=tree.cal,
                                                tree.calib.LTT = tree.calib.LTT,
                                                work.dir = work.dir,
-                                               sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.cov.95,
+                                               sub.dir.rename = ABC_DestDir.classic.phylo.mAr.cov.95,
                                                simpact.trans.net = simpact.trans.net,
                                                fasta.file = "C.Epidemic.fas",
                                                tree.file = "C.Epidemic_seed.seq.bis.sim.nwk.fasta.nwk")
     
   }else{
     
-    phlyo.stat <- rep(NA,30) # length(phylo.target.cov.95) =30
+    phlyo.stat <- rep(NA,30) # length(phylo.target.mAr.cov.95) =30
     
   }
   
@@ -4354,6 +4361,7 @@ simpact4ABC.classic.phylo.MCAR.cov.95 <- function(inputvector){
   
   return(outputvector)
 }
+
 
 
 ##############
@@ -4390,34 +4398,32 @@ classic.target <- as.numeric(classic.target)
 
 # Phylo stats
 
-phylo.target.MCAR.cov.35 <-  colMedians(targets.stat[,27:56])
 
-phylo.target.MCAR.cov.40 <-  colMedians(targets.stat[,57:86])
+phylo.target.mAr.cov.35 <-  colMedians(targets.stat[,417:446])
 
-phylo.target.MCAR.cov.45 <-  colMedians(targets.stat[,87:116])
+phylo.target.mAr.cov.40 <-  colMedians(targets.stat[,447:476])
 
-phylo.target.MCAR.cov.50 <-  colMedians(targets.stat[,117:146])
+phylo.target.mAr.cov.45 <-  colMedians(targets.stat[,477:506])
 
-phylo.target.MCAR.cov.55 <-  colMedians(targets.stat[,147:176])
+phylo.target.mAr.cov.50 <-  colMedians(targets.stat[,507:536])
 
-phylo.target.MCAR.cov.60 <-  colMedians(targets.stat[,176:206])
+phylo.target.mAr.cov.55 <-  colMedians(targets.stat[,537:566])
 
-phylo.target.MCAR.cov.65 <-  colMedians(targets.stat[,207:236])
+phylo.target.mAr.cov.60 <-  colMedians(targets.stat[,567:596])
 
-phylo.target.MCAR.cov.70 <-  colMedians(targets.stat[,237:266])
+phylo.target.mAr.cov.65 <-  colMedians(targets.stat[,597:626])
 
-phylo.target.MCAR.cov.75 <-  colMedians(targets.stat[,267:296])
+phylo.target.mAr.cov.70 <-  colMedians(targets.stat[,627:656])
 
-phylo.target.MCAR.cov.80 <-  colMedians(targets.stat[,297:326])
+phylo.target.mAr.cov.75 <-  colMedians(targets.stat[,657:686])
 
-phylo.target.MCAR.cov.85 <-  colMedians(targets.stat[,327:356])
+phylo.target.mAr.cov.80 <-  colMedians(targets.stat[,687:716])
 
-phylo.target.MCAR.cov.90 <-  colMedians(targets.stat[,357:386])
+phylo.target.mAr.cov.85 <-  colMedians(targets.stat[,717:746])
 
-phylo.target.MCAR.cov.95 <-  colMedians(targets.stat[,387:416])
+phylo.target.mAr.cov.90 <-  colMedians(targets.stat[,747:776])
 
-
-
+phylo.target.mAr.cov.95 <-  colMedians(targets.stat[,777:806])
 
 
 
@@ -4430,27 +4436,27 @@ library(data.table)
 
 # 35%
 
-sum_stat_obs.MCAR.cov.35 <- c(as.numeric(classic.target), as.numeric(phylo.target.MCAR.cov.35))
+sum_stat_obs.mAr.cov.35 <- c(as.numeric(classic.target), as.numeric(phylo.target.mAr.cov.35))
 
 
-ABC_rej.classic.phylo.MCAR.cov.35 <-  ABC_rejection(model = simpact4ABC.classic.phylo.MCAR.cov.35,
-                                                    prior = simpact_prior,
-                                                    summary_stat_target = sum_stat_obs.MCAR.cov.35,
-                                                    nb_simul = 12,
-                                                    use_seed = TRUE,
-                                                    seed_count = 1,
-                                                    n_cluster = 4,
-                                                    tol = 2/12)
+ABC_rej.classic.phylo.mAr.cov.35 <-  ABC_rejection(model = simpact4ABC.classic.phylo.mAr.cov.35,
+                                                   prior = simpact_prior,
+                                                   summary_stat_target = sum_stat_obs.mAr.cov.35,
+                                                   nb_simul = 12,
+                                                   use_seed = TRUE,
+                                                   seed_count = 1,
+                                                   n_cluster = 4,
+                                                   tol = 2/12)
 
 
 
-output.params.classic.phylo.MCAR.cov.35 <- as.data.table(ABC_rej.classic.phylo.MCAR.cov.35$param)
+output.params.classic.phylo.mAr.cov.35 <- as.data.table(ABC_rej.classic.phylo.mAr.cov.35$param)
 
-write.csv(output.params.classic.phylo.MCAR.cov.35, file = "output.params.classic.phylo.MCAR.cov.35.csv")
+write.csv(output.params.classic.phylo.mAr.cov.35, file = "output.params.classic.phylo.mAr.cov.35.csv")
 
-output.params.classic.phylo.MCAR.cov.35 <- as.data.frame(as.matrix(output.params.classic.phylo.MCAR.cov.35))
+output.params.classic.phylo.mAr.cov.35 <- as.data.frame(as.matrix(output.params.classic.phylo.mAr.cov.35))
 
-median.targets.stat.phylo.MCRA.cov.35 <-  colMedians((output.params.classic.phylo.MCAR.cov.35))  # Ok # library(robustbase)
+median.targets.stat.phylo.mAr.cov.35 <-  colMedians((output.params.classic.phylo.mAr.cov.35))  # Ok # library(robustbase)
 
 
 # Run default model with parameters values from calibration
@@ -4469,47 +4475,47 @@ setwd(paste0(work.dir))
 
 pacman::p_load(snow, parallel, RSimpactCyan, RSimpactHelper, ape, Rsamtools)
 
-inputvector.MCRA.cov.35 <- as.numeric(median.targets.stat.phylo.MCRA.cov.35)
+inputvector.mAr.cov.35 <- as.numeric(median.targets.stat.phylo.mAr.cov.35)
 
 reps <- 4
 
 
-inputmatrix.MCRA.cov.35 <- matrix(rep(inputvector.MCRA.cov.35, reps), byrow = TRUE, nrow = reps)
+inputmatrix.mAr.cov.35 <- matrix(rep(inputvector.mAr.cov.35, reps), byrow = TRUE, nrow = reps)
 
 
-epic.metric.calibrates.MCRA.cov.35 <- simpact.parallel(model = wrapper.test.study.1,
-                                                       actual.input.matrix = inputmatrix.MCRA.cov.35,
-                                                       seed_count = 124,
-                                                       n_cluster = 4)
+epic.metric.calibrates.mAr.cov.35 <- simpact.parallel(model = wrapper.test.study.1,
+                                                      actual.input.matrix = inputmatrix.mAr.cov.35,
+                                                      seed_count = 124,
+                                                      n_cluster = 4)
 
 
-write.csv(epic.metric.calibrates.MCRA.cov.35, file = paste0(work.dir,"/epic.metric.calibrates.MCRA.cov.35.csv"))
+write.csv(epic.metric.calibrates.mAr.cov.35, file = paste0(work.dir,"/epic.metric.calibrates.mAr.cov.35.csv"))
 
 
 # 40%
 
 
-sum_stat_obs.MCAR.cov.40 <- c(as.numeric(classic.target), as.numeric(phylo.target.MCAR.cov.40))
+sum_stat_obs.mAr.cov.40 <- c(as.numeric(classic.target), as.numeric(phylo.target.mAr.cov.40))
 
 
-ABC_rej.classic.phylo.MCAR.cov.40 <-  ABC_rejection(model = simpact4ABC.classic.phylo.MCAR.cov.40,
-                                                    prior = simpact_prior,
-                                                    summary_stat_target = sum_stat_obs.MCAR.cov.40,
-                                                    nb_simul = 12,
-                                                    use_seed = TRUE,
-                                                    seed_count = 1,
-                                                    n_cluster = 4,
-                                                    tol = 2/12)
+ABC_rej.classic.phylo.mAr.cov.40 <-  ABC_rejection(model = simpact4ABC.classic.phylo.mAr.cov.40,
+                                                   prior = simpact_prior,
+                                                   summary_stat_target = sum_stat_obs.mAr.cov.40,
+                                                   nb_simul = 12,
+                                                   use_seed = TRUE,
+                                                   seed_count = 1,
+                                                   n_cluster = 4,
+                                                   tol = 2/12)
 
 
 
-output.params.classic.phylo.MCAR.cov.40 <- as.data.table(ABC_rej.classic.phylo.MCAR.cov.40$param)
+output.params.classic.phylo.mAr.cov.40 <- as.data.table(ABC_rej.classic.phylo.mAr.cov.40$param)
 
-write.csv(output.params.classic.phylo.MCAR.cov.40, file = "output.params.classic.phylo.MCAR.cov.40.csv")
+write.csv(output.params.classic.phylo.mAr.cov.40, file = "output.params.classic.phylo.mAr.cov.40.csv")
 
-output.params.classic.phylo.MCAR.cov.40 <- as.data.frame(as.matrix(output.params.classic.phylo.MCAR.cov.40))
+output.params.classic.phylo.mAr.cov.40 <- as.data.frame(as.matrix(output.params.classic.phylo.mAr.cov.40))
 
-median.targets.stat.phylo.MCRA.cov.40 <-  colMedians((output.params.classic.phylo.MCAR.cov.40))  # Ok # library(robustbase)
+median.targets.stat.phylo.mAr.cov.40 <-  colMedians((output.params.classic.phylo.mAr.cov.40))  # Ok # library(robustbase)
 
 
 # Run default model with parameters values from calibration
@@ -4528,47 +4534,47 @@ setwd(paste0(work.dir))
 
 pacman::p_load(snow, parallel, RSimpactCyan, RSimpactHelper, ape, Rsamtools)
 
-inputvector.MCRA.cov.40 <- as.numeric(median.targets.stat.phylo.MCRA.cov.40)
+inputvector.mAr.cov.40 <- as.numeric(median.targets.stat.phylo.mAr.cov.40)
 
 reps <- 4
 
 
-inputmatrix.MCRA.cov.40 <- matrix(rep(inputvector.MCRA.cov.40, reps), byrow = TRUE, nrow = reps)
+inputmatrix.mAr.cov.40 <- matrix(rep(inputvector.mAr.cov.40, reps), byrow = TRUE, nrow = reps)
 
 
-epic.metric.calibrates.MCRA.cov.40 <- simpact.parallel(model = wrapper.test.study.1,
-                                                       actual.input.matrix = inputmatrix.MCRA.cov.40,
-                                                       seed_count = 124,
-                                                       n_cluster = 4)
+epic.metric.calibrates.mAr.cov.40 <- simpact.parallel(model = wrapper.test.study.1,
+                                                      actual.input.matrix = inputmatrix.mAr.cov.40,
+                                                      seed_count = 124,
+                                                      n_cluster = 4)
 
 
-write.csv(epic.metric.calibrates.MCRA.cov.40, file = paste0(work.dir,"/epic.metric.calibrates.MCRA.cov.40.csv"))
+write.csv(epic.metric.calibrates.mAr.cov.40, file = paste0(work.dir,"/epic.metric.calibrates.mAr.cov.40.csv"))
 
 
 # 45%
 
 
-sum_stat_obs.MCAR.cov.45 <- c(as.numeric(classic.target), as.numeric(phylo.target.MCAR.cov.45))
+sum_stat_obs.mAr.cov.45 <- c(as.numeric(classic.target), as.numeric(phylo.target.mAr.cov.45))
 
 
-ABC_rej.classic.phylo.MCAR.cov.45 <-  ABC_rejection(model = simpact4ABC.classic.phylo.MCAR.cov.45,
-                                                    prior = simpact_prior,
-                                                    summary_stat_target = sum_stat_obs.MCAR.cov.45,
-                                                    nb_simul = 12,
-                                                    use_seed = TRUE,
-                                                    seed_count = 1,
-                                                    n_cluster = 4,
-                                                    tol = 2/12)
+ABC_rej.classic.phylo.mAr.cov.45 <-  ABC_rejection(model = simpact4ABC.classic.phylo.mAr.cov.45,
+                                                   prior = simpact_prior,
+                                                   summary_stat_target = sum_stat_obs.mAr.cov.45,
+                                                   nb_simul = 12,
+                                                   use_seed = TRUE,
+                                                   seed_count = 1,
+                                                   n_cluster = 4,
+                                                   tol = 2/12)
 
 
 
-output.params.classic.phylo.MCAR.cov.45 <- as.data.table(ABC_rej.classic.phylo.MCAR.cov.45$param)
+output.params.classic.phylo.mAr.cov.45 <- as.data.table(ABC_rej.classic.phylo.mAr.cov.45$param)
 
-write.csv(output.params.classic.phylo.MCAR.cov.45, file = "output.params.classic.phylo.MCAR.cov.45.csv")
+write.csv(output.params.classic.phylo.mAr.cov.45, file = "output.params.classic.phylo.mAr.cov.45.csv")
 
-output.params.classic.phylo.MCAR.cov.45 <- as.data.frame(as.matrix(output.params.classic.phylo.MCAR.cov.45))
+output.params.classic.phylo.mAr.cov.45 <- as.data.frame(as.matrix(output.params.classic.phylo.mAr.cov.45))
 
-median.targets.stat.phylo.MCRA.cov.45 <-  colMedians((output.params.classic.phylo.MCAR.cov.45))  # Ok # library(robustbase)
+median.targets.stat.phylo.mAr.cov.45 <-  colMedians((output.params.classic.phylo.mAr.cov.45))  # Ok # library(robustbase)
 
 
 # Run default model with parameters values from calibration
@@ -4587,47 +4593,47 @@ setwd(paste0(work.dir))
 
 pacman::p_load(snow, parallel, RSimpactCyan, RSimpactHelper, ape, Rsamtools)
 
-inputvector.MCRA.cov.45 <- as.numeric(median.targets.stat.phylo.MCRA.cov.45)
+inputvector.mAr.cov.45 <- as.numeric(median.targets.stat.phylo.mAr.cov.45)
 
 reps <- 4
 
 
-inputmatrix.MCRA.cov.45 <- matrix(rep(inputvector.MCRA.cov.45, reps), byrow = TRUE, nrow = reps)
+inputmatrix.mAr.cov.45 <- matrix(rep(inputvector.mAr.cov.45, reps), byrow = TRUE, nrow = reps)
 
 
-epic.metric.calibrates.MCRA.cov.45 <- simpact.parallel(model = wrapper.test.study.1,
-                                                       actual.input.matrix = inputmatrix.MCRA.cov.45,
-                                                       seed_count = 124,
-                                                       n_cluster = 4)
+epic.metric.calibrates.mAr.cov.45 <- simpact.parallel(model = wrapper.test.study.1,
+                                                      actual.input.matrix = inputmatrix.mAr.cov.45,
+                                                      seed_count = 124,
+                                                      n_cluster = 4)
 
 
-write.csv(epic.metric.calibrates.MCRA.cov.45, file = paste0(work.dir,"/epic.metric.calibrates.MCRA.cov.45.csv"))
+write.csv(epic.metric.calibrates.mAr.cov.45, file = paste0(work.dir,"/epic.metric.calibrates.mAr.cov.45.csv"))
 
 
 # 50%
 
 
-sum_stat_obs.MCAR.cov.50 <- c(as.numeric(classic.target), as.numeric(phylo.target.MCAR.cov.50))
+sum_stat_obs.mAr.cov.50 <- c(as.numeric(classic.target), as.numeric(phylo.target.mAr.cov.50))
 
 
-ABC_rej.classic.phylo.MCAR.cov.50 <-  ABC_rejection(model = simpact4ABC.classic.phylo.MCAR.cov.50,
-                                                    prior = simpact_prior,
-                                                    summary_stat_target = sum_stat_obs.MCAR.cov.50,
-                                                    nb_simul = 12,
-                                                    use_seed = TRUE,
-                                                    seed_count = 1,
-                                                    n_cluster = 4,
-                                                    tol = 2/12)
+ABC_rej.classic.phylo.mAr.cov.50 <-  ABC_rejection(model = simpact4ABC.classic.phylo.mAr.cov.50,
+                                                   prior = simpact_prior,
+                                                   summary_stat_target = sum_stat_obs.mAr.cov.50,
+                                                   nb_simul = 12,
+                                                   use_seed = TRUE,
+                                                   seed_count = 1,
+                                                   n_cluster = 4,
+                                                   tol = 2/12)
 
 
 
-output.params.classic.phylo.MCAR.cov.50 <- as.data.table(ABC_rej.classic.phylo.MCAR.cov.50$param)
+output.params.classic.phylo.mAr.cov.50 <- as.data.table(ABC_rej.classic.phylo.mAr.cov.50$param)
 
-write.csv(output.params.classic.phylo.MCAR.cov.50, file = "output.params.classic.phylo.MCAR.cov.50.csv")
+write.csv(output.params.classic.phylo.mAr.cov.50, file = "output.params.classic.phylo.mAr.cov.50.csv")
 
-output.params.classic.phylo.MCAR.cov.50 <- as.data.frame(as.matrix(output.params.classic.phylo.MCAR.cov.50))
+output.params.classic.phylo.mAr.cov.50 <- as.data.frame(as.matrix(output.params.classic.phylo.mAr.cov.50))
 
-median.targets.stat.phylo.MCRA.cov.50 <-  colMedians((output.params.classic.phylo.MCAR.cov.50))  # Ok # library(robustbase)
+median.targets.stat.phylo.mAr.cov.50 <-  colMedians((output.params.classic.phylo.mAr.cov.50))  # Ok # library(robustbase)
 
 
 # Run default model with parameters values from calibration
@@ -4646,47 +4652,47 @@ setwd(paste0(work.dir))
 
 pacman::p_load(snow, parallel, RSimpactCyan, RSimpactHelper, ape, Rsamtools)
 
-inputvector.MCRA.cov.50 <- as.numeric(median.targets.stat.phylo.MCRA.cov.50)
+inputvector.mAr.cov.50 <- as.numeric(median.targets.stat.phylo.mAr.cov.50)
 
 reps <- 4
 
 
-inputmatrix.MCRA.cov.50 <- matrix(rep(inputvector.MCRA.cov.50, reps), byrow = TRUE, nrow = reps)
+inputmatrix.mAr.cov.50 <- matrix(rep(inputvector.mAr.cov.50, reps), byrow = TRUE, nrow = reps)
 
 
-epic.metric.calibrates.MCRA.cov.50 <- simpact.parallel(model = wrapper.test.study.1,
-                                                       actual.input.matrix = inputmatrix.MCRA.cov.50,
-                                                       seed_count = 124,
-                                                       n_cluster = 4)
+epic.metric.calibrates.mAr.cov.50 <- simpact.parallel(model = wrapper.test.study.1,
+                                                      actual.input.matrix = inputmatrix.mAr.cov.50,
+                                                      seed_count = 124,
+                                                      n_cluster = 4)
 
 
-write.csv(epic.metric.calibrates.MCRA.cov.50, file = paste0(work.dir,"/epic.metric.calibrates.MCRA.cov.50.csv"))
+write.csv(epic.metric.calibrates.mAr.cov.50, file = paste0(work.dir,"/epic.metric.calibrates.mAr.cov.50.csv"))
 
 
 # 55%
 
 
-sum_stat_obs.MCAR.cov.55 <- c(as.numeric(classic.target), as.numeric(phylo.target.MCAR.cov.55))
+sum_stat_obs.mAr.cov.55 <- c(as.numeric(classic.target), as.numeric(phylo.target.mAr.cov.55))
 
 
-ABC_rej.classic.phylo.MCAR.cov.55 <-  ABC_rejection(model = simpact4ABC.classic.phylo.MCAR.cov.55,
-                                                    prior = simpact_prior,
-                                                    summary_stat_target = sum_stat_obs.MCAR.cov.55,
-                                                    nb_simul = 12,
-                                                    use_seed = TRUE,
-                                                    seed_count = 1,
-                                                    n_cluster = 4,
-                                                    tol = 2/12)
+ABC_rej.classic.phylo.mAr.cov.55 <-  ABC_rejection(model = simpact4ABC.classic.phylo.mAr.cov.55,
+                                                   prior = simpact_prior,
+                                                   summary_stat_target = sum_stat_obs.mAr.cov.55,
+                                                   nb_simul = 12,
+                                                   use_seed = TRUE,
+                                                   seed_count = 1,
+                                                   n_cluster = 4,
+                                                   tol = 2/12)
 
 
 
-output.params.classic.phylo.MCAR.cov.55 <- as.data.table(ABC_rej.classic.phylo.MCAR.cov.55$param)
+output.params.classic.phylo.mAr.cov.55 <- as.data.table(ABC_rej.classic.phylo.mAr.cov.55$param)
 
-write.csv(output.params.classic.phylo.MCAR.cov.55, file = "output.params.classic.phylo.MCAR.cov.55.csv")
+write.csv(output.params.classic.phylo.mAr.cov.55, file = "output.params.classic.phylo.mAr.cov.55.csv")
 
-output.params.classic.phylo.MCAR.cov.55 <- as.data.frame(as.matrix(output.params.classic.phylo.MCAR.cov.55))
+output.params.classic.phylo.mAr.cov.55 <- as.data.frame(as.matrix(output.params.classic.phylo.mAr.cov.55))
 
-median.targets.stat.phylo.MCRA.cov.55 <-  colMedians((output.params.classic.phylo.MCAR.cov.55))  # Ok # library(robustbase)
+median.targets.stat.phylo.mAr.cov.55 <-  colMedians((output.params.classic.phylo.mAr.cov.55))  # Ok # library(robustbase)
 
 
 # Run default model with parameters values from calibration
@@ -4705,47 +4711,47 @@ setwd(paste0(work.dir))
 
 pacman::p_load(snow, parallel, RSimpactCyan, RSimpactHelper, ape, Rsamtools)
 
-inputvector.MCRA.cov.55 <- as.numeric(median.targets.stat.phylo.MCRA.cov.55)
+inputvector.mAr.cov.55 <- as.numeric(median.targets.stat.phylo.mAr.cov.55)
 
 reps <- 4
 
 
-inputmatrix.MCRA.cov.55 <- matrix(rep(inputvector.MCRA.cov.55, reps), byrow = TRUE, nrow = reps)
+inputmatrix.mAr.cov.55 <- matrix(rep(inputvector.mAr.cov.55, reps), byrow = TRUE, nrow = reps)
 
 
-epic.metric.calibrates.MCRA.cov.55 <- simpact.parallel(model = wrapper.test.study.1,
-                                                       actual.input.matrix = inputmatrix.MCRA.cov.55,
-                                                       seed_count = 124,
-                                                       n_cluster = 4)
+epic.metric.calibrates.mAr.cov.55 <- simpact.parallel(model = wrapper.test.study.1,
+                                                      actual.input.matrix = inputmatrix.mAr.cov.55,
+                                                      seed_count = 124,
+                                                      n_cluster = 4)
 
 
-write.csv(epic.metric.calibrates.MCRA.cov.55, file = paste0(work.dir,"/epic.metric.calibrates.MCRA.cov.55.csv"))
+write.csv(epic.metric.calibrates.mAr.cov.55, file = paste0(work.dir,"/epic.metric.calibrates.mAr.cov.55.csv"))
 
 
 # 60%
 
 
-sum_stat_obs.MCAR.cov.60 <- c(as.numeric(classic.target), as.numeric(phylo.target.MCAR.cov.60))
+sum_stat_obs.mAr.cov.60 <- c(as.numeric(classic.target), as.numeric(phylo.target.mAr.cov.60))
 
 
-ABC_rej.classic.phylo.MCAR.cov.60 <-  ABC_rejection(model = simpact4ABC.classic.phylo.MCAR.cov.60,
-                                                    prior = simpact_prior,
-                                                    summary_stat_target = sum_stat_obs.MCAR.cov.60,
-                                                    nb_simul = 12,
-                                                    use_seed = TRUE,
-                                                    seed_count = 1,
-                                                    n_cluster = 4,
-                                                    tol = 2/12)
+ABC_rej.classic.phylo.mAr.cov.60 <-  ABC_rejection(model = simpact4ABC.classic.phylo.mAr.cov.60,
+                                                   prior = simpact_prior,
+                                                   summary_stat_target = sum_stat_obs.mAr.cov.60,
+                                                   nb_simul = 12,
+                                                   use_seed = TRUE,
+                                                   seed_count = 1,
+                                                   n_cluster = 4,
+                                                   tol = 2/12)
 
 
 
-output.params.classic.phylo.MCAR.cov.60 <- as.data.table(ABC_rej.classic.phylo.MCAR.cov.60$param)
+output.params.classic.phylo.mAr.cov.60 <- as.data.table(ABC_rej.classic.phylo.mAr.cov.60$param)
 
-write.csv(output.params.classic.phylo.MCAR.cov.60, file = "output.params.classic.phylo.MCAR.cov.60.csv")
+write.csv(output.params.classic.phylo.mAr.cov.60, file = "output.params.classic.phylo.mAr.cov.60.csv")
 
-output.params.classic.phylo.MCAR.cov.60 <- as.data.frame(as.matrix(output.params.classic.phylo.MCAR.cov.60))
+output.params.classic.phylo.mAr.cov.60 <- as.data.frame(as.matrix(output.params.classic.phylo.mAr.cov.60))
 
-median.targets.stat.phylo.MCRA.cov.60 <-  colMedians((output.params.classic.phylo.MCAR.cov.60))  # Ok # library(robustbase)
+median.targets.stat.phylo.mAr.cov.60 <-  colMedians((output.params.classic.phylo.mAr.cov.60))  # Ok # library(robustbase)
 
 
 # Run default model with parameters values from calibration
@@ -4764,47 +4770,47 @@ setwd(paste0(work.dir))
 
 pacman::p_load(snow, parallel, RSimpactCyan, RSimpactHelper, ape, Rsamtools)
 
-inputvector.MCRA.cov.60 <- as.numeric(median.targets.stat.phylo.MCRA.cov.60)
+inputvector.mAr.cov.60 <- as.numeric(median.targets.stat.phylo.mAr.cov.60)
 
 reps <- 4
 
 
-inputmatrix.MCRA.cov.60 <- matrix(rep(inputvector.MCRA.cov.60, reps), byrow = TRUE, nrow = reps)
+inputmatrix.mAr.cov.60 <- matrix(rep(inputvector.mAr.cov.60, reps), byrow = TRUE, nrow = reps)
 
 
-epic.metric.calibrates.MCRA.cov.60 <- simpact.parallel(model = wrapper.test.study.1,
-                                                       actual.input.matrix = inputmatrix.MCRA.cov.60,
-                                                       seed_count = 124,
-                                                       n_cluster = 4)
+epic.metric.calibrates.mAr.cov.60 <- simpact.parallel(model = wrapper.test.study.1,
+                                                      actual.input.matrix = inputmatrix.mAr.cov.60,
+                                                      seed_count = 124,
+                                                      n_cluster = 4)
 
 
-write.csv(epic.metric.calibrates.MCRA.cov.60, file = paste0(work.dir,"/epic.metric.calibrates.MCRA.cov.60.csv"))
+write.csv(epic.metric.calibrates.mAr.cov.60, file = paste0(work.dir,"/epic.metric.calibrates.mAr.cov.60.csv"))
 
 
 # 65%
 
 
-sum_stat_obs.MCAR.cov.65 <- c(as.numeric(classic.target), as.numeric(phylo.target.MCAR.cov.65))
+sum_stat_obs.mAr.cov.65 <- c(as.numeric(classic.target), as.numeric(phylo.target.mAr.cov.65))
 
 
-ABC_rej.classic.phylo.MCAR.cov.65 <-  ABC_rejection(model = simpact4ABC.classic.phylo.MCAR.cov.65,
-                                                    prior = simpact_prior,
-                                                    summary_stat_target = sum_stat_obs.MCAR.cov.65,
-                                                    nb_simul = 12,
-                                                    use_seed = TRUE,
-                                                    seed_count = 1,
-                                                    n_cluster = 4,
-                                                    tol = 2/12)
+ABC_rej.classic.phylo.mAr.cov.65 <-  ABC_rejection(model = simpact4ABC.classic.phylo.mAr.cov.65,
+                                                   prior = simpact_prior,
+                                                   summary_stat_target = sum_stat_obs.mAr.cov.65,
+                                                   nb_simul = 12,
+                                                   use_seed = TRUE,
+                                                   seed_count = 1,
+                                                   n_cluster = 4,
+                                                   tol = 2/12)
 
 
 
-output.params.classic.phylo.MCAR.cov.65 <- as.data.table(ABC_rej.classic.phylo.MCAR.cov.65$param)
+output.params.classic.phylo.mAr.cov.65 <- as.data.table(ABC_rej.classic.phylo.mAr.cov.65$param)
 
-write.csv(output.params.classic.phylo.MCAR.cov.65, file = "output.params.classic.phylo.MCAR.cov.65.csv")
+write.csv(output.params.classic.phylo.mAr.cov.65, file = "output.params.classic.phylo.mAr.cov.65.csv")
 
-output.params.classic.phylo.MCAR.cov.65 <- as.data.frame(as.matrix(output.params.classic.phylo.MCAR.cov.65))
+output.params.classic.phylo.mAr.cov.65 <- as.data.frame(as.matrix(output.params.classic.phylo.mAr.cov.65))
 
-median.targets.stat.phylo.MCRA.cov.65 <-  colMedians((output.params.classic.phylo.MCAR.cov.65))  # Ok # library(robustbase)
+median.targets.stat.phylo.mAr.cov.65 <-  colMedians((output.params.classic.phylo.mAr.cov.65))  # Ok # library(robustbase)
 
 
 # Run default model with parameters values from calibration
@@ -4823,47 +4829,47 @@ setwd(paste0(work.dir))
 
 pacman::p_load(snow, parallel, RSimpactCyan, RSimpactHelper, ape, Rsamtools)
 
-inputvector.MCRA.cov.65 <- as.numeric(median.targets.stat.phylo.MCRA.cov.65)
+inputvector.mAr.cov.65 <- as.numeric(median.targets.stat.phylo.mAr.cov.65)
 
 reps <- 4
 
 
-inputmatrix.MCRA.cov.65 <- matrix(rep(inputvector.MCRA.cov.65, reps), byrow = TRUE, nrow = reps)
+inputmatrix.mAr.cov.65 <- matrix(rep(inputvector.mAr.cov.65, reps), byrow = TRUE, nrow = reps)
 
 
-epic.metric.calibrates.MCRA.cov.65 <- simpact.parallel(model = wrapper.test.study.1,
-                                                       actual.input.matrix = inputmatrix.MCRA.cov.65,
-                                                       seed_count = 124,
-                                                       n_cluster = 4)
+epic.metric.calibrates.mAr.cov.65 <- simpact.parallel(model = wrapper.test.study.1,
+                                                      actual.input.matrix = inputmatrix.mAr.cov.65,
+                                                      seed_count = 124,
+                                                      n_cluster = 4)
 
 
-write.csv(epic.metric.calibrates.MCRA.cov.65, file = paste0(work.dir,"/epic.metric.calibrates.MCRA.cov.65.csv"))
+write.csv(epic.metric.calibrates.mAr.cov.65, file = paste0(work.dir,"/epic.metric.calibrates.mAr.cov.65.csv"))
 
 
 # 70%
 
 
-sum_stat_obs.MCAR.cov.70 <- c(as.numeric(classic.target), as.numeric(phylo.target.MCAR.cov.70))
+sum_stat_obs.mAr.cov.70 <- c(as.numeric(classic.target), as.numeric(phylo.target.mAr.cov.70))
 
 
-ABC_rej.classic.phylo.MCAR.cov.70 <-  ABC_rejection(model = simpact4ABC.classic.phylo.MCAR.cov.70,
-                                                    prior = simpact_prior,
-                                                    summary_stat_target = sum_stat_obs.MCAR.cov.70,
-                                                    nb_simul = 12,
-                                                    use_seed = TRUE,
-                                                    seed_count = 1,
-                                                    n_cluster = 4,
-                                                    tol = 2/12)
+ABC_rej.classic.phylo.mAr.cov.70 <-  ABC_rejection(model = simpact4ABC.classic.phylo.mAr.cov.70,
+                                                   prior = simpact_prior,
+                                                   summary_stat_target = sum_stat_obs.mAr.cov.70,
+                                                   nb_simul = 12,
+                                                   use_seed = TRUE,
+                                                   seed_count = 1,
+                                                   n_cluster = 4,
+                                                   tol = 2/12)
 
 
 
-output.params.classic.phylo.MCAR.cov.70 <- as.data.table(ABC_rej.classic.phylo.MCAR.cov.70$param)
+output.params.classic.phylo.mAr.cov.70 <- as.data.table(ABC_rej.classic.phylo.mAr.cov.70$param)
 
-write.csv(output.params.classic.phylo.MCAR.cov.70, file = "output.params.classic.phylo.MCAR.cov.70.csv")
+write.csv(output.params.classic.phylo.mAr.cov.70, file = "output.params.classic.phylo.mAr.cov.70.csv")
 
-output.params.classic.phylo.MCAR.cov.70 <- as.data.frame(as.matrix(output.params.classic.phylo.MCAR.cov.70))
+output.params.classic.phylo.mAr.cov.70 <- as.data.frame(as.matrix(output.params.classic.phylo.mAr.cov.70))
 
-median.targets.stat.phylo.MCRA.cov.70 <-  colMedians((output.params.classic.phylo.MCAR.cov.70))  # Ok # library(robustbase)
+median.targets.stat.phylo.mAr.cov.70 <-  colMedians((output.params.classic.phylo.mAr.cov.70))  # Ok # library(robustbase)
 
 
 # Run default model with parameters values from calibration
@@ -4882,47 +4888,47 @@ setwd(paste0(work.dir))
 
 pacman::p_load(snow, parallel, RSimpactCyan, RSimpactHelper, ape, Rsamtools)
 
-inputvector.MCRA.cov.70 <- as.numeric(median.targets.stat.phylo.MCRA.cov.70)
+inputvector.mAr.cov.70 <- as.numeric(median.targets.stat.phylo.mAr.cov.70)
 
 reps <- 4
 
 
-inputmatrix.MCRA.cov.70 <- matrix(rep(inputvector.MCRA.cov.70, reps), byrow = TRUE, nrow = reps)
+inputmatrix.mAr.cov.70 <- matrix(rep(inputvector.mAr.cov.70, reps), byrow = TRUE, nrow = reps)
 
 
-epic.metric.calibrates.MCRA.cov.70 <- simpact.parallel(model = wrapper.test.study.1,
-                                                       actual.input.matrix = inputmatrix.MCRA.cov.70,
-                                                       seed_count = 124,
-                                                       n_cluster = 4)
+epic.metric.calibrates.mAr.cov.70 <- simpact.parallel(model = wrapper.test.study.1,
+                                                      actual.input.matrix = inputmatrix.mAr.cov.70,
+                                                      seed_count = 124,
+                                                      n_cluster = 4)
 
 
-write.csv(epic.metric.calibrates.MCRA.cov.70, file = paste0(work.dir,"/epic.metric.calibrates.MCRA.cov.70.csv"))
+write.csv(epic.metric.calibrates.mAr.cov.70, file = paste0(work.dir,"/epic.metric.calibrates.mAr.cov.70.csv"))
 
 
 # 75%
 
 
-sum_stat_obs.MCAR.cov.75 <- c(as.numeric(classic.target), as.numeric(phylo.target.MCAR.cov.75))
+sum_stat_obs.mAr.cov.75 <- c(as.numeric(classic.target), as.numeric(phylo.target.mAr.cov.75))
 
 
-ABC_rej.classic.phylo.MCAR.cov.75 <-  ABC_rejection(model = simpact4ABC.classic.phylo.MCAR.cov.75,
-                                                    prior = simpact_prior,
-                                                    summary_stat_target = sum_stat_obs.MCAR.cov.75,
-                                                    nb_simul = 12,
-                                                    use_seed = TRUE,
-                                                    seed_count = 1,
-                                                    n_cluster = 4,
-                                                    tol = 2/12)
+ABC_rej.classic.phylo.mAr.cov.75 <-  ABC_rejection(model = simpact4ABC.classic.phylo.mAr.cov.75,
+                                                   prior = simpact_prior,
+                                                   summary_stat_target = sum_stat_obs.mAr.cov.75,
+                                                   nb_simul = 12,
+                                                   use_seed = TRUE,
+                                                   seed_count = 1,
+                                                   n_cluster = 4,
+                                                   tol = 2/12)
 
 
 
-output.params.classic.phylo.MCAR.cov.75 <- as.data.table(ABC_rej.classic.phylo.MCAR.cov.75$param)
+output.params.classic.phylo.mAr.cov.75 <- as.data.table(ABC_rej.classic.phylo.mAr.cov.75$param)
 
-write.csv(output.params.classic.phylo.MCAR.cov.75, file = "output.params.classic.phylo.MCAR.cov.75.csv")
+write.csv(output.params.classic.phylo.mAr.cov.75, file = "output.params.classic.phylo.mAr.cov.75.csv")
 
-output.params.classic.phylo.MCAR.cov.75 <- as.data.frame(as.matrix(output.params.classic.phylo.MCAR.cov.75))
+output.params.classic.phylo.mAr.cov.75 <- as.data.frame(as.matrix(output.params.classic.phylo.mAr.cov.75))
 
-median.targets.stat.phylo.MCRA.cov.75 <-  colMedians((output.params.classic.phylo.MCAR.cov.75))  # Ok # library(robustbase)
+median.targets.stat.phylo.mAr.cov.75 <-  colMedians((output.params.classic.phylo.mAr.cov.75))  # Ok # library(robustbase)
 
 
 # Run default model with parameters values from calibration
@@ -4941,47 +4947,47 @@ setwd(paste0(work.dir))
 
 pacman::p_load(snow, parallel, RSimpactCyan, RSimpactHelper, ape, Rsamtools)
 
-inputvector.MCRA.cov.75 <- as.numeric(median.targets.stat.phylo.MCRA.cov.75)
+inputvector.mAr.cov.75 <- as.numeric(median.targets.stat.phylo.mAr.cov.75)
 
 reps <- 4
 
 
-inputmatrix.MCRA.cov.75 <- matrix(rep(inputvector.MCRA.cov.75, reps), byrow = TRUE, nrow = reps)
+inputmatrix.mAr.cov.75 <- matrix(rep(inputvector.mAr.cov.75, reps), byrow = TRUE, nrow = reps)
 
 
-epic.metric.calibrates.MCRA.cov.75 <- simpact.parallel(model = wrapper.test.study.1,
-                                                       actual.input.matrix = inputmatrix.MCRA.cov.75,
-                                                       seed_count = 124,
-                                                       n_cluster = 4)
+epic.metric.calibrates.mAr.cov.75 <- simpact.parallel(model = wrapper.test.study.1,
+                                                      actual.input.matrix = inputmatrix.mAr.cov.75,
+                                                      seed_count = 124,
+                                                      n_cluster = 4)
 
 
-write.csv(epic.metric.calibrates.MCRA.cov.75, file = paste0(work.dir,"/epic.metric.calibrates.MCRA.cov.75.csv"))
+write.csv(epic.metric.calibrates.mAr.cov.75, file = paste0(work.dir,"/epic.metric.calibrates.mAr.cov.75.csv"))
 
 
 # 80%
 
 
-sum_stat_obs.MCAR.cov.80 <- c(as.numeric(classic.target), as.numeric(phylo.target.MCAR.cov.80))
+sum_stat_obs.mAr.cov.80 <- c(as.numeric(classic.target), as.numeric(phylo.target.mAr.cov.80))
 
 
-ABC_rej.classic.phylo.MCAR.cov.80 <-  ABC_rejection(model = simpact4ABC.classic.phylo.MCAR.cov.80,
-                                                    prior = simpact_prior,
-                                                    summary_stat_target = sum_stat_obs.MCAR.cov.80,
-                                                    nb_simul = 12,
-                                                    use_seed = TRUE,
-                                                    seed_count = 1,
-                                                    n_cluster = 4,
-                                                    tol = 2/12)
+ABC_rej.classic.phylo.mAr.cov.80 <-  ABC_rejection(model = simpact4ABC.classic.phylo.mAr.cov.80,
+                                                   prior = simpact_prior,
+                                                   summary_stat_target = sum_stat_obs.mAr.cov.80,
+                                                   nb_simul = 12,
+                                                   use_seed = TRUE,
+                                                   seed_count = 1,
+                                                   n_cluster = 4,
+                                                   tol = 2/12)
 
 
 
-output.params.classic.phylo.MCAR.cov.80 <- as.data.table(ABC_rej.classic.phylo.MCAR.cov.80$param)
+output.params.classic.phylo.mAr.cov.80 <- as.data.table(ABC_rej.classic.phylo.mAr.cov.80$param)
 
-write.csv(output.params.classic.phylo.MCAR.cov.80, file = "output.params.classic.phylo.MCAR.cov.80.csv")
+write.csv(output.params.classic.phylo.mAr.cov.80, file = "output.params.classic.phylo.mAr.cov.80.csv")
 
-output.params.classic.phylo.MCAR.cov.80 <- as.data.frame(as.matrix(output.params.classic.phylo.MCAR.cov.80))
+output.params.classic.phylo.mAr.cov.80 <- as.data.frame(as.matrix(output.params.classic.phylo.mAr.cov.80))
 
-median.targets.stat.phylo.MCRA.cov.80 <-  colMedians((output.params.classic.phylo.MCAR.cov.80))  # Ok # library(robustbase)
+median.targets.stat.phylo.mAr.cov.80 <-  colMedians((output.params.classic.phylo.mAr.cov.80))  # Ok # library(robustbase)
 
 
 # Run default model with parameters values from calibration
@@ -5000,47 +5006,47 @@ setwd(paste0(work.dir))
 
 pacman::p_load(snow, parallel, RSimpactCyan, RSimpactHelper, ape, Rsamtools)
 
-inputvector.MCRA.cov.80 <- as.numeric(median.targets.stat.phylo.MCRA.cov.80)
+inputvector.mAr.cov.80 <- as.numeric(median.targets.stat.phylo.mAr.cov.80)
 
 reps <- 4
 
 
-inputmatrix.MCRA.cov.80 <- matrix(rep(inputvector.MCRA.cov.80, reps), byrow = TRUE, nrow = reps)
+inputmatrix.mAr.cov.80 <- matrix(rep(inputvector.mAr.cov.80, reps), byrow = TRUE, nrow = reps)
 
 
-epic.metric.calibrates.MCRA.cov.80 <- simpact.parallel(model = wrapper.test.study.1,
-                                                       actual.input.matrix = inputmatrix.MCRA.cov.80,
-                                                       seed_count = 124,
-                                                       n_cluster = 4)
+epic.metric.calibrates.mAr.cov.80 <- simpact.parallel(model = wrapper.test.study.1,
+                                                      actual.input.matrix = inputmatrix.mAr.cov.80,
+                                                      seed_count = 124,
+                                                      n_cluster = 4)
 
 
-write.csv(epic.metric.calibrates.MCRA.cov.80, file = paste0(work.dir,"/epic.metric.calibrates.MCRA.cov.80.csv"))
+write.csv(epic.metric.calibrates.mAr.cov.80, file = paste0(work.dir,"/epic.metric.calibrates.mAr.cov.80.csv"))
 
 
 # 85%
 
 
-sum_stat_obs.MCAR.cov.85 <- c(as.numeric(classic.target), as.numeric(phylo.target.MCAR.cov.85))
+sum_stat_obs.mAr.cov.85 <- c(as.numeric(classic.target), as.numeric(phylo.target.mAr.cov.85))
 
 
-ABC_rej.classic.phylo.MCAR.cov.85 <-  ABC_rejection(model = simpact4ABC.classic.phylo.MCAR.cov.85,
-                                                    prior = simpact_prior,
-                                                    summary_stat_target = sum_stat_obs.MCAR.cov.85,
-                                                    nb_simul = 12,
-                                                    use_seed = TRUE,
-                                                    seed_count = 1,
-                                                    n_cluster = 4,
-                                                    tol = 2/12)
+ABC_rej.classic.phylo.mAr.cov.85 <-  ABC_rejection(model = simpact4ABC.classic.phylo.mAr.cov.85,
+                                                   prior = simpact_prior,
+                                                   summary_stat_target = sum_stat_obs.mAr.cov.85,
+                                                   nb_simul = 12,
+                                                   use_seed = TRUE,
+                                                   seed_count = 1,
+                                                   n_cluster = 4,
+                                                   tol = 2/12)
 
 
 
-output.params.classic.phylo.MCAR.cov.85 <- as.data.table(ABC_rej.classic.phylo.MCAR.cov.85$param)
+output.params.classic.phylo.mAr.cov.85 <- as.data.table(ABC_rej.classic.phylo.mAr.cov.85$param)
 
-write.csv(output.params.classic.phylo.MCAR.cov.85, file = "output.params.classic.phylo.MCAR.cov.85.csv")
+write.csv(output.params.classic.phylo.mAr.cov.85, file = "output.params.classic.phylo.mAr.cov.85.csv")
 
-output.params.classic.phylo.MCAR.cov.85 <- as.data.frame(as.matrix(output.params.classic.phylo.MCAR.cov.85))
+output.params.classic.phylo.mAr.cov.85 <- as.data.frame(as.matrix(output.params.classic.phylo.mAr.cov.85))
 
-median.targets.stat.phylo.MCRA.cov.85 <-  colMedians((output.params.classic.phylo.MCAR.cov.85))  # Ok # library(robustbase)
+median.targets.stat.phylo.mAr.cov.85 <-  colMedians((output.params.classic.phylo.mAr.cov.85))  # Ok # library(robustbase)
 
 
 # Run default model with parameters values from calibration
@@ -5059,47 +5065,47 @@ setwd(paste0(work.dir))
 
 pacman::p_load(snow, parallel, RSimpactCyan, RSimpactHelper, ape, Rsamtools)
 
-inputvector.MCRA.cov.85 <- as.numeric(median.targets.stat.phylo.MCRA.cov.85)
+inputvector.mAr.cov.85 <- as.numeric(median.targets.stat.phylo.mAr.cov.85)
 
 reps <- 4
 
 
-inputmatrix.MCRA.cov.85 <- matrix(rep(inputvector.MCRA.cov.85, reps), byrow = TRUE, nrow = reps)
+inputmatrix.mAr.cov.85 <- matrix(rep(inputvector.mAr.cov.85, reps), byrow = TRUE, nrow = reps)
 
 
-epic.metric.calibrates.MCRA.cov.85 <- simpact.parallel(model = wrapper.test.study.1,
-                                                       actual.input.matrix = inputmatrix.MCRA.cov.85,
-                                                       seed_count = 124,
-                                                       n_cluster = 4)
+epic.metric.calibrates.mAr.cov.85 <- simpact.parallel(model = wrapper.test.study.1,
+                                                      actual.input.matrix = inputmatrix.mAr.cov.85,
+                                                      seed_count = 124,
+                                                      n_cluster = 4)
 
 
-write.csv(epic.metric.calibrates.MCRA.cov.85, file = paste0(work.dir,"/epic.metric.calibrates.MCRA.cov.85.csv"))
+write.csv(epic.metric.calibrates.mAr.cov.85, file = paste0(work.dir,"/epic.metric.calibrates.mAr.cov.85.csv"))
 
 
 # 90%
 
 
-sum_stat_obs.MCAR.cov.90 <- c(as.numeric(classic.target), as.numeric(phylo.target.MCAR.cov.90))
+sum_stat_obs.mAr.cov.90 <- c(as.numeric(classic.target), as.numeric(phylo.target.mAr.cov.90))
 
 
-ABC_rej.classic.phylo.MCAR.cov.90 <-  ABC_rejection(model = simpact4ABC.classic.phylo.MCAR.cov.90,
-                                                    prior = simpact_prior,
-                                                    summary_stat_target = sum_stat_obs.MCAR.cov.90,
-                                                    nb_simul = 12,
-                                                    use_seed = TRUE,
-                                                    seed_count = 1,
-                                                    n_cluster = 4,
-                                                    tol = 2/12)
+ABC_rej.classic.phylo.mAr.cov.90 <-  ABC_rejection(model = simpact4ABC.classic.phylo.mAr.cov.90,
+                                                   prior = simpact_prior,
+                                                   summary_stat_target = sum_stat_obs.mAr.cov.90,
+                                                   nb_simul = 12,
+                                                   use_seed = TRUE,
+                                                   seed_count = 1,
+                                                   n_cluster = 4,
+                                                   tol = 2/12)
 
 
 
-output.params.classic.phylo.MCAR.cov.90 <- as.data.table(ABC_rej.classic.phylo.MCAR.cov.90$param)
+output.params.classic.phylo.mAr.cov.90 <- as.data.table(ABC_rej.classic.phylo.mAr.cov.90$param)
 
-write.csv(output.params.classic.phylo.MCAR.cov.90, file = "output.params.classic.phylo.MCAR.cov.90.csv")
+write.csv(output.params.classic.phylo.mAr.cov.90, file = "output.params.classic.phylo.mAr.cov.90.csv")
 
-output.params.classic.phylo.MCAR.cov.90 <- as.data.frame(as.matrix(output.params.classic.phylo.MCAR.cov.90))
+output.params.classic.phylo.mAr.cov.90 <- as.data.frame(as.matrix(output.params.classic.phylo.mAr.cov.90))
 
-median.targets.stat.phylo.MCRA.cov.90 <-  colMedians((output.params.classic.phylo.MCAR.cov.90))  # Ok # library(robustbase)
+median.targets.stat.phylo.mAr.cov.90 <-  colMedians((output.params.classic.phylo.mAr.cov.90))  # Ok # library(robustbase)
 
 
 # Run default model with parameters values from calibration
@@ -5118,47 +5124,47 @@ setwd(paste0(work.dir))
 
 pacman::p_load(snow, parallel, RSimpactCyan, RSimpactHelper, ape, Rsamtools)
 
-inputvector.MCRA.cov.90 <- as.numeric(median.targets.stat.phylo.MCRA.cov.90)
+inputvector.mAr.cov.90 <- as.numeric(median.targets.stat.phylo.mAr.cov.90)
 
 reps <- 4
 
 
-inputmatrix.MCRA.cov.90 <- matrix(rep(inputvector.MCRA.cov.90, reps), byrow = TRUE, nrow = reps)
+inputmatrix.mAr.cov.90 <- matrix(rep(inputvector.mAr.cov.90, reps), byrow = TRUE, nrow = reps)
 
 
-epic.metric.calibrates.MCRA.cov.90 <- simpact.parallel(model = wrapper.test.study.1,
-                                                       actual.input.matrix = inputmatrix.MCRA.cov.90,
-                                                       seed_count = 124,
-                                                       n_cluster = 4)
+epic.metric.calibrates.mAr.cov.90 <- simpact.parallel(model = wrapper.test.study.1,
+                                                      actual.input.matrix = inputmatrix.mAr.cov.90,
+                                                      seed_count = 124,
+                                                      n_cluster = 4)
 
 
-write.csv(epic.metric.calibrates.MCRA.cov.90, file = paste0(work.dir,"/epic.metric.calibrates.MCRA.cov.90.csv"))
+write.csv(epic.metric.calibrates.mAr.cov.90, file = paste0(work.dir,"/epic.metric.calibrates.mAr.cov.90.csv"))
 
 
 # 95%
 
 
-sum_stat_obs.MCAR.cov.95 <- c(as.numeric(classic.target), as.numeric(phylo.target.MCAR.cov.95))
+sum_stat_obs.mAr.cov.95 <- c(as.numeric(classic.target), as.numeric(phylo.target.mAr.cov.95))
 
 
-ABC_rej.classic.phylo.MCAR.cov.95 <-  ABC_rejection(model = simpact4ABC.classic.phylo.MCAR.cov.95,
-                                                    prior = simpact_prior,
-                                                    summary_stat_target = sum_stat_obs.MCAR.cov.95,
-                                                    nb_simul = 12,
-                                                    use_seed = TRUE,
-                                                    seed_count = 1,
-                                                    n_cluster = 4,
-                                                    tol = 2/12)
+ABC_rej.classic.phylo.mAr.cov.95 <-  ABC_rejection(model = simpact4ABC.classic.phylo.mAr.cov.95,
+                                                   prior = simpact_prior,
+                                                   summary_stat_target = sum_stat_obs.mAr.cov.95,
+                                                   nb_simul = 12,
+                                                   use_seed = TRUE,
+                                                   seed_count = 1,
+                                                   n_cluster = 4,
+                                                   tol = 2/12)
 
 
 
-output.params.classic.phylo.MCAR.cov.95 <- as.data.table(ABC_rej.classic.phylo.MCAR.cov.95$param)
+output.params.classic.phylo.mAr.cov.95 <- as.data.table(ABC_rej.classic.phylo.mAr.cov.95$param)
 
-write.csv(output.params.classic.phylo.MCAR.cov.95, file = "output.params.classic.phylo.MCAR.cov.95.csv")
+write.csv(output.params.classic.phylo.mAr.cov.95, file = "output.params.classic.phylo.mAr.cov.95.csv")
 
-output.params.classic.phylo.MCAR.cov.95 <- as.data.frame(as.matrix(output.params.classic.phylo.MCAR.cov.95))
+output.params.classic.phylo.mAr.cov.95 <- as.data.frame(as.matrix(output.params.classic.phylo.mAr.cov.95))
 
-median.targets.stat.phylo.MCRA.cov.95 <-  colMedians((output.params.classic.phylo.MCAR.cov.95))  # Ok # library(robustbase)
+median.targets.stat.phylo.mAr.cov.95 <-  colMedians((output.params.classic.phylo.mAr.cov.95))  # Ok # library(robustbase)
 
 
 # Run default model with parameters values from calibration
@@ -5177,19 +5183,21 @@ setwd(paste0(work.dir))
 
 pacman::p_load(snow, parallel, RSimpactCyan, RSimpactHelper, ape, Rsamtools)
 
-inputvector.MCRA.cov.95 <- as.numeric(median.targets.stat.phylo.MCRA.cov.95)
+inputvector.mAr.cov.95 <- as.numeric(median.targets.stat.phylo.mAr.cov.95)
 
 reps <- 4
 
 
-inputmatrix.MCRA.cov.95 <- matrix(rep(inputvector.MCRA.cov.95, reps), byrow = TRUE, nrow = reps)
+inputmatrix.mAr.cov.95 <- matrix(rep(inputvector.mAr.cov.95, reps), byrow = TRUE, nrow = reps)
 
 
-epic.metric.calibrates.MCRA.cov.95 <- simpact.parallel(model = wrapper.test.study.1,
-                                                       actual.input.matrix = inputmatrix.MCRA.cov.95,
-                                                       seed_count = 124,
-                                                       n_cluster = 4)
+epic.metric.calibrates.mAr.cov.95 <- simpact.parallel(model = wrapper.test.study.1,
+                                                      actual.input.matrix = inputmatrix.mAr.cov.95,
+                                                      seed_count = 124,
+                                                      n_cluster = 4)
 
 
-write.csv(epic.metric.calibrates.MCRA.cov.95, file = paste0(work.dir,"/epic.metric.calibrates.MCRA.cov.95.csv"))
+write.csv(epic.metric.calibrates.mAr.cov.95, file = paste0(work.dir,"/epic.metric.calibrates.mAr.cov.95.csv"))
+
+
 

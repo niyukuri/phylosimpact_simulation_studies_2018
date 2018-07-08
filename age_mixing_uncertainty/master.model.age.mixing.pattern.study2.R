@@ -1,6 +1,7 @@
+# Master model for simulation of age-mixing patterns
+
 
 # Define directory
-# check loaded packages length(getLoadedDLLs())                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
 
 # work.dir <- "/home/david/Desktop/mastermodeltest" # on laptop
 
@@ -17,11 +18,13 @@ pacman::p_load(snow, parallel, RSimpactCyan, RSimpactHelper, ape, Rsamtools)
 
 
 
-# inputvector <- c(123,-0.52, -0.05, 2.8, 0, 3, 0.25, -0.3, -0.1, 0.2,
-#                  -1, -90, 0.5, 0.05, -0.14, 5, 7, 12, -2.7) # length(inputvector) = 18
+# inputvector <- c(294052610,1.05, 0.25, 0, 3, 0.23, 0.23, 45, 45, -0.7, 2.8,
+#                  -0.3, -0.3,
+#                  -2.7, # conception
+#                  -0.52, -0.05)
 
 
-wrapper.master.phylo.simpact.study.1 <- function(inputvector = input.vector){
+master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   
   
   source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
@@ -257,8 +260,8 @@ wrapper.master.phylo.simpact.study.1 <- function(inputvector = input.vector){
   #
   cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
                                    population.simtime = 50, 
-                                   population.nummen = 600, 
-                                   population.numwomen = 600,
+                                   population.nummen = 6000, 
+                                   population.numwomen = 6000,
                                    hivseed.time = 10, 
                                    hivseed.type = "amount",
                                    hivseed.amount = 20, 
@@ -436,7 +439,6 @@ wrapper.master.phylo.simpact.study.1 <- function(inputvector = input.vector){
   
   sub.dir.rename <- paste0(work.dir,"/temp/",generate.filename(10))
   
-  
   # Run Simpact
   ##############
   
@@ -465,30 +467,80 @@ wrapper.master.phylo.simpact.study.1 <- function(inputvector = input.vector){
   # simpact.trans.net.projection <- transmission.network.builder(datalist = datalist.agemix, endpoint = 45)
   
   
-  ############################ METRICS: TRANSMISSION NETWORK CHARACTERISTICS #####################
+  ##########################################################
+  # Step 3: Empirical data and age-mixing in transmissions #
+  ##########################################################
   
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/simulation_study_1/epi.metric.study.1.R")
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
   
   
-  epid.metrics <- epi.metric.study.1(datalist.agemix = datalist.agemix)
+  agemixing.df <- agemixing.trans.df(trans.network = simpact.trans.net,
+                                           limitTransmEvents = 7)
   
-  name.epid.metrics <- names(epid.metrics)
   
-  names(epid.metrics) <- name.epid.metrics
+  # IDs of individuals infected in the time window of the study
   
-  #################################### Features #############################
+  IDs.study <- new.transmissions.dat(datalist = datalist.agemix, 
+                                     time.window=c(30,40))
   
-  # 2.1. Classic features
+  agemixing.df.IDs <- dplyr::filter(agemixing.df, agemixing.df$RecId%in%IDs.study)
   
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/simulation_study_1/classic.features.study.1.R")
+  # Table of age mixing in transmissions within differewnt age groups #
+  #####################################################################
   
-  true.features.classic <- classic.features.study.1(datalist = datalist.agemix,
-                                                    work.dir = work.dir,
-                                                    sub.dir.rename = sub.dir.rename)
   
-  name.true.features.classic <- names(true.features.classic)
   
-  names(true.features.classic) <- name.true.features.classic
+  # Group 15 - 25
+  ###############
+  
+  trans.sum.men.15.25 <- dplyr::filter(agemixing.df.IDs, agemixing.df.IDs$GenderRec=="0" & trans.sum.age.limit$age.i >= age.group.15.25[1] & trans.sum.age.limit$age.i < age.group.15.25[2])
+  
+  trans.sum.women.15.25 <- dplyr::filter(agemixing.df.IDs, agemixing.df.IDs$GenderRec=="1" & trans.sum.age.limit$age.i >= age.group.15.25[1] & trans.sum.age.limit$age.i < age.group.15.25[2])
+  
+  perc.100.15.25 <- nrow(trans.sum.men.15.25) + nrow(trans.sum.women.15.25) # total number of individuals with age limit
+  
+  trans.sum.men.women.15.25 <- rbind(trans.sum.men.15.25, trans.sum.women.15.25)
+  
+  
+  
+  # Group 25 - 40
+  ###############
+  
+  trans.sum.men.25.40 <- dplyr::filter(agemixing.df.IDs, agemixing.df.IDs$GenderRec=="0" & trans.sum.age.limit$age.i >= age.group.25.40[1] & trans.sum.age.limit$age.i < age.group.25.40[2])
+  
+  trans.sum.women.25.40 <- dplyr::filter(agemixing.df.IDs, agemixing.df.IDs$GenderRec=="1" & trans.sum.age.limit$age.i >= age.group.25.40[1] & trans.sum.age.limit$age.i < age.group.25.40[2])
+  
+  perc.100.25.40 <- nrow(trans.sum.men.25.40) + nrow(trans.sum.women.25.40) # total number of individuals with age limit
+  
+  trans.sum.men.women.25.40 <- rbind(trans.sum.men.25.40, trans.sum.women.25.40)
+  
+  
+  
+  # Group 40 - 50
+  ###############
+  
+  trans.sum.men.40.50 <- dplyr::filter(agemixing.df.IDs, agemixing.df.IDs$GenderRec=="0" & trans.sum.age.limit$age.i >= age.group.40.50[1] & trans.sum.age.limit$age.i < age.group.40.50[2])
+  
+  trans.sum.women.40.50 <- dplyr::filter(agemixing.df.IDs, agemixing.df.IDs$GenderRec=="1" & trans.sum.age.limit$age.i >= age.group.40.50[1] & trans.sum.age.limit$age.i < age.group.40.50[2])
+  
+  perc.100.40.50 <- nrow(trans.sum.men.40.50) + nrow(trans.sum.women.40.50) # total number of individuals with age limit
+  
+  trans.sum.men.women.40.50 <- rbind(trans.sum.men.40.50, trans.sum.women.40.50)
+  
+  
+  
+  # Age difference statistics #
+  #############################
+  AD <- abs(abs(agemixing.df.IDs$TOBDon) - abs(agemixing.df.IDs$TOBRec))
+  mean.AD <- mean(AD)
+  med.AD <- median(AD)
+  sd.AD <- sd(AD)
+  
+  # Mixed effect models #
+  #######################
+  fit.agemix.trans.women <- fit.agemix.trans.women(datatable = agemixing.df.IDs)
+  fit.agemix.trans.men <- fit.agemix.trans.men(datatable = agemixing.df.IDs)
+
   
   ###############################
   # Step 3: Sequence simulation #
@@ -525,6 +577,9 @@ wrapper.master.phylo.simpact.study.1 <- function(inputvector = input.vector){
   # Step 4: Construct time stamped phylogenetic trees #   + Sequence coverage Scenarios
   #####################################################
   
+  
+  #### ALL sequences of infected individuals in period of the study ####
+  ######################################################################
   
   dirfasttree <- work.dir
   
@@ -583,9 +638,12 @@ wrapper.master.phylo.simpact.study.1 <- function(inputvector = input.vector){
     
     names(true.features.phylogenetic) <- name.true.features.phylogenetic
     
+    
+    
     #### BEGIN Sequence Coverage Scenarios for MCAR ####
     
     cut.val <- 5 # consider at least 5 sequences
+    
     
     ### 1st Scenario: 35 ###
     ########################
@@ -1177,15 +1235,14 @@ wrapper.master.phylo.simpact.study.1 <- function(inputvector = input.vector){
     
     names(sim.features.phylogenetic) <- name.sim.features.phylogenetic
     
-  }else{
-    
-    
-    # No phylogenetic features
-    sim.features.phylogenetic <- rep(NA, 13*30)
   }
+  
+  
   #     c(name.epid.metrics, name.true.features.classic, name.true.features.phylogenetic)
   
-  epi.metrics.features <- c(epid.metrics, true.features.classic, sim.features.phylogenetic)
+  epi.metrics.features <- c(epid.metrics, true.features.classic, sim.features.phylogenetic,
+                            mAr.sim.features.phylogenetic, mAr.B.sim.features.phylogenetic,
+                            mAr.C.sim.features.phylogenetic)
   
   return(epi.metrics.features)
   
@@ -1196,11 +1253,18 @@ wrapper.master.phylo.simpact.study.1 <- function(inputvector = input.vector){
 
 # unlink(paste0("temp"), recursive = TRUE)
 
-
-
+# 
+# inputvector <- c(101,1.05, 0.25, 0, 3, 0.23, 0.23, 45, 45, -0.7, 2.8,
+#                  -0.3, -0.3,
+#                  -2.7, # conception
+#                  -0.52, -0.05)
+# 
+# test.all <- wrapper.phylo.simpact.study.1(inputvector = inputvector) # L = 437
 
 inputvector <- c(-0.52, -0.05, 2.8, 0, 3, 0.25, -0.3, -0.1, 0.2,
                  -1, -90, 0.5, 0.05, -0.14, 5, 7, 12, -2.7) # length(inputvector) = 18
+# 
+# 
 # 
 # 
 # 
@@ -1211,7 +1275,7 @@ inputvector <- c(-0.52, -0.05, 2.8, 0, 3, 0.25, -0.3, -0.1, 0.2,
 # # replication number
 # 
 
-reps <- 4
+reps <- 2
 
 # 
 # 
@@ -1228,6 +1292,8 @@ features.matrix <- simpact.parallel(model = wrapper.master.phylo.simpact.study.1
                                     actual.input.matrix = inputmatrix,
                                     seed_count = 124,
                                     n_cluster = 4)
+
+
 # 
 # sim.end.time <- proc.time()[3] - sim.start.time
 # 
@@ -1238,7 +1304,7 @@ features.matrix <- simpact.parallel(model = wrapper.master.phylo.simpact.study.1
 # # save features in the working directory
 # 
 
-write.csv(features.matrix, file = paste0(work.dir,"/features.matrix.417.cols.csv"))
+write.csv(features.matrix, file = paste0(work.dir,"/features.matrix.csv"))
 
 # 
 # unlink(paste0("temp"), recursive = TRUE)

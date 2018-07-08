@@ -7,11 +7,11 @@ wrapper.test.study.1 <- function(inputvector){
   source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
   
   
-  work.dir <- "/home/david/Desktop/mastermodeltest" # on laptop
+  # work.dir <- "/home/david/Desktop/mastermodeltest" # on laptop
   
-  # work.dir <- "/home/niyukuri/Desktop/mastermodeltest" # on PC
+  work.dir <- "/home/niyukuri/Desktop/mastermodeltest" # on PC
   
-  destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
   
   # destDir <- "/home/niyukuri/Desktop/mastermodeltest/temp" # on PC
   
@@ -57,8 +57,8 @@ wrapper.test.study.1 <- function(inputvector){
   #
   cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
                                    population.simtime = 50, 
-                                   population.nummen = 400, 
-                                   population.numwomen = 400,
+                                   population.nummen = 600, 
+                                   population.numwomen = 600,
                                    hivseed.time = 10, 
                                    hivseed.type = "amount",
                                    hivseed.amount = 20, 
