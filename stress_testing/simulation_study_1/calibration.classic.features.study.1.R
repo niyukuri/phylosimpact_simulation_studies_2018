@@ -76,7 +76,7 @@ simpact4ABC.classic <- function(inputvector){
   # # Sexual behaviour
   # ###################
   #
-  seedid <- inputvector[1]
+  seedid <- inputvector[1] 
   
   cfg.list["dissolution.alpha_0"] <- inputvector[2] # [1] # -0.52 c("unif", -1, 0)
   cfg.list["dissolution.alpha_4"] <- inputvector [3] # [2] # -0.05 c("unif", -0.5, 0)
@@ -385,8 +385,8 @@ obs.targets <- as.numeric(sum_stat_obs)
 
 MaC.simp <- MaC(targets.empirical = obs.targets,
                 RMSD.tol.max = 2,
-                min.givetomice = 20,
-                n.experiments = 200,
+                min.givetomice = 120,
+                n.experiments = 1200,
                 lls = lls,
                 uls = uls,
                 model = simpact4ABC.classic,
