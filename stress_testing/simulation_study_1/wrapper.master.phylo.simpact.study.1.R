@@ -1,10 +1,10 @@
 
 # Define directory
 
-work.dir <- "/home/david/Desktop/mastermodeltest" # on laptop
+# work.dir <- "/home/david/Desktop/mastermodeltest" # on laptop
 
 
-# work.dir <- "/home/niyukuri/Desktop/mastermodeltest" # on PC
+work.dir <- "/home/niyukuri/Desktop/mastermodeltest" # on PC
 
 
 setwd(paste0(work.dir))
@@ -3126,7 +3126,8 @@ wrapper.master.phylo.simpact.study.1 <- function(inputvector = input.vector){
 # 
 # test.all <- wrapper.phylo.simpact.study.1(inputvector = inputvector) # L = 437
 
-inputvector <- c(-0.52, -0.05, 2.8, 0, 3, 0.25, -0.3, -0.1, 0.2,
+inputvector <- c(-0.52, -0.05, 2.8, 0, 3, 0.25, -0.3, -0.1, 
+                 # 0.2,
                  -1, -90, 0.5, 0.05, -0.14, 5, 7, 12, -2.7) # length(inputvector) = 18
 # 
 # 
