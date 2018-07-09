@@ -273,6 +273,7 @@ wrapper.master.phylo.simpact.study.1 <- function(inputvector = input.vector){
   #
   seedid <- inputvector[1]
   
+  cfg.list["population.msm"] <- "no"
   cfg.list["dissolution.alpha_0"] <- inputvector[2] # [1] # -0.52 c("unif", -1, 0)
   cfg.list["dissolution.alpha_4"] <- inputvector [3] # [2] # -0.05 c("unif", -0.5, 0)
   cfg.list["formation.hazard.agegapry.baseline"] <- inputvector[4] # [3] # 2 c("unif", 1, 3)
