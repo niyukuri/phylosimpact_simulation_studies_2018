@@ -3,9 +3,9 @@
 
 simpact4ABC.classic <- function(inputvector){
   
-  # work.dir <- "/home/david/Desktop/calibration" # on laptop
+  work.dir <- "/home/david/Desktop/calibration" # on laptop
   
-  work.dir <- "/home/niyukuri/Desktop/calibration" # on PC
+  # work.dir <- "/home/niyukuri/Desktop/calibration" # on PC
   
   setwd(paste0(work.dir))
   
@@ -56,6 +56,8 @@ simpact4ABC.classic <- function(inputvector){
   
   source("~/phylosimpact_simulation_studies_2018/stress_testing/simulation_study_1/classic.features.study.1.R")
   
+  
+  
   age.distr <- agedistr.creator(shape = 5, scale = 65)
   #
   cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
@@ -71,42 +73,50 @@ simpact4ABC.classic <- function(inputvector){
                                    debut.debutage = 15
   )
   
-  
   # # Sexual behaviour
   # ###################
   #
-  cfg.list["dissolution.alpha_0"] <- inputvector[2] # -0.52 c("unif", -1, 0)
-  cfg.list["dissolution.alpha_4"] <- inputvector[3] # -0.05 c("unif", -0.5, 0)
-  cfg.list["formation.hazard.agegapry.baseline"] <- inputvector[4] # 2 c("unif", 1, 3)
-  cfg.list["person.agegap.man.dist.normal.mu"] <- inputvector[5] # 0 c("unif", -0.5, 0.5)
-  cfg.list["person.agegap.woman.dist.normal.mu"] <- inputvector[5] # 0
-  cfg.list["person.agegap.man.dist.normal.sigma"] <- inputvector[6] # 3 c("unif", 2, 4)
-  cfg.list["person.agegap.woman.dist.normal.sigma"] <- inputvector[6] # 3 
-  cfg.list["formation.hazard.agegapry.gap_agescale_man"] <- inputvector[7] # 0.25 c("unif", 0, 1)
-  cfg.list["formation.hazard.agegapry.gap_agescale_woman"] <- inputvector[7] # 0.25
-  cfg.list["formation.hazard.agegapry.numrel_man"] <- inputvector[8] # -0.3 c("unif", -1, 0)
-  cfg.list["formation.hazard.agegapry.numrel_woman"] <- inputvector[8] # -0.3
-  cfg.list["formation.hazard.agegapry.numrel_diff"] <- inputvector[9] # -0.1 c("unif", -0.9, 0)
-  cfg.list["population.eyecap.fraction"] <- inputvector[10] # 0.2 c("unif", 0, 0.5)
+  seedid <- inputvector[1]
+  
+  cfg.list["dissolution.alpha_0"] <- inputvector[2] # [1] # -0.52 c("unif", -1, 0)
+  cfg.list["dissolution.alpha_4"] <- inputvector [3] # [2] # -0.05 c("unif", -0.5, 0)
+  cfg.list["formation.hazard.agegapry.baseline"] <- inputvector[4] # [3] # 2 c("unif", 1, 3)
+  cfg.list["person.agegap.man.dist.normal.mu"] <- inputvector[5] # [4] # 0 c("unif", -0.5, 0.5)
+  cfg.list["person.agegap.woman.dist.normal.mu"] <- inputvector[5] # [4] # 0
+  cfg.list["person.agegap.man.dist.normal.sigma"] <- inputvector[6] # [5] # 3 c("unif", 2, 4)
+  cfg.list["person.agegap.woman.dist.normal.sigma"] <- inputvector[6] # [5] # 3 
+  cfg.list["formation.hazard.agegapry.gap_agescale_man"] <- inputvector[7] # [6] # 0.25 c("unif", 0, 1)
+  cfg.list["formation.hazard.agegapry.gap_agescale_woman"] <- inputvector[7] # [6] # 0.25
+  cfg.list["formation.hazard.agegapry.numrel_man"] <- inputvector[8] # [7] # -0.3 c("unif", -1, 0)
+  cfg.list["formation.hazard.agegapry.numrel_woman"] <- inputvector[8] # [7] # -0.3
+  cfg.list["formation.hazard.agegapry.numrel_diff"] <- inputvector[9] # [8] # -0.1 c("unif", -0.9, 0)
+  
+  # cfg.list["population.eyecap.fraction"] <- inputvector[10] # [9] # 0.2 c("unif", 0, 0.5) # REMOVED in params 
   #
   # # HIV transmission
   # ###################
   #
   
-  cfg.list["hivtransmission.param.a"] <- inputvector[11] # -1 c("unif", -2, 0)
-  cfg.list["hivtransmission.param.b"] <- inputvector[12] # -90 c("unif", -100, -80)
-  cfg.list["hivtransmission.param.c"] <- inputvector[13] # 0.5 c("unif", 0, 1)
-  cfg.list["hivtransmission.param.f1"] <- inputvector[14] # 0.04879016 c("unif", 0, 0.5)
-  cfg.list["hivtransmission.param.f2"] <- inputvector[15] # -0.1386294 c("unif", -0.5, 0)
-  cfg.list["person.vsp.toacute.x"] <- inputvector[16] # 5 c("unif", 3, 7)
-  cfg.list["person.vsp.toaids.x"] <- inputvector[17] # 7 c("unif", 5, 9)
-  cfg.list["person.vsp.tofinalaids.x"] <- inputvector[18] # 12 c("unif", 10, 14)
+  
+  cfg.list["hivtransmission.param.a"] <- inputvector[10] # [10] # -1 c("unif", -2, 0)
+  cfg.list["hivtransmission.param.b"] <- inputvector[11] # [11] # -90 c("unif", -100, -80)
+  cfg.list["hivtransmission.param.c"] <- inputvector[12] # [12] # 0.5 c("unif", 0, 1)
+  cfg.list["hivtransmission.param.f1"] <- inputvector[13] # [13] # 0.04879016 c("unif", 0, 0.5)
+  cfg.list["hivtransmission.param.f2"] <- inputvector[14] # [14] # -0.1386294 c("unif", -0.5, 0)
+  
+  # Disease progression > may be remove in parameter to estimates
+  
+  cfg.list["person.vsp.toacute.x"] <- inputvector[15] # [15] # 5 c("unif", 3, 7)
+  cfg.list["person.vsp.toaids.x"] <- inputvector[16] # [16] # 7 c("unif", 5, 9)
+  cfg.list["person.vsp.tofinalaids.x"] <- inputvector[17] # [17] # 12 c("unif", 10, 14)
+  
+  
   #
   # # Demographic
   # ##############
   #
   
-  cfg.list["conception.alpha_base"] <- inputvector[19] # -2.7 c("unif", -3.5, -1.7)
+  cfg.list["conception.alpha_base"] <- inputvector[18] # [18] # -2.7 c("unif", -3.5, -1.7)
   
   #
   #
@@ -234,7 +244,12 @@ simpact4ABC.classic <- function(inputvector){
 
 simpact_prior <- list(c("unif", -1, 0), c("unif", -0.5, 0), c("unif", 1, 3), c("unif", -0.5, 0.5),
                       c("unif", 2, 4), c("unif", 0, 1), c("unif", -1, 0), c("unif", -0.9, 0), 
-                      c("unif", 0, 0.5), c("unif", -2, 0), c("unif", -100, -80), c("unif", 0, 1), 
+                      
+                      # c("unif", 0, 0.5), 
+                      
+                      c("unif", -2, 0), 
+                      
+                      c("unif", -100, -80), c("unif", 0, 1), 
                       c("unif", 0, 0.5), c("unif", -0.5, 0), c("unif", 3, 7), c("unif", 5, 9),
                       c("unif", 10, 14),  c("unif", -3.5, -1.7))
 
@@ -274,11 +289,8 @@ write.csv(output.params.classic, file = "output.params.classic.csv")
 
 output.params.classic <- as.data.frame(as.matrix(output.params.classic))
 
-<<<<<<< HEAD
-=======
 median.targets.stat.classic <-  colMedians((output.params.classic))  # Ok # library(robustbase)
 
->>>>>>> master
 # 
 # Seq.simp <- ABC_sequential(model = simpact4ABC.classic,
 #                           method = "Lenormand",
@@ -294,8 +306,8 @@ median.targets.stat.classic <-  colMedians((output.params.classic))  # Ok # libr
 # 
 # 
 # ## MaC approach
-<<<<<<< HEAD
-# 
+
+
 # library(RSimpactHelper)
 # library(mice)
 # library(gsubfn)
@@ -326,7 +338,6 @@ median.targets.stat.classic <-  colMedians((output.params.classic))  # Ok # libr
 #                 maxit = 20,
 #                 maxwaves = 1,
 #                 n_cluster = 8)
-=======
 
 library(RSimpactHelper)
 library(mice)
@@ -337,9 +348,36 @@ library(randtoolbox)
 library(pcaPP)
 library(glmnet)
 
-lls <- c(-1, -0.5, 1, -0.5, 2, 0, -1, -0.9, 0, -2, -100, 0, 0, -0.5, 3, 5, 10, -3.5)
+lls.simp <- function(simpact_prior){
+  
+  l <- vector()
+  #u <- vector()
+  for(i in 1:length(simpact_prior)){
+    l.i <- simpact_prior[[i]][2]
+    #u.i <- simpact_prior[[i]][3]
+    l <- c(l, l.i)
+    #u <- c(u, u.i)
+  }
+  return(l)
+}
 
-uls <- c(0, 0, 3, 0.5, 4, 1, 0, 0, 0.5, 0, -80, 1, 0.5, 0, 7, 9, 14, -1.7)
+uls.simp <- function(simpact_prior){
+  
+  #l <- vector()
+  u <- vector()
+  for(i in 1:length(simpact_prior)){
+    #l.i <- simpact_prior[[i]][2]
+    u.i <- simpact_prior[[i]][3]
+    #l <- c(l, l.i)
+    u <- c(u, u.i)
+  }
+  return(u)
+}
+
+
+lls <- as.numeric(lls.simp(simpact_prior))
+uls <- as.numeric(uls.simp(simpact_prior))
+
 
 obs.targets <- as.numeric(sum_stat_obs)
 
@@ -351,14 +389,14 @@ MaC.simp <- MaC(targets.empirical = obs.targets,
                 lls = lls,
                 uls = uls,
                 model = simpact4ABC.classic,
-                strict.positive.params = c(5, 12, 14:16),
-                probability.params = 6,
+                strict.positive.params = c(5, 14:16),
+                probability.params = c(6,11, 12),
                 method = "norm",
                 predictorMatrix = "complete",
                 maxit = 20,
                 maxwaves = 1,
                 n_cluster = 8)
->>>>>>> master
+
 
 
 
