@@ -145,6 +145,10 @@ classic.features.study.1 <- function(datalist = datalist.agemix,
     #
     # men.lmer <- ampmodel(data = dplyr::filter(agemix.model[[1]], Gender =="male"))
     
+    data = dplyr::filter(agemix.model[[1]], Gender =="male")
+    
+    if( length(data$ID) > length(unique(data$ID)) ){
+    
     men.lmer <- lmer(pagerelform ~ agerelform0 + (1 | ID),
                      data = dplyr::filter(agemix.model[[1]], Gender =="male"),
                      REML = TRUE,
@@ -170,6 +174,13 @@ classic.features.study.1 <- function(datalist = datalist.agemix,
     ## SDAD: standard deviation of age differences
     ## BSD: between-subject standard deviation of age differences
     
+    mix.dat <- c(AAD.male, SDAD.male, slope.male, WSD.male, BSD.male, intercept.male)
+    
+    }else{
+      
+      mix.dat <- rep(NA, 6)
+      
+    }
     
     # age.scatter.df <- agemix.model[[1]]
     
@@ -181,8 +192,10 @@ classic.features.study.1 <- function(datalist = datalist.agemix,
     #                                                    timepoint = datalist.agemix$itable$population.simtime[1] - 0.5)
     # 
     
-    pp.cp.6months.male <- concurr.pointprev.calculator(datalist = datalist.agemix,
-                                                       timepoint = 40 - 0.5)
+   
+    
+    pp.cp.6months.male <- tryCatch(concurr.pointprev.calculator(datalist = datalist.agemix,
+                                                       timepoint = 40 - 0.5), error=function(e) return(NA))
     
     
     
@@ -193,7 +206,7 @@ classic.features.study.1 <- function(datalist = datalist.agemix,
                     # cov.vector,
                     relsperpersonperyear, agegapsd,
                     
-                    AAD.male, SDAD.male, slope.male, WSD.male, BSD.male, intercept.male,
+                    mix.dat,
                     
                     pp.cp.6months.male)
     
@@ -226,7 +239,7 @@ classic.features.study.1 <- function(datalist = datalist.agemix,
                         
                         "pp.cp.6months.male")
     
-    summary.df <- rep(0, length(features.names)) # NA -> 0
+    summary.df <- rep(NA, length(features.names)) # NA -> 0
     
     names(summary.df) <- features.names # > length(features.names) [1] 16
     
