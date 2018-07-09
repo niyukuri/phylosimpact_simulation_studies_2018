@@ -3,9 +3,9 @@
 
 simpact4ABC.classic <- function(inputvector){
   
-  work.dir <- "/home/david/Desktop/calibration" # on laptop
+  # work.dir <- "/home/david/Desktop/calibration" # on laptop
   
-  # work.dir <- "/home/niyukuri/Desktop/calibration" # on PC
+  work.dir <- "/home/niyukuri/Desktop/calibration" # on PC
   
   setwd(paste0(work.dir))
   
@@ -225,11 +225,12 @@ simpact4ABC.classic <- function(inputvector){
                          destDir = ABC_DestDir.classic) #simpact.run(cfg, ABC_DestDir, identifierFormat = ABC_identifier)  
   
   datalist <- readthedata(results)
+
   
-  
-  summary.stat <- classic.features.study.1(datalist = datalist,
+  summary.stat <- tryCatch(classic.features.study.1(datalist = datalist,
                                            work.dir = work.dir,
-                                           sub.dir.rename = ABC_DestDir.classic)
+                                           sub.dir.rename = ABC_DestDir.classic), 
+                           error=function(e) return(rep(NA, 16)))
   
   
   outputvector <- as.numeric(summary.stat) 
@@ -394,8 +395,9 @@ MaC.simp <- MaC(targets.empirical = obs.targets,
                 method = "norm",
                 predictorMatrix = "complete",
                 maxit = 20,
-                maxwaves = 1,
+                maxwaves = 2,
                 n_cluster = 8)
+
 
 
 
