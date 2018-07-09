@@ -260,8 +260,8 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   #
   cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
                                    population.simtime = 50, 
-                                   population.nummen = 6000, 
-                                   population.numwomen = 6000,
+                                   population.nummen = 600, 
+                                   population.numwomen = 600,
                                    hivseed.time = 10, 
                                    hivseed.type = "amount",
                                    hivseed.amount = 20, 
@@ -288,24 +288,25 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   cfg.list["formation.hazard.agegapry.numrel_man"] <- inputvector[8] # [7] # -0.3 c("unif", -1, 0)
   cfg.list["formation.hazard.agegapry.numrel_woman"] <- inputvector[8] # [7] # -0.3
   cfg.list["formation.hazard.agegapry.numrel_diff"] <- inputvector[9] # [8] # -0.1 c("unif", -0.9, 0)
-  cfg.list["population.eyecap.fraction"] <- inputvector[10] # [9] # 0.2 c("unif", 0, 0.5)
+  
+  # cfg.list["population.eyecap.fraction"] <- inputvector[10] # [9] # 0.2 c("unif", 0, 0.5) # REMOVED in params 
   #
   # # HIV transmission
   # ###################
   #
   
   
-  cfg.list["hivtransmission.param.a"] <- inputvector[11] # [10] # -1 c("unif", -2, 0)
-  cfg.list["hivtransmission.param.b"] <- inputvector[12] # [11] # -90 c("unif", -100, -80)
-  cfg.list["hivtransmission.param.c"] <- inputvector[13] # [12] # 0.5 c("unif", 0, 1)
-  cfg.list["hivtransmission.param.f1"] <- inputvector[14] # [13] # 0.04879016 c("unif", 0, 0.5)
-  cfg.list["hivtransmission.param.f2"] <- inputvector[15] # [14] # -0.1386294 c("unif", -0.5, 0)
+  cfg.list["hivtransmission.param.a"] <- inputvector[10] # [10] # -1 c("unif", -2, 0)
+  cfg.list["hivtransmission.param.b"] <- inputvector[11] # [11] # -90 c("unif", -100, -80)
+  cfg.list["hivtransmission.param.c"] <- inputvector[12] # [12] # 0.5 c("unif", 0, 1)
+  cfg.list["hivtransmission.param.f1"] <- inputvector[13] # [13] # 0.04879016 c("unif", 0, 0.5)
+  cfg.list["hivtransmission.param.f2"] <- inputvector[14] # [14] # -0.1386294 c("unif", -0.5, 0)
   
   # Disease progression > may be remove in parameter to estimates
   
-  cfg.list["person.vsp.toacute.x"] <- inputvector[16] # [15] # 5 c("unif", 3, 7)
-  cfg.list["person.vsp.toaids.x"] <- inputvector[17] # [16] # 7 c("unif", 5, 9)
-  cfg.list["person.vsp.tofinalaids.x"] <- inputvector[18] # [17] # 12 c("unif", 10, 14)
+  cfg.list["person.vsp.toacute.x"] <- inputvector[15] # [15] # 5 c("unif", 3, 7)
+  cfg.list["person.vsp.toaids.x"] <- inputvector[16] # [16] # 7 c("unif", 5, 9)
+  cfg.list["person.vsp.tofinalaids.x"] <- inputvector[17] # [17] # 12 c("unif", 10, 14)
   
   
   #
@@ -313,7 +314,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   # ##############
   #
   
-  cfg.list["conception.alpha_base"] <- inputvector[19] # [18] # -2.7 c("unif", -3.5, -1.7)
+  cfg.list["conception.alpha_base"] <- inputvector[18] # [18] # -2.7 c("unif", -3.5, -1.7)
   
   #
   #
@@ -414,7 +415,6 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   
   # Events
   cfg.list["population.maxevents"] <- as.numeric(cfg.list["population.simtime"][1]) * as.numeric(cfg.list["population.nummen"][1]) * 3
-  
   
   # Avoid overlaping in same directory
   
@@ -1261,7 +1261,8 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
 # 
 # test.all <- wrapper.phylo.simpact.study.1(inputvector = inputvector) # L = 437
 
-inputvector <- c(-0.52, -0.05, 2.8, 0, 3, 0.25, -0.3, -0.1, 0.2,
+inputvector <- c(-0.52, -0.05, 2.8, 0, 3, 0.25, -0.3, -0.1, 
+                 # 0.2,
                  -1, -90, 0.5, 0.05, -0.14, 5, 7, 12, -2.7) # length(inputvector) = 18
 # 
 # 
