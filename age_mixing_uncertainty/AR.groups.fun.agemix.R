@@ -300,14 +300,7 @@ AR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net,
 }
 
 
-b <- AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                     limitTransmEvents = 7,
-                     timewindow = c(30,40),
-                     seq.cov = 70,
-                     seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                     age.group.15.25 = c(15,25),
-                     age.group.25.40 = c(25,40),
-                     age.group.40.50 = c(40,50))
+
 
 
 
