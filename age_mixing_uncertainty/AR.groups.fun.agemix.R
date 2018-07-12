@@ -1,3 +1,4 @@
+# true we record of infection - infection time
 
 AR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net,
                                  limitTransmEvents = 7,
@@ -17,10 +18,10 @@ AR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net,
     
     transm.age.df.ic <- as.data.frame(simpact.trans.net[[i]])
     
-    age.inf.Rec <- transm.age.df.ic$InfecTime - transm.age.df.ic$TOBRec
-    age.inf.Don <- transm.age.df.ic$InfecTime - transm.age.df.ic$TOBDon
+    age.samp.Rec <- transm.age.df.ic$SampTime - transm.age.df.ic$TOBRec
+    age.samp.Don <- transm.age.df.ic$SampTime - transm.age.df.ic$TOBDon
     
-    transm.age.i <- cbind(transm.age.df.ic, age.inf.Rec, age.inf.Don)
+    transm.age.i <- cbind(transm.age.df.ic, age.samp.Rec, age.samp.Don)
     
     new.transm.tab[[i]] <- transm.age.i
     
@@ -68,31 +69,88 @@ AR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net,
       
     }
     
-    # trans.sum.age.limit <- dplyr::filter(trans.sum.rename.id, trans.sum.rename.id$age.inf.Rec<=age.group.40.50[2])
+    # trans.sum.age.limit <- dplyr::filter(trans.sum.rename.id, trans.sum.rename.id$age.samp.Rec<=age.group.40.50[2])
     
-    trans.sum.age.limit <- dplyr::filter(trans.sum.rename.id, trans.sum.rename.id$InfecTime >= timewindow[1] & trans.sum.rename.id$InfecTime <= timewindow[2])
+    trans.sum.age.limit <- dplyr::filter(trans.sum.rename.id, trans.sum.rename.id$SampTime >= timewindow[1] & trans.sum.rename.id$SampTime <= timewindow[2])
     
     
-    sort.partners.fun <- function(partner.table = partner.table){
+    sort.partners.fun <- function(partner.table = partner.table){ # for receivers
       
-      part.15.25 <- dplyr::filter(partner.table, partner.table$age.inf.Don >= age.group.15.25[1] & partner.table$age.inf.Don < age.group.15.25[2])
-      part.25.40 <- dplyr::filter(partner.table, partner.table$age.inf.Don >= age.group.25.40[1] & partner.table$age.inf.Don < age.group.25.40[2])
-      part.40.50 <- dplyr::filter(partner.table, partner.table$age.inf.Don >= age.group.40.50[1] & partner.table$age.inf.Don < age.group.40.50[2])
+      # age and gender structured receiver individuals 
       
-      N.part.15.25 <- nrow(part.15.25)
-      N.part.25.40 <- nrow(part.25.40)
-      N.part.40.50 <- nrow(part.40.50)
+      num.15.25.men <- tryCatch(dplyr::filter(partner.table, partner.table$GenderRec=="0" & partner.table$age.samp.Rec >= age.group.15.25[1] & partner.table$age.samp.Rec < age.group.15.25[2]),
+                                error=function(e) return(NULL))
       
-      return(c(N.part.15.25, N.part.25.40, N.part.40.50))
+      num.15.25.women <- tryCatch(dplyr::filter(partner.table, partner.table$GenderRec=="1" & partner.table$age.samp.Rec >= age.group.15.25[1] & partner.table$age.samp.Rec < age.group.15.25[2]),
+                                  error=function(e) return(NULL))
+      
+      
+      num.25.40.men <- tryCatch(dplyr::filter(partner.table, partner.table$GenderRec=="0" & partner.table$age.samp.Rec >= age.group.25.40[1] & partner.table$age.samp.Rec < age.group.25.40[2]),
+                                error=function(e) return(NULL))
+      
+      num.25.40.women <- tryCatch(dplyr::filter(partner.table, partner.table$GenderRec=="1" & partner.table$age.samp.Rec >= age.group.25.40[1] & partner.table$age.samp.Rec < age.group.25.40[2]),
+                                  error=function(e) return(NULL))
+      
+      
+      num.40.50.men <- tryCatch(dplyr::filter(partner.table, partner.table$GenderRec=="0" & partner.table$age.samp.Rec >= age.group.40.50[1] & partner.table$age.samp.Rec < age.group.40.50[2]),
+                                error=function(e) return(NULL))
+      
+      num.40.50.women <- tryCatch(dplyr::filter(partner.table, partner.table$GenderRec=="1" & partner.table$age.samp.Rec >= age.group.40.50[1] & partner.table$age.samp.Rec < age.group.40.50[2]),
+                                  error=function(e) return(NULL))
+      
+      # consider filter == men
+      
+      part.men.15.25.women.15.25 <- tryCatch(dplyr::filter(num.15.25.men, num.15.25.men$age.samp.Don >= age.group.15.25[1] & num.15.25.men$age.samp.Don < age.group.15.25[2]),
+                                             error=function(e) return(NULL)) # table of women partners of men between 15 and 25 years old
+      
+      part.men.15.25.women.25.40 <- tryCatch(dplyr::filter(num.15.25.men, num.15.25.men$age.samp.Don >= age.group.25.40[1] & num.15.25.men$age.samp.Don < age.group.25.40[2]),
+                                             error=function(e) return(NULL)) 
+      
+      part.men.15.25.women.40.50 <- tryCatch(dplyr::filter(num.15.25.men, num.15.25.men$age.samp.Don >= age.group.40.50[1] & num.15.25.men$age.samp.Don < age.group.40.50[2]),
+                                             error=function(e) return(NULL)) 
+      
+      
+      part.men.25.40.women.15.25 <- tryCatch(dplyr::filter(num.25.40.men, num.25.40.men$age.samp.Don >= age.group.15.25[1] & num.25.40.men$age.samp.Don < age.group.15.25[2]),
+                                             error=function(e) return(NULL)) 
+      
+      part.men.25.40.women.25.40 <- tryCatch(dplyr::filter(num.25.40.men, num.25.40.men$age.samp.Don >= age.group.25.40[1] & num.25.40.men$age.samp.Don < age.group.25.40[2]),
+                                             error=function(e) return(NULL)) 
+      
+      part.men.25.40.women.40.50 <- tryCatch(dplyr::filter(num.25.40.men, num.25.40.men$age.samp.Don >= age.group.40.50[1] & num.25.40.men$age.samp.Don < age.group.40.50[2]),
+                                             error=function(e) return(NULL)) 
+      
+      
+      part.men.40.50.women.15.25 <- tryCatch(dplyr::filter(num.40.50.men, num.40.50.men$age.samp.Don >= age.group.15.25[1] & num.40.50.men$age.samp.Don < age.group.15.25[2]),
+                                             error=function(e) return(NULL)) 
+      
+      part.men.40.50.women.25.40 <- tryCatch(dplyr::filter(num.40.50.men, num.40.50.men$age.samp.Don >= age.group.25.40[1] & num.40.50.men$age.samp.Don < age.group.25.40[2]),
+                                             error=function(e) return(NULL)) 
+      
+      part.men.40.50.women.40.50 <- tryCatch(dplyr::filter(num.40.50.men, num.40.50.men$age.samp.Don >= age.group.40.50[1] & num.40.50.men$age.samp.Don < age.group.40.50[2]),
+                                             error=function(e) return(NULL)) 
+      
+      # part.15.25 <- dplyr::filter(partner.table, partner.table$age.samp.Don >= age.group.15.25[1] & partner.table$age.samp.Don < age.group.15.25[2])
+      # part.25.40 <- dplyr::filter(partner.table, partner.table$age.samp.Don >= age.group.25.40[1] & partner.table$age.samp.Don < age.group.25.40[2])
+      # part.40.50 <- dplyr::filter(partner.table, partner.table$age.samp.Don >= age.group.40.50[1] & partner.table$age.samp.Don < age.group.40.50[2])
+      
+      # N.part.15.25 <- nrow(part.15.25)
+      # N.part.25.40 <- nrow(part.25.40)
+      # N.part.40.50 <- nrow(part.40.50)
+      
+      N.partners <- c(nrow(part.men.15.25.women.15.25), nrow(part.men.15.25.women.25.40), nrow(part.men.15.25.women.40.50),
+                      nrow(part.men.25.40.women.15.25), nrow(part.men.25.40.women.25.40), nrow(part.men.25.40.women.40.50),
+                      nrow(part.men.40.50.women.15.25), nrow(part.men.40.50.women.25.40), nrow(part.men.40.50.women.40.50))
+      
+      return(N.partners)
       
     }
     
     # Group 15 - 25
     ###############
     
-    trans.sum.men.15.25 <- dplyr::filter(trans.sum.age.limit, trans.sum.age.limit$GenderRec=="0" & trans.sum.age.limit$age.inf.Rec >= age.group.15.25[1] & trans.sum.age.limit$age.inf.Rec < age.group.15.25[2])
+    trans.sum.men.15.25 <- dplyr::filter(trans.sum.age.limit, trans.sum.age.limit$GenderRec=="0" & trans.sum.age.limit$age.samp.Rec >= age.group.15.25[1] & trans.sum.age.limit$age.samp.Rec < age.group.15.25[2])
     
-    trans.sum.women.15.25 <- dplyr::filter(trans.sum.age.limit, trans.sum.age.limit$GenderRec=="1" & trans.sum.age.limit$age.inf.Rec >= age.group.15.25[1] & trans.sum.age.limit$age.inf.Rec < age.group.15.25[2])
+    trans.sum.women.15.25 <- dplyr::filter(trans.sum.age.limit, trans.sum.age.limit$GenderRec=="1" & trans.sum.age.limit$age.samp.Rec >= age.group.15.25[1] & trans.sum.age.limit$age.samp.Rec < age.group.15.25[2])
     
     
     
@@ -130,7 +188,7 @@ AR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net,
     }
     
     
-    samp.all.15.25 <- c(x.id.15.25, y.id.15.25)
+    samp.all.15.25 <- c(x.id.15.25, y.id.15.25) # 280
     
     trans.sum.men.15.25.sel <- dplyr::filter(trans.sum.men.15.25, trans.sum.men.15.25$id%in%x.id.15.25)
     trans.sum.women.15.25.sel <- dplyr::filter(trans.sum.women.15.25, trans.sum.women.15.25$id%in%y.id.15.25)
@@ -144,9 +202,9 @@ AR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net,
     # Group 25 - 40
     ###############
     
-    trans.sum.men.25.40 <- dplyr::filter(trans.sum.age.limit, trans.sum.age.limit$GenderRec=="0" & trans.sum.age.limit$age.inf.Rec >= age.group.25.40[1] & trans.sum.age.limit$age.inf.Rec < age.group.25.40[2])
+    trans.sum.men.25.40 <- dplyr::filter(trans.sum.age.limit, trans.sum.age.limit$GenderRec=="0" & trans.sum.age.limit$age.samp.Rec >= age.group.25.40[1] & trans.sum.age.limit$age.samp.Rec < age.group.25.40[2])
     
-    trans.sum.women.25.40 <- dplyr::filter(trans.sum.age.limit, trans.sum.age.limit$GenderRec=="1" & trans.sum.age.limit$age.inf.Rec >= age.group.25.40[1] & trans.sum.age.limit$age.inf.Rec < age.group.25.40[2])
+    trans.sum.women.25.40 <- dplyr::filter(trans.sum.age.limit, trans.sum.age.limit$GenderRec=="1" & trans.sum.age.limit$age.samp.Rec >= age.group.25.40[1] & trans.sum.age.limit$age.samp.Rec < age.group.25.40[2])
     
     perc.100.25.40 <- nrow(trans.sum.men.25.40) + nrow(trans.sum.women.25.40) # total number of individuals with age limit
     
@@ -182,7 +240,7 @@ AR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net,
     }
     
     
-    samp.all.25.40 <- c(x.id.25.40, y.id.25.40)
+    samp.all.25.40 <- c(x.id.25.40, y.id.25.40) # 32
     
     trans.sum.men.25.40.sel <- dplyr::filter(trans.sum.men.25.40, trans.sum.men.25.40$id%in%x.id.25.40)
     trans.sum.women.25.40.sel <- dplyr::filter(trans.sum.women.25.40, trans.sum.women.25.40$id%in%y.id.25.40)
@@ -197,9 +255,9 @@ AR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net,
     # Group 40 - 50
     ###############
     
-    trans.sum.men.40.50 <- dplyr::filter(trans.sum.age.limit, trans.sum.age.limit$GenderRec=="0" & trans.sum.age.limit$age.inf.Rec >= age.group.40.50[1] & trans.sum.age.limit$age.inf.Rec < age.group.40.50[2])
+    trans.sum.men.40.50 <- dplyr::filter(trans.sum.age.limit, trans.sum.age.limit$GenderRec=="0" & trans.sum.age.limit$age.samp.Rec >= age.group.40.50[1] & trans.sum.age.limit$age.samp.Rec < age.group.40.50[2])
     
-    trans.sum.women.40.50 <- dplyr::filter(trans.sum.age.limit, trans.sum.age.limit$GenderRec=="1" & trans.sum.age.limit$age.inf.Rec >= age.group.40.50[1] & trans.sum.age.limit$age.inf.Rec < age.group.40.50[2])
+    trans.sum.women.40.50 <- dplyr::filter(trans.sum.age.limit, trans.sum.age.limit$GenderRec=="1" & trans.sum.age.limit$age.samp.Rec >= age.group.40.50[1] & trans.sum.age.limit$age.samp.Rec < age.group.40.50[2])
     
     perc.100.40.50 <- nrow(trans.sum.men.40.50) + nrow(trans.sum.women.40.50) # total number of individuals with age limit
     
@@ -235,7 +293,7 @@ AR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net,
     }
     
     
-    samp.all.40.50 <- c(x.id.40.50, y.id.40.50)
+    samp.all.40.50 <- c(x.id.40.50, y.id.40.50) # 2
     
     trans.sum.men.40.50.sel <- dplyr::filter(trans.sum.men.40.50, trans.sum.men.40.50$id%in%x.id.40.50)
     trans.sum.women.40.50.sel <- dplyr::filter(trans.sum.women.40.50, trans.sum.women.40.50$id%in%y.id.40.50)
@@ -250,24 +308,31 @@ AR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net,
     
     # samp.all <- c(samp.all.15.25, samp.all.25.40, samp.all.40.50)
     
+    # ouput.transm.dat <- c(nrow(trans.sum.men.15.25), nrow(trans.sum.women.15.25),
+    #                       nrow(trans.sum.men.25.40), nrow(trans.sum.women.25.40),
+    #                       nrow(trans.sum.men.40.50), nrow(trans.sum.women.40.50),
+    #                       
+    #                       partners.men.rec.15.25, partners.men.rec.25.40, partners.men.rec.40.50,
+    #                       partners.women.rec.15.25, partners.women.rec.25.40, partners.women.rec.40.50)
+    
     ouput.transm.dat <- c(nrow(trans.sum.men.15.25), nrow(trans.sum.women.15.25),
                           nrow(trans.sum.men.25.40), nrow(trans.sum.women.25.40),
                           nrow(trans.sum.men.40.50), nrow(trans.sum.women.40.50),
                           
-                          partners.men.rec.15.25, partners.men.rec.25.40, partners.men.rec.40.50,
-                          partners.women.rec.15.25, partners.women.rec.25.40, partners.women.rec.40.50)
+                          partners.men.rec.15.25+partners.men.rec.25.40+partners.men.rec.40.50)
     
+    
+    # N.partners <- c(nrow(part.men.15.25.women.15.25), nrow(part.men.15.25.women.25.40), nrow(part.men.15.25.women.40.50),
+    #                 nrow(part.men.25.40.women.15.25), nrow(part.men.25.40.women.25.40), nrow(part.men.25.40.women.40.50),
+    #                 nrow(part.men.40.50.women.15.25), nrow(part.men.40.50.women.25.40), nrow(part.men.40.50.women.40.50))
+    # 
     val.names <- c("num.men.15.25", "num.women.15.25",
                    "num.men.25.40", "num.women.25.40",
                    "num.men.40.50", "num.women.40.50",
                    
                    "partners.men.15.25.w.15.25", "partners.men.15.25.w.25.40", "partners.men.15.25.w.40.50",
                    "partners.men.25.40.w.15.25", "partners.men.25.40.w.25.40", "partners.men.25.40.w.40.50",
-                   "partners.men.40.50.w.15.25", "partners.men.40.50.w.25.40", "partners.men.40.50.w.40.50",
-                   
-                   "partners.women.15.25.w.15.25", "partners.women.15.25.w.25.40", "partners.women.15.25.w.40.50",
-                   "partners.women.25.40.w.15.25", "partners.women.25.40.w.25.40", "partners.women.25.40.w.40.50",
-                   "partners.women.40.50.w.15.25", "partners.women.40.50.w.25.40", "partners.women.40.50.w.40.50")
+                   "partners.men.40.50.w.15.25", "partners.men.40.50.w.25.40", "partners.men.40.50.w.40.50")
     
     names(ouput.transm.dat) <- val.names
     
@@ -281,11 +346,7 @@ AR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net,
                    
                    "partners.men.15.25.w.15.25", "partners.men.15.25.w.25.40", "partners.men.15.25.w.40.50",
                    "partners.men.25.40.w.15.25", "partners.men.25.40.w.25.40", "partners.men.25.40.w.40.50",
-                   "partners.men.40.50.w.15.25", "partners.men.40.50.w.25.40", "partners.men.40.50.w.40.50",
-                   
-                   "partners.women.15.25.w.15.25", "partners.women.15.25.w.25.40", "partners.women.15.25.w.40.50",
-                   "partners.women.25.40.w.15.25", "partners.women.25.40.w.25.40", "partners.women.25.40.w.40.50",
-                   "partners.women.40.50.w.15.25", "partners.women.40.50.w.25.40", "partners.women.40.50.w.40.50")
+                   "partners.men.40.50.w.15.25", "partners.men.40.50.w.25.40", "partners.men.40.50.w.40.50")
     
     ouput.transm.dat <- rep(NA, length(val.names))
     
