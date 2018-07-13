@@ -151,17 +151,15 @@ AR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net,
     
   }
   
+  
+  trans.sum.age.limit <- data.transm.agemix
+  
   # Group 15 - 25
   ###############
   
   trans.sum.men.15.25 <- dplyr::filter(trans.sum.age.limit, trans.sum.age.limit$GenderRec=="0" & trans.sum.age.limit$age.samp.Rec >= age.group.15.25[1] & trans.sum.age.limit$age.samp.Rec < age.group.15.25[2])
   
   trans.sum.women.15.25 <- dplyr::filter(trans.sum.age.limit, trans.sum.age.limit$GenderRec=="1" & trans.sum.age.limit$age.samp.Rec >= age.group.15.25[1] & trans.sum.age.limit$age.samp.Rec < age.group.15.25[2])
-  
-  
-  trans.sum.men.15.25.sel <- dplyr::filter(trans.sum.men.15.25, trans.sum.men.15.25$id%in%x.id.15.25)
-  trans.sum.women.15.25.sel <- dplyr::filter(trans.sum.women.15.25, trans.sum.women.15.25$id%in%y.id.15.25)
-  
   
   
   # Group 25 - 40
@@ -171,8 +169,6 @@ AR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net,
   
   trans.sum.women.25.40 <- dplyr::filter(trans.sum.age.limit, trans.sum.age.limit$GenderRec=="1" & trans.sum.age.limit$age.samp.Rec >= age.group.25.40[1] & trans.sum.age.limit$age.samp.Rec < age.group.25.40[2])
   
-  trans.sum.men.25.40.sel <- dplyr::filter(trans.sum.men.25.40, trans.sum.men.25.40$id%in%x.id.25.40)
-  trans.sum.women.25.40.sel <- dplyr::filter(trans.sum.women.25.40, trans.sum.women.25.40$id%in%y.id.25.40)
   
   
   # Group 40 - 50
@@ -184,13 +180,7 @@ AR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net,
   
   
   
-  trans.sum.men.40.50.sel <- dplyr::filter(trans.sum.men.40.50, trans.sum.men.40.50$id%in%x.id.40.50)
-  trans.sum.women.40.50.sel <- dplyr::filter(trans.sum.women.40.50, trans.sum.women.40.50$id%in%y.id.40.50)
-  
-  
-  
   partners.age.str <- sort.partners.fun(data.transm.agemix) # 154
-  
   
   ouput.transm.dat <- c(nrow(trans.sum.men.15.25), nrow(trans.sum.women.15.25),
                         nrow(trans.sum.men.25.40), nrow(trans.sum.women.25.40),
@@ -214,6 +204,7 @@ AR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net,
   
   ouput.transm.dat.AD <- c(ouput.transm.dat, mean.AD, med.AD, sd.AD)
   
+  
   val.names <- c("num.men.15.25", "num.women.15.25",
                  "num.men.25.40", "num.women.25.40",
                  "num.men.40.50", "num.women.40.50",
@@ -228,7 +219,7 @@ AR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net,
   
   
   
-  return(ouput.transm.dat)
+  return(ouput.transm.dat.AD)
 }
 
 
