@@ -1631,10 +1631,10 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   name.CAR.90 <- paste0("CAR.90.",names(CAR.90))
   name.CAR.95 <- paste0("CAR.95.",names(CAR.95))
   
-  name.MCAR.scenari <- c(name.MCAR.35, name.MCAR.40, name.MCAR.45, name.MCAR.50,
-                         name.MCAR.55, name.MCAR.60, name.MCAR.65, name.MCAR.70,
-                         name.MCAR.75, name.MCAR.75, name.MCAR.80, name.MCAR.85,
-                         name.MCAR.90, name.MCAR.95)
+  name.MCAR.scenari <- c(name.CAR.35, name.CAR.40, name.CAR.45, name.CAR.50,
+                         name.CAR.55, name.CAR.60, name.CAR.65, name.CAR.70,
+                         name.CAR.75, name.CAR.80, name.CAR.85,
+                         name.CAR.90, name.CAR.95)
 
   
   name.AR.a.35 <- paste0("AR.a.35.",names(AR.a.35))
@@ -1653,7 +1653,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   
   name.AR.a.scenari <- c(name.AR.a.35, name.AR.a.40, name.AR.a.45, name.AR.a.50,
                          name.AR.a.55, name.AR.a.60, name.AR.a.65, name.AR.a.70,
-                         name.AR.a.75, name.AR.a.75, name.AR.a.80, name.AR.a.85,
+                         name.AR.a.75, name.AR.a.80, name.AR.a.85,
                          name.AR.a.90, name.AR.a.95)
   
 
@@ -1673,7 +1673,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   
   name.AR.b.scenari <- c(name.AR.b.35, name.AR.b.40, name.AR.b.45, name.AR.b.50,
                          name.AR.b.55, name.AR.b.60, name.AR.b.65, name.AR.b.70,
-                         name.AR.b.75, name.AR.b.75, name.AR.b.80, name.AR.b.85,
+                         name.AR.b.75, name.AR.b.80, name.AR.b.85,
                          name.AR.b.90, name.AR.b.95)
   
 
@@ -1693,7 +1693,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   
   name.AR.c.scenari <- c(name.AR.c.35, name.AR.c.40, name.AR.c.45, name.AR.c.50,
                          name.AR.c.55, name.AR.c.60, name.AR.c.65, name.AR.c.70,
-                         name.AR.c.75, name.AR.c.75, name.AR.c.80, name.AR.c.85,
+                         name.AR.c.75, name.AR.c.80, name.AR.c.85,
                          name.AR.c.90, name.AR.c.95)
   
   
@@ -1713,7 +1713,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   
   name.clust.MCAR.scenari <- c(name.clust.MCAR.35, name.clust.MCAR.40, name.clust.MCAR.45, name.clust.MCAR.50,
                                name.clust.MCAR.55, name.clust.MCAR.60, name.clust.MCAR.65, name.clust.MCAR.70,
-                               name.clust.MCAR.75, name.clust.MCAR.75, name.clust.MCAR.80, name.clust.MCAR.85,
+                               name.clust.MCAR.75, name.clust.MCAR.80, name.clust.MCAR.85,
                                name.clust.MCAR.90, name.clust.MCAR.95)
   
   
@@ -1733,7 +1733,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   
   name.clust.AR.a.scenari <- c(name.clust.AR.a.35, name.clust.AR.a.40, name.clust.AR.a.45, name.clust.AR.a.50,
                                name.clust.AR.a.55, name.clust.AR.a.60, name.clust.AR.a.65, name.clust.AR.a.70,
-                               name.clust.AR.a.75, name.clust.AR.a.75, name.clust.AR.a.80, name.clust.AR.a.85,
+                               name.clust.AR.a.75, name.clust.AR.a.80, name.clust.AR.a.85,
                                name.clust.AR.a.90, name.clust.AR.a.95)
   
   
@@ -1753,7 +1753,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   
   name.clust.AR.b.scenari <- c(name.clust.AR.b.35, name.clust.AR.b.40, name.clust.AR.b.45, name.clust.AR.b.50,
                                name.clust.AR.b.55, name.clust.AR.b.60, name.clust.AR.b.65, name.clust.AR.b.70,
-                               name.clust.AR.b.75, name.clust.AR.b.75, name.clust.AR.b.80, name.clust.AR.b.85,
+                               name.clust.AR.b.75, name.clust.AR.b.80, name.clust.AR.b.85,
                                name.clust.AR.b.90, name.clust.AR.b.95)
   
   name.clust.AR.c.35 <- paste0("clust.AR.c.35.",names(transm.clust.AR.c.cov.35.val))
@@ -1772,7 +1772,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   
   name.clust.AR.c.scenari <- c(name.clust.AR.c.35, name.clust.AR.c.40, name.clust.AR.c.45, name.clust.AR.c.50,
                                name.clust.AR.c.55, name.clust.AR.c.60, name.clust.AR.c.65, name.clust.AR.c.70,
-                               name.clust.AR.c.75, name.clust.AR.c.75, name.clust.AR.c.80, name.clust.AR.c.85,
+                               name.clust.AR.c.75, name.clust.AR.c.80, name.clust.AR.c.85,
                                name.clust.AR.c.90, name.clust.AR.c.95)
   
   # ALL names together
@@ -1874,7 +1874,7 @@ inputmatrix <- matrix(rep(inputvector, reps), byrow = TRUE, nrow = reps)
 features.matrix <- simpact.parallel(model = master.model.age.mixing.pattern.study2,
                                     actual.input.matrix = inputmatrix,
                                     seed_count = 124,
-                                    n_cluster = 4)
+                                    n_cluster = 8)
 
 
 # 
