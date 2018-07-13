@@ -149,6 +149,9 @@ CAR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net,
     
   }
   
+  
+  trans.sum.age.limit <- data.transm.agemix
+  
   # Group 15 - 25
   ###############
   
@@ -177,12 +180,12 @@ CAR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net,
   
   partners.age.str <- sort.partners.fun(data.transm.agemix) # 154
   
-  
   ouput.transm.dat <- c(nrow(trans.sum.men.15.25), nrow(trans.sum.women.15.25),
                         nrow(trans.sum.men.25.40), nrow(trans.sum.women.25.40),
                         nrow(trans.sum.men.40.50), nrow(trans.sum.women.40.50),
                         
                         partners.age.str)
+  
   
   # Age difference statistics #
   #############################
@@ -197,6 +200,9 @@ CAR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net,
   # fit.agemix.trans.men <- fit.agemix.trans.men(datatable = data.transm.agemix)
   
   
+  ouput.transm.dat.AD <- c(ouput.transm.dat, mean.AD, med.AD, sd.AD)
+  
+  
   val.names <- c("num.men.15.25", "num.women.15.25",
                  "num.men.25.40", "num.women.25.40",
                  "num.men.40.50", "num.women.40.50",
@@ -208,10 +214,10 @@ CAR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net,
                  "mean.AD", "median.AD", "sd.AD")
   
   
-  names(ouput.transm.dat) <- val.names
+  names(ouput.transm.dat.AD) <- val.names
   
   
-  return(ouput.transm.dat)
+  return(ouput.transm.dat.AD)
 }
 
 ### ----------------------------------------
