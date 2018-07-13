@@ -30,6 +30,11 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
   
   
+  source("~/phylosimpact_simulation_studies_2018/age_mixing_uncertainty/AR.groups.fun.agemix.R")
+  source("~/phylosimpact_simulation_studies_2018/age_mixing_uncertainty/phylo.AR.groups.fun.agemix.R")
+  source("~/phylosimpact_simulation_studies_2018/age_mixing_uncertainty/CAR.groups.fun.agemix.R")
+  source("~/phylosimpact_simulation_studies_2018/age_mixing_uncertainty/phylo.CAR.groups.fun.agemix.R") 
+  
   # work.dir <- "/home/david/Desktop/mastermodeltest" # on laptop
   
   work.dir <- "/home/niyukuri/Desktop/mastermodeltest" # on PC
@@ -475,7 +480,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   
   
   agemixing.df <- agemixing.trans.df(trans.network = simpact.trans.net,
-                                           limitTransmEvents = 7)
+                                     limitTransmEvents = 7)
   
   
   # IDs of individuals infected in the time window of the study
@@ -491,16 +496,30 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   #####################################################################
   
   
+  # Age difference statistics #
+  #############################
+  AD <- abs(abs(agemixing.df.IDs$TOBDon) - abs(agemixing.df.IDs$TOBRec))
+  mean.AD <- mean(AD)
+  med.AD <- median(AD)
+  sd.AD <- sd(AD)
+  
+  # Mixed effect models #
+  #######################
+  fit.agemix.trans.women <- fit.agemix.trans.women(datatable = agemixing.df.IDs)
+  fit.agemix.trans.men <- fit.agemix.trans.men(datatable = agemixing.df.IDs)
+  
   # I. MCAR
   
   CAR.35 <- CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                             limitTransmEvents = 7,
-                             timewindow = c(30,40),
-                             seq.cov = 35,
-                             #    seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                             age.group.15.25 = c(15,25),
-                             age.group.25.40 = c(25,40),
-                             age.group.40.50 = c(40,50))
+                                  limitTransmEvents = 7,
+                                  timewindow = c(30,40),
+                                  seq.cov = 35,
+                                  #    seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                  age.group.15.25 = c(15,25),
+                                  age.group.25.40 = c(25,40),
+                                  age.group.40.50 = c(40,50))
+  
+  
   
   CAR.40 <- CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
                                   limitTransmEvents = 7,
@@ -530,7 +549,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
                                   age.group.40.50 = c(40,50))
   
   
- 
+  
   CAR.55 <- CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
                                   limitTransmEvents = 7,
                                   timewindow = c(30,40),
@@ -619,6 +638,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
                                   age.group.15.25 = c(15,25),
                                   age.group.25.40 = c(25,40),
                                   age.group.40.50 = c(40,50))
+  
   
   # II. MAR
   
@@ -745,6 +765,9 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
                                   age.group.15.25 = c(15,25),
                                   age.group.25.40 = c(25,40),
                                   age.group.40.50 = c(40,50))
+  
+  
+  
   
   # II.b
   
@@ -1000,6 +1023,8 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   
   
   
+  
+  
   # Age difference statistics #
   #############################
   AD <- abs(abs(agemixing.df.IDs$TOBDon) - abs(agemixing.df.IDs$TOBRec))
@@ -1007,719 +1032,802 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   med.AD <- median(AD)
   sd.AD <- sd(AD)
   
-  # Mixed effect models #
-  #######################
-  fit.agemix.trans.women <- fit.agemix.trans.women(datatable = agemixing.df.IDs)
-  fit.agemix.trans.men <- fit.agemix.trans.men(datatable = agemixing.df.IDs)
+  
+  
+  # III. Transmission clusters with MCAR
+  
+  
+  
+  transm.clust.MCAR.cov.35 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 35,
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50))
+  transm.clust.MCAR.cov.35.val <- sapply(transm.clust.MCAR.cov.35, mean)
+  
+  
+  transm.clust.MCAR.cov.40 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 40,
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50))
+  transm.clust.MCAR.cov.40.val <- sapply(transm.clust.MCAR.cov.40, mean)
+  
+  
+  
+  transm.clust.MCAR.cov.45 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 45,
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50))
+  transm.clust.MCAR.cov.45.val <- sapply(transm.clust.MCAR.cov.45, mean)
+  
+  transm.clust.MCAR.cov.50 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 50,
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50))
+  transm.clust.MCAR.cov.50.val <- sapply(transm.clust.MCAR.cov.50, mean)
+  
+  
+  transm.clust.MCAR.cov.55 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 55,
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50))
+  transm.clust.MCAR.cov.55.val <- sapply(transm.clust.MCAR.cov.55, mean)
+  
+  
+  
+  transm.clust.MCAR.cov.60 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 60,
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50))
+  transm.clust.MCAR.cov.60.val <- sapply(transm.clust.MCAR.cov.60, mean)
+  
+  
+  
+  transm.clust.MCAR.cov.65 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 65,
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50))
+  transm.clust.MCAR.cov.65.val <- sapply(transm.clust.MCAR.cov.65, mean)
+  
+  
+  transm.clust.MCAR.cov.70 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 70,
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50))
+  transm.clust.MCAR.cov.70.val <- sapply(transm.clust.MCAR.cov.70, mean)
+  
+  transm.clust.MCAR.cov.75 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 75,
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50))
+  transm.clust.MCAR.cov.75.val <- sapply(transm.clust.MCAR.cov.75, mean)
+  
+  transm.clust.MCAR.cov.80 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 80,
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50))
+  transm.clust.MCAR.cov.80.val <- sapply(transm.clust.MCAR.cov.80, mean)
+  
+  transm.clust.MCAR.cov.85 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 85,
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50))
+  transm.clust.MCAR.cov.85.val <- sapply(transm.clust.MCAR.cov.85, mean)
+  
+  transm.clust.MCAR.cov.90 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 90,
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50))
+  transm.clust.MCAR.cov.90.val <- sapply(transm.clust.MCAR.cov.90, mean)
+  
+  transm.clust.MCAR.cov.95 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 95,
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50))
+  transm.clust.MCAR.cov.95.val <- sapply(transm.clust.MCAR.cov.95, mean)
+  
+  
+  
+  # IV. Transmission clusters with MAR
+  
+  # IV.a 
+  
+  transm.clust.AR.a.cov.35 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                         limitTransmEvents = 7,
+                                                         timewindow = c(30,40),
+                                                         seq.cov = 35,
+                                                         seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                         age.group.15.25 = c(15,25),
+                                                         age.group.25.40 = c(25,40),
+                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.a.cov.35.val <- sapply(transm.clust.AR.a.cov.35, mean)
+  
+  transm.clust.AR.a.cov.40 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                         limitTransmEvents = 7,
+                                                         timewindow = c(30,40),
+                                                         seq.cov = 40,
+                                                         seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                         age.group.15.25 = c(15,25),
+                                                         age.group.25.40 = c(25,40),
+                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.a.cov.40.val <- sapply(transm.clust.AR.a.cov.40, mean)
+  
+  transm.clust.AR.a.cov.45 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                         limitTransmEvents = 7,
+                                                         timewindow = c(30,40),
+                                                         seq.cov = 45,
+                                                         seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                         age.group.15.25 = c(15,25),
+                                                         age.group.25.40 = c(25,40),
+                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.a.cov.45.val <- sapply(transm.clust.AR.a.cov.45, mean)
+  
+  transm.clust.AR.a.cov.50 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                         limitTransmEvents = 7,
+                                                         timewindow = c(30,40),
+                                                         seq.cov = 50,
+                                                         seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                         age.group.15.25 = c(15,25),
+                                                         age.group.25.40 = c(25,40),
+                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.a.cov.50.val <- sapply(transm.clust.AR.a.cov.50, mean)
+  
+  transm.clust.AR.a.cov.55 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                         limitTransmEvents = 7,
+                                                         timewindow = c(30,40),
+                                                         seq.cov = 55,
+                                                         seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                         age.group.15.25 = c(15,25),
+                                                         age.group.25.40 = c(25,40),
+                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.a.cov.55.val <- sapply(transm.clust.AR.a.cov.55, mean)
+  
+  transm.clust.AR.a.cov.60 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                         limitTransmEvents = 7,
+                                                         timewindow = c(30,40),
+                                                         seq.cov = 60,
+                                                         seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                         age.group.15.25 = c(15,25),
+                                                         age.group.25.40 = c(25,40),
+                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.a.cov.60.val <- sapply(transm.clust.AR.a.cov.60, mean)
+  
+  
+  
+  transm.clust.AR.a.cov.65 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                         limitTransmEvents = 7,
+                                                         timewindow = c(30,40),
+                                                         seq.cov = 65,
+                                                         seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                         age.group.15.25 = c(15,25),
+                                                         age.group.25.40 = c(25,40),
+                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.a.cov.65.val <- sapply(transm.clust.AR.a.cov.65, mean)
+  
+  transm.clust.AR.a.cov.70 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                         limitTransmEvents = 7,
+                                                         timewindow = c(30,40),
+                                                         seq.cov = 70,
+                                                         seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                         age.group.15.25 = c(15,25),
+                                                         age.group.25.40 = c(25,40),
+                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.a.cov.70.val <- sapply(transm.clust.AR.a.cov.70, mean)
+  
+  transm.clust.AR.a.cov.75 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                         limitTransmEvents = 7,
+                                                         timewindow = c(30,40),
+                                                         seq.cov = 75,
+                                                         seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                         age.group.15.25 = c(15,25),
+                                                         age.group.25.40 = c(25,40),
+                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.a.cov.75.val <- sapply(transm.clust.AR.a.cov.75, mean)
+  
+  
+  
+  transm.clust.AR.a.cov.80 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                         limitTransmEvents = 7,
+                                                         timewindow = c(30,40),
+                                                         seq.cov = 80,
+                                                         seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                         age.group.15.25 = c(15,25),
+                                                         age.group.25.40 = c(25,40),
+                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.a.cov.80.val <- sapply(transm.clust.AR.a.cov.80, mean)
+  
+  
+  
+  transm.clust.AR.a.cov.85 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                         limitTransmEvents = 7,
+                                                         timewindow = c(30,40),
+                                                         seq.cov = 85,
+                                                         seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                         age.group.15.25 = c(15,25),
+                                                         age.group.25.40 = c(25,40),
+                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.a.cov.85.val <- sapply(transm.clust.AR.a.cov.85, mean)
+  
+  
+  transm.clust.AR.a.cov.90 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                         limitTransmEvents = 7,
+                                                         timewindow = c(30,40),
+                                                         seq.cov = 90,
+                                                         seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                         age.group.15.25 = c(15,25),
+                                                         age.group.25.40 = c(25,40),
+                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.a.cov.90.val <- sapply(transm.clust.AR.a.cov.90, mean)
+  
+  
+  
+  transm.clust.AR.a.cov.95 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                         limitTransmEvents = 7,
+                                                         timewindow = c(30,40),
+                                                         seq.cov = 95,
+                                                         seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                         age.group.15.25 = c(15,25),
+                                                         age.group.25.40 = c(25,40),
+                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.a.cov.95.val <- sapply(transm.clust.AR.a.cov.95, mean)
+  
+  
+  
+  
+  # IV.b
+  
+  
+  transm.clust.AR.b.cov.35 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                         limitTransmEvents = 7,
+                                                         timewindow = c(30,40),
+                                                         seq.cov = 35,
+                                                         seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
+                                                         age.group.15.25 = c(15,25),
+                                                         age.group.25.40 = c(25,40),
+                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.b.cov.35.val <- sapply(transm.clust.AR.b.cov.35, mean)
+  
+  
+  transm.clust.AR.b.cov.40 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                         limitTransmEvents = 7,
+                                                         timewindow = c(30,40),
+                                                         seq.cov = 40,
+                                                         seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
+                                                         age.group.15.25 = c(15,25),
+                                                         age.group.25.40 = c(25,40),
+                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.b.cov.40.val <- sapply(transm.clust.AR.b.cov.40, mean)
+  
+  
+  transm.clust.AR.b.cov.45 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                         limitTransmEvents = 7,
+                                                         timewindow = c(30,40),
+                                                         seq.cov = 45,
+                                                         seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
+                                                         age.group.15.25 = c(15,25),
+                                                         age.group.25.40 = c(25,40),
+                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.b.cov.45.val <- sapply(transm.clust.AR.b.cov.45, mean)
+  
+  
+  transm.clust.AR.b.cov.50 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                         limitTransmEvents = 7,
+                                                         timewindow = c(30,40),
+                                                         seq.cov = 50,
+                                                         seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
+                                                         age.group.15.25 = c(15,25),
+                                                         age.group.25.40 = c(25,40),
+                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.b.cov.50.val <- sapply(transm.clust.AR.b.cov.50, mean)
+  
+  
+  transm.clust.AR.b.cov.55 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                         limitTransmEvents = 7,
+                                                         timewindow = c(30,40),
+                                                         seq.cov = 55,
+                                                         seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
+                                                         age.group.15.25 = c(15,25),
+                                                         age.group.25.40 = c(25,40),
+                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.b.cov.55.val <- sapply(transm.clust.AR.b.cov.55, mean)
+  
+  
+  transm.clust.AR.b.cov.60 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                         limitTransmEvents = 7,
+                                                         timewindow = c(30,40),
+                                                         seq.cov = 60,
+                                                         seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
+                                                         age.group.15.25 = c(15,25),
+                                                         age.group.25.40 = c(25,40),
+                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.b.cov.60.val <- sapply(transm.clust.AR.b.cov.60, mean)
+  
+  
+  
+  transm.clust.AR.b.cov.65 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                         limitTransmEvents = 7,
+                                                         timewindow = c(30,40),
+                                                         seq.cov = 65,
+                                                         seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
+                                                         age.group.15.25 = c(15,25),
+                                                         age.group.25.40 = c(25,40),
+                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.b.cov.65.val <- sapply(transm.clust.AR.b.cov.65, mean)
+  
+  
+  transm.clust.AR.b.cov.70 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                         limitTransmEvents = 7,
+                                                         timewindow = c(30,40),
+                                                         seq.cov = 70,
+                                                         seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
+                                                         age.group.15.25 = c(15,25),
+                                                         age.group.25.40 = c(25,40),
+                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.b.cov.70.val <- sapply(transm.clust.AR.b.cov.70, mean)
+  
+  
+  transm.clust.AR.b.cov.75 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                         limitTransmEvents = 7,
+                                                         timewindow = c(30,40),
+                                                         seq.cov = 75,
+                                                         seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
+                                                         age.group.15.25 = c(15,25),
+                                                         age.group.25.40 = c(25,40),
+                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.b.cov.75.val <- sapply(transm.clust.AR.b.cov.75, mean)
+  
+  
+  
+  transm.clust.AR.b.cov.80 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                         limitTransmEvents = 7,
+                                                         timewindow = c(30,40),
+                                                         seq.cov = 80,
+                                                         seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
+                                                         age.group.15.25 = c(15,25),
+                                                         age.group.25.40 = c(25,40),
+                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.b.cov.80.val <- sapply(transm.clust.AR.b.cov.80, mean)
+  
+  
+  
+  transm.clust.AR.b.cov.85 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                         limitTransmEvents = 7,
+                                                         timewindow = c(30,40),
+                                                         seq.cov = 85,
+                                                         seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
+                                                         age.group.15.25 = c(15,25),
+                                                         age.group.25.40 = c(25,40),
+                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.b.cov.85.val <- sapply(transm.clust.AR.b.cov.85, mean)
+  
+  
+  transm.clust.AR.b.cov.90 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                         limitTransmEvents = 7,
+                                                         timewindow = c(30,40),
+                                                         seq.cov = 90,
+                                                         seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
+                                                         age.group.15.25 = c(15,25),
+                                                         age.group.25.40 = c(25,40),
+                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.b.cov.90.val <- sapply(transm.clust.AR.b.cov.90, mean)
+  
+  
+  
+  transm.clust.AR.b.cov.95 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                         limitTransmEvents = 7,
+                                                         timewindow = c(30,40),
+                                                         seq.cov = 95,
+                                                         seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
+                                                         age.group.15.25 = c(15,25),
+                                                         age.group.25.40 = c(25,40),
+                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.b.cov.95.val <- sapply(transm.clust.AR.b.cov.95, mean)
+  
+  
+  
+  
+  # IV.c
+  
+  
+  transm.clust.AR.c.cov.35 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                         limitTransmEvents = 7,
+                                                         timewindow = c(30,40),
+                                                         seq.cov = 35,
+                                                         seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
+                                                         age.group.15.25 = c(15,25),
+                                                         age.group.25.40 = c(25,40),
+                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.c.cov.35.val <- sapply(transm.clust.AR.c.cov.35, mean)
+  
+  transm.clust.AR.c.cov.40 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                         limitTransmEvents = 7,
+                                                         timewindow = c(30,40),
+                                                         seq.cov = 40,
+                                                         seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
+                                                         age.group.15.25 = c(15,25),
+                                                         age.group.25.40 = c(25,40),
+                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.c.cov.40.val <- sapply(transm.clust.AR.c.cov.40, mean)
+  
+  
+  transm.clust.AR.c.cov.45 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                         limitTransmEvents = 7,
+                                                         timewindow = c(30,40),
+                                                         seq.cov = 45,
+                                                         seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
+                                                         age.group.15.25 = c(15,25),
+                                                         age.group.25.40 = c(25,40),
+                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.c.cov.45.val <- sapply(transm.clust.AR.c.cov.45, mean)
+  
+  
+  transm.clust.AR.c.cov.50 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                         limitTransmEvents = 7,
+                                                         timewindow = c(30,40),
+                                                         seq.cov = 50,
+                                                         seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
+                                                         age.group.15.25 = c(15,25),
+                                                         age.group.25.40 = c(25,40),
+                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.c.cov.50.val <- sapply(transm.clust.AR.c.cov.50, mean)
+  
+  
+  transm.clust.AR.c.cov.55 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                         limitTransmEvents = 7,
+                                                         timewindow = c(30,40),
+                                                         seq.cov = 55,
+                                                         seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
+                                                         age.group.15.25 = c(15,25),
+                                                         age.group.25.40 = c(25,40),
+                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.c.cov.55.val <- sapply(transm.clust.AR.c.cov.55, mean)
+  
+  
+  transm.clust.AR.c.cov.60 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                         limitTransmEvents = 7,
+                                                         timewindow = c(30,40),
+                                                         seq.cov = 60,
+                                                         seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
+                                                         age.group.15.25 = c(15,25),
+                                                         age.group.25.40 = c(25,40),
+                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.c.cov.60.val <- sapply(transm.clust.AR.c.cov.60, mean)
+  
+  
+  
+  transm.clust.AR.c.cov.65 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                         limitTransmEvents = 7,
+                                                         timewindow = c(30,40),
+                                                         seq.cov = 65,
+                                                         seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
+                                                         age.group.15.25 = c(15,25),
+                                                         age.group.25.40 = c(25,40),
+                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.c.cov.65.val <- sapply(transm.clust.AR.c.cov.65, mean)
+  
+  
+  transm.clust.AR.c.cov.70 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                         limitTransmEvents = 7,
+                                                         timewindow = c(30,40),
+                                                         seq.cov = 70,
+                                                         seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
+                                                         age.group.15.25 = c(15,25),
+                                                         age.group.25.40 = c(25,40),
+                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.c.cov.70.val <- sapply(transm.clust.AR.c.cov.70, mean)
+  
+  
+  transm.clust.AR.c.cov.75 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                         limitTransmEvents = 7,
+                                                         timewindow = c(30,40),
+                                                         seq.cov = 75,
+                                                         seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
+                                                         age.group.15.25 = c(15,25),
+                                                         age.group.25.40 = c(25,40),
+                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.c.cov.75.val <- sapply(transm.clust.AR.c.cov.75, mean)
+  
+  
+  
+  transm.clust.AR.c.cov.80 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                         limitTransmEvents = 7,
+                                                         timewindow = c(30,40),
+                                                         seq.cov = 80,
+                                                         seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
+                                                         age.group.15.25 = c(15,25),
+                                                         age.group.25.40 = c(25,40),
+                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.c.cov.80.val <- sapply(transm.clust.AR.c.cov.80, mean)
+  
+  
+  
+  transm.clust.AR.c.cov.85 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                         limitTransmEvents = 7,
+                                                         timewindow = c(30,40),
+                                                         seq.cov = 85,
+                                                         seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
+                                                         age.group.15.25 = c(15,25),
+                                                         age.group.25.40 = c(25,40),
+                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.c.cov.85.val <- sapply(transm.clust.AR.c.cov.85, mean)
+  
+  
+  transm.clust.AR.c.cov.90 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                         limitTransmEvents = 7,
+                                                         timewindow = c(30,40),
+                                                         seq.cov = 90,
+                                                         seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
+                                                         age.group.15.25 = c(15,25),
+                                                         age.group.25.40 = c(25,40),
+                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.c.cov.90.val <- sapply(transm.clust.AR.c.cov.90, mean)
+  
+  
+  
+  transm.clust.AR.c.cov.95 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                         limitTransmEvents = 7,
+                                                         timewindow = c(30,40),
+                                                         seq.cov = 95,
+                                                         seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
+                                                         age.group.15.25 = c(15,25),
+                                                         age.group.25.40 = c(25,40),
+                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.c.cov.95.val <- sapply(transm.clust.AR.c.cov.95, mean)
+  
+  
+  
+  
+  # Names
+  
+  name.CAR.35 <- paste0("CAR.35.",names(CAR.35))
+  name.CAR.40 <- paste0("CAR.40.",names(CAR.40))
+  name.CAR.45 <- paste0("CAR.45.",names(CAR.45))
+  name.CAR.50 <- paste0("CAR.50.",names(CAR.50))
+  name.CAR.55 <- paste0("CAR.55.",names(CAR.55))
+  name.CAR.60 <- paste0("CAR.60.",names(CAR.60))
+  name.CAR.65 <- paste0("CAR.65.",names(CAR.65))
+  name.CAR.70 <- paste0("CAR.70.",names(CAR.70))
+  name.CAR.75 <- paste0("CAR.75.",names(CAR.75))
+  name.CAR.80 <- paste0("CAR.80.",names(CAR.80))
+  name.CAR.85 <- paste0("CAR.85.",names(CAR.85))
+  name.CAR.90 <- paste0("CAR.90.",names(CAR.90))
+  name.CAR.95 <- paste0("CAR.95.",names(CAR.95))
+  
+  name.MCAR.scenari <- c(name.MCAR.35, name.MCAR.40, name.MCAR.45, name.MCAR.50,
+                         name.MCAR.55, name.MCAR.60, name.MCAR.65, name.MCAR.70,
+                         name.MCAR.75, name.MCAR.75, name.MCAR.80, name.MCAR.85,
+                         name.MCAR.90, name.MCAR.95)
 
   
-  ###############################
-  # Step 3: Sequence simulation #
-  ###############################
+  name.AR.a.35 <- paste0("AR.a.35.",names(AR.a.35))
+  name.AR.a.40 <- paste0("AR.a.40.",names(AR.a.40))
+  name.AR.a.45 <- paste0("AR.a.45.",names(AR.a.45))
+  name.AR.a.50 <- paste0("AR.a.50.",names(AR.a.50))
+  name.AR.a.55 <- paste0("AR.a.55.",names(AR.a.55))
+  name.AR.a.60 <- paste0("AR.a.60.",names(AR.a.60))
+  name.AR.a.65 <- paste0("AR.a.65.",names(AR.a.65))
+  name.AR.a.70 <- paste0("AR.a.70.",names(AR.a.70))
+  name.AR.a.75 <- paste0("AR.a.75.",names(AR.a.75))
+  name.AR.a.80 <- paste0("AR.a.80.",names(AR.a.80))
+  name.AR.a.85 <- paste0("AR.a.95.",names(AR.a.85))
+  name.AR.a.90 <- paste0("AR.a.90.",names(AR.a.90))
+  name.AR.a.95 <- paste0("AR.a.95.",names(AR.a.95))
+  
+  name.AR.a.scenari <- c(name.AR.a.35, name.AR.a.40, name.AR.a.45, name.AR.a.50,
+                         name.AR.a.55, name.AR.a.60, name.AR.a.65, name.AR.a.70,
+                         name.AR.a.75, name.AR.a.75, name.AR.a.80, name.AR.a.85,
+                         name.AR.a.90, name.AR.a.95)
+  
+
+  name.AR.b.35 <- paste0("AR.b.35.",names(AR.b.35))
+  name.AR.b.40 <- paste0("AR.b.40.",names(AR.b.40))
+  name.AR.b.45 <- paste0("AR.b.45.",names(AR.b.45))
+  name.AR.b.50 <- paste0("AR.b.50.",names(AR.b.50))
+  name.AR.b.55 <- paste0("AR.b.55.",names(AR.b.55))
+  name.AR.b.60 <- paste0("AR.b.60.",names(AR.b.60))
+  name.AR.b.65 <- paste0("AR.b.65.",names(AR.b.65))
+  name.AR.b.70 <- paste0("AR.b.70.",names(AR.b.70))
+  name.AR.b.75 <- paste0("AR.b.75.",names(AR.b.75))
+  name.AR.b.80 <- paste0("AR.b.80.",names(AR.b.80))
+  name.AR.b.85 <- paste0("AR.b.85.",names(AR.b.85))
+  name.AR.b.90 <- paste0("AR.b.90.",names(AR.b.90))
+  name.AR.b.95 <- paste0("AR.b.95.",names(AR.b.95))
+  
+  name.AR.b.scenari <- c(name.AR.b.35, name.AR.b.40, name.AR.b.45, name.AR.b.50,
+                         name.AR.b.55, name.AR.b.60, name.AR.b.65, name.AR.b.70,
+                         name.AR.b.75, name.AR.b.75, name.AR.b.80, name.AR.b.85,
+                         name.AR.b.90, name.AR.b.95)
+  
+
+  name.AR.c.35 <- paste0("AR.c.35.",names(AR.c.35))
+  name.AR.c.40 <- paste0("AR.c.40.",names(AR.c.40))
+  name.AR.c.45 <- paste0("AR.c.45.",names(AR.c.45))
+  name.AR.c.50 <- paste0("AR.c.50.",names(AR.c.50))
+  name.AR.c.55 <- paste0("AR.c.55.",names(AR.c.55))
+  name.AR.c.60 <- paste0("AR.c.60.",names(AR.c.60))
+  name.AR.c.65 <- paste0("AR.c.65.",names(AR.c.65))
+  name.AR.c.70 <- paste0("AR.c.70.",names(AR.c.70))
+  name.AR.c.75 <- paste0("AR.c.75.",names(AR.c.75))
+  name.AR.c.80 <- paste0("AR.c.80.",names(AR.c.80))
+  name.AR.c.85 <- paste0("AR.c.85.",names(AR.c.85))
+  name.AR.c.90 <- paste0("AR.c.90.",names(AR.c.90))
+  name.AR.c.95 <- paste0("AR.c.95.",names(AR.c.95))
+  
+  name.AR.c.scenari <- c(name.AR.c.35, name.AR.c.40, name.AR.c.45, name.AR.c.50,
+                         name.AR.c.55, name.AR.c.60, name.AR.c.65, name.AR.c.70,
+                         name.AR.c.75, name.AR.c.75, name.AR.c.80, name.AR.c.85,
+                         name.AR.c.90, name.AR.c.95)
   
   
-  trans.net <- simpact.trans.net # all transmission networks
+  name.clust.MCAR.35 <- paste0("clust.MCAR.35.",names(transm.clust.MCAR.cov.35.val))
+  name.clust.MCAR.40 <- paste0("clust.MCAR.40.",names(transm.clust.MCAR.cov.40.val))
+  name.clust.MCAR.45 <- paste0("clust.MCAR.45.",names(transm.clust.MCAR.cov.45.val))
+  name.clust.MCAR.50 <- paste0("clust.MCAR.50.",names(transm.clust.MCAR.cov.50.val))
+  name.clust.MCAR.55 <- paste0("clust.MCAR.55.",names(transm.clust.MCAR.cov.55.val))
+  name.clust.MCAR.60 <- paste0("clust.MCAR.60.",names(transm.clust.MCAR.cov.60.val))
+  name.clust.MCAR.65 <- paste0("clust.MCAR.65.",names(transm.clust.MCAR.cov.65.val))
+  name.clust.MCAR.70 <- paste0("clust.MCAR.70.",names(transm.clust.MCAR.cov.70.val))
+  name.clust.MCAR.75 <- paste0("clust.MCAR.75.",names(transm.clust.MCAR.cov.75.val))
+  name.clust.MCAR.80 <- paste0("clust.MCAR.80.",names(transm.clust.MCAR.cov.80.val))
+  name.clust.MCAR.85 <- paste0("clust.MCAR.85.",names(transm.clust.MCAR.cov.85.val))
+  name.clust.MCAR.90 <- paste0("clust.MCAR.90.",names(transm.clust.MCAR.cov.90.val))
+  name.clust.MCAR.95 <- paste0("clust.MCAR.95.",names(transm.clust.MCAR.cov.95.val))
+  
+  name.clust.MCAR.scenari <- c(name.clust.MCAR.35, name.clust.MCAR.40, name.clust.MCAR.45, name.clust.MCAR.50,
+                               name.clust.MCAR.55, name.clust.MCAR.60, name.clust.MCAR.65, name.clust.MCAR.70,
+                               name.clust.MCAR.75, name.clust.MCAR.75, name.clust.MCAR.80, name.clust.MCAR.85,
+                               name.clust.MCAR.90, name.clust.MCAR.95)
   
   
-  dirseqgen <- work.dir
+  name.clust.AR.a.35 <- paste0("clust.AR.a.35.",names(transm.clust.AR.a.cov.35.val))
+  name.clust.AR.a.40 <- paste0("clust.AR.a.40.",names(transm.clust.AR.a.cov.40.val))
+  name.clust.AR.a.45 <- paste0("clust.AR.a.45.",names(transm.clust.AR.a.cov.45.val))
+  name.clust.AR.a.50 <- paste0("clust.AR.a.50.",names(transm.clust.AR.a.cov.50.val))
+  name.clust.AR.a.55 <- paste0("clust.AR.a.55.",names(transm.clust.AR.a.cov.55.val))
+  name.clust.AR.a.60 <- paste0("clust.AR.a.60.",names(transm.clust.AR.a.cov.60.val))
+  name.clust.AR.a.65 <- paste0("clust.AR.a.65.",names(transm.clust.AR.a.cov.65.val))
+  name.clust.AR.a.70 <- paste0("clust.AR.a.70.",names(transm.clust.AR.a.cov.70.val))
+  name.clust.AR.a.75 <- paste0("clust.AR.a.75.",names(transm.clust.AR.a.cov.75.val))
+  name.clust.AR.a.80 <- paste0("clust.AR.a.80.",names(transm.clust.AR.a.cov.80.val))
+  name.clust.AR.a.85 <- paste0("clust.AR.a.85.",names(transm.clust.AR.a.cov.85.val))
+  name.clust.AR.a.90 <- paste0("clust.AR.a.90.",names(transm.clust.AR.a.cov.90.val))
+  name.clust.AR.a.95 <- paste0("clust.AR.a.95.",names(transm.clust.AR.a.cov.95.val))
   
-  seeds.num <- inputvector[1]
-  
-  # Sequence simulation is done for at least a transmission network with 6 individuals
-  # This means that limitTransmEvents equal at least 7
-  
-  sequence.simulation.seqgen.par(dir.seq = dirseqgen,
-                                 sub.dir.rename = sub.dir.rename,
-                                 simpact.trans.net = simpact.trans.net,
-                                 seq.gen.tool = "seq-gen",
-                                 seeds.num = seeds.num,
-                                 endpoint = 40,
-                                 limitTransmEvents = 7, # no less than 7
-                                 hiv.seq.file = "hiv.seq.C.pol.j.fasta",
-                                 clust = FALSE) # hiv.seq.file lodged in work.dir
-  
-  # Transform the sequence format to be handled by ClusterPicker
-  sequ.dna <- read.dna(file = paste0(sub.dir.rename,"/C.Epidemic_seed.seq.bis.sim.nwk.fasta"), format = "interleaved")
-  write.dna(sequ.dna, file = paste0(sub.dir.rename,"/C.Epidemic.fas") , format = "fasta")
+  name.clust.AR.a.scenari <- c(name.clust.AR.a.35, name.clust.AR.a.40, name.clust.AR.a.45, name.clust.AR.a.50,
+                               name.clust.AR.a.55, name.clust.AR.a.60, name.clust.AR.a.65, name.clust.AR.a.70,
+                               name.clust.AR.a.75, name.clust.AR.a.75, name.clust.AR.a.80, name.clust.AR.a.85,
+                               name.clust.AR.a.90, name.clust.AR.a.95)
   
   
+  name.clust.AR.b.35 <- paste0("clust.AR.b.35.",names(transm.clust.AR.b.cov.35.val))
+  name.clust.AR.b.40 <- paste0("clust.AR.b.40.",names(transm.clust.AR.b.cov.40.val))
+  name.clust.AR.b.45 <- paste0("clust.AR.b.45.",names(transm.clust.AR.b.cov.45.val))
+  name.clust.AR.b.50 <- paste0("clust.AR.b.50.",names(transm.clust.AR.b.cov.50.val))
+  name.clust.AR.b.55 <- paste0("clust.AR.b.55.",names(transm.clust.AR.b.cov.55.val))
+  name.clust.AR.b.60 <- paste0("clust.AR.b.60.",names(transm.clust.AR.b.cov.60.val))
+  name.clust.AR.b.65 <- paste0("clust.AR.b.65.",names(transm.clust.AR.b.cov.65.val))
+  name.clust.AR.b.70 <- paste0("clust.AR.b.70.",names(transm.clust.AR.b.cov.70.val))
+  name.clust.AR.b.75 <- paste0("clust.AR.b.75.",names(transm.clust.AR.b.cov.75.val))
+  name.clust.AR.b.80 <- paste0("clust.AR.b.80.",names(transm.clust.AR.b.cov.80.val))
+  name.clust.AR.b.85 <- paste0("clust.AR.b.85.",names(transm.clust.AR.b.cov.85.val))
+  name.clust.AR.b.90 <- paste0("clust.AR.b.90.",names(transm.clust.AR.b.cov.90.val))
+  name.clust.AR.b.95 <- paste0("clust.AR.b.95.",names(transm.clust.AR.b.cov.95.val))
   
-  #####################################################
-  # Step 4: Construct time stamped phylogenetic trees #   + Sequence coverage Scenarios
-  #####################################################
+  name.clust.AR.b.scenari <- c(name.clust.AR.b.35, name.clust.AR.b.40, name.clust.AR.b.45, name.clust.AR.b.50,
+                               name.clust.AR.b.55, name.clust.AR.b.60, name.clust.AR.b.65, name.clust.AR.b.70,
+                               name.clust.AR.b.75, name.clust.AR.b.75, name.clust.AR.b.80, name.clust.AR.b.85,
+                               name.clust.AR.b.90, name.clust.AR.b.95)
   
+  name.clust.AR.c.35 <- paste0("clust.AR.c.35.",names(transm.clust.AR.c.cov.35.val))
+  name.clust.AR.c.40 <- paste0("clust.AR.c.40.",names(transm.clust.AR.c.cov.40.val))
+  name.clust.AR.c.45 <- paste0("clust.AR.c.45.",names(transm.clust.AR.c.cov.45.val))
+  name.clust.AR.c.50 <- paste0("clust.AR.c.50.",names(transm.clust.AR.c.cov.50.val))
+  name.clust.AR.c.55 <- paste0("clust.AR.c.55.",names(transm.clust.AR.c.cov.55.val))
+  name.clust.AR.c.60 <- paste0("clust.AR.c.60.",names(transm.clust.AR.c.cov.60.val))
+  name.clust.AR.c.65 <- paste0("clust.AR.c.65.",names(transm.clust.AR.c.cov.65.val))
+  name.clust.AR.c.70 <- paste0("clust.AR.c.70.",names(transm.clust.AR.c.cov.70.val))
+  name.clust.AR.c.75 <- paste0("clust.AR.c.75.",names(transm.clust.AR.c.cov.75.val))
+  name.clust.AR.c.80 <- paste0("clust.AR.c.80.",names(transm.clust.AR.c.cov.80.val))
+  name.clust.AR.c.85 <- paste0("clust.AR.c.85.",names(transm.clust.AR.c.cov.85.val))
+  name.clust.AR.c.90 <- paste0("clust.AR.c.90.",names(transm.clust.AR.c.cov.90.val))
+  name.clust.AR.c.95 <- paste0("clust.AR.c.95.",names(transm.clust.AR.c.cov.95.val))
   
-  #### ALL sequences of infected individuals in period of the study ####
-  ######################################################################
+  name.clust.AR.c.scenari <- c(name.clust.AR.c.35, name.clust.AR.c.40, name.clust.AR.c.45, name.clust.AR.c.50,
+                               name.clust.AR.c.55, name.clust.AR.c.60, name.clust.AR.c.65, name.clust.AR.c.70,
+                               name.clust.AR.c.75, name.clust.AR.c.75, name.clust.AR.c.80, name.clust.AR.c.85,
+                               name.clust.AR.c.90, name.clust.AR.c.95)
   
-  dirfasttree <- work.dir
-  
-  
-  if(file.exists(paste0(sub.dir.rename, "/C.Epidemic_seed.seq.bis.sim.nwk.fasta"))==TRUE){
-    
-    # check if the run has simulated sequence,
-    # in other words: we have a transmission network with at least 6 individuals
-    
-    
-    ### Featrures from all sequences ###
-    ####################################
-    
-    ####### Features ALL sequences
-    ### BEGIN
-    tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
-                                                 sub.dir.rename = sub.dir.rename,
-                                                 fasttree.tool = "FastTree",
-                                                 calendar.dates = "samplingtimes.all.csv",
-                                                 simseqfile = "C.Epidemic_seed.seq.bis.sim.nwk.fasta",
-                                                 count.start = 1977,
-                                                 endsim = 40,
-                                                 clust = FALSE)
-    
-    tree.calib.LTT <- tree.calib
-    
-    write.tree(tree.calib, file = paste0(sub.dir.rename,"/calibrated.tree.nwk"))
-    
-    
-    N <- node.age(tree.calib)
-    
-    int.node.age <- N$Ti # internal nodes ages
-    
-    latest.samp <- N$timeToMRCA+N$timeOfMRCA # latest sampling date
-    
-    
-    
-    # 2.2. Features from phylogenetic tree:
-    
-    # library(phytools)
-    
-    source("~/phylosimpact_simulation_studies_2018/stress_testing/simulation_study_1/phylogenetic.features.study.1.R")
-    
-    tree.cal <- read.tree(paste0(sub.dir.rename, "/calibrated.tree.nwk"))
-    
-    true.features.phylogenetic <- phylogenetic.features.study1(tree.topo=tree.cal,
-                                                               tree.calib.LTT = tree.calib.LTT,
-                                                               work.dir = work.dir,
-                                                               sub.dir.rename = sub.dir.rename,
-                                                               simpact.trans.net = simpact.trans.net,
-                                                               fasta.file = "C.Epidemic.fas",
-                                                               tree.file = "C.Epidemic_seed.seq.bis.sim.nwk.fasta.nwk")
-    
-    
-    name.true.features.phylogenetic <- names(true.features.phylogenetic)
-    
-    names(true.features.phylogenetic) <- name.true.features.phylogenetic
-    
-    
-    
-    #### BEGIN Sequence Coverage Scenarios for MCAR ####
-    
-    cut.val <- 5 # consider at least 5 sequences
-    
-    
-    ### 1st Scenario: 35 ###
-    ########################
-    
-    cov.35.IDs <- IDs.Seq.Random(simpact.trans.net = simpact.trans.net,
-                                 limitTransmEvents = 7,
-                                 timewindow = c(10,40),
-                                 seq.cov = 35,
-                                 age.limit=65)
-    
-    
-    
-    
-    if(length(cov.35.IDs)>=cut.val){
-      
-      choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.fas"),
-                          select.vec = cov.35.IDs, 
-                          name.file = paste0(sub.dir.rename, "/cov.35.IDs.C.Epidemic.Fasta"))
-      
-      
-      cov.35.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
-                                                              sub.dir.rename = sub.dir.rename,
-                                                              fasttree.tool = "FastTree",
-                                                              calendar.dates = "samplingtimes.all.csv",
-                                                              simseqfile = "cov.35.IDs.C.Epidemic.Fasta",
-                                                              count.start = 1977,
-                                                              endsim = 40,
-                                                              clust = FALSE)
-      
-      tree.cal.cov.35.IDs <- read.tree(paste0(sub.dir.rename, "/cov.35.IDs.C.Epidemic.Fasta.nwk"))
-      
-      cov.35.IDs.features.phylogenetic <- phylogenetic.features.study1(tree.topo=tree.cal.cov.35.IDs,
-                                                                       tree.calib.LTT = cov.35.IDs.tree.calib,
-                                                                       work.dir = work.dir,
-                                                                       sub.dir.rename = sub.dir.rename,
-                                                                       simpact.trans.net = simpact.trans.net,
-                                                                       fasta.file = "cov.35.IDs.C.Epidemic.Fasta",
-                                                                       tree.file = "cov.35.IDs.C.Epidemic.Fasta.nwk")
-      
-    }else{
-      
-      cov.35.IDs.features.phylogenetic <- rep(NA, length(cov.35.IDs.features.phylogenetic))
-    }
-    
-    
-    ### 2nd Scenario: 40 ###
-    ########################
-    
-    cov.40.IDs <- IDs.Seq.Random(simpact.trans.net = simpact.trans.net,
-                                 limitTransmEvents = 7,
-                                 timewindow = c(10,40),
-                                 seq.cov = 40,
-                                 age.limit=65)
-    
-    
-    if(length(cov.40.IDs)>=cut.val){
-      
-      choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.fas"),
-                          select.vec = cov.40.IDs, 
-                          name.file = paste0(sub.dir.rename, "/cov.40.IDs.C.Epidemic.Fasta"))
-      
-      
-      cov.40.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
-                                                              sub.dir.rename = sub.dir.rename,
-                                                              fasttree.tool = "FastTree",
-                                                              calendar.dates = "samplingtimes.all.csv",
-                                                              simseqfile = "cov.40.IDs.C.Epidemic.Fasta",
-                                                              count.start = 1977,
-                                                              endsim = 40,
-                                                              clust = FALSE)
-      
-      tree.cal.cov.40.IDs <- read.tree(paste0(sub.dir.rename, "/cov.40.IDs.C.Epidemic.Fasta.nwk"))
-      
-      cov.40.IDs.features.phylogenetic <- phylogenetic.features.study1(tree.topo=tree.cal.cov.40.IDs,
-                                                                       tree.calib.LTT = cov.40.IDs.tree.calib,
-                                                                       work.dir = work.dir,
-                                                                       sub.dir.rename = sub.dir.rename,
-                                                                       simpact.trans.net = simpact.trans.net,
-                                                                       fasta.file = "cov.40.IDs.C.Epidemic.Fasta",
-                                                                       tree.file = "cov.40.IDs.C.Epidemic.Fasta.nwk")
-      
-    }else{
-      
-      cov.40.IDs.features.phylogenetic <- rep(NA, length(cov.40.IDs.features.phylogenetic))
-    }
-    
-    
-    ### 3rd Scenario: 45 ###
-    ########################
-    
-    cov.45.IDs <- IDs.Seq.Random(simpact.trans.net = simpact.trans.net,
-                                 limitTransmEvents = 7,
-                                 timewindow = c(10,40),
-                                 seq.cov = 45,
-                                 age.limit=65)
-    
-    
-    if(length(cov.45.IDs)>=cut.val){
-      
-      choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.fas"),
-                          select.vec = cov.45.IDs, 
-                          name.file = paste0(sub.dir.rename, "/cov.45.IDs.C.Epidemic.Fasta"))
-      
-      
-      cov.45.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
-                                                              sub.dir.rename = sub.dir.rename,
-                                                              fasttree.tool = "FastTree",
-                                                              calendar.dates = "samplingtimes.all.csv",
-                                                              simseqfile = "cov.45.IDs.C.Epidemic.Fasta",
-                                                              count.start = 1977,
-                                                              endsim = 40,
-                                                              clust = FALSE)
-      
-      tree.cal.cov.45.IDs <- read.tree(paste0(sub.dir.rename, "/cov.45.IDs.C.Epidemic.Fasta.nwk"))
-      
-      cov.45.IDs.features.phylogenetic <- phylogenetic.features.study1(tree.topo=tree.cal.cov.45.IDs,
-                                                                       tree.calib.LTT = cov.45.IDs.tree.calib,
-                                                                       work.dir = work.dir,
-                                                                       sub.dir.rename = sub.dir.rename,
-                                                                       simpact.trans.net = simpact.trans.net,
-                                                                       fasta.file = "cov.45.IDs.C.Epidemic.Fasta",
-                                                                       tree.file = "cov.45.IDs.C.Epidemic.Fasta.nwk")
-      
-    }else{
-      
-      cov.45.IDs.features.phylogenetic <- rep(NA, length(cov.45.IDs.features.phylogenetic))
-    }
-    
-    
-    ### 4th Scenario: 50 ###
-    ########################
-    
-    cov.50.IDs <- IDs.Seq.Random(simpact.trans.net = simpact.trans.net,
-                                 limitTransmEvents = 7,
-                                 timewindow = c(10,40),
-                                 seq.cov = 50,
-                                 age.limit=65)
-    
-    
-    if(length(cov.50.IDs)>=cut.val){
-      
-      choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.fas"),
-                          select.vec = cov.50.IDs, 
-                          name.file = paste0(sub.dir.rename, "/cov.50.IDs.C.Epidemic.Fasta"))
-      
-      
-      cov.50.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
-                                                              sub.dir.rename = sub.dir.rename,
-                                                              fasttree.tool = "FastTree",
-                                                              calendar.dates = "samplingtimes.all.csv",
-                                                              simseqfile = "cov.50.IDs.C.Epidemic.Fasta",
-                                                              count.start = 1977,
-                                                              endsim = 40,
-                                                              clust = FALSE)
-      
-      tree.cal.cov.50.IDs <- read.tree(paste0(sub.dir.rename, "/cov.50.IDs.C.Epidemic.Fasta.nwk"))
-      
-      cov.50.IDs.features.phylogenetic <- phylogenetic.features.study1(tree.topo=tree.cal.cov.50.IDs,
-                                                                       tree.calib.LTT = cov.50.IDs.tree.calib,
-                                                                       work.dir = work.dir,
-                                                                       sub.dir.rename = sub.dir.rename,
-                                                                       simpact.trans.net = simpact.trans.net,
-                                                                       fasta.file = "cov.50.IDs.C.Epidemic.Fasta",
-                                                                       tree.file = "cov.50.IDs.C.Epidemic.Fasta.nwk")
-      
-    }else{
-      
-      cov.50.IDs.features.phylogenetic <- rep(NA, length(cov.50.IDs.features.phylogenetic))
-    }
-    
-    
-    ### 5th Scenario: 55 ###
-    ########################
-    
-    cov.55.IDs <- IDs.Seq.Random(simpact.trans.net = simpact.trans.net,
-                                 limitTransmEvents = 7,
-                                 timewindow = c(10,40),
-                                 seq.cov = 55,
-                                 age.limit=65)
-    
-    
-    if(length(cov.55.IDs)>=cut.val){
-      
-      choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.fas"),
-                          select.vec = cov.55.IDs, 
-                          name.file = paste0(sub.dir.rename, "/cov.55.IDs.C.Epidemic.Fasta"))
-      
-      
-      cov.55.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
-                                                              sub.dir.rename = sub.dir.rename,
-                                                              fasttree.tool = "FastTree",
-                                                              calendar.dates = "samplingtimes.all.csv",
-                                                              simseqfile = "cov.55.IDs.C.Epidemic.Fasta",
-                                                              count.start = 1977,
-                                                              endsim = 40,
-                                                              clust = FALSE)
-      
-      tree.cal.cov.55.IDs <- read.tree(paste0(sub.dir.rename, "/cov.55.IDs.C.Epidemic.Fasta.nwk"))
-      
-      cov.55.IDs.features.phylogenetic <- phylogenetic.features.study1(tree.topo=tree.cal.cov.55.IDs,
-                                                                       tree.calib.LTT = cov.55.IDs.tree.calib,
-                                                                       work.dir = work.dir,
-                                                                       sub.dir.rename = sub.dir.rename,
-                                                                       simpact.trans.net = simpact.trans.net,
-                                                                       fasta.file = "cov.55.IDs.C.Epidemic.Fasta",
-                                                                       tree.file = "cov.55.IDs.C.Epidemic.Fasta.nwk")
-      
-    }else{
-      
-      cov.55.IDs.features.phylogenetic <- rep(NA, length(cov.55.IDs.features.phylogenetic))
-    }
-    
-    
-    ### 6th Scenario: 60 ###
-    ########################
-    
-    cov.60.IDs <- IDs.Seq.Random(simpact.trans.net = simpact.trans.net,
-                                 limitTransmEvents = 7,
-                                 timewindow = c(10,40),
-                                 seq.cov = 60,
-                                 age.limit=65)
-    
-    
-    if(length(cov.60.IDs)>=cut.val){
-      
-      choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.fas"),
-                          select.vec = cov.60.IDs, 
-                          name.file = paste0(sub.dir.rename, "/cov.60.IDs.C.Epidemic.Fasta"))
-      
-      
-      cov.60.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
-                                                              sub.dir.rename = sub.dir.rename,
-                                                              fasttree.tool = "FastTree",
-                                                              calendar.dates = "samplingtimes.all.csv",
-                                                              simseqfile = "cov.60.IDs.C.Epidemic.Fasta",
-                                                              count.start = 1977,
-                                                              endsim = 40,
-                                                              clust = FALSE)
-      
-      tree.cal.cov.60.IDs <- read.tree(paste0(sub.dir.rename, "/cov.60.IDs.C.Epidemic.Fasta.nwk"))
-      
-      cov.60.IDs.features.phylogenetic <- phylogenetic.features.study1(tree.topo=tree.cal.cov.60.IDs,
-                                                                       tree.calib.LTT = cov.60.IDs.tree.calib,
-                                                                       work.dir = work.dir,
-                                                                       sub.dir.rename = sub.dir.rename,
-                                                                       simpact.trans.net = simpact.trans.net,
-                                                                       fasta.file = "cov.60.IDs.C.Epidemic.Fasta",
-                                                                       tree.file = "cov.60.IDs.C.Epidemic.Fasta.nwk")
-      
-    }else{
-      
-      cov.60.IDs.features.phylogenetic <- rep(NA, length(cov.60.IDs.features.phylogenetic))
-    }
-    
-    
-    ### 7th Scenario: 65 ###
-    ########################
-    
-    cov.65.IDs <- IDs.Seq.Random(simpact.trans.net = simpact.trans.net,
-                                 limitTransmEvents = 7,
-                                 timewindow = c(10,40),
-                                 seq.cov = 65,
-                                 age.limit=65)
-    
-    
-    if(length(cov.65.IDs)>=cut.val){
-      
-      choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.fas"),
-                          select.vec = cov.65.IDs, 
-                          name.file = paste0(sub.dir.rename, "/cov.65.IDs.C.Epidemic.Fasta"))
-      
-      
-      cov.65.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
-                                                              sub.dir.rename = sub.dir.rename,
-                                                              fasttree.tool = "FastTree",
-                                                              calendar.dates = "samplingtimes.all.csv",
-                                                              simseqfile = "cov.65.IDs.C.Epidemic.Fasta",
-                                                              count.start = 1977,
-                                                              endsim = 40,
-                                                              clust = FALSE)
-      
-      tree.cal.cov.65.IDs <- read.tree(paste0(sub.dir.rename, "/cov.65.IDs.C.Epidemic.Fasta.nwk"))
-      
-      cov.65.IDs.features.phylogenetic <- phylogenetic.features.study1(tree.topo=tree.cal.cov.65.IDs,
-                                                                       tree.calib.LTT = cov.65.IDs.tree.calib,
-                                                                       work.dir = work.dir,
-                                                                       sub.dir.rename = sub.dir.rename,
-                                                                       simpact.trans.net = simpact.trans.net,
-                                                                       fasta.file = "cov.65.IDs.C.Epidemic.Fasta",
-                                                                       tree.file = "cov.65.IDs.C.Epidemic.Fasta.nwk")
-      
-    }else{
-      
-      cov.65.IDs.features.phylogenetic <- rep(NA, length(cov.65.IDs.features.phylogenetic))
-    }
-    
-    
-    ### 8th Scenario: 70 ###
-    ########################
-    
-    cov.70.IDs <- IDs.Seq.Random(simpact.trans.net = simpact.trans.net,
-                                 limitTransmEvents = 7,
-                                 timewindow = c(10,40),
-                                 seq.cov = 70,
-                                 age.limit=65)
-    
-    
-    if(length(cov.70.IDs)>=cut.val){
-      
-      choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.fas"),
-                          select.vec = cov.70.IDs, 
-                          name.file = paste0(sub.dir.rename, "/cov.70.IDs.C.Epidemic.Fasta"))
-      
-      
-      cov.70.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
-                                                              sub.dir.rename = sub.dir.rename,
-                                                              fasttree.tool = "FastTree",
-                                                              calendar.dates = "samplingtimes.all.csv",
-                                                              simseqfile = "cov.70.IDs.C.Epidemic.Fasta",
-                                                              count.start = 1977,
-                                                              endsim = 40,
-                                                              clust = FALSE)
-      
-      tree.cal.cov.70.IDs <- read.tree(paste0(sub.dir.rename, "/cov.70.IDs.C.Epidemic.Fasta.nwk"))
-      
-      cov.70.IDs.features.phylogenetic <- phylogenetic.features.study1(tree.topo=tree.cal.cov.70.IDs,
-                                                                       tree.calib.LTT = cov.70.IDs.tree.calib,
-                                                                       work.dir = work.dir,
-                                                                       sub.dir.rename = sub.dir.rename,
-                                                                       simpact.trans.net = simpact.trans.net,
-                                                                       fasta.file = "cov.70.IDs.C.Epidemic.Fasta",
-                                                                       tree.file = "cov.70.IDs.C.Epidemic.Fasta.nwk")
-      
-    }else{
-      
-      cov.70.IDs.features.phylogenetic <- rep(NA, length(cov.70.IDs.features.phylogenetic))
-    }
-    
-    
-    ### 9th Scenario: 75 ###
-    ########################
-    
-    cov.75.IDs <- IDs.Seq.Random(simpact.trans.net = simpact.trans.net,
-                                 limitTransmEvents = 7,
-                                 timewindow = c(10,40),
-                                 seq.cov = 75,
-                                 age.limit=65)
-    
-    
-    if(length(cov.75.IDs)>=cut.val){
-      
-      choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.fas"),
-                          select.vec = cov.75.IDs, 
-                          name.file = paste0(sub.dir.rename, "/cov.75.IDs.C.Epidemic.Fasta"))
-      
-      
-      cov.75.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
-                                                              sub.dir.rename = sub.dir.rename,
-                                                              fasttree.tool = "FastTree",
-                                                              calendar.dates = "samplingtimes.all.csv",
-                                                              simseqfile = "cov.75.IDs.C.Epidemic.Fasta",
-                                                              count.start = 1977,
-                                                              endsim = 40,
-                                                              clust = FALSE)
-      
-      tree.cal.cov.75.IDs <- read.tree(paste0(sub.dir.rename, "/cov.75.IDs.C.Epidemic.Fasta.nwk"))
-      
-      cov.75.IDs.features.phylogenetic <- phylogenetic.features.study1(tree.topo=tree.cal.cov.75.IDs,
-                                                                       tree.calib.LTT = cov.75.IDs.tree.calib,
-                                                                       work.dir = work.dir,
-                                                                       sub.dir.rename = sub.dir.rename,
-                                                                       simpact.trans.net = simpact.trans.net,
-                                                                       fasta.file = "cov.75.IDs.C.Epidemic.Fasta",
-                                                                       tree.file = "cov.75.IDs.C.Epidemic.Fasta.nwk")
-      
-    }else{
-      
-      cov.75.IDs.features.phylogenetic <- rep(NA, length(cov.75.IDs.features.phylogenetic))
-    }
-    
-    
-    ### 10th Scenario: 80 ###
-    ########################
-    
-    cov.80.IDs <- IDs.Seq.Random(simpact.trans.net = simpact.trans.net,
-                                 limitTransmEvents = 7,
-                                 timewindow = c(10,40),
-                                 seq.cov = 80,
-                                 age.limit=65)
-    
-    
-    if(length(cov.80.IDs)>=cut.val){
-      
-      choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.fas"),
-                          select.vec = cov.80.IDs, 
-                          name.file = paste0(sub.dir.rename, "/cov.80.IDs.C.Epidemic.Fasta"))
-      
-      
-      cov.80.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
-                                                              sub.dir.rename = sub.dir.rename,
-                                                              fasttree.tool = "FastTree",
-                                                              calendar.dates = "samplingtimes.all.csv",
-                                                              simseqfile = "cov.80.IDs.C.Epidemic.Fasta",
-                                                              count.start = 1977,
-                                                              endsim = 40,
-                                                              clust = FALSE)
-      
-      tree.cal.cov.80.IDs <- read.tree(paste0(sub.dir.rename, "/cov.80.IDs.C.Epidemic.Fasta.nwk"))
-      
-      cov.80.IDs.features.phylogenetic <- phylogenetic.features.study1(tree.topo=tree.cal.cov.80.IDs,
-                                                                       tree.calib.LTT = cov.80.IDs.tree.calib,
-                                                                       work.dir = work.dir,
-                                                                       sub.dir.rename = sub.dir.rename,
-                                                                       simpact.trans.net = simpact.trans.net,
-                                                                       fasta.file = "cov.80.IDs.C.Epidemic.Fasta",
-                                                                       tree.file = "cov.80.IDs.C.Epidemic.Fasta.nwk")
-      
-    }else{
-      
-      cov.80.IDs.features.phylogenetic <- rep(NA, length(cov.80.IDs.features.phylogenetic))
-    }
-    
-    
-    ### 11th Scenario: 85 ###
-    ########################
-    
-    cov.85.IDs <- IDs.Seq.Random(simpact.trans.net = simpact.trans.net,
-                                 limitTransmEvents = 7,
-                                 timewindow = c(10,40),
-                                 seq.cov = 85,
-                                 age.limit=65)
-    
-    
-    if(length(cov.85.IDs)>=cut.val){
-      
-      choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.fas"),
-                          select.vec = cov.85.IDs, 
-                          name.file = paste0(sub.dir.rename, "/cov.85.IDs.C.Epidemic.Fasta"))
-      
-      
-      cov.85.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
-                                                              sub.dir.rename = sub.dir.rename,
-                                                              fasttree.tool = "FastTree",
-                                                              calendar.dates = "samplingtimes.all.csv",
-                                                              simseqfile = "cov.85.IDs.C.Epidemic.Fasta",
-                                                              count.start = 1977,
-                                                              endsim = 40,
-                                                              clust = FALSE)
-      
-      tree.cal.cov.85.IDs <- read.tree(paste0(sub.dir.rename, "/cov.85.IDs.C.Epidemic.Fasta.nwk"))
-      
-      cov.85.IDs.features.phylogenetic <- phylogenetic.features.study1(tree.topo=tree.cal.cov.85.IDs,
-                                                                       tree.calib.LTT = cov.85.IDs.tree.calib,
-                                                                       work.dir = work.dir,
-                                                                       sub.dir.rename = sub.dir.rename,
-                                                                       simpact.trans.net = simpact.trans.net,
-                                                                       fasta.file = "cov.85.IDs.C.Epidemic.Fasta",
-                                                                       tree.file = "cov.85.IDs.C.Epidemic.Fasta.nwk")
-      
-    }else{
-      
-      cov.85.IDs.features.phylogenetic <- rep(NA, length(cov.85.IDs.features.phylogenetic))
-    }
-    
-    
-    ### 12th Scenario: 90 ###
-    ########################
-    
-    cov.90.IDs <- IDs.Seq.Random(simpact.trans.net = simpact.trans.net,
-                                 limitTransmEvents = 7,
-                                 timewindow = c(10,40),
-                                 seq.cov = 90,
-                                 age.limit=65)
-    
-    
-    if(length(cov.90.IDs)>=cut.val){
-      
-      choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.fas"),
-                          select.vec = cov.90.IDs, 
-                          name.file = paste0(sub.dir.rename, "/cov.90.IDs.C.Epidemic.Fasta"))
-      
-      
-      cov.90.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
-                                                              sub.dir.rename = sub.dir.rename,
-                                                              fasttree.tool = "FastTree",
-                                                              calendar.dates = "samplingtimes.all.csv",
-                                                              simseqfile = "cov.90.IDs.C.Epidemic.Fasta",
-                                                              count.start = 1977,
-                                                              endsim = 40,
-                                                              clust = FALSE)
-      
-      tree.cal.cov.90.IDs <- read.tree(paste0(sub.dir.rename, "/cov.90.IDs.C.Epidemic.Fasta.nwk"))
-      
-      cov.90.IDs.features.phylogenetic <- phylogenetic.features.study1(tree.topo=tree.cal.cov.90.IDs,
-                                                                       tree.calib.LTT = cov.90.IDs.tree.calib,
-                                                                       work.dir = work.dir,
-                                                                       sub.dir.rename = sub.dir.rename,
-                                                                       simpact.trans.net = simpact.trans.net,
-                                                                       fasta.file = "cov.90.IDs.C.Epidemic.Fasta",
-                                                                       tree.file = "cov.90.IDs.C.Epidemic.Fasta.nwk")
-      
-    }else{
-      
-      cov.90.IDs.features.phylogenetic <- rep(NA, length(cov.90.IDs.features.phylogenetic))
-    }
-    
-    
-    ### 13th Scenario: 95 ###
-    ########################
-    
-    cov.95.IDs <- IDs.Seq.Random(simpact.trans.net = simpact.trans.net,
-                                 limitTransmEvents = 7,
-                                 timewindow = c(10,40),
-                                 seq.cov = 95,
-                                 age.limit=65)
-    
-    
-    if(length(cov.95.IDs)>=cut.val){
-      
-      choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.fas"),
-                          select.vec = cov.95.IDs, 
-                          name.file = paste0(sub.dir.rename, "/cov.95.IDs.C.Epidemic.Fasta"))
-      
-      
-      cov.95.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
-                                                              sub.dir.rename = sub.dir.rename,
-                                                              fasttree.tool = "FastTree",
-                                                              calendar.dates = "samplingtimes.all.csv",
-                                                              simseqfile = "cov.95.IDs.C.Epidemic.Fasta",
-                                                              count.start = 1977,
-                                                              endsim = 40,
-                                                              clust = FALSE)
-      
-      tree.cal.cov.95.IDs <- read.tree(paste0(sub.dir.rename, "/cov.95.IDs.C.Epidemic.Fasta.nwk"))
-      
-      cov.95.IDs.features.phylogenetic <- phylogenetic.features.study1(tree.topo=tree.cal.cov.95.IDs,
-                                                                       tree.calib.LTT = cov.95.IDs.tree.calib,
-                                                                       work.dir = work.dir,
-                                                                       sub.dir.rename = sub.dir.rename,
-                                                                       simpact.trans.net = simpact.trans.net,
-                                                                       fasta.file = "cov.95.IDs.C.Epidemic.Fasta",
-                                                                       tree.file = "cov.95.IDs.C.Epidemic.Fasta.nwk")
-      
-    }else{
-      
-      cov.95.IDs.features.phylogenetic <- rep(NA, length(cov.95.IDs.features.phylogenetic))
-    }
-    
-    
-    sim.features.phylogenetic <- c(cov.35.IDs.features.phylogenetic,
-                                   cov.40.IDs.features.phylogenetic,
-                                   cov.45.IDs.features.phylogenetic,
-                                   cov.50.IDs.features.phylogenetic,
-                                   cov.55.IDs.features.phylogenetic,
-                                   cov.60.IDs.features.phylogenetic,
-                                   cov.65.IDs.features.phylogenetic,
-                                   cov.70.IDs.features.phylogenetic,
-                                   cov.75.IDs.features.phylogenetic,
-                                   cov.80.IDs.features.phylogenetic,
-                                   cov.85.IDs.features.phylogenetic,
-                                   cov.95.IDs.features.phylogenetic,
-                                   cov.95.IDs.features.phylogenetic)
-    
-    name.cov.35.IDs.features.phylogenetic <- paste0("cov.35.",names(cov.35.IDs.features.phylogenetic))
-    name.cov.40.IDs.features.phylogenetic <- paste0("cov.40.",names(cov.40.IDs.features.phylogenetic))
-    name.cov.45.IDs.features.phylogenetic <- paste0("cov.45.",names(cov.45.IDs.features.phylogenetic))
-    name.cov.50.IDs.features.phylogenetic <- paste0("cov.50.",names(cov.50.IDs.features.phylogenetic))
-    name.cov.55.IDs.features.phylogenetic <- paste0("cov.55.",names(cov.55.IDs.features.phylogenetic))
-    name.cov.60.IDs.features.phylogenetic <- paste0("cov.60.",names(cov.60.IDs.features.phylogenetic))
-    name.cov.65.IDs.features.phylogenetic <- paste0("cov.65.",names(cov.65.IDs.features.phylogenetic))
-    name.cov.70.IDs.features.phylogenetic <- paste0("cov.70.",names(cov.70.IDs.features.phylogenetic))
-    name.cov.75.IDs.features.phylogenetic <- paste0("cov.75.",names(cov.75.IDs.features.phylogenetic))
-    name.cov.80.IDs.features.phylogenetic <- paste0("cov.80.",names(cov.80.IDs.features.phylogenetic))
-    name.cov.85.IDs.features.phylogenetic <- paste0("cov.85.",names(cov.85.IDs.features.phylogenetic))
-    name.cov.90.IDs.features.phylogenetic <- paste0("cov.90.",names(cov.90.IDs.features.phylogenetic))
-    name.cov.95.IDs.features.phylogenetic <- paste0("cov.95.",names(cov.95.IDs.features.phylogenetic))
-    
-    name.sim.features.phylogenetic <- c(name.cov.35.IDs.features.phylogenetic,
-                                        name.cov.40.IDs.features.phylogenetic,
-                                        name.cov.45.IDs.features.phylogenetic,
-                                        name.cov.50.IDs.features.phylogenetic,
-                                        name.cov.55.IDs.features.phylogenetic,
-                                        name.cov.60.IDs.features.phylogenetic,
-                                        name.cov.65.IDs.features.phylogenetic,
-                                        name.cov.70.IDs.features.phylogenetic,
-                                        name.cov.75.IDs.features.phylogenetic,
-                                        name.cov.80.IDs.features.phylogenetic,
-                                        name.cov.85.IDs.features.phylogenetic,
-                                        name.cov.90.IDs.features.phylogenetic,
-                                        name.cov.95.IDs.features.phylogenetic)
-    
-    names(sim.features.phylogenetic) <- name.sim.features.phylogenetic
-    
-  }
+  # ALL names together
+  names.scenari <- c("Pop.mean.AD", "Pop.med.AD", "Pop.sd.AD",
+                     
+                     name.MCAR.scenari, name.AR.a.scenari, name.AR.b.scenari, 
+                     name.AR.c.scenari, name.clust.MCAR.scenari,
+                     name.clust.AR.a.scenari, name.clust.AR.b.scenari, 
+                     name.clust.AR.c.scenari)
   
   
-  #     c(name.epid.metrics, name.true.features.classic, name.true.features.phylogenetic)
+  outputvector <- c(mean.AD, med.AD, sd.AD,
+                    
+                    CAR.35, CAR.40, CAR.45, CAR.50, CAR.55, CAR.60, CAR.65, 
+                    CAR.70, CAR.75, CAR.80, CAR.85, CAR.90, CAR.95,
+                    
+                    AR.a.35, AR.a.40, AR.a.45, AR.a.50, AR.a.55, AR.a.60, AR.a.65,
+                    AR.a.70, AR.a.75, AR.a.80, AR.a.85, AR.a.90, AR.a.95,
+                    
+                    AR.b.35, AR.b.40, AR.b.45, AR.b.50, AR.b.55, AR.b.60, AR.b.65,
+                    AR.b.70, AR.b.75, AR.b.80, AR.b.85, AR.b.90, AR.b.95,
+                    
+                    AR.c.35, AR.c.40, AR.c.45, AR.c.50, AR.c.55, AR.c.60, AR.c.65,
+                    AR.c.70, AR.c.75, AR.c.80, AR.c.85, AR.c.90, AR.c.95,
+                    
+                    transm.clust.MCAR.cov.35.val, transm.clust.MCAR.cov.40.val, transm.clust.MCAR.cov.45.val,
+                    transm.clust.MCAR.cov.50.val, transm.clust.MCAR.cov.55.val, transm.clust.MCAR.cov.60.val,
+                    transm.clust.MCAR.cov.65.val, transm.clust.MCAR.cov.70.val, transm.clust.MCAR.cov.75.val,
+                    transm.clust.MCAR.cov.80.val, transm.clust.MCAR.cov.85.val, transm.clust.MCAR.cov.90.val,
+                    transm.clust.MCAR.cov.95.val,
+                    
+                    transm.clust.AR.a.cov.35.val, transm.clust.AR.a.cov.40.val, transm.clust.AR.a.cov.45.val,
+                    transm.clust.AR.a.cov.50.val, transm.clust.AR.a.cov.55.val, transm.clust.AR.a.cov.60.val,
+                    transm.clust.AR.a.cov.65.val, transm.clust.AR.a.cov.70.val, transm.clust.AR.a.cov.75.val,
+                    transm.clust.AR.a.cov.80.val, transm.clust.AR.a.cov.85.val, transm.clust.AR.a.cov.90.val,
+                    transm.clust.AR.a.cov.95.val,
+                    
+                    transm.clust.AR.b.cov.35.val, transm.clust.AR.b.cov.40.val, transm.clust.AR.b.cov.45.val,
+                    transm.clust.AR.b.cov.50.val, transm.clust.AR.b.cov.55.val, transm.clust.AR.b.cov.60.val,
+                    transm.clust.AR.b.cov.65.val, transm.clust.AR.b.cov.70.val, transm.clust.AR.b.cov.75.val,
+                    transm.clust.AR.b.cov.80.val, transm.clust.AR.b.cov.85.val, transm.clust.AR.b.cov.90.val,
+                    transm.clust.AR.b.cov.95.val,
+                    
+                    transm.clust.AR.c.cov.35.val, transm.clust.AR.c.cov.40.val, transm.clust.AR.c.cov.45.val,
+                    transm.clust.AR.c.cov.50.val, transm.clust.AR.c.cov.55.val, transm.clust.AR.c.cov.60.val,
+                    transm.clust.AR.c.cov.65.val, transm.clust.AR.c.cov.70.val, transm.clust.AR.c.cov.75.val,
+                    transm.clust.AR.c.cov.80.val, transm.clust.AR.c.cov.85.val, transm.clust.AR.c.cov.90.val,
+                    transm.clust.AR.c.cov.95.val)
   
-  epi.metrics.features <- c(epid.metrics, true.features.classic, sim.features.phylogenetic,
-                            mAr.sim.features.phylogenetic, mAr.B.sim.features.phylogenetic,
-                            mAr.C.sim.features.phylogenetic)
+  outputvector <- as.numeric(outputvector)
   
-  return(epi.metrics.features)
+  names(outputvector) <- names.scenari
   
-  unlink(paste0(sub.dir.rename), recursive = TRUE) # sub.dir.rename
+  return(outputvector)
+  
   
   
 }
@@ -1737,6 +1845,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
 inputvector <- c(-0.52, -0.05, 2.8, 0, 3, 0.25, -0.3, -0.1, 
                  # 0.2,
                  -1, -90, 0.5, 0.05, -0.14, 5, 7, 12, -2.7) # length(inputvector) = 18
+
 # 
 # 
 # 
@@ -1762,7 +1871,7 @@ inputmatrix <- matrix(rep(inputvector, reps), byrow = TRUE, nrow = reps)
 # 
 # sim.start.time <- proc.time()[3] # ! IDs.gender.men50.women50.age.group.features
 # 
-features.matrix <- simpact.parallel(model = wrapper.master.phylo.simpact.study.1,
+features.matrix <- simpact.parallel(model = master.model.age.mixing.pattern.study2,
                                     actual.input.matrix = inputmatrix,
                                     seed_count = 124,
                                     n_cluster = 4)
