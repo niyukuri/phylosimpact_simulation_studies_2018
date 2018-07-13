@@ -156,38 +156,49 @@ phylo.CAR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net,
       return(va)
     }
     
+
     # Possibles pairings
     
     
-    pairs.15.25.men.women.15.25 <- tryCatch(comb(nrow(num.15.25.men), nrow(num.15.25.women)), # C(1,n)
-                                            error=function(e) return(NA))
+    pairs.15.25.men.women.15.25 <- comb(1, nrow(num.15.25.men)) * comb(1, nrow(num.15.25.women))
+    # tryCatch(comb(nrow(num.15.25.men), nrow(num.15.25.women)), # C(1,n)
+    #                                       error=function(e) return(NA))
+    # 
+    pairs.25.40.men.women.15.25 <- comb(1, nrow(num.25.40.men)) * comb(1, nrow(num.15.25.women))
+    # tryCatch(comb(nrow(num.25.40.men), nrow(num.15.25.women)),
+    #                                       error=function(e) return(NA))
+    # 
+    pairs.40.50.men.women.15.25 <- comb(1, nrow(num.40.50.men)) * comb(1, nrow(num.15.25.women)) 
+    # tryCatch(comb(nrow(num.40.50.men), nrow(num.15.25.women)),
+    #                                       error=function(e) return(NA))
+    # 
     
-    pairs.25.40.men.women.15.25 <- tryCatch(comb(nrow(num.25.40.men), nrow(num.15.25.women)),
-                                            error=function(e) return(NA))
-    
-    pairs.40.50.men.women.15.25 <- tryCatch(comb(nrow(num.40.50.men), nrow(num.15.25.women)),
-                                            error=function(e) return(NA))
-    
-    
-    pairs.15.25.men.women.25.40 <- tryCatch(comb(nrow(num.15.25.men), nrow(num.25.40.women)),
-                                            error=function(e) return(NA))
-    
-    pairs.25.40.men.women.25.40 <- tryCatch(comb(nrow(num.25.40.men), nrow(num.25.40.women)),
-                                            error=function(e) return(NA))
-    
-    pairs.40.50.men.women.25.40 <- tryCatch(comb(nrow(num.40.50.men), nrow(num.25.40.women)),
-                                            error=function(e) return(NA))
+    pairs.15.25.men.women.25.40 <- comb(1, nrow(num.15.25.men)) * comb(1, nrow(num.25.40.women))  
+    # tryCatch(comb(nrow(num.15.25.men), nrow(num.25.40.women)),
+    #                                       error=function(e) return(NA))
+    # 
+    pairs.25.40.men.women.25.40 <- comb(1, nrow(num.25.40.men)) * comb(1, nrow(num.25.40.women))   
+    # tryCatch(comb(nrow(num.25.40.men), nrow(num.25.40.women)),
+    #                                       error=function(e) return(NA))
+    # 
+    pairs.40.50.men.women.25.40 <- comb(1, nrow(num.40.50.men)) * comb(1, nrow(num.25.40.women))   
+    # tryCatch(comb(nrow(num.40.50.men), nrow(num.25.40.women)),
+    #                                       error=function(e) return(NA))
+    # 
     
     
-    
-    pairs.15.25.men.women.40.50 <- tryCatch(comb(nrow(num.15.25.men), nrow(num.15.25.women)),
-                                            error=function(e) return(NA))
-    
-    pairs.25.40.men.women.40.50 <- tryCatch(comb(nrow(num.25.40.men), nrow(num.15.25.women)),
-                                            error=function(e) return(NA))
-    
-    pairs.40.50.men.women.40.50 <- tryCatch(comb(nrow(num.40.50.men), nrow(num.15.25.women)),
-                                            error=function(e) return(NA))
+    pairs.15.25.men.women.40.50 <- comb(1, nrow(num.15.25.men)) * comb(1, nrow(num.40.50.women))   
+    # tryCatch(comb(nrow(num.15.25.men), nrow(num.40.50.women)),
+    #                                       error=function(e) return(NA))
+    # 
+    pairs.25.40.men.women.40.50 <- comb(1, nrow(num.25.40.men)) * comb(1, nrow(num.40.50.women))   
+    # tryCatch(comb(nrow(num.25.40.men), nrow(num.40.50.women)),
+    #                                       error=function(e) return(NA))
+    # 
+    pairs.40.50.men.women.40.50 <-  comb(1, nrow(num.25.40.men)) * comb(1, nrow(num.40.50.women))   
+    # tryCatch(comb(nrow(num.40.50.men), nrow(num.40.50.women)),
+    #                                       error=function(e) return(NA))
+    # 
     
     
     pairings.al <- c(pairs.15.25.men.women.15.25, pairs.15.25.men.women.25.40, pairs.15.25.men.women.40.50,
@@ -232,7 +243,39 @@ phylo.CAR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net,
     
     pairings.clust.tab <- sort.partners.fun.phylo(partner.table = transm.df.cl)
     
-    pairings.clust.tab.list[[i]] <- pairings.clust.tab
+    
+    # Age difference statistics #
+    #############################
+    AD <- abs(abs(transm.df.cl$TOBDon) - abs(transm.df.cl$TOBRec))
+    mean.AD <- mean(AD)
+    med.AD <- median(AD)
+    sd.AD <- sd(AD)
+    
+    # Mixed effect models #
+    #######################
+    # fit.agemix.trans.women <- fit.agemix.trans.women(datatable = data.transm.agemix)
+    # fit.agemix.trans.men <- fit.agemix.trans.men(datatable = data.transm.agemix)
+    
+    AD.stat <- c(mean.AD, med.AD, sd.AD)
+    
+    pairings.clust.tab.AD <- c(pairings.clust.tab, AD.stat)
+    
+    pairings.clust.tab.AD <- as.numeric(pairings.clust.tab.AD)
+    
+    val.names <- c("num.men.15.25", "num.women.15.25",
+                   "num.men.25.40", "num.women.25.40",
+                   "num.men.40.50", "num.women.40.50",
+                   
+                   "partners.men.15.25.w.15.25", "partners.men.15.25.w.25.40", "partners.men.15.25.w.40.50",
+                   "partners.men.25.40.w.15.25", "partners.men.25.40.w.25.40", "partners.men.25.40.w.40.50",
+                   "partners.men.40.50.w.15.25", "partners.men.40.50.w.25.40", "partners.men.40.50.w.40.50", 
+                   
+                   "mean.AD", "median.AD", "sd.AD")
+    
+    names(pairings.clust.tab.AD) <- val.names
+    
+    
+    pairings.clust.tab.list[[i]] <- pairings.clust.tab.AD
     
   }
   

@@ -29,46 +29,8 @@ phylo.AR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net,
     
   }
   
-  mAr.IDs <- IDs.Seq.Age.Groups(simpact.trans.net = simpact.trans.net,
-                                limitTransmEvents = limitTransmEvents,
-                                timewindow = timewindow,
-                                seq.cov = seq.cov,
-                                seq.gender.ratio = seq.gender.ratio,
-                                age.group.15.25 = age.group.15.25,
-                                age.group.25.40 = age.group.25.40,
-                                age.group.40.50 = age.group.40.50)
   
-  choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.fas"),
-                      select.vec = mAr.IDs, 
-                      name.file = paste0(sub.dir.rename,"/",paste0("cov.",seq.cov, ".mAr.IDs.C.Epidemic.Fasta")))
-  
-  
-  mAr.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
-                                                       sub.dir.rename = sub.dir.rename,
-                                                       fasttree.tool = "FastTree",
-                                                       calendar.dates = "samplingtimes.all.csv",
-                                                       simseqfile = paste0("cov.",seq.cov, ".mAr.IDs.C.Epidemic.Fasta"),
-                                                       count.start = 1977,
-                                                       endsim = 40,
-                                                       clust = FALSE)
-  
-  tree.cal.cov.35.IDs <- read.tree(paste0(sub.dir.rename, paste0("/cov.",seq.cov, ".mAr.IDs.C.Epidemic.Fasta.nwk")))
-  
-  
-  
-  # run ClusterPicker
-  
-  system(paste("java -jar ", paste(paste0(work.dir,"/ClusterPicker_1.2.3.jar"), paste0(sub.dir.rename,"/", paste0("cov.",seq.cov, ".mAr.IDs.C.Epidemic.Fasta")), paste0(sub.dir.rename,"/",paste0("cov.",seq.cov, ".mAr.IDs.C.Epidemic.Fasta.nwk")),  paste0("0.9 0.9 0.045 2 gap"))))
-  
-  # Read clusters' files
-  
-  d <- list.files(path = paste0(sub.dir.rename), pattern = paste0(paste0("cov.",seq.cov, ".mAr.IDs.C.Epidemic.Fasta"),"_",paste0("cov.",seq.cov, ".mAr.IDs.C.Epidemic.Fasta"),"_","clusterPicks_cluste"), 
-                  all.files = FALSE,
-                  full.names = FALSE, recursive = FALSE)
-  
-  
-  
-  
+  ##
   
   # id of people who got infection by seed event: seeds.id
   trans.network <- new.transm.tab
@@ -122,6 +84,48 @@ phylo.AR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net,
   #                                 limitTransmEvents = 7)
   
   
+  mAr.IDs <- IDs.Seq.Age.Groups(simpact.trans.net = simpact.trans.net,
+                                limitTransmEvents = limitTransmEvents,
+                                timewindow = timewindow,
+                                seq.cov = seq.cov,
+                                seq.gender.ratio = seq.gender.ratio,
+                                age.group.15.25 = age.group.15.25,
+                                age.group.25.40 = age.group.25.40,
+                                age.group.40.50 = age.group.40.50)
+  
+  choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.fas"),
+                      select.vec = mAr.IDs, 
+                      name.file = paste0(sub.dir.rename,"/",paste0("cov.",seq.cov, ".mAr.IDs.C.Epidemic.Fasta")))
+  
+  
+  mAr.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
+                                                       sub.dir.rename = sub.dir.rename,
+                                                       fasttree.tool = "FastTree",
+                                                       calendar.dates = "samplingtimes.all.csv",
+                                                       simseqfile = paste0("cov.",seq.cov, ".mAr.IDs.C.Epidemic.Fasta"),
+                                                       count.start = 1977,
+                                                       endsim = 40,
+                                                       clust = FALSE)
+  
+  tree.cal.cov.35.IDs <- read.tree(paste0(sub.dir.rename, paste0("/cov.",seq.cov, ".mAr.IDs.C.Epidemic.Fasta.nwk")))
+  
+  
+  
+  # run ClusterPicker
+  
+  system(paste("java -jar ", paste(paste0(work.dir,"/ClusterPicker_1.2.3.jar"), paste0(sub.dir.rename,"/", paste0("cov.",seq.cov, ".mAr.IDs.C.Epidemic.Fasta")), paste0(sub.dir.rename,"/",paste0("cov.",seq.cov, ".mAr.IDs.C.Epidemic.Fasta.nwk")),  paste0("0.9 0.9 0.045 2 gap"))))
+  
+  # Read clusters' files
+  
+  d <- list.files(path = paste0(sub.dir.rename), pattern = paste0(paste0("cov.",seq.cov, ".mAr.IDs.C.Epidemic.Fasta"),"_",paste0("cov.",seq.cov, ".mAr.IDs.C.Epidemic.Fasta"),"_","clusterPicks_cluste"), 
+                  all.files = FALSE,
+                  full.names = FALSE, recursive = FALSE)
+  
+  
+  
+  
+  
+  
   # define to filter pairings
   sort.partners.fun.phylo <- function(partner.table = partner.table){ # for receivers
     
@@ -160,36 +164,45 @@ phylo.AR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net,
     # Possibles pairings
     
     
-    pairs.15.25.men.women.15.25 <- tryCatch(comb(nrow(num.15.25.men), nrow(num.15.25.women)), # C(1,n)
-                                            error=function(e) return(NA))
+    pairs.15.25.men.women.15.25 <- comb(1, nrow(num.15.25.men)) * comb(1, nrow(num.15.25.women))
+      # tryCatch(comb(nrow(num.15.25.men), nrow(num.15.25.women)), # C(1,n)
+      #                                       error=function(e) return(NA))
+      # 
+    pairs.25.40.men.women.15.25 <- comb(1, nrow(num.25.40.men)) * comb(1, nrow(num.15.25.women))
+      # tryCatch(comb(nrow(num.25.40.men), nrow(num.15.25.women)),
+      #                                       error=function(e) return(NA))
+      # 
+    pairs.40.50.men.women.15.25 <- comb(1, nrow(num.40.50.men)) * comb(1, nrow(num.15.25.women)) 
+      # tryCatch(comb(nrow(num.40.50.men), nrow(num.15.25.women)),
+      #                                       error=function(e) return(NA))
+      # 
     
-    pairs.25.40.men.women.15.25 <- tryCatch(comb(nrow(num.25.40.men), nrow(num.15.25.women)),
-                                            error=function(e) return(NA))
-    
-    pairs.40.50.men.women.15.25 <- tryCatch(comb(nrow(num.40.50.men), nrow(num.15.25.women)),
-                                            error=function(e) return(NA))
-    
-    
-    pairs.15.25.men.women.25.40 <- tryCatch(comb(nrow(num.15.25.men), nrow(num.25.40.women)),
-                                            error=function(e) return(NA))
-    
-    pairs.25.40.men.women.25.40 <- tryCatch(comb(nrow(num.25.40.men), nrow(num.25.40.women)),
-                                            error=function(e) return(NA))
-    
-    pairs.40.50.men.women.25.40 <- tryCatch(comb(nrow(num.40.50.men), nrow(num.25.40.women)),
-                                            error=function(e) return(NA))
+    pairs.15.25.men.women.25.40 <- comb(1, nrow(num.15.25.men)) * comb(1, nrow(num.25.40.women))  
+      # tryCatch(comb(nrow(num.15.25.men), nrow(num.25.40.women)),
+      #                                       error=function(e) return(NA))
+      # 
+    pairs.25.40.men.women.25.40 <- comb(1, nrow(num.25.40.men)) * comb(1, nrow(num.25.40.women))   
+      # tryCatch(comb(nrow(num.25.40.men), nrow(num.25.40.women)),
+      #                                       error=function(e) return(NA))
+      # 
+    pairs.40.50.men.women.25.40 <- comb(1, nrow(num.40.50.men)) * comb(1, nrow(num.25.40.women))   
+      # tryCatch(comb(nrow(num.40.50.men), nrow(num.25.40.women)),
+      #                                       error=function(e) return(NA))
+      # 
     
     
-    
-    pairs.15.25.men.women.40.50 <- tryCatch(comb(nrow(num.15.25.men), nrow(num.15.25.women)),
-                                            error=function(e) return(NA))
-    
-    pairs.25.40.men.women.40.50 <- tryCatch(comb(nrow(num.25.40.men), nrow(num.15.25.women)),
-                                            error=function(e) return(NA))
-    
-    pairs.40.50.men.women.40.50 <- tryCatch(comb(nrow(num.40.50.men), nrow(num.15.25.women)),
-                                            error=function(e) return(NA))
-    
+    pairs.15.25.men.women.40.50 <- comb(1, nrow(num.15.25.men)) * comb(1, nrow(num.40.50.women))   
+      # tryCatch(comb(nrow(num.15.25.men), nrow(num.40.50.women)),
+      #                                       error=function(e) return(NA))
+      # 
+    pairs.25.40.men.women.40.50 <- comb(1, nrow(num.25.40.men)) * comb(1, nrow(num.40.50.women))   
+      # tryCatch(comb(nrow(num.25.40.men), nrow(num.40.50.women)),
+      #                                       error=function(e) return(NA))
+      # 
+    pairs.40.50.men.women.40.50 <-  comb(1, nrow(num.25.40.men)) * comb(1, nrow(num.40.50.women))   
+      # tryCatch(comb(nrow(num.40.50.men), nrow(num.40.50.women)),
+      #                                       error=function(e) return(NA))
+      # 
     
     pairings.al <- c(pairs.15.25.men.women.15.25, pairs.15.25.men.women.25.40, pairs.15.25.men.women.40.50,
                      pairs.25.40.men.women.15.25, pairs.25.40.men.women.25.40, pairs.25.40.men.women.40.50,
@@ -233,7 +246,38 @@ phylo.AR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net,
     
     pairings.clust.tab <- sort.partners.fun.phylo(partner.table = transm.df.cl)
     
-    pairings.clust.tab.list[[i]] <- pairings.clust.tab
+    # Age difference statistics #
+    #############################
+    AD <- abs(abs(transm.df.cl$TOBDon) - abs(transm.df.cl$TOBRec))
+    mean.AD <- mean(AD)
+    med.AD <- median(AD)
+    sd.AD <- sd(AD)
+    
+    # Mixed effect models #
+    #######################
+    # fit.agemix.trans.women <- fit.agemix.trans.women(datatable = data.transm.agemix)
+    # fit.agemix.trans.men <- fit.agemix.trans.men(datatable = data.transm.agemix)
+    
+    AD.stat <- c(mean.AD, med.AD, sd.AD)
+    
+    pairings.clust.tab.AD <- c(pairings.clust.tab, AD.stat)
+    
+    pairings.clust.tab.AD <- as.numeric(pairings.clust.tab.AD)
+    
+    val.names <- c("num.men.15.25", "num.women.15.25",
+                   "num.men.25.40", "num.women.25.40",
+                   "num.men.40.50", "num.women.40.50",
+                   
+                   "partners.men.15.25.w.15.25", "partners.men.15.25.w.25.40", "partners.men.15.25.w.40.50",
+                   "partners.men.25.40.w.15.25", "partners.men.25.40.w.25.40", "partners.men.25.40.w.40.50",
+                   "partners.men.40.50.w.15.25", "partners.men.40.50.w.25.40", "partners.men.40.50.w.40.50", 
+                   
+                   "mean.AD", "median.AD", "sd.AD")
+    
+    names(pairings.clust.tab.AD) <- val.names
+    
+    
+    pairings.clust.tab.list[[i]] <- pairings.clust.tab.AD
     
   }
   
@@ -246,7 +290,7 @@ phylo.AR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net,
   
 }
 
-# 
+#
 # b <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
 #                                 limitTransmEvents = 7,
 #                                 timewindow = c(30,40),
