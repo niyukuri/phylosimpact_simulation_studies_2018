@@ -41,7 +41,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   
   # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
   
-  destDir <- "/home/niyukuri/Desktop/mastermodeltest/temp" # on PC
+  # destDir <- "/home/niyukuri/Desktop/mastermodeltest/temp" # on PC
   
   
   library(RSimpactCyan)
@@ -265,8 +265,8 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   #
   cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
                                    population.simtime = 50, 
-                                   population.nummen = 600, 
-                                   population.numwomen = 600,
+                                   population.nummen = 2000, 
+                                   population.numwomen = 2000,
                                    hivseed.time = 10, 
                                    hivseed.type = "amount",
                                    hivseed.amount = 20, 
@@ -471,6 +471,35 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   
   # simpact.trans.net.projection <- transmission.network.builder(datalist = datalist.agemix, endpoint = 45)
   
+  ###############################
+  # Step 3: Sequence simulation #
+  ###############################
+  
+  
+  trans.net <- simpact.trans.net # all transmission networks
+  
+  
+  dirseqgen <- work.dir
+  
+  seeds.num <- inputvector[1]
+  
+  # Sequence simulation is done for at least a transmission network with 6 individuals
+  # This means that limitTransmEvents equal at least 7
+  
+  sequence.simulation.seqgen.par(dir.seq = dirseqgen,
+                                 sub.dir.rename = sub.dir.rename,
+                                 simpact.trans.net = simpact.trans.net,
+                                 seq.gen.tool = "seq-gen",
+                                 seeds.num = seeds.num,
+                                 endpoint = 40,
+                                 limitTransmEvents = 7, # no less than 7
+                                 hiv.seq.file = "hiv.seq.C.pol.j.fasta",
+                                 clust = FALSE) # hiv.seq.file lodged in work.dir
+  
+  # Transform the sequence format to be handled by ClusterPicker
+  sequ.dna <- read.dna(file = paste0(sub.dir.rename,"/C.Epidemic_seed.seq.bis.sim.nwk.fasta"), format = "interleaved")
+  write.dna(sequ.dna, file = paste0(sub.dir.rename,"/C.Epidemic.fas") , format = "fasta")
+  
   
   ##########################################################
   # Step 3: Empirical data and age-mixing in transmissions #
@@ -495,18 +524,18 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   # Table of age mixing in transmissions within differewnt age groups #
   #####################################################################
   
-  
-  # Age difference statistics #
-  #############################
-  AD <- abs(abs(agemixing.df.IDs$TOBDon) - abs(agemixing.df.IDs$TOBRec))
-  mean.AD <- mean(AD)
-  med.AD <- median(AD)
-  sd.AD <- sd(AD)
-  
-  # Mixed effect models #
-  #######################
-  fit.agemix.trans.women <- fit.agemix.trans.women(datatable = agemixing.df.IDs)
-  fit.agemix.trans.men <- fit.agemix.trans.men(datatable = agemixing.df.IDs)
+  #  
+  #  # Age difference statistics #
+  #  #############################
+  #  AD <- abs(abs(agemixing.df.IDs$TOBDon) - abs(agemixing.df.IDs$TOBRec))
+  #  mean.AD <- mean(AD)
+  #  med.AD <- median(AD)
+  #  sd.AD <- sd(AD)
+  #  
+  #  # Mixed effect models #
+  #  #######################
+  # # fit.agemix.trans.women <- fit.agemix.trans.women(datatable = agemixing.df.IDs)
+  # # fit.agemix.trans.men <- fit.agemix.trans.men(datatable = agemixing.df.IDs)
   
   # I. MCAR
   
@@ -1036,9 +1065,9 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   
   # III. Transmission clusters with MCAR
   
+  dirfasttree <- work.dir
   
-  
-  transm.clust.MCAR.cov.35 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.MCAR.cov.35 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                           limitTransmEvents = 7,
                                                           timewindow = c(30,40),
                                                           seq.cov = 35,
@@ -1048,7 +1077,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   transm.clust.MCAR.cov.35.val <- sapply(transm.clust.MCAR.cov.35, mean)
   
   
-  transm.clust.MCAR.cov.40 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.MCAR.cov.40 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                           limitTransmEvents = 7,
                                                           timewindow = c(30,40),
                                                           seq.cov = 40,
@@ -1059,7 +1088,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   
   
   
-  transm.clust.MCAR.cov.45 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.MCAR.cov.45 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                           limitTransmEvents = 7,
                                                           timewindow = c(30,40),
                                                           seq.cov = 45,
@@ -1068,7 +1097,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
                                                           age.group.40.50 = c(40,50))
   transm.clust.MCAR.cov.45.val <- sapply(transm.clust.MCAR.cov.45, mean)
   
-  transm.clust.MCAR.cov.50 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.MCAR.cov.50 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                           limitTransmEvents = 7,
                                                           timewindow = c(30,40),
                                                           seq.cov = 50,
@@ -1078,7 +1107,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   transm.clust.MCAR.cov.50.val <- sapply(transm.clust.MCAR.cov.50, mean)
   
   
-  transm.clust.MCAR.cov.55 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.MCAR.cov.55 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                           limitTransmEvents = 7,
                                                           timewindow = c(30,40),
                                                           seq.cov = 55,
@@ -1089,7 +1118,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   
   
   
-  transm.clust.MCAR.cov.60 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.MCAR.cov.60 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                           limitTransmEvents = 7,
                                                           timewindow = c(30,40),
                                                           seq.cov = 60,
@@ -1100,7 +1129,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   
   
   
-  transm.clust.MCAR.cov.65 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.MCAR.cov.65 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                           limitTransmEvents = 7,
                                                           timewindow = c(30,40),
                                                           seq.cov = 65,
@@ -1110,7 +1139,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   transm.clust.MCAR.cov.65.val <- sapply(transm.clust.MCAR.cov.65, mean)
   
   
-  transm.clust.MCAR.cov.70 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.MCAR.cov.70 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                           limitTransmEvents = 7,
                                                           timewindow = c(30,40),
                                                           seq.cov = 70,
@@ -1119,7 +1148,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
                                                           age.group.40.50 = c(40,50))
   transm.clust.MCAR.cov.70.val <- sapply(transm.clust.MCAR.cov.70, mean)
   
-  transm.clust.MCAR.cov.75 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.MCAR.cov.75 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                           limitTransmEvents = 7,
                                                           timewindow = c(30,40),
                                                           seq.cov = 75,
@@ -1128,7 +1157,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
                                                           age.group.40.50 = c(40,50))
   transm.clust.MCAR.cov.75.val <- sapply(transm.clust.MCAR.cov.75, mean)
   
-  transm.clust.MCAR.cov.80 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.MCAR.cov.80 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                           limitTransmEvents = 7,
                                                           timewindow = c(30,40),
                                                           seq.cov = 80,
@@ -1137,7 +1166,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
                                                           age.group.40.50 = c(40,50))
   transm.clust.MCAR.cov.80.val <- sapply(transm.clust.MCAR.cov.80, mean)
   
-  transm.clust.MCAR.cov.85 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.MCAR.cov.85 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                           limitTransmEvents = 7,
                                                           timewindow = c(30,40),
                                                           seq.cov = 85,
@@ -1146,7 +1175,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
                                                           age.group.40.50 = c(40,50))
   transm.clust.MCAR.cov.85.val <- sapply(transm.clust.MCAR.cov.85, mean)
   
-  transm.clust.MCAR.cov.90 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.MCAR.cov.90 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                           limitTransmEvents = 7,
                                                           timewindow = c(30,40),
                                                           seq.cov = 90,
@@ -1155,7 +1184,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
                                                           age.group.40.50 = c(40,50))
   transm.clust.MCAR.cov.90.val <- sapply(transm.clust.MCAR.cov.90, mean)
   
-  transm.clust.MCAR.cov.95 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.MCAR.cov.95 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                           limitTransmEvents = 7,
                                                           timewindow = c(30,40),
                                                           seq.cov = 95,
@@ -1165,12 +1194,14 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   transm.clust.MCAR.cov.95.val <- sapply(transm.clust.MCAR.cov.95, mean)
   
   
+
+  
   
   # IV. Transmission clusters with MAR
   
   # IV.a 
   
-  transm.clust.AR.a.cov.35 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.AR.a.cov.35 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                          limitTransmEvents = 7,
                                                          timewindow = c(30,40),
                                                          seq.cov = 35,
@@ -1180,7 +1211,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
                                                          age.group.40.50 = c(40,50))
   transm.clust.AR.a.cov.35.val <- sapply(transm.clust.AR.a.cov.35, mean)
   
-  transm.clust.AR.a.cov.40 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.AR.a.cov.40 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                          limitTransmEvents = 7,
                                                          timewindow = c(30,40),
                                                          seq.cov = 40,
@@ -1190,7 +1221,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
                                                          age.group.40.50 = c(40,50))
   transm.clust.AR.a.cov.40.val <- sapply(transm.clust.AR.a.cov.40, mean)
   
-  transm.clust.AR.a.cov.45 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.AR.a.cov.45 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                          limitTransmEvents = 7,
                                                          timewindow = c(30,40),
                                                          seq.cov = 45,
@@ -1200,7 +1231,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
                                                          age.group.40.50 = c(40,50))
   transm.clust.AR.a.cov.45.val <- sapply(transm.clust.AR.a.cov.45, mean)
   
-  transm.clust.AR.a.cov.50 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.AR.a.cov.50 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                          limitTransmEvents = 7,
                                                          timewindow = c(30,40),
                                                          seq.cov = 50,
@@ -1210,7 +1241,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
                                                          age.group.40.50 = c(40,50))
   transm.clust.AR.a.cov.50.val <- sapply(transm.clust.AR.a.cov.50, mean)
   
-  transm.clust.AR.a.cov.55 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.AR.a.cov.55 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                          limitTransmEvents = 7,
                                                          timewindow = c(30,40),
                                                          seq.cov = 55,
@@ -1220,7 +1251,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
                                                          age.group.40.50 = c(40,50))
   transm.clust.AR.a.cov.55.val <- sapply(transm.clust.AR.a.cov.55, mean)
   
-  transm.clust.AR.a.cov.60 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.AR.a.cov.60 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                          limitTransmEvents = 7,
                                                          timewindow = c(30,40),
                                                          seq.cov = 60,
@@ -1232,7 +1263,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   
   
   
-  transm.clust.AR.a.cov.65 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.AR.a.cov.65 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                          limitTransmEvents = 7,
                                                          timewindow = c(30,40),
                                                          seq.cov = 65,
@@ -1242,7 +1273,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
                                                          age.group.40.50 = c(40,50))
   transm.clust.AR.a.cov.65.val <- sapply(transm.clust.AR.a.cov.65, mean)
   
-  transm.clust.AR.a.cov.70 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.AR.a.cov.70 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                          limitTransmEvents = 7,
                                                          timewindow = c(30,40),
                                                          seq.cov = 70,
@@ -1252,7 +1283,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
                                                          age.group.40.50 = c(40,50))
   transm.clust.AR.a.cov.70.val <- sapply(transm.clust.AR.a.cov.70, mean)
   
-  transm.clust.AR.a.cov.75 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.AR.a.cov.75 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                          limitTransmEvents = 7,
                                                          timewindow = c(30,40),
                                                          seq.cov = 75,
@@ -1264,7 +1295,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   
   
   
-  transm.clust.AR.a.cov.80 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.AR.a.cov.80 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                          limitTransmEvents = 7,
                                                          timewindow = c(30,40),
                                                          seq.cov = 80,
@@ -1276,7 +1307,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   
   
   
-  transm.clust.AR.a.cov.85 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.AR.a.cov.85 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                          limitTransmEvents = 7,
                                                          timewindow = c(30,40),
                                                          seq.cov = 85,
@@ -1287,7 +1318,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   transm.clust.AR.a.cov.85.val <- sapply(transm.clust.AR.a.cov.85, mean)
   
   
-  transm.clust.AR.a.cov.90 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.AR.a.cov.90 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                          limitTransmEvents = 7,
                                                          timewindow = c(30,40),
                                                          seq.cov = 90,
@@ -1299,7 +1330,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   
   
   
-  transm.clust.AR.a.cov.95 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.AR.a.cov.95 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                          limitTransmEvents = 7,
                                                          timewindow = c(30,40),
                                                          seq.cov = 95,
@@ -1315,7 +1346,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   # IV.b
   
   
-  transm.clust.AR.b.cov.35 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.AR.b.cov.35 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                          limitTransmEvents = 7,
                                                          timewindow = c(30,40),
                                                          seq.cov = 35,
@@ -1326,7 +1357,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   transm.clust.AR.b.cov.35.val <- sapply(transm.clust.AR.b.cov.35, mean)
   
   
-  transm.clust.AR.b.cov.40 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.AR.b.cov.40 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                          limitTransmEvents = 7,
                                                          timewindow = c(30,40),
                                                          seq.cov = 40,
@@ -1337,7 +1368,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   transm.clust.AR.b.cov.40.val <- sapply(transm.clust.AR.b.cov.40, mean)
   
   
-  transm.clust.AR.b.cov.45 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.AR.b.cov.45 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                          limitTransmEvents = 7,
                                                          timewindow = c(30,40),
                                                          seq.cov = 45,
@@ -1348,7 +1379,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   transm.clust.AR.b.cov.45.val <- sapply(transm.clust.AR.b.cov.45, mean)
   
   
-  transm.clust.AR.b.cov.50 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.AR.b.cov.50 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                          limitTransmEvents = 7,
                                                          timewindow = c(30,40),
                                                          seq.cov = 50,
@@ -1359,7 +1390,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   transm.clust.AR.b.cov.50.val <- sapply(transm.clust.AR.b.cov.50, mean)
   
   
-  transm.clust.AR.b.cov.55 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.AR.b.cov.55 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                          limitTransmEvents = 7,
                                                          timewindow = c(30,40),
                                                          seq.cov = 55,
@@ -1370,7 +1401,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   transm.clust.AR.b.cov.55.val <- sapply(transm.clust.AR.b.cov.55, mean)
   
   
-  transm.clust.AR.b.cov.60 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.AR.b.cov.60 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                          limitTransmEvents = 7,
                                                          timewindow = c(30,40),
                                                          seq.cov = 60,
@@ -1382,7 +1413,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   
   
   
-  transm.clust.AR.b.cov.65 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.AR.b.cov.65 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                          limitTransmEvents = 7,
                                                          timewindow = c(30,40),
                                                          seq.cov = 65,
@@ -1393,7 +1424,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   transm.clust.AR.b.cov.65.val <- sapply(transm.clust.AR.b.cov.65, mean)
   
   
-  transm.clust.AR.b.cov.70 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.AR.b.cov.70 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                          limitTransmEvents = 7,
                                                          timewindow = c(30,40),
                                                          seq.cov = 70,
@@ -1404,7 +1435,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   transm.clust.AR.b.cov.70.val <- sapply(transm.clust.AR.b.cov.70, mean)
   
   
-  transm.clust.AR.b.cov.75 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.AR.b.cov.75 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                          limitTransmEvents = 7,
                                                          timewindow = c(30,40),
                                                          seq.cov = 75,
@@ -1416,7 +1447,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   
   
   
-  transm.clust.AR.b.cov.80 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.AR.b.cov.80 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                          limitTransmEvents = 7,
                                                          timewindow = c(30,40),
                                                          seq.cov = 80,
@@ -1428,7 +1459,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   
   
   
-  transm.clust.AR.b.cov.85 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.AR.b.cov.85 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                          limitTransmEvents = 7,
                                                          timewindow = c(30,40),
                                                          seq.cov = 85,
@@ -1439,7 +1470,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   transm.clust.AR.b.cov.85.val <- sapply(transm.clust.AR.b.cov.85, mean)
   
   
-  transm.clust.AR.b.cov.90 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.AR.b.cov.90 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                          limitTransmEvents = 7,
                                                          timewindow = c(30,40),
                                                          seq.cov = 90,
@@ -1451,7 +1482,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   
   
   
-  transm.clust.AR.b.cov.95 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.AR.b.cov.95 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                          limitTransmEvents = 7,
                                                          timewindow = c(30,40),
                                                          seq.cov = 95,
@@ -1467,7 +1498,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   # IV.c
   
   
-  transm.clust.AR.c.cov.35 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.AR.c.cov.35 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                          limitTransmEvents = 7,
                                                          timewindow = c(30,40),
                                                          seq.cov = 35,
@@ -1477,7 +1508,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
                                                          age.group.40.50 = c(40,50))
   transm.clust.AR.c.cov.35.val <- sapply(transm.clust.AR.c.cov.35, mean)
   
-  transm.clust.AR.c.cov.40 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.AR.c.cov.40 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                          limitTransmEvents = 7,
                                                          timewindow = c(30,40),
                                                          seq.cov = 40,
@@ -1488,7 +1519,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   transm.clust.AR.c.cov.40.val <- sapply(transm.clust.AR.c.cov.40, mean)
   
   
-  transm.clust.AR.c.cov.45 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.AR.c.cov.45 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                          limitTransmEvents = 7,
                                                          timewindow = c(30,40),
                                                          seq.cov = 45,
@@ -1499,7 +1530,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   transm.clust.AR.c.cov.45.val <- sapply(transm.clust.AR.c.cov.45, mean)
   
   
-  transm.clust.AR.c.cov.50 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.AR.c.cov.50 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                          limitTransmEvents = 7,
                                                          timewindow = c(30,40),
                                                          seq.cov = 50,
@@ -1510,7 +1541,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   transm.clust.AR.c.cov.50.val <- sapply(transm.clust.AR.c.cov.50, mean)
   
   
-  transm.clust.AR.c.cov.55 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.AR.c.cov.55 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                          limitTransmEvents = 7,
                                                          timewindow = c(30,40),
                                                          seq.cov = 55,
@@ -1521,7 +1552,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   transm.clust.AR.c.cov.55.val <- sapply(transm.clust.AR.c.cov.55, mean)
   
   
-  transm.clust.AR.c.cov.60 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.AR.c.cov.60 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                          limitTransmEvents = 7,
                                                          timewindow = c(30,40),
                                                          seq.cov = 60,
@@ -1533,7 +1564,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   
   
   
-  transm.clust.AR.c.cov.65 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.AR.c.cov.65 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                          limitTransmEvents = 7,
                                                          timewindow = c(30,40),
                                                          seq.cov = 65,
@@ -1544,7 +1575,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   transm.clust.AR.c.cov.65.val <- sapply(transm.clust.AR.c.cov.65, mean)
   
   
-  transm.clust.AR.c.cov.70 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.AR.c.cov.70 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                          limitTransmEvents = 7,
                                                          timewindow = c(30,40),
                                                          seq.cov = 70,
@@ -1555,7 +1586,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   transm.clust.AR.c.cov.70.val <- sapply(transm.clust.AR.c.cov.70, mean)
   
   
-  transm.clust.AR.c.cov.75 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.AR.c.cov.75 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                          limitTransmEvents = 7,
                                                          timewindow = c(30,40),
                                                          seq.cov = 75,
@@ -1567,7 +1598,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   
   
   
-  transm.clust.AR.c.cov.80 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.AR.c.cov.80 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                          limitTransmEvents = 7,
                                                          timewindow = c(30,40),
                                                          seq.cov = 80,
@@ -1579,7 +1610,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   
   
   
-  transm.clust.AR.c.cov.85 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.AR.c.cov.85 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                          limitTransmEvents = 7,
                                                          timewindow = c(30,40),
                                                          seq.cov = 85,
@@ -1590,7 +1621,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   transm.clust.AR.c.cov.85.val <- sapply(transm.clust.AR.c.cov.85, mean)
   
   
-  transm.clust.AR.c.cov.90 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.AR.c.cov.90 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                          limitTransmEvents = 7,
                                                          timewindow = c(30,40),
                                                          seq.cov = 90,
@@ -1602,7 +1633,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   
   
   
-  transm.clust.AR.c.cov.95 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  transm.clust.AR.c.cov.95 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
                                                          limitTransmEvents = 7,
                                                          timewindow = c(30,40),
                                                          seq.cov = 95,
@@ -1611,7 +1642,6 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
                                                          age.group.25.40 = c(25,40),
                                                          age.group.40.50 = c(40,50))
   transm.clust.AR.c.cov.95.val <- sapply(transm.clust.AR.c.cov.95, mean)
-  
   
   
   
@@ -1635,7 +1665,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
                          name.CAR.55, name.CAR.60, name.CAR.65, name.CAR.70,
                          name.CAR.75, name.CAR.80, name.CAR.85,
                          name.CAR.90, name.CAR.95)
-
+  
   
   name.AR.a.35 <- paste0("AR.a.35.",names(AR.a.35))
   name.AR.a.40 <- paste0("AR.a.40.",names(AR.a.40))
@@ -1656,7 +1686,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
                          name.AR.a.75, name.AR.a.80, name.AR.a.85,
                          name.AR.a.90, name.AR.a.95)
   
-
+  
   name.AR.b.35 <- paste0("AR.b.35.",names(AR.b.35))
   name.AR.b.40 <- paste0("AR.b.40.",names(AR.b.40))
   name.AR.b.45 <- paste0("AR.b.45.",names(AR.b.45))
@@ -1676,7 +1706,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
                          name.AR.b.75, name.AR.b.80, name.AR.b.85,
                          name.AR.b.90, name.AR.b.95)
   
-
+  
   name.AR.c.35 <- paste0("AR.c.35.",names(AR.c.35))
   name.AR.c.40 <- paste0("AR.c.40.",names(AR.c.40))
   name.AR.c.45 <- paste0("AR.c.45.",names(AR.c.45))
@@ -1858,7 +1888,7 @@ inputvector <- c(-0.52, -0.05, 2.8, 0, 3, 0.25, -0.3, -0.1,
 # # replication number
 # 
 
-reps <- 2
+reps <- 8
 
 # 
 # 
@@ -1876,6 +1906,7 @@ features.matrix <- simpact.parallel(model = master.model.age.mixing.pattern.stud
                                     seed_count = 124,
                                     n_cluster = 8)
 
+View(features.matrix)
 
 # 
 # sim.end.time <- proc.time()[3] - sim.start.time
