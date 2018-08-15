@@ -106,9 +106,9 @@ simpact4ABC.classic <- function(inputvector){
   
   # Disease progression > may be remove in parameter to estimates
   
-  cfg.list["person.vsp.toacute.x"] <- inputvector[15] # [15] # 5 c("unif", 3, 7)
-  cfg.list["person.vsp.toaids.x"] <- inputvector[16] # [16] # 7 c("unif", 5, 9)
-  cfg.list["person.vsp.tofinalaids.x"] <- inputvector[17] # [17] # 12 c("unif", 10, 14)
+  cfg.list["person.vsp.toacute.x"] <- 5 # inputvector[15] # [15] # 5 c("unif", 3, 7)
+  cfg.list["person.vsp.toaids.x"] <- 7 # inputvector[16] # [16] # 7 c("unif", 5, 9)
+  cfg.list["person.vsp.tofinalaids.x"] <- 12 # inputvector[17] # [17] # 12 c("unif", 10, 14)
   
   
   #
@@ -116,7 +116,7 @@ simpact4ABC.classic <- function(inputvector){
   # ##############
   #
   
-  cfg.list["conception.alpha_base"] <- inputvector[18] # [18] # -2.7 c("unif", -3.5, -1.7)
+  cfg.list["conception.alpha_base"] <- inputvector[15] # inputvector[18] # [18] # -2.7 c("unif", -3.5, -1.7)
   
   #
   #
@@ -225,11 +225,11 @@ simpact4ABC.classic <- function(inputvector){
                          destDir = ABC_DestDir.classic) #simpact.run(cfg, ABC_DestDir, identifierFormat = ABC_identifier)  
   
   datalist <- readthedata(results)
-
+  
   
   summary.stat <- tryCatch(classic.features.study.1(datalist = datalist,
-                                           work.dir = work.dir,
-                                           sub.dir.rename = ABC_DestDir.classic), 
+                                                    work.dir = work.dir,
+                                                    sub.dir.rename = ABC_DestDir.classic), 
                            error=function(e) return(rep(NA, 16)))
   
   
@@ -254,6 +254,9 @@ simpact_prior <- list(c("unif", -1, 0), c("unif", -0.5, 0), c("unif", 1, 3), c("
                       c("unif", 0, 0.5), c("unif", -0.5, 0), c("unif", 3, 7), c("unif", 5, 9),
                       c("unif", 10, 14),  c("unif", -3.5, -1.7))
 
+simpact_prior <- simpact_prior[-c(14,15,16)]
+
+# x[-c(2, 3)]
 
 # Observed features
 
@@ -383,22 +386,26 @@ uls <- as.numeric(uls.simp(simpact_prior))
 obs.targets <- as.numeric(sum_stat_obs)
 
 
-MaC.simp <- MaC(targets.empirical = obs.targets,
-                RMSD.tol.max = 2,
-                min.givetomice = 120,
-                n.experiments = 1200,
-                lls = lls,
-                uls = uls,
-                model = simpact4ABC.classic,
-                strict.positive.params = c(5, 14:16),
-                probability.params = c(6,11, 12),
-                method = "norm",
-                predictorMatrix = "complete",
-                maxit = 20,
-                maxwaves = 2,
-                n_cluster = 8)
+MaC.simp <- MaC.weighted(targets.empirical = obs.targets,
+                         RMSD.tol.max = 2,
+                         min.givetomice = 120,
+                         n.experiments = 1200,
+                         lls = lls,
+                         uls = uls,
+                         model = simpact4ABC.classic,
+                         strict.positive.params = c(5), #c(5, 14:16),
+                         probability.params = c(6,11, 12),
+                         inside_prior = TRUE, 
+                         method = "norm",
+                         predictorMatrix = "complete",
+                         maxit = 20,
+                         maxwaves = 4,
+                         n_cluster = 8)
 
 
+MaC.simp$selected.experiments[[1]]
+
+MaC.simp$selected.experiments[[2]]
 
 
 
@@ -428,9 +435,9 @@ inputmatrix.classic <- matrix(rep(inputvector.classic, reps), byrow = TRUE, nrow
 
 
 epi.metric.calibrates.classic <- simpact.parallel(model = wrapper.test.study.1,
-                                               actual.input.matrix = inputmatrix.classic,
-                                               seed_count = 124,
-                                               n_cluster = 4)
+                                                  actual.input.matrix = inputmatrix.classic,
+                                                  seed_count = 124,
+                                                  n_cluster = 4)
 
 
 # 
