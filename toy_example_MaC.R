@@ -177,3 +177,130 @@ MaC.simpact <- MaC(targets.empirical = sum_stat_obs.MCAR.cov.35,
                    maxit = 20,
                    maxwaves = 1,
                    n_cluster = 8)
+
+
+# Many parameters
+##########################
+
+toy_model.par <- function(x){
+  set.seed(x[1])   # THIS IS ESSENTIAL
+  c( x[2] + x[3] + x[3]*x[4] + rnorm(1,0,0.1) + x[5] + x[6] + x[7] + x[8] ,   # x[1] and x[2] now become x[2] and x[3]
+     x[2] * x[3] + rnorm(1,0,0.1)  + x[5] + x[7] + + x[8])
+}
+
+sum_stat_obs <- c(1.5, 0.5)
+
+lls.par = c(0, 1, 1, 0, 3, 5 , 0)
+uls.par = c(1.5, 2, 3, 1, 5, 10, 1)
+
+# To get more info about the arguments of the MaC function:
+# help(MaC)
+
+MaC.toy.par <- MaC(targets.empirical = sum_stat_obs,
+                   RMSD.tol.max = 2,
+                   min.givetomice = 200,
+                   n.experiments = 2000,
+                   lls = lls.par,
+                   uls = uls.par,
+                   model = toy_model.par,
+                   strict.positive.params = 0,
+                   probability.params = 0,
+                   method = "norm",
+                   predictorMatrix = "complete",
+                   maxit = 20,
+                   maxwaves = 2,
+                   n_cluster = 8)
+
+
+# Let's compare this to accept-reject ABC
+library(EasyABC)
+
+# help("ABC_rejection")
+
+toy_prior.par <- list(c("unif", lls.par[1], uls.par[1]),
+                      c("unif", lls.par[2], uls.par[2]),
+                      c("unif", lls.par[3], uls.par[3]),
+                      c("unif", lls.par[4], uls.par[4]),
+                      c("unif", lls.par[5], uls.par[5]),
+                      c("unif", lls.par[6], uls.par[6]),
+                      c("unif", lls.par[7], uls.par[7]))
+
+
+Rej.toy.par <- ABC_rejection(model = toy_model.par,
+                             prior = toy_prior.par,
+                             summary_stat_target = sum_stat_obs,
+                             nb_simul = 12000,
+                             use_seed = TRUE,
+                             seed_count = 1,
+                             n_cluster = 8,
+                             tol = 200/12000)
+
+
+
+# Let's compare this to sequential ABC
+
+# help("ABC_sequential")
+
+Seq.toy.par <- ABC_sequential(model = toy_model.par,
+                              method = "Lenormand",
+                              prior = toy_prior.par,
+                              summary_stat_target = sum_stat_obs,
+                              nb_simul = 2000,
+                              alpha = 0.1,
+                              p_acc_min = 0.03,
+                              use_seed = TRUE,
+                              seed_count = 1,
+                              n_cluster = 8,
+                              inside_prior = FALSE)
+# To see how many waves were done:
+1 + (Seq.toy.par$nsim - 2000) / 1800
+
+# Plotting the input parameters of the calibrated model
+plot(Rej.toy.par$param[, 1],
+     Rej.toy.par$param[, 2],
+     pch = 16,
+     col = "black",
+     xlab = "parameter 1",
+     ylab = "parameter 2",
+     xlim = c(0,1.5),
+     ylim = c(0, 2))
+points(Seq.toy.par$param[, 1],
+       Seq.toy.par$param[, 2],
+       pch = 16,
+       col = "blue2")
+points(MaC.toy.par$selected.experiments[[6]][, 1],
+       MaC.toy.par$selected.experiments[[6]][, 2],
+       pch = 16,
+       col = "orange")
+
+
+# Plotting the summary statistics of the calibrated model
+plot(Rej.toy.par$stats[, 1],
+     Rej.toy.par$stats[, 2],
+     pch = 16,
+     col = "black",
+     xlab = "summary statistic 1",
+     ylab = "summary statistic 2",
+     xlim = c(1.4, 1.6),
+     ylim = c(0.3, 0.7))
+points(Seq.toy.par$stats[, 1],
+       Seq.toy.par$stats[, 2],
+       pch = 16,
+       col = "blue2")
+points(MaC.toy.par$selected.experiments[[6]][, 3],
+       MaC.toy.par$selected.experiments[[6]][, 4],
+       pch = 16,
+       col = "orange")
+
+points(sum_stat_obs[1],
+       sum_stat_obs[2],
+       pch = "+",
+       cex = 3,
+       col = "red3")
+
+# Comparing simulation time:
+MaC.toy.par$secondspassed[3]
+Rej.toy.par$computime
+Seq.toy.par$computime
+
+
