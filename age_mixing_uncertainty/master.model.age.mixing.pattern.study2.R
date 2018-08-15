@@ -1888,7 +1888,7 @@ inputvector <- c(-0.52, -0.05, 2.8, 0, 3, 0.25, -0.3, -0.1,
 # # replication number
 # 
 
-reps <- 8
+reps <- 100
 
 # 
 # 
@@ -1904,9 +1904,9 @@ inputmatrix <- matrix(rep(inputvector, reps), byrow = TRUE, nrow = reps)
 features.matrix <- simpact.parallel(model = master.model.age.mixing.pattern.study2,
                                     actual.input.matrix = inputmatrix,
                                     seed_count = 124,
-                                    n_cluster = 8)
+                                    n_cluster = 24)
 
-View(features.matrix)
+# View(features.matrix)
 
 # 
 # sim.end.time <- proc.time()[3] - sim.start.time
@@ -1918,7 +1918,7 @@ View(features.matrix)
 # # save features in the working directory
 # 
 
-write.csv(features.matrix, file = paste0(work.dir,"/features.matrix.csv"))
+write.csv(features.matrix, file = paste0(work.dir,"/master.model.age.mixing.pattern.study2.csv"))
 
 # 
 # unlink(paste0("temp"), recursive = TRUE)
