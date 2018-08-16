@@ -63,7 +63,7 @@ with(Rail, bwplot(Rail ~ residuals(r1.lm)))
 library(lme4)
 
 r2.lme <- lmer(travel ~ 1 + (1 | Rail),
-             REML=FALSE, data=Rail)
+               REML=FALSE, data=Rail)
 
 
 summary(r2.lme)
@@ -242,3 +242,198 @@ str(dragons)  # we took samples from three sites per mountain range and eight mo
 
 ### comparison
 
+
+
+
+# Dummy data for age-mixing in transmission clusters
+
+female.age <- c(17:24, 32, 23, 21, 29, 19, 21, 23, 24, 18, 19, 19, 21, 17:24, 21:27, 19)
+male.age <- c(19, 21, 23, 24, 18, 19, 19, 21, 17:24, 21:27)
+
+
+female.df <- data.frame(age=female.age)
+male.df <- data.frame(age=male.age)
+
+female.df$gender <- "female"
+male.df$gender <- "male"
+
+ageTransmClust <- rbind(female.df, male.df)
+
+ggplot(ageTransmClust, aes(age, fill = gender)) + geom_density(alpha = 0.2)
+
+
+library(ggplot2)
+
+# 1
+female.age1 <- c(17, 32, 23, 21, 29, 19, 21, 23, 24, 18, 19, 19, 21, 17:24, 21:27, 19)
+male.age1 <- c(42, 40, 35, 49, 50, 37, 45, 49, 39, 41)
+
+
+female.df1 <- data.frame(age=female.age1)
+male.df1 <- data.frame(age=male.age1)
+
+female.df1$gender <- "female"
+male.df1$gender <- "male"
+
+ageTransmClust1 <- rbind(female.df1, male.df1)
+
+ggplot(ageTransmClust1, aes(age, fill = gender)) + geom_density(alpha = 0.2)
+
+# 2
+
+female.age2 <- c(17, 32, 23, 21, 22, 19, 21, 23, 24, 18, 19, 19, 21, 17:24,19)
+male.age2 <- c(42, 21, 41, 35, 39, 50, 19, 27, 45, 39, 39, 21)
+
+
+female.df2 <- data.frame(age=female.age2)
+male.df2 <- data.frame(age=male.age2)
+
+female.df2$gender <- "female"
+male.df2$gender <- "male"
+
+ageTransmClust2 <- rbind(female.df2, male.df2)
+
+ggplot(ageTransmClust2, aes(age, fill = gender)) + geom_density(alpha = 0.2)
+
+# 3
+
+female.age3 <- c(17:34, 32, 23, 21, 22, 19, 21:27, 23, 24, 18, 19, 19, 21, 17:24,19)
+male.age3 <- c(42, 21:42, 41, 35, 39, 50, 17:29, 27, 45, 39, 39, 21)
+
+
+female.df3 <- data.frame(age=female.age3)
+male.df3 <- data.frame(age=male.age3)
+
+female.df3$gender <- "female"
+male.df3$gender <- "male"
+
+ageTransmClust3 <- rbind(female.df3, male.df3)
+
+
+ggplot(ageTransmClust3, aes(age, fill = gender)) + geom_density(alpha = 0.2)
+
+
+# 4
+
+female.age4 <- c(17:34, 32, 23, 21, 22, 23, 24, 18, 19, 19, 21, 17:24,19)
+male.age4 <- c(42, 21:42, 41, 35, 39, 50, 27, 45, 39, 39, 21)
+
+
+female.df4 <- data.frame(age=female.age4)
+male.df4 <- data.frame(age=male.age4)
+
+female.df4$gender <- "female"
+male.df4$gender <- "male"
+
+ageTransmClust4 <- rbind(female.df4, male.df4)
+
+
+ggplot(ageTransmClust4, aes(age, fill = gender)) + geom_density(alpha = 0.2)
+
+
+# 5
+
+female.age5 <- c(17:34, 32, 23, 21, 22, 23:40, 24, 18, 19, 19, 21, 17:24,19)
+male.age5 <- c(42, 21:42, 41, 35, 39, 19, 50, 27, 45:50, 39, 39:41, 21)
+
+
+female.df5 <- data.frame(age=female.age5)
+male.df5 <- data.frame(age=male.age5)
+
+female.df5$gender <- "female"
+male.df5$gender <- "male"
+
+ageTransmClust5 <- rbind(female.df5, male.df5)
+
+
+ggplot(ageTransmClust5, aes(age, fill = gender)) + geom_density(alpha = 0.2)
+
+
+# 6
+
+female.age6 <- c(17:34, 32, 23, 21, 22,  24, 18, 19, 19, 21, 27:44,19)
+male.age6 <- c(42, 41, 35, 39, 19, 50, 27, 45:50, 39, 39:41, 21)
+
+
+female.df6 <- data.frame(age=female.age6)
+male.df6 <- data.frame(age=male.age6)
+
+female.df6$gender <- "female"
+male.df6$gender <- "male"
+
+ageTransmClust6 <- rbind(female.df6, male.df6)
+
+
+ggplot(ageTransmClust6, aes(age, fill = gender)) + geom_density(alpha = 0.2)
+
+
+# 7
+
+female.age7 <- c(32, 23, 21, 22, 40:49,  24, 18)
+male.age7 <- c(42, 41, 35, 39, 19, 50, 27, 45:50, 39, 39:41)
+
+
+female.df7 <- data.frame(age=female.age7)
+male.df7 <- data.frame(age=male.age7)
+
+female.df7$gender <- "female"
+male.df7$gender <- "male"
+
+ageTransmClust7 <- rbind(female.df7, male.df7)
+
+ggplot(ageTransmClust7, aes(age, fill = gender)) + geom_density(alpha = 0.2)
+
+
+ageTransmClusts <- list(ageTransmClust1, ageTransmClust2, ageTransmClust3,
+                        ageTransmClust4, ageTransmClust5, ageTransmClust6,
+                        ageTransmClust7)
+
+library(nlme)
+
+ageTransmClust1$id <- 1
+ageTransmClust2$id <- 2
+ageTransmClust3$id <- 3
+ageTransmClust4$id <- 4
+ageTransmClust5$id <- 5
+ageTransmClust6$id <- 6
+ageTransmClust7$id <- 7
+
+ageTransmClusts.Clean <- list(ageTransmClust1, ageTransmClust2, ageTransmClust3,
+                              ageTransmClust4, ageTransmClust5, ageTransmClust6,
+                              ageTransmClust7)
+
+AGEMIX <- do.call(rbind, ageTransmClusts.Clean)
+
+AGEMIX$id <- as.factor(AGEMIX$id)
+
+traclust <- lme(age ~ val, data = AGEMIX, random = ~ 1|id)
+
+library(lme4)
+
+traclust2 <- lmer(age ~ val +  (1|id), data = AGEMIX)
+
+# Error in match.arg(name) : 
+#   'arg' should be one of “X”, “Z”, “Zt”, “Ztlist”, “mmList”, “y”, “mu”, “u”, “b”, 
+# “Gp”, “Tp”, “L”, “Lambda”, “Lambdat”, “Lind”, “Tlist”, “A”, “RX”, “RZX”, “sigma”, 
+# “flist”, “fixef”, “beta”, “theta”, “ST”, “REML”, “is_REML”, “n_rtrms”, “n_rfacs”, 
+# “N”, “n”, “p”, “q”, “p_i”, “l_i”, “q_i”, “k”, “m_i”, “m”, “cnms”, “devcomp”, “offset”, 
+# “lower”, “devfun”, “glmer.nb.theta”
+
+random.effects(traclust)
+
+fitted(traclust, level = 0:1)
+
+coef(summary(traclust))[2] # 
+
+ranef(traclust)[[1]][[1]]
+
+a <- coef(summary(traclust))[1] # 
+
+beta <- coef(summary(traclust))[2] # or fixed.effects(summary(traclust))[2] 
+# getME(traclust2,"beta")[2] < this is bridge.width 
+
+# b <- getME(traclust2,"sigma") # between cluster var
+
+b1 <- as.numeric(VarCorr(traclust)[3]) # between cluster variation
+
+b2 <- as.numeric(VarCorr(traclust)[4]) # within cluster variation
