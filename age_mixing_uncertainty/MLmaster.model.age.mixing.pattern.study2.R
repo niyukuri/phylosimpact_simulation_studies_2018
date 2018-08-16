@@ -1908,6 +1908,19 @@ inputvector <- c(-0.52, -0.05, 2.8, 0, 3, 0.25, -0.3, -0.1,
                  # 0.2,
                  -1, -90, 0.5, 0.05, -0.14, 5, 7, 12, -2.7) # length(inputvector) = 18
 
+
+inputvector.age.gap <- c(-0.52, -0.05, 5, 7, 3, 0.25, -0.3, -0.1, 
+                         # 0.2,
+                         -1, -90, 0.5, 0.05, -0.14, 5, 7, 12, -2.7) # length(inputvector) = 18
+
+# 
+# 
+# cfg.list["formation.hazard.agegapry.baseline"] <- inputvector[4] # [3] # 2 c("unif", 1, 3)
+# cfg.list["person.agegap.man.dist.normal.mu"] <- inputvector[5] # [4] # 0 c("unif", -0.5, 0.5)
+# cfg.list["person.agegap.woman.dist.normal.mu"] <- inputvector[5] # [4] # 0
+# cfg.list["person.agegap.man.dist.normal.sigma"] <- inputvector[6] # [5] # 3 c("unif", 2, 4)
+# cfg.list["person.agegap.woman.dist.normal.sigma"] <- inputvector[6] # [5] # 3 
+
 # 
 # 
 # 
@@ -1920,7 +1933,7 @@ inputvector <- c(-0.52, -0.05, 2.8, 0, 3, 0.25, -0.3, -0.1,
 # # replication number
 # 
 
-reps <- 2
+reps <- 4
 
 # 
 # 
@@ -1950,7 +1963,7 @@ features.matrix <- simpact.parallel(model = MLmaster.model.age.mixing.pattern.st
 # # save features in the working directory
 # 
 
-write.csv(features.matrix, file = paste0(work.dir,"/MLmaster.model.age.mixing.pattern.study2.csv"))
+write.csv(features.matrix, file = paste0(work.dir,"/MLmaster.model.age.mixing.pattern.toy1.csv"))
 
 # 
 # unlink(paste0("temp"), recursive = TRUE)
