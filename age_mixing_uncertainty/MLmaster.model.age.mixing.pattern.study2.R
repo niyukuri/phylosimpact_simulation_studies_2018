@@ -17,23 +17,22 @@ setwd(paste0(work.dir))
 pacman::p_load(snow, parallel, RSimpactCyan, RSimpactHelper, ape, Rsamtools)
 
 
-
-# inputvector <- c(294052610,1.05, 0.25, 0, 3, 0.23, 0.23, 45, 45, -0.7, 2.8,
-#                  -0.3, -0.3,
-#                  -2.7, # conception
-#                  -0.52, -0.05)
+# inputvector <- c(123, -0.52, -0.05, 2.8, 0, 3, 0.25, -0.3, -0.1, 
+#                  # 0.2,
+#                  -1, -90, 0.5, 0.05, -0.14, 5, 7, 12, -2.7) # length(inputvector) = 18
 
 
-master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
+
+MLmaster.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   
   
   source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
   
   
   source("~/phylosimpact_simulation_studies_2018/age_mixing_uncertainty/AR.groups.fun.agemix.R")
-  source("~/phylosimpact_simulation_studies_2018/age_mixing_uncertainty/phylo.AR.groups.fun.agemix.R")
+  source("~/phylosimpact_simulation_studies_2018/age_mixing_uncertainty/MLphylo.AR.groups.fun.agemix.R")
   source("~/phylosimpact_simulation_studies_2018/age_mixing_uncertainty/CAR.groups.fun.agemix.R")
-  source("~/phylosimpact_simulation_studies_2018/age_mixing_uncertainty/phylo.CAR.groups.fun.agemix.R") 
+  source("~/phylosimpact_simulation_studies_2018/age_mixing_uncertainty/MLphylo.CAR.groups.fun.agemix.R") 
   
   # work.dir <- "/home/david/Desktop/mastermodeltest" # on laptop
   
@@ -669,6 +668,36 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
                                   age.group.40.50 = c(40,50))
   
   
+  # val.names <- c("num.men.15.25", "num.women.15.25",
+  #                "num.men.25.40", "num.women.25.40",
+  #                "num.men.40.50", "num.women.40.50",
+  #                
+  #                "partners.men.15.25.w.15.25", "partners.men.15.25.w.25.40", "partners.men.15.25.w.40.50",
+  #                "partners.men.25.40.w.15.25", "partners.men.25.40.w.25.40", "partners.men.25.40.w.40.50",
+  #                "partners.men.40.50.w.15.25", "partners.men.40.50.w.25.40", "partners.men.40.50.w.40.50",
+  #                
+  #                "mean.AD", "median.AD", "sd.AD")
+  
+  flag.women.val <- CAR.95[13] # partners.men.40.50.w.15.25
+  
+  flag.men.val <- CAR.95[9] # partners.men.15.25.w.40.50
+  
+  flag.women <- NA
+  flag.men <- NA
+  
+  if(flag.women.val >=1){
+    flag.women <- 1
+  }else{
+    flag.women <- 0
+  }
+  
+  if(flag.men.val >=1){
+    flag.men <- 1
+  }else{
+    flag.men <- 0
+  }
+  
+  
   # II. MAR
   
   # II.a.
@@ -1067,277 +1096,277 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   
   dirfasttree <- work.dir
   
-  transm.clust.MCAR.cov.35 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                          limitTransmEvents = 7,
-                                                          timewindow = c(30,40),
-                                                          seq.cov = 35,
-                                                          age.group.15.25 = c(15,25),
-                                                          age.group.25.40 = c(25,40),
-                                                          age.group.40.50 = c(40,50))
+  transm.clust.MCAR.cov.35 <- MLphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                            limitTransmEvents = 7,
+                                                            timewindow = c(30,40),
+                                                            seq.cov = 35,
+                                                            age.group.15.25 = c(15,25),
+                                                            age.group.25.40 = c(25,40),
+                                                            age.group.40.50 = c(40,50))
   transm.clust.MCAR.cov.35.val <- sapply(transm.clust.MCAR.cov.35, mean)
   
   
-  transm.clust.MCAR.cov.40 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                          limitTransmEvents = 7,
-                                                          timewindow = c(30,40),
-                                                          seq.cov = 40,
-                                                          age.group.15.25 = c(15,25),
-                                                          age.group.25.40 = c(25,40),
-                                                          age.group.40.50 = c(40,50))
+  transm.clust.MCAR.cov.40 <- MLphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                            limitTransmEvents = 7,
+                                                            timewindow = c(30,40),
+                                                            seq.cov = 40,
+                                                            age.group.15.25 = c(15,25),
+                                                            age.group.25.40 = c(25,40),
+                                                            age.group.40.50 = c(40,50))
   transm.clust.MCAR.cov.40.val <- sapply(transm.clust.MCAR.cov.40, mean)
   
   
   
-  transm.clust.MCAR.cov.45 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                          limitTransmEvents = 7,
-                                                          timewindow = c(30,40),
-                                                          seq.cov = 45,
-                                                          age.group.15.25 = c(15,25),
-                                                          age.group.25.40 = c(25,40),
-                                                          age.group.40.50 = c(40,50))
+  transm.clust.MCAR.cov.45 <- MLphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                            limitTransmEvents = 7,
+                                                            timewindow = c(30,40),
+                                                            seq.cov = 45,
+                                                            age.group.15.25 = c(15,25),
+                                                            age.group.25.40 = c(25,40),
+                                                            age.group.40.50 = c(40,50))
   transm.clust.MCAR.cov.45.val <- sapply(transm.clust.MCAR.cov.45, mean)
   
-  transm.clust.MCAR.cov.50 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                          limitTransmEvents = 7,
-                                                          timewindow = c(30,40),
-                                                          seq.cov = 50,
-                                                          age.group.15.25 = c(15,25),
-                                                          age.group.25.40 = c(25,40),
-                                                          age.group.40.50 = c(40,50))
+  transm.clust.MCAR.cov.50 <- MLphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                            limitTransmEvents = 7,
+                                                            timewindow = c(30,40),
+                                                            seq.cov = 50,
+                                                            age.group.15.25 = c(15,25),
+                                                            age.group.25.40 = c(25,40),
+                                                            age.group.40.50 = c(40,50))
   transm.clust.MCAR.cov.50.val <- sapply(transm.clust.MCAR.cov.50, mean)
   
   
-  transm.clust.MCAR.cov.55 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                          limitTransmEvents = 7,
-                                                          timewindow = c(30,40),
-                                                          seq.cov = 55,
-                                                          age.group.15.25 = c(15,25),
-                                                          age.group.25.40 = c(25,40),
-                                                          age.group.40.50 = c(40,50))
+  transm.clust.MCAR.cov.55 <- MLphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                            limitTransmEvents = 7,
+                                                            timewindow = c(30,40),
+                                                            seq.cov = 55,
+                                                            age.group.15.25 = c(15,25),
+                                                            age.group.25.40 = c(25,40),
+                                                            age.group.40.50 = c(40,50))
   transm.clust.MCAR.cov.55.val <- sapply(transm.clust.MCAR.cov.55, mean)
   
   
   
-  transm.clust.MCAR.cov.60 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                          limitTransmEvents = 7,
-                                                          timewindow = c(30,40),
-                                                          seq.cov = 60,
-                                                          age.group.15.25 = c(15,25),
-                                                          age.group.25.40 = c(25,40),
-                                                          age.group.40.50 = c(40,50))
+  transm.clust.MCAR.cov.60 <- MLphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                            limitTransmEvents = 7,
+                                                            timewindow = c(30,40),
+                                                            seq.cov = 60,
+                                                            age.group.15.25 = c(15,25),
+                                                            age.group.25.40 = c(25,40),
+                                                            age.group.40.50 = c(40,50))
   transm.clust.MCAR.cov.60.val <- sapply(transm.clust.MCAR.cov.60, mean)
   
   
   
-  transm.clust.MCAR.cov.65 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                          limitTransmEvents = 7,
-                                                          timewindow = c(30,40),
-                                                          seq.cov = 65,
-                                                          age.group.15.25 = c(15,25),
-                                                          age.group.25.40 = c(25,40),
-                                                          age.group.40.50 = c(40,50))
+  transm.clust.MCAR.cov.65 <- MLphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                            limitTransmEvents = 7,
+                                                            timewindow = c(30,40),
+                                                            seq.cov = 65,
+                                                            age.group.15.25 = c(15,25),
+                                                            age.group.25.40 = c(25,40),
+                                                            age.group.40.50 = c(40,50))
   transm.clust.MCAR.cov.65.val <- sapply(transm.clust.MCAR.cov.65, mean)
   
   
-  transm.clust.MCAR.cov.70 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                          limitTransmEvents = 7,
-                                                          timewindow = c(30,40),
-                                                          seq.cov = 70,
-                                                          age.group.15.25 = c(15,25),
-                                                          age.group.25.40 = c(25,40),
-                                                          age.group.40.50 = c(40,50))
+  transm.clust.MCAR.cov.70 <- MLphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                            limitTransmEvents = 7,
+                                                            timewindow = c(30,40),
+                                                            seq.cov = 70,
+                                                            age.group.15.25 = c(15,25),
+                                                            age.group.25.40 = c(25,40),
+                                                            age.group.40.50 = c(40,50))
   transm.clust.MCAR.cov.70.val <- sapply(transm.clust.MCAR.cov.70, mean)
   
-  transm.clust.MCAR.cov.75 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                          limitTransmEvents = 7,
-                                                          timewindow = c(30,40),
-                                                          seq.cov = 75,
-                                                          age.group.15.25 = c(15,25),
-                                                          age.group.25.40 = c(25,40),
-                                                          age.group.40.50 = c(40,50))
+  transm.clust.MCAR.cov.75 <- MLphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                            limitTransmEvents = 7,
+                                                            timewindow = c(30,40),
+                                                            seq.cov = 75,
+                                                            age.group.15.25 = c(15,25),
+                                                            age.group.25.40 = c(25,40),
+                                                            age.group.40.50 = c(40,50))
   transm.clust.MCAR.cov.75.val <- sapply(transm.clust.MCAR.cov.75, mean)
   
-  transm.clust.MCAR.cov.80 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                          limitTransmEvents = 7,
-                                                          timewindow = c(30,40),
-                                                          seq.cov = 80,
-                                                          age.group.15.25 = c(15,25),
-                                                          age.group.25.40 = c(25,40),
-                                                          age.group.40.50 = c(40,50))
+  transm.clust.MCAR.cov.80 <- MLphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                            limitTransmEvents = 7,
+                                                            timewindow = c(30,40),
+                                                            seq.cov = 80,
+                                                            age.group.15.25 = c(15,25),
+                                                            age.group.25.40 = c(25,40),
+                                                            age.group.40.50 = c(40,50))
   transm.clust.MCAR.cov.80.val <- sapply(transm.clust.MCAR.cov.80, mean)
   
-  transm.clust.MCAR.cov.85 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                          limitTransmEvents = 7,
-                                                          timewindow = c(30,40),
-                                                          seq.cov = 85,
-                                                          age.group.15.25 = c(15,25),
-                                                          age.group.25.40 = c(25,40),
-                                                          age.group.40.50 = c(40,50))
+  transm.clust.MCAR.cov.85 <- MLphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                            limitTransmEvents = 7,
+                                                            timewindow = c(30,40),
+                                                            seq.cov = 85,
+                                                            age.group.15.25 = c(15,25),
+                                                            age.group.25.40 = c(25,40),
+                                                            age.group.40.50 = c(40,50))
   transm.clust.MCAR.cov.85.val <- sapply(transm.clust.MCAR.cov.85, mean)
   
-  transm.clust.MCAR.cov.90 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                          limitTransmEvents = 7,
-                                                          timewindow = c(30,40),
-                                                          seq.cov = 90,
-                                                          age.group.15.25 = c(15,25),
-                                                          age.group.25.40 = c(25,40),
-                                                          age.group.40.50 = c(40,50))
+  transm.clust.MCAR.cov.90 <- MLphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                            limitTransmEvents = 7,
+                                                            timewindow = c(30,40),
+                                                            seq.cov = 90,
+                                                            age.group.15.25 = c(15,25),
+                                                            age.group.25.40 = c(25,40),
+                                                            age.group.40.50 = c(40,50))
   transm.clust.MCAR.cov.90.val <- sapply(transm.clust.MCAR.cov.90, mean)
   
-  transm.clust.MCAR.cov.95 <- phylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                          limitTransmEvents = 7,
-                                                          timewindow = c(30,40),
-                                                          seq.cov = 95,
-                                                          age.group.15.25 = c(15,25),
-                                                          age.group.25.40 = c(25,40),
-                                                          age.group.40.50 = c(40,50))
+  transm.clust.MCAR.cov.95 <- MLphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                            limitTransmEvents = 7,
+                                                            timewindow = c(30,40),
+                                                            seq.cov = 95,
+                                                            age.group.15.25 = c(15,25),
+                                                            age.group.25.40 = c(25,40),
+                                                            age.group.40.50 = c(40,50))
   transm.clust.MCAR.cov.95.val <- sapply(transm.clust.MCAR.cov.95, mean)
   
   
-
+  
   
   
   # IV. Transmission clusters with MAR
   
   # IV.a 
   
-  transm.clust.AR.a.cov.35 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                         limitTransmEvents = 7,
-                                                         timewindow = c(30,40),
-                                                         seq.cov = 35,
-                                                         seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                                         age.group.15.25 = c(15,25),
-                                                         age.group.25.40 = c(25,40),
-                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.a.cov.35 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 35,
+                                                           seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50))
   transm.clust.AR.a.cov.35.val <- sapply(transm.clust.AR.a.cov.35, mean)
   
-  transm.clust.AR.a.cov.40 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                         limitTransmEvents = 7,
-                                                         timewindow = c(30,40),
-                                                         seq.cov = 40,
-                                                         seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                                         age.group.15.25 = c(15,25),
-                                                         age.group.25.40 = c(25,40),
-                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.a.cov.40 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 40,
+                                                           seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50))
   transm.clust.AR.a.cov.40.val <- sapply(transm.clust.AR.a.cov.40, mean)
   
-  transm.clust.AR.a.cov.45 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                         limitTransmEvents = 7,
-                                                         timewindow = c(30,40),
-                                                         seq.cov = 45,
-                                                         seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                                         age.group.15.25 = c(15,25),
-                                                         age.group.25.40 = c(25,40),
-                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.a.cov.45 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 45,
+                                                           seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50))
   transm.clust.AR.a.cov.45.val <- sapply(transm.clust.AR.a.cov.45, mean)
   
-  transm.clust.AR.a.cov.50 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                         limitTransmEvents = 7,
-                                                         timewindow = c(30,40),
-                                                         seq.cov = 50,
-                                                         seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                                         age.group.15.25 = c(15,25),
-                                                         age.group.25.40 = c(25,40),
-                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.a.cov.50 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 50,
+                                                           seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50))
   transm.clust.AR.a.cov.50.val <- sapply(transm.clust.AR.a.cov.50, mean)
   
-  transm.clust.AR.a.cov.55 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                         limitTransmEvents = 7,
-                                                         timewindow = c(30,40),
-                                                         seq.cov = 55,
-                                                         seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                                         age.group.15.25 = c(15,25),
-                                                         age.group.25.40 = c(25,40),
-                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.a.cov.55 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 55,
+                                                           seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50))
   transm.clust.AR.a.cov.55.val <- sapply(transm.clust.AR.a.cov.55, mean)
   
-  transm.clust.AR.a.cov.60 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                         limitTransmEvents = 7,
-                                                         timewindow = c(30,40),
-                                                         seq.cov = 60,
-                                                         seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                                         age.group.15.25 = c(15,25),
-                                                         age.group.25.40 = c(25,40),
-                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.a.cov.60 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 60,
+                                                           seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50))
   transm.clust.AR.a.cov.60.val <- sapply(transm.clust.AR.a.cov.60, mean)
   
   
   
-  transm.clust.AR.a.cov.65 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                         limitTransmEvents = 7,
-                                                         timewindow = c(30,40),
-                                                         seq.cov = 65,
-                                                         seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                                         age.group.15.25 = c(15,25),
-                                                         age.group.25.40 = c(25,40),
-                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.a.cov.65 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 65,
+                                                           seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50))
   transm.clust.AR.a.cov.65.val <- sapply(transm.clust.AR.a.cov.65, mean)
   
-  transm.clust.AR.a.cov.70 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                         limitTransmEvents = 7,
-                                                         timewindow = c(30,40),
-                                                         seq.cov = 70,
-                                                         seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                                         age.group.15.25 = c(15,25),
-                                                         age.group.25.40 = c(25,40),
-                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.a.cov.70 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 70,
+                                                           seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50))
   transm.clust.AR.a.cov.70.val <- sapply(transm.clust.AR.a.cov.70, mean)
   
-  transm.clust.AR.a.cov.75 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                         limitTransmEvents = 7,
-                                                         timewindow = c(30,40),
-                                                         seq.cov = 75,
-                                                         seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                                         age.group.15.25 = c(15,25),
-                                                         age.group.25.40 = c(25,40),
-                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.a.cov.75 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 75,
+                                                           seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50))
   transm.clust.AR.a.cov.75.val <- sapply(transm.clust.AR.a.cov.75, mean)
   
   
   
-  transm.clust.AR.a.cov.80 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                         limitTransmEvents = 7,
-                                                         timewindow = c(30,40),
-                                                         seq.cov = 80,
-                                                         seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                                         age.group.15.25 = c(15,25),
-                                                         age.group.25.40 = c(25,40),
-                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.a.cov.80 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 80,
+                                                           seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50))
   transm.clust.AR.a.cov.80.val <- sapply(transm.clust.AR.a.cov.80, mean)
   
   
   
-  transm.clust.AR.a.cov.85 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                         limitTransmEvents = 7,
-                                                         timewindow = c(30,40),
-                                                         seq.cov = 85,
-                                                         seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                                         age.group.15.25 = c(15,25),
-                                                         age.group.25.40 = c(25,40),
-                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.a.cov.85 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 85,
+                                                           seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50))
   transm.clust.AR.a.cov.85.val <- sapply(transm.clust.AR.a.cov.85, mean)
   
   
-  transm.clust.AR.a.cov.90 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                         limitTransmEvents = 7,
-                                                         timewindow = c(30,40),
-                                                         seq.cov = 90,
-                                                         seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                                         age.group.15.25 = c(15,25),
-                                                         age.group.25.40 = c(25,40),
-                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.a.cov.90 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 90,
+                                                           seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50))
   transm.clust.AR.a.cov.90.val <- sapply(transm.clust.AR.a.cov.90, mean)
   
   
   
-  transm.clust.AR.a.cov.95 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                         limitTransmEvents = 7,
-                                                         timewindow = c(30,40),
-                                                         seq.cov = 95,
-                                                         seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                                         age.group.15.25 = c(15,25),
-                                                         age.group.25.40 = c(25,40),
-                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.a.cov.95 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 95,
+                                                           seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50))
   transm.clust.AR.a.cov.95.val <- sapply(transm.clust.AR.a.cov.95, mean)
   
   
@@ -1346,150 +1375,150 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   # IV.b
   
   
-  transm.clust.AR.b.cov.35 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                         limitTransmEvents = 7,
-                                                         timewindow = c(30,40),
-                                                         seq.cov = 35,
-                                                         seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
-                                                         age.group.15.25 = c(15,25),
-                                                         age.group.25.40 = c(25,40),
-                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.b.cov.35 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 35,
+                                                           seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50))
   transm.clust.AR.b.cov.35.val <- sapply(transm.clust.AR.b.cov.35, mean)
   
   
-  transm.clust.AR.b.cov.40 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                         limitTransmEvents = 7,
-                                                         timewindow = c(30,40),
-                                                         seq.cov = 40,
-                                                         seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
-                                                         age.group.15.25 = c(15,25),
-                                                         age.group.25.40 = c(25,40),
-                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.b.cov.40 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 40,
+                                                           seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50))
   transm.clust.AR.b.cov.40.val <- sapply(transm.clust.AR.b.cov.40, mean)
   
   
-  transm.clust.AR.b.cov.45 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                         limitTransmEvents = 7,
-                                                         timewindow = c(30,40),
-                                                         seq.cov = 45,
-                                                         seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
-                                                         age.group.15.25 = c(15,25),
-                                                         age.group.25.40 = c(25,40),
-                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.b.cov.45 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 45,
+                                                           seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50))
   transm.clust.AR.b.cov.45.val <- sapply(transm.clust.AR.b.cov.45, mean)
   
   
-  transm.clust.AR.b.cov.50 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                         limitTransmEvents = 7,
-                                                         timewindow = c(30,40),
-                                                         seq.cov = 50,
-                                                         seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
-                                                         age.group.15.25 = c(15,25),
-                                                         age.group.25.40 = c(25,40),
-                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.b.cov.50 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 50,
+                                                           seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50))
   transm.clust.AR.b.cov.50.val <- sapply(transm.clust.AR.b.cov.50, mean)
   
   
-  transm.clust.AR.b.cov.55 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                         limitTransmEvents = 7,
-                                                         timewindow = c(30,40),
-                                                         seq.cov = 55,
-                                                         seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
-                                                         age.group.15.25 = c(15,25),
-                                                         age.group.25.40 = c(25,40),
-                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.b.cov.55 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 55,
+                                                           seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50))
   transm.clust.AR.b.cov.55.val <- sapply(transm.clust.AR.b.cov.55, mean)
   
   
-  transm.clust.AR.b.cov.60 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                         limitTransmEvents = 7,
-                                                         timewindow = c(30,40),
-                                                         seq.cov = 60,
-                                                         seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
-                                                         age.group.15.25 = c(15,25),
-                                                         age.group.25.40 = c(25,40),
-                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.b.cov.60 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 60,
+                                                           seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50))
   transm.clust.AR.b.cov.60.val <- sapply(transm.clust.AR.b.cov.60, mean)
   
   
   
-  transm.clust.AR.b.cov.65 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                         limitTransmEvents = 7,
-                                                         timewindow = c(30,40),
-                                                         seq.cov = 65,
-                                                         seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
-                                                         age.group.15.25 = c(15,25),
-                                                         age.group.25.40 = c(25,40),
-                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.b.cov.65 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 65,
+                                                           seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50))
   transm.clust.AR.b.cov.65.val <- sapply(transm.clust.AR.b.cov.65, mean)
   
   
-  transm.clust.AR.b.cov.70 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                         limitTransmEvents = 7,
-                                                         timewindow = c(30,40),
-                                                         seq.cov = 70,
-                                                         seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
-                                                         age.group.15.25 = c(15,25),
-                                                         age.group.25.40 = c(25,40),
-                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.b.cov.70 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 70,
+                                                           seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50))
   transm.clust.AR.b.cov.70.val <- sapply(transm.clust.AR.b.cov.70, mean)
   
   
-  transm.clust.AR.b.cov.75 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                         limitTransmEvents = 7,
-                                                         timewindow = c(30,40),
-                                                         seq.cov = 75,
-                                                         seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
-                                                         age.group.15.25 = c(15,25),
-                                                         age.group.25.40 = c(25,40),
-                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.b.cov.75 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 75,
+                                                           seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50))
   transm.clust.AR.b.cov.75.val <- sapply(transm.clust.AR.b.cov.75, mean)
   
   
   
-  transm.clust.AR.b.cov.80 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                         limitTransmEvents = 7,
-                                                         timewindow = c(30,40),
-                                                         seq.cov = 80,
-                                                         seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
-                                                         age.group.15.25 = c(15,25),
-                                                         age.group.25.40 = c(25,40),
-                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.b.cov.80 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 80,
+                                                           seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50))
   transm.clust.AR.b.cov.80.val <- sapply(transm.clust.AR.b.cov.80, mean)
   
   
   
-  transm.clust.AR.b.cov.85 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                         limitTransmEvents = 7,
-                                                         timewindow = c(30,40),
-                                                         seq.cov = 85,
-                                                         seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
-                                                         age.group.15.25 = c(15,25),
-                                                         age.group.25.40 = c(25,40),
-                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.b.cov.85 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 85,
+                                                           seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50))
   transm.clust.AR.b.cov.85.val <- sapply(transm.clust.AR.b.cov.85, mean)
   
   
-  transm.clust.AR.b.cov.90 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                         limitTransmEvents = 7,
-                                                         timewindow = c(30,40),
-                                                         seq.cov = 90,
-                                                         seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
-                                                         age.group.15.25 = c(15,25),
-                                                         age.group.25.40 = c(25,40),
-                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.b.cov.90 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 90,
+                                                           seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50))
   transm.clust.AR.b.cov.90.val <- sapply(transm.clust.AR.b.cov.90, mean)
   
   
   
-  transm.clust.AR.b.cov.95 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                         limitTransmEvents = 7,
-                                                         timewindow = c(30,40),
-                                                         seq.cov = 95,
-                                                         seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
-                                                         age.group.15.25 = c(15,25),
-                                                         age.group.25.40 = c(25,40),
-                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.b.cov.95 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 95,
+                                                           seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50))
   transm.clust.AR.b.cov.95.val <- sapply(transm.clust.AR.b.cov.95, mean)
   
   
@@ -1498,149 +1527,149 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   # IV.c
   
   
-  transm.clust.AR.c.cov.35 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                         limitTransmEvents = 7,
-                                                         timewindow = c(30,40),
-                                                         seq.cov = 35,
-                                                         seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
-                                                         age.group.15.25 = c(15,25),
-                                                         age.group.25.40 = c(25,40),
-                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.c.cov.35 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 35,
+                                                           seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50))
   transm.clust.AR.c.cov.35.val <- sapply(transm.clust.AR.c.cov.35, mean)
   
-  transm.clust.AR.c.cov.40 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                         limitTransmEvents = 7,
-                                                         timewindow = c(30,40),
-                                                         seq.cov = 40,
-                                                         seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
-                                                         age.group.15.25 = c(15,25),
-                                                         age.group.25.40 = c(25,40),
-                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.c.cov.40 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 40,
+                                                           seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50))
   transm.clust.AR.c.cov.40.val <- sapply(transm.clust.AR.c.cov.40, mean)
   
   
-  transm.clust.AR.c.cov.45 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                         limitTransmEvents = 7,
-                                                         timewindow = c(30,40),
-                                                         seq.cov = 45,
-                                                         seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
-                                                         age.group.15.25 = c(15,25),
-                                                         age.group.25.40 = c(25,40),
-                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.c.cov.45 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 45,
+                                                           seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50))
   transm.clust.AR.c.cov.45.val <- sapply(transm.clust.AR.c.cov.45, mean)
   
   
-  transm.clust.AR.c.cov.50 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                         limitTransmEvents = 7,
-                                                         timewindow = c(30,40),
-                                                         seq.cov = 50,
-                                                         seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
-                                                         age.group.15.25 = c(15,25),
-                                                         age.group.25.40 = c(25,40),
-                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.c.cov.50 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 50,
+                                                           seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50))
   transm.clust.AR.c.cov.50.val <- sapply(transm.clust.AR.c.cov.50, mean)
   
   
-  transm.clust.AR.c.cov.55 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                         limitTransmEvents = 7,
-                                                         timewindow = c(30,40),
-                                                         seq.cov = 55,
-                                                         seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
-                                                         age.group.15.25 = c(15,25),
-                                                         age.group.25.40 = c(25,40),
-                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.c.cov.55 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 55,
+                                                           seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50))
   transm.clust.AR.c.cov.55.val <- sapply(transm.clust.AR.c.cov.55, mean)
   
   
-  transm.clust.AR.c.cov.60 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                         limitTransmEvents = 7,
-                                                         timewindow = c(30,40),
-                                                         seq.cov = 60,
-                                                         seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
-                                                         age.group.15.25 = c(15,25),
-                                                         age.group.25.40 = c(25,40),
-                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.c.cov.60 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 60,
+                                                           seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50))
   transm.clust.AR.c.cov.60.val <- sapply(transm.clust.AR.c.cov.60, mean)
   
   
   
-  transm.clust.AR.c.cov.65 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                         limitTransmEvents = 7,
-                                                         timewindow = c(30,40),
-                                                         seq.cov = 65,
-                                                         seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
-                                                         age.group.15.25 = c(15,25),
-                                                         age.group.25.40 = c(25,40),
-                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.c.cov.65 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 65,
+                                                           seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50))
   transm.clust.AR.c.cov.65.val <- sapply(transm.clust.AR.c.cov.65, mean)
   
   
-  transm.clust.AR.c.cov.70 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                         limitTransmEvents = 7,
-                                                         timewindow = c(30,40),
-                                                         seq.cov = 70,
-                                                         seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
-                                                         age.group.15.25 = c(15,25),
-                                                         age.group.25.40 = c(25,40),
-                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.c.cov.70 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 70,
+                                                           seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50))
   transm.clust.AR.c.cov.70.val <- sapply(transm.clust.AR.c.cov.70, mean)
   
   
-  transm.clust.AR.c.cov.75 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                         limitTransmEvents = 7,
-                                                         timewindow = c(30,40),
-                                                         seq.cov = 75,
-                                                         seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
-                                                         age.group.15.25 = c(15,25),
-                                                         age.group.25.40 = c(25,40),
-                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.c.cov.75 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 75,
+                                                           seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50))
   transm.clust.AR.c.cov.75.val <- sapply(transm.clust.AR.c.cov.75, mean)
   
   
   
-  transm.clust.AR.c.cov.80 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                         limitTransmEvents = 7,
-                                                         timewindow = c(30,40),
-                                                         seq.cov = 80,
-                                                         seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
-                                                         age.group.15.25 = c(15,25),
-                                                         age.group.25.40 = c(25,40),
-                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.c.cov.80 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 80,
+                                                           seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50))
   transm.clust.AR.c.cov.80.val <- sapply(transm.clust.AR.c.cov.80, mean)
   
   
   
-  transm.clust.AR.c.cov.85 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                         limitTransmEvents = 7,
-                                                         timewindow = c(30,40),
-                                                         seq.cov = 85,
-                                                         seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
-                                                         age.group.15.25 = c(15,25),
-                                                         age.group.25.40 = c(25,40),
-                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.c.cov.85 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 85,
+                                                           seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50))
   transm.clust.AR.c.cov.85.val <- sapply(transm.clust.AR.c.cov.85, mean)
   
   
-  transm.clust.AR.c.cov.90 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                         limitTransmEvents = 7,
-                                                         timewindow = c(30,40),
-                                                         seq.cov = 90,
-                                                         seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
-                                                         age.group.15.25 = c(15,25),
-                                                         age.group.25.40 = c(25,40),
-                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.c.cov.90 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 90,
+                                                           seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50))
   transm.clust.AR.c.cov.90.val <- sapply(transm.clust.AR.c.cov.90, mean)
   
   
   
-  transm.clust.AR.c.cov.95 <- phylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                         limitTransmEvents = 7,
-                                                         timewindow = c(30,40),
-                                                         seq.cov = 95,
-                                                         seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
-                                                         age.group.15.25 = c(15,25),
-                                                         age.group.25.40 = c(25,40),
-                                                         age.group.40.50 = c(40,50))
+  transm.clust.AR.c.cov.95 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 95,
+                                                           seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50))
   transm.clust.AR.c.cov.95.val <- sapply(transm.clust.AR.c.cov.95, mean)
   
   
@@ -1806,7 +1835,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
                                name.clust.AR.c.90, name.clust.AR.c.95)
   
   # ALL names together
-  names.scenari <- c("Pop.mean.AD", "Pop.med.AD", "Pop.sd.AD",
+  names.scenari <- c("flag.women", "flag.men", "Pop.mean.AD", "Pop.med.AD", "Pop.sd.AD",
                      
                      name.MCAR.scenari, name.AR.a.scenari, name.AR.b.scenari, 
                      name.AR.c.scenari, name.clust.MCAR.scenari,
@@ -1814,7 +1843,7 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
                      name.clust.AR.c.scenari)
   
   
-  outputvector <- c(mean.AD, med.AD, sd.AD,
+  outputvector <- c(flag.women, flag.men, mean.AD, med.AD, sd.AD,
                     
                     CAR.35, CAR.40, CAR.45, CAR.50, CAR.55, CAR.60, CAR.65, 
                     CAR.70, CAR.75, CAR.80, CAR.85, CAR.90, CAR.95,
@@ -1862,6 +1891,9 @@ master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
   
 }
 
+# debugonce(MLmaster.model.age.mixing.pattern.study2)
+# 
+# MLmaster.model.age.mixing.pattern.study2(inputvector = inputvector)
 # unlink(paste0("temp"), recursive = TRUE)
 
 # 
@@ -1876,6 +1908,19 @@ inputvector <- c(-0.52, -0.05, 2.8, 0, 3, 0.25, -0.3, -0.1,
                  # 0.2,
                  -1, -90, 0.5, 0.05, -0.14, 5, 7, 12, -2.7) # length(inputvector) = 18
 
+
+inputvector.age.gap <- c(-0.52, -0.05, 5, 7, 3, 0.25, -0.3, -0.1, 
+                         # 0.2,
+                         -1, -90, 0.5, 0.05, -0.14, 5, 7, 12, -2.7) # length(inputvector) = 18
+
+# 
+# 
+# cfg.list["formation.hazard.agegapry.baseline"] <- inputvector[4] # [3] # 2 c("unif", 1, 3)
+# cfg.list["person.agegap.man.dist.normal.mu"] <- inputvector[5] # [4] # 0 c("unif", -0.5, 0.5)
+# cfg.list["person.agegap.woman.dist.normal.mu"] <- inputvector[5] # [4] # 0
+# cfg.list["person.agegap.man.dist.normal.sigma"] <- inputvector[6] # [5] # 3 c("unif", 2, 4)
+# cfg.list["person.agegap.woman.dist.normal.sigma"] <- inputvector[6] # [5] # 3 
+
 # 
 # 
 # 
@@ -1888,7 +1933,7 @@ inputvector <- c(-0.52, -0.05, 2.8, 0, 3, 0.25, -0.3, -0.1,
 # # replication number
 # 
 
-reps <- 100
+reps <- 4
 
 # 
 # 
@@ -1901,7 +1946,7 @@ inputmatrix <- matrix(rep(inputvector, reps), byrow = TRUE, nrow = reps)
 # 
 # sim.start.time <- proc.time()[3] # ! IDs.gender.men50.women50.age.group.features
 # 
-features.matrix <- simpact.parallel(model = master.model.age.mixing.pattern.study2,
+features.matrix <- simpact.parallel(model = MLmaster.model.age.mixing.pattern.study2,
                                     actual.input.matrix = inputmatrix,
                                     seed_count = 124,
                                     n_cluster = 24)
@@ -1918,7 +1963,7 @@ features.matrix <- simpact.parallel(model = master.model.age.mixing.pattern.stud
 # # save features in the working directory
 # 
 
-write.csv(features.matrix, file = paste0(work.dir,"/master.model.age.mixing.pattern.study2.csv"))
+write.csv(features.matrix, file = paste0(work.dir,"/MLmaster.model.age.mixing.pattern.toy1.csv"))
 
 # 
 # unlink(paste0("temp"), recursive = TRUE)
