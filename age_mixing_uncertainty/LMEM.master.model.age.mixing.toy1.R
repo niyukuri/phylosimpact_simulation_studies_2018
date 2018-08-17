@@ -29,11 +29,11 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
   source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R") # 
   
   source("~/phylosimpact_simulation_studies_2018/age_mixing_uncertainty/mixed.effect.fit.transmission.clusters.R")  
-
+  
   source("~/phylosimpact_simulation_studies_2018/age_mixing_uncertainty/LMEMphylo.AR.groups.fun.agemix.R")
   source("~/phylosimpact_simulation_studies_2018/age_mixing_uncertainty/LMEMphylo.CAR.groups.fun.agemix.R") 
-  source("~/phylosimpact_simulation_studies_2018/age_mixing_uncertainty/phylo.AR.groups.fun.agemix.R")
-  source("~/phylosimpact_simulation_studies_2018/age_mixing_uncertainty/phylo.CAR.groups.fun.agemix.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/age_mixing_uncertainty/CAR.groups.fun.agemix.R") 
   
   # work.dir <- "/home/david/Desktop/mastermodeltest" # on laptop
   
@@ -610,133 +610,170 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
   
   dirfasttree <- work.dir
   
-  sub.dir.rename <- sub.dir.rename
   
-  transm.clust.MCAR.cov.35 <- LMEMphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                            limitTransmEvents = 7,
-                                                            timewindow = c(30,40),
-                                                            seq.cov = 35,
-                                                            age.group.15.25 = c(15,25),
-                                                            age.group.25.40 = c(25,40),
-                                                            age.group.40.50 = c(40,50))
+  transm.clust.MCAR.cov.35 <- LMEMphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, 
+                                                              work.dir = work.dir,  
+                                                              dirfasttree = dirfasttree, 
+                                                              sub.dir.rename = sub.dir.rename,
+                                                              limitTransmEvents = 7,
+                                                              timewindow = c(30,40),
+                                                              seq.cov = 35,
+                                                              age.group.15.25 = c(15,25),
+                                                              age.group.25.40 = c(25,40),
+                                                              age.group.40.50 = c(40,50))
   transm.clust.MCAR.cov.35.val <- sapply(transm.clust.MCAR.cov.35, mean)
-
   
   
-  transm.clust.MCAR.cov.40 <- LMEMphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                            limitTransmEvents = 7,
-                                                            timewindow = c(30,40),
-                                                            seq.cov = 40,
-                                                            age.group.15.25 = c(15,25),
-                                                            age.group.25.40 = c(25,40),
-                                                            age.group.40.50 = c(40,50))
+  
+  transm.clust.MCAR.cov.40 <- LMEMphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, 
+                                                              work.dir = work.dir,   
+                                                              dirfasttree = dirfasttree,  
+                                                              sub.dir.rename = sub.dir.rename,
+                                                              limitTransmEvents = 7,
+                                                              timewindow = c(30,40),
+                                                              seq.cov = 40,
+                                                              age.group.15.25 = c(15,25),
+                                                              age.group.25.40 = c(25,40),
+                                                              age.group.40.50 = c(40,50))
   transm.clust.MCAR.cov.40.val <- sapply(transm.clust.MCAR.cov.40, mean)
   
   
   
-  transm.clust.MCAR.cov.45 <- LMEMphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                            limitTransmEvents = 7,
-                                                            timewindow = c(30,40),
-                                                            seq.cov = 45,
-                                                            age.group.15.25 = c(15,25),
-                                                            age.group.25.40 = c(25,40),
-                                                            age.group.40.50 = c(40,50))
+  transm.clust.MCAR.cov.45 <- LMEMphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, 
+                                                              work.dir = work.dir,   dirfasttree = dirfasttree, 
+                                                              sub.dir.rename = sub.dir.rename,
+                                                              limitTransmEvents = 7,
+                                                              timewindow = c(30,40),
+                                                              seq.cov = 45,
+                                                              age.group.15.25 = c(15,25),
+                                                              age.group.25.40 = c(25,40),
+                                                              age.group.40.50 = c(40,50))
   transm.clust.MCAR.cov.45.val <- sapply(transm.clust.MCAR.cov.45, mean)
   
-  transm.clust.MCAR.cov.50 <- LMEMphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                            limitTransmEvents = 7,
-                                                            timewindow = c(30,40),
-                                                            seq.cov = 50,
-                                                            age.group.15.25 = c(15,25),
-                                                            age.group.25.40 = c(25,40),
-                                                            age.group.40.50 = c(40,50))
+  transm.clust.MCAR.cov.50 <- LMEMphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, 
+                                                              work.dir = work.dir,  
+                                                              dirfasttree = dirfasttree, 
+                                                              sub.dir.rename = sub.dir.rename,
+                                                              limitTransmEvents = 7,
+                                                              timewindow = c(30,40),
+                                                              seq.cov = 50,
+                                                              age.group.15.25 = c(15,25),
+                                                              age.group.25.40 = c(25,40),
+                                                              age.group.40.50 = c(40,50))
   transm.clust.MCAR.cov.50.val <- sapply(transm.clust.MCAR.cov.50, mean)
   
   
-  transm.clust.MCAR.cov.55 <- LMEMphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                            limitTransmEvents = 7,
-                                                            timewindow = c(30,40),
-                                                            seq.cov = 55,
-                                                            age.group.15.25 = c(15,25),
-                                                            age.group.25.40 = c(25,40),
-                                                            age.group.40.50 = c(40,50))
+  transm.clust.MCAR.cov.55 <- LMEMphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, 
+                                                              work.dir = work.dir,   
+                                                              dirfasttree = dirfasttree,  
+                                                              sub.dir.rename = sub.dir.rename,
+                                                              limitTransmEvents = 7,
+                                                              timewindow = c(30,40),
+                                                              seq.cov = 55,
+                                                              age.group.15.25 = c(15,25),
+                                                              age.group.25.40 = c(25,40),
+                                                              age.group.40.50 = c(40,50))
   transm.clust.MCAR.cov.55.val <- sapply(transm.clust.MCAR.cov.55, mean)
   
   
   
-  transm.clust.MCAR.cov.60 <- LMEMphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                            limitTransmEvents = 7,
-                                                            timewindow = c(30,40),
-                                                            seq.cov = 60,
-                                                            age.group.15.25 = c(15,25),
-                                                            age.group.25.40 = c(25,40),
-                                                            age.group.40.50 = c(40,50))
+  transm.clust.MCAR.cov.60 <- LMEMphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                              work.dir = work.dir,   
+                                                              dirfasttree = dirfasttree,  
+                                                              sub.dir.rename = sub.dir.rename,
+                                                              limitTransmEvents = 7,
+                                                              timewindow = c(30,40),
+                                                              seq.cov = 60,
+                                                              age.group.15.25 = c(15,25),
+                                                              age.group.25.40 = c(25,40),
+                                                              age.group.40.50 = c(40,50))
   transm.clust.MCAR.cov.60.val <- sapply(transm.clust.MCAR.cov.60, mean)
   
   
   
-  transm.clust.MCAR.cov.65 <- LMEMphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                            limitTransmEvents = 7,
-                                                            timewindow = c(30,40),
-                                                            seq.cov = 65,
-                                                            age.group.15.25 = c(15,25),
-                                                            age.group.25.40 = c(25,40),
-                                                            age.group.40.50 = c(40,50))
+  transm.clust.MCAR.cov.65 <- LMEMphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, 
+                                                              work.dir = work.dir,  
+                                                              dirfasttree = dirfasttree, 
+                                                              sub.dir.rename = sub.dir.rename,
+                                                              limitTransmEvents = 7,
+                                                              timewindow = c(30,40),
+                                                              seq.cov = 65,
+                                                              age.group.15.25 = c(15,25),
+                                                              age.group.25.40 = c(25,40),
+                                                              age.group.40.50 = c(40,50))
   transm.clust.MCAR.cov.65.val <- sapply(transm.clust.MCAR.cov.65, mean)
   
   
-  transm.clust.MCAR.cov.70 <- LMEMphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                            limitTransmEvents = 7,
-                                                            timewindow = c(30,40),
-                                                            seq.cov = 70,
-                                                            age.group.15.25 = c(15,25),
-                                                            age.group.25.40 = c(25,40),
-                                                            age.group.40.50 = c(40,50))
+  transm.clust.MCAR.cov.70 <- LMEMphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, 
+                                                              work.dir = work.dir,   
+                                                              dirfasttree = dirfasttree,  
+                                                              sub.dir.rename = sub.dir.rename,
+                                                              limitTransmEvents = 7,
+                                                              timewindow = c(30,40),
+                                                              seq.cov = 70,
+                                                              age.group.15.25 = c(15,25),
+                                                              age.group.25.40 = c(25,40),
+                                                              age.group.40.50 = c(40,50))
   transm.clust.MCAR.cov.70.val <- sapply(transm.clust.MCAR.cov.70, mean)
   
-  transm.clust.MCAR.cov.75 <- LMEMphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                            limitTransmEvents = 7,
-                                                            timewindow = c(30,40),
-                                                            seq.cov = 75,
-                                                            age.group.15.25 = c(15,25),
-                                                            age.group.25.40 = c(25,40),
-                                                            age.group.40.50 = c(40,50))
+  transm.clust.MCAR.cov.75 <- LMEMphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                              work.dir = work.dir,  
+                                                              dirfasttree = dirfasttree, 
+                                                              sub.dir.rename = sub.dir.rename,
+                                                              limitTransmEvents = 7,
+                                                              timewindow = c(30,40),
+                                                              seq.cov = 75,
+                                                              age.group.15.25 = c(15,25),
+                                                              age.group.25.40 = c(25,40),
+                                                              age.group.40.50 = c(40,50))
   transm.clust.MCAR.cov.75.val <- sapply(transm.clust.MCAR.cov.75, mean)
   
-  transm.clust.MCAR.cov.80 <- LMEMphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                            limitTransmEvents = 7,
-                                                            timewindow = c(30,40),
-                                                            seq.cov = 80,
-                                                            age.group.15.25 = c(15,25),
-                                                            age.group.25.40 = c(25,40),
-                                                            age.group.40.50 = c(40,50))
+  transm.clust.MCAR.cov.80 <- LMEMphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, 
+                                                              work.dir = work.dir,   
+                                                              dirfasttree = dirfasttree, 
+                                                              sub.dir.rename = sub.dir.rename,
+                                                              limitTransmEvents = 7,
+                                                              timewindow = c(30,40),
+                                                              seq.cov = 80,
+                                                              age.group.15.25 = c(15,25),
+                                                              age.group.25.40 = c(25,40),
+                                                              age.group.40.50 = c(40,50))
   transm.clust.MCAR.cov.80.val <- sapply(transm.clust.MCAR.cov.80, mean)
   
-  transm.clust.MCAR.cov.85 <- LMEMphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                            limitTransmEvents = 7,
-                                                            timewindow = c(30,40),
-                                                            seq.cov = 85,
-                                                            age.group.15.25 = c(15,25),
-                                                            age.group.25.40 = c(25,40),
-                                                            age.group.40.50 = c(40,50))
+  transm.clust.MCAR.cov.85 <- LMEMphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, 
+                                                              work.dir = work.dir,  
+                                                              dirfasttree = dirfasttree, 
+                                                              sub.dir.rename = sub.dir.rename,
+                                                              limitTransmEvents = 7,
+                                                              timewindow = c(30,40),
+                                                              seq.cov = 85,
+                                                              age.group.15.25 = c(15,25),
+                                                              age.group.25.40 = c(25,40),
+                                                              age.group.40.50 = c(40,50))
   transm.clust.MCAR.cov.85.val <- sapply(transm.clust.MCAR.cov.85, mean)
   
-  transm.clust.MCAR.cov.90 <- LMEMphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                            limitTransmEvents = 7,
-                                                            timewindow = c(30,40),
-                                                            seq.cov = 90,
-                                                            age.group.15.25 = c(15,25),
-                                                            age.group.25.40 = c(25,40),
-                                                            age.group.40.50 = c(40,50))
+  transm.clust.MCAR.cov.90 <- LMEMphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                              work.dir = work.dir,   
+                                                              dirfasttree = dirfasttree, 
+                                                              sub.dir.rename = sub.dir.rename,
+                                                              limitTransmEvents = 7,
+                                                              timewindow = c(30,40),
+                                                              seq.cov = 90,
+                                                              age.group.15.25 = c(15,25),
+                                                              age.group.25.40 = c(25,40),
+                                                              age.group.40.50 = c(40,50))
   transm.clust.MCAR.cov.90.val <- sapply(transm.clust.MCAR.cov.90, mean)
   
-  transm.clust.MCAR.cov.95 <- LMEMphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                            limitTransmEvents = 7,
-                                                            timewindow = c(30,40),
-                                                            seq.cov = 95,
-                                                            age.group.15.25 = c(15,25),
-                                                            age.group.25.40 = c(25,40),
-                                                            age.group.40.50 = c(40,50))
+  transm.clust.MCAR.cov.95 <- LMEMphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, 
+                                                              work.dir = work.dir,  
+                                                              dirfasttree = dirfasttree, 
+                                                              sub.dir.rename = sub.dir.rename,
+                                                              limitTransmEvents = 7,
+                                                              timewindow = c(30,40),
+                                                              seq.cov = 95,
+                                                              age.group.15.25 = c(15,25),
+                                                              age.group.25.40 = c(25,40),
+                                                              age.group.40.50 = c(40,50))
   transm.clust.MCAR.cov.95.val <- sapply(transm.clust.MCAR.cov.95, mean)
   
   
@@ -747,143 +784,182 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
   
   # IV.a 
   
-  transm.clust.AR.a.cov.35 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                           limitTransmEvents = 7,
-                                                           timewindow = c(30,40),
-                                                           seq.cov = 35,
-                                                           seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                                           age.group.15.25 = c(15,25),
-                                                           age.group.25.40 = c(25,40),
-                                                           age.group.40.50 = c(40,50))
+  transm.clust.AR.a.cov.35 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                             work.dir = work.dir,  
+                                                             dirfasttree = dirfasttree, 
+                                                             sub.dir.rename = sub.dir.rename,
+                                                             limitTransmEvents = 7,
+                                                             timewindow = c(30,40),
+                                                             seq.cov = 35,
+                                                             seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                             age.group.15.25 = c(15,25),
+                                                             age.group.25.40 = c(25,40),
+                                                             age.group.40.50 = c(40,50))
   transm.clust.AR.a.cov.35.val <- sapply(transm.clust.AR.a.cov.35, mean)
   
-  transm.clust.AR.a.cov.40 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                           limitTransmEvents = 7,
-                                                           timewindow = c(30,40),
-                                                           seq.cov = 40,
-                                                           seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                                           age.group.15.25 = c(15,25),
-                                                           age.group.25.40 = c(25,40),
-                                                           age.group.40.50 = c(40,50))
+  transm.clust.AR.a.cov.40 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, 
+                                                             work.dir = work.dir, 
+                                                             dirfasttree = dirfasttree,  
+                                                             sub.dir.rename = sub.dir.rename,
+                                                             limitTransmEvents = 7,
+                                                             timewindow = c(30,40),
+                                                             seq.cov = 40,
+                                                             seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                             age.group.15.25 = c(15,25),
+                                                             age.group.25.40 = c(25,40),
+                                                             age.group.40.50 = c(40,50))
   transm.clust.AR.a.cov.40.val <- sapply(transm.clust.AR.a.cov.40, mean)
   
-  transm.clust.AR.a.cov.45 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                           limitTransmEvents = 7,
-                                                           timewindow = c(30,40),
-                                                           seq.cov = 45,
-                                                           seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                                           age.group.15.25 = c(15,25),
-                                                           age.group.25.40 = c(25,40),
-                                                           age.group.40.50 = c(40,50))
+  transm.clust.AR.a.cov.45 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, 
+                                                             work.dir = work.dir,  
+                                                             dirfasttree = dirfasttree,  
+                                                             sub.dir.rename = sub.dir.rename,
+                                                             limitTransmEvents = 7,
+                                                             timewindow = c(30,40),
+                                                             seq.cov = 45,
+                                                             seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                             age.group.15.25 = c(15,25),
+                                                             age.group.25.40 = c(25,40),
+                                                             age.group.40.50 = c(40,50))
   transm.clust.AR.a.cov.45.val <- sapply(transm.clust.AR.a.cov.45, mean)
   
-  transm.clust.AR.a.cov.50 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                           limitTransmEvents = 7,
-                                                           timewindow = c(30,40),
-                                                           seq.cov = 50,
-                                                           seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                                           age.group.15.25 = c(15,25),
-                                                           age.group.25.40 = c(25,40),
-                                                           age.group.40.50 = c(40,50))
+  transm.clust.AR.a.cov.50 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, 
+                                                             work.dir = work.dir, 
+                                                             dirfasttree = dirfasttree, 
+                                                             sub.dir.rename = sub.dir.rename,
+                                                             limitTransmEvents = 7,
+                                                             timewindow = c(30,40),
+                                                             seq.cov = 50,
+                                                             seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                             age.group.15.25 = c(15,25),
+                                                             age.group.25.40 = c(25,40),
+                                                             age.group.40.50 = c(40,50))
   transm.clust.AR.a.cov.50.val <- sapply(transm.clust.AR.a.cov.50, mean)
   
-  transm.clust.AR.a.cov.55 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                           limitTransmEvents = 7,
-                                                           timewindow = c(30,40),
-                                                           seq.cov = 55,
-                                                           seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                                           age.group.15.25 = c(15,25),
-                                                           age.group.25.40 = c(25,40),
-                                                           age.group.40.50 = c(40,50))
+  transm.clust.AR.a.cov.55 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, 
+                                                             work.dir = work.dir,   
+                                                             dirfasttree = dirfasttree,  
+                                                             sub.dir.rename = sub.dir.rename,
+                                                             limitTransmEvents = 7,
+                                                             timewindow = c(30,40),
+                                                             seq.cov = 55,
+                                                             seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                             age.group.15.25 = c(15,25),
+                                                             age.group.25.40 = c(25,40),
+                                                             age.group.40.50 = c(40,50))
   transm.clust.AR.a.cov.55.val <- sapply(transm.clust.AR.a.cov.55, mean)
   
-  transm.clust.AR.a.cov.60 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                           limitTransmEvents = 7,
-                                                           timewindow = c(30,40),
-                                                           seq.cov = 60,
-                                                           seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                                           age.group.15.25 = c(15,25),
-                                                           age.group.25.40 = c(25,40),
-                                                           age.group.40.50 = c(40,50))
+  transm.clust.AR.a.cov.60 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                             work.dir = work.dir,   
+                                                             dirfasttree = dirfasttree,  
+                                                             sub.dir.rename = sub.dir.rename,
+                                                             limitTransmEvents = 7,
+                                                             timewindow = c(30,40),
+                                                             seq.cov = 60,
+                                                             seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                             age.group.15.25 = c(15,25),
+                                                             age.group.25.40 = c(25,40),
+                                                             age.group.40.50 = c(40,50))
   transm.clust.AR.a.cov.60.val <- sapply(transm.clust.AR.a.cov.60, mean)
   
   
   
-  transm.clust.AR.a.cov.65 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                           limitTransmEvents = 7,
-                                                           timewindow = c(30,40),
-                                                           seq.cov = 65,
-                                                           seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                                           age.group.15.25 = c(15,25),
-                                                           age.group.25.40 = c(25,40),
-                                                           age.group.40.50 = c(40,50))
+  transm.clust.AR.a.cov.65 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, 
+                                                             work.dir = work.dir,  
+                                                             dirfasttree = dirfasttree, 
+                                                             sub.dir.rename = sub.dir.rename,
+                                                             limitTransmEvents = 7,
+                                                             timewindow = c(30,40),
+                                                             seq.cov = 65,
+                                                             seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                             age.group.15.25 = c(15,25),
+                                                             age.group.25.40 = c(25,40),
+                                                             age.group.40.50 = c(40,50))
   transm.clust.AR.a.cov.65.val <- sapply(transm.clust.AR.a.cov.65, mean)
   
-  transm.clust.AR.a.cov.70 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                           limitTransmEvents = 7,
-                                                           timewindow = c(30,40),
-                                                           seq.cov = 70,
-                                                           seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                                           age.group.15.25 = c(15,25),
-                                                           age.group.25.40 = c(25,40),
-                                                           age.group.40.50 = c(40,50))
+  transm.clust.AR.a.cov.70 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, 
+                                                             work.dir = work.dir,  
+                                                             dirfasttree = dirfasttree,
+                                                             sub.dir.rename = sub.dir.rename,
+                                                             limitTransmEvents = 7,
+                                                             timewindow = c(30,40),
+                                                             seq.cov = 70,
+                                                             seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                             age.group.15.25 = c(15,25),
+                                                             age.group.25.40 = c(25,40),
+                                                             age.group.40.50 = c(40,50))
   transm.clust.AR.a.cov.70.val <- sapply(transm.clust.AR.a.cov.70, mean)
   
-  transm.clust.AR.a.cov.75 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                           limitTransmEvents = 7,
-                                                           timewindow = c(30,40),
-                                                           seq.cov = 75,
-                                                           seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                                           age.group.15.25 = c(15,25),
-                                                           age.group.25.40 = c(25,40),
-                                                           age.group.40.50 = c(40,50))
+  transm.clust.AR.a.cov.75 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                             work.dir = work.dir, 
+                                                             dirfasttree = dirfasttree, 
+                                                             sub.dir.rename = sub.dir.rename,
+                                                             limitTransmEvents = 7,
+                                                             timewindow = c(30,40),
+                                                             seq.cov = 75,
+                                                             seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                             age.group.15.25 = c(15,25),
+                                                             age.group.25.40 = c(25,40),
+                                                             age.group.40.50 = c(40,50))
   transm.clust.AR.a.cov.75.val <- sapply(transm.clust.AR.a.cov.75, mean)
   
   
   
-  transm.clust.AR.a.cov.80 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                           limitTransmEvents = 7,
-                                                           timewindow = c(30,40),
-                                                           seq.cov = 80,
-                                                           seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                                           age.group.15.25 = c(15,25),
-                                                           age.group.25.40 = c(25,40),
-                                                           age.group.40.50 = c(40,50))
+  transm.clust.AR.a.cov.80 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, 
+                                                             work.dir = work.dir, 
+                                                             dirfasttree = dirfasttree,  
+                                                             sub.dir.rename = sub.dir.rename,
+                                                             limitTransmEvents = 7,
+                                                             timewindow = c(30,40),
+                                                             seq.cov = 80,
+                                                             seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                             age.group.15.25 = c(15,25),
+                                                             age.group.25.40 = c(25,40),
+                                                             age.group.40.50 = c(40,50))
   transm.clust.AR.a.cov.80.val <- sapply(transm.clust.AR.a.cov.80, mean)
   
   
   
-  transm.clust.AR.a.cov.85 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                           limitTransmEvents = 7,
-                                                           timewindow = c(30,40),
-                                                           seq.cov = 85,
-                                                           seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                                           age.group.15.25 = c(15,25),
-                                                           age.group.25.40 = c(25,40),
-                                                           age.group.40.50 = c(40,50))
+  transm.clust.AR.a.cov.85 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, 
+                                                             work.dir = work.dir,   
+                                                             dirfasttree = dirfasttree,  
+                                                             sub.dir.rename = sub.dir.rename,
+                                                             limitTransmEvents = 7,
+                                                             timewindow = c(30,40),
+                                                             seq.cov = 85,
+                                                             seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                             age.group.15.25 = c(15,25),
+                                                             age.group.25.40 = c(25,40),
+                                                             age.group.40.50 = c(40,50))
   transm.clust.AR.a.cov.85.val <- sapply(transm.clust.AR.a.cov.85, mean)
   
   
-  transm.clust.AR.a.cov.90 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                           limitTransmEvents = 7,
-                                                           timewindow = c(30,40),
-                                                           seq.cov = 90,
-                                                           seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                                           age.group.15.25 = c(15,25),
-                                                           age.group.25.40 = c(25,40),
-                                                           age.group.40.50 = c(40,50))
+  transm.clust.AR.a.cov.90 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                             work.dir = work.dir,  
+                                                             dirfasttree = dirfasttree, 
+                                                             sub.dir.rename = sub.dir.rename,
+                                                             limitTransmEvents = 7,
+                                                             timewindow = c(30,40),
+                                                             seq.cov = 90,
+                                                             seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                             age.group.15.25 = c(15,25),
+                                                             age.group.25.40 = c(25,40),
+                                                             age.group.40.50 = c(40,50))
   transm.clust.AR.a.cov.90.val <- sapply(transm.clust.AR.a.cov.90, mean)
   
   
   
-  transm.clust.AR.a.cov.95 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
-                                                           limitTransmEvents = 7,
-                                                           timewindow = c(30,40),
-                                                           seq.cov = 95,
-                                                           seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                                           age.group.15.25 = c(15,25),
-                                                           age.group.25.40 = c(25,40),
-                                                           age.group.40.50 = c(40,50))
+  transm.clust.AR.a.cov.95 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, 
+                                                             work.dir = work.dir,  
+                                                             dirfasttree = dirfasttree,  
+                                                             sub.dir.rename = sub.dir.rename,
+                                                             limitTransmEvents = 7,
+                                                             timewindow = c(30,40),
+                                                             seq.cov = 95,
+                                                             seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                             age.group.15.25 = c(15,25),
+                                                             age.group.25.40 = c(25,40),
+                                                             age.group.40.50 = c(40,50))
   transm.clust.AR.a.cov.95.val <- sapply(transm.clust.AR.a.cov.95, mean)
   
   
@@ -891,7 +967,10 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
   
   # IV.b
   
-  transm.clust.AR.b.cov.35 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+  transm.clust.AR.b.cov.35 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, 
+                                                             work.dir = work.dir,   
+                                                             dirfasttree = dirfasttree,  
+                                                             sub.dir.rename = sub.dir.rename,
                                                              limitTransmEvents = 7,
                                                              timewindow = c(30,40),
                                                              seq.cov = 35,
@@ -901,7 +980,10 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
                                                              age.group.40.50 = c(40,50))
   transm.clust.AR.b.cov.35.val <- sapply(transm.clust.AR.b.cov.35, mean)
   
-  transm.clust.AR.b.cov.40 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+  transm.clust.AR.b.cov.40 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                             work.dir = work.dir,  
+                                                             dirfasttree = dirfasttree,  
+                                                             sub.dir.rename = sub.dir.rename,
                                                              limitTransmEvents = 7,
                                                              timewindow = c(30,40),
                                                              seq.cov = 40,
@@ -911,7 +993,10 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
                                                              age.group.40.50 = c(40,50))
   transm.clust.AR.b.cov.40.val <- sapply(transm.clust.AR.b.cov.40, mean)
   
-  transm.clust.AR.b.cov.45 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+  transm.clust.AR.b.cov.45 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, 
+                                                             work.dir = work.dir,  
+                                                             dirfasttree = dirfasttree, 
+                                                             sub.dir.rename = sub.dir.rename,
                                                              limitTransmEvents = 7,
                                                              timewindow = c(30,40),
                                                              seq.cov = 45,
@@ -921,7 +1006,10 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
                                                              age.group.40.50 = c(40,50))
   transm.clust.AR.b.cov.45.val <- sapply(transm.clust.AR.b.cov.45, mean)
   
-  transm.clust.AR.b.cov.50 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+  transm.clust.AR.b.cov.50 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, 
+                                                             work.dir = work.dir,   
+                                                             dirfasttree = dirfasttree, 
+                                                             sub.dir.rename = sub.dir.rename,
                                                              limitTransmEvents = 7,
                                                              timewindow = c(30,40),
                                                              seq.cov = 50,
@@ -931,7 +1019,10 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
                                                              age.group.40.50 = c(40,50))
   transm.clust.AR.b.cov.50.val <- sapply(transm.clust.AR.b.cov.50, mean)
   
-  transm.clust.AR.b.cov.55 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+  transm.clust.AR.b.cov.55 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                             work.dir = work.dir, 
+                                                             dirfasttree = dirfasttree, 
+                                                             sub.dir.rename = sub.dir.rename,
                                                              limitTransmEvents = 7,
                                                              timewindow = c(30,40),
                                                              seq.cov = 55,
@@ -941,7 +1032,10 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
                                                              age.group.40.50 = c(40,50))
   transm.clust.AR.b.cov.55.val <- sapply(transm.clust.AR.b.cov.55, mean)
   
-  transm.clust.AR.b.cov.60 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+  transm.clust.AR.b.cov.60 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                             work.dir = work.dir,  
+                                                             dirfasttree = dirfasttree,  
+                                                             sub.dir.rename = sub.dir.rename,
                                                              limitTransmEvents = 7,
                                                              timewindow = c(30,40),
                                                              seq.cov = 60,
@@ -953,7 +1047,10 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
   
   
   
-  transm.clust.AR.b.cov.65 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+  transm.clust.AR.b.cov.65 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                             work.dir = work.dir,  
+                                                             dirfasttree = dirfasttree,  
+                                                             sub.dir.rename = sub.dir.rename,
                                                              limitTransmEvents = 7,
                                                              timewindow = c(30,40),
                                                              seq.cov = 65,
@@ -963,7 +1060,10 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
                                                              age.group.40.50 = c(40,50))
   transm.clust.AR.b.cov.65.val <- sapply(transm.clust.AR.b.cov.65, mean)
   
-  transm.clust.AR.b.cov.70 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+  transm.clust.AR.b.cov.70 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                             work.dir = work.dir,  
+                                                             dirfasttree = dirfasttree, 
+                                                             sub.dir.rename = sub.dir.rename,
                                                              limitTransmEvents = 7,
                                                              timewindow = c(30,40),
                                                              seq.cov = 70,
@@ -973,7 +1073,10 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
                                                              age.group.40.50 = c(40,50))
   transm.clust.AR.b.cov.70.val <- sapply(transm.clust.AR.b.cov.70, mean)
   
-  transm.clust.AR.b.cov.75 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+  transm.clust.AR.b.cov.75 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, 
+                                                             work.dir = work.dir,  
+                                                             dirfasttree = dirfasttree, 
+                                                             sub.dir.rename = sub.dir.rename,
                                                              limitTransmEvents = 7,
                                                              timewindow = c(30,40),
                                                              seq.cov = 75,
@@ -985,7 +1088,10 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
   
   
   
-  transm.clust.AR.b.cov.80 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+  transm.clust.AR.b.cov.80 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, 
+                                                             work.dir = work.dir,   
+                                                             dirfasttree = dirfasttree, 
+                                                             sub.dir.rename = sub.dir.rename,
                                                              limitTransmEvents = 7,
                                                              timewindow = c(30,40),
                                                              seq.cov = 80,
@@ -997,7 +1103,10 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
   
   
   
-  transm.clust.AR.b.cov.85 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+  transm.clust.AR.b.cov.85 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                             work.dir = work.dir,  
+                                                             dirfasttree = dirfasttree, 
+                                                             sub.dir.rename = sub.dir.rename,
                                                              limitTransmEvents = 7,
                                                              timewindow = c(30,40),
                                                              seq.cov = 85,
@@ -1008,7 +1117,10 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
   transm.clust.AR.b.cov.85.val <- sapply(transm.clust.AR.b.cov.85, mean)
   
   
-  transm.clust.AR.b.cov.90 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+  transm.clust.AR.b.cov.90 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, 
+                                                             work.dir = work.dir,  
+                                                             dirfasttree = dirfasttree,  
+                                                             sub.dir.rename = sub.dir.rename,
                                                              limitTransmEvents = 7,
                                                              timewindow = c(30,40),
                                                              seq.cov = 90,
@@ -1020,7 +1132,10 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
   
   
   
-  transm.clust.AR.b.cov.95 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+  transm.clust.AR.b.cov.95 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, 
+                                                             work.dir = work.dir,  
+                                                             dirfasttree = dirfasttree, 
+                                                             sub.dir.rename = sub.dir.rename,
                                                              limitTransmEvents = 7,
                                                              timewindow = c(30,40),
                                                              seq.cov = 95,
@@ -1034,7 +1149,10 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
   
   # IV.c
   
-  transm.clust.AR.c.cov.35 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+  transm.clust.AR.c.cov.35 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                             work.dir = work.dir,  
+                                                             dirfasttree = dirfasttree, 
+                                                             sub.dir.rename = sub.dir.rename,
                                                              limitTransmEvents = 7,
                                                              timewindow = c(30,40),
                                                              seq.cov = 35,
@@ -1044,7 +1162,10 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
                                                              age.group.40.50 = c(40,50))
   transm.clust.AR.c.cov.35.val <- sapply(transm.clust.AR.c.cov.35, mean)
   
-  transm.clust.AR.c.cov.40 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+  transm.clust.AR.c.cov.40 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                             work.dir = work.dir, 
+                                                             dirfasttree = dirfasttree,  
+                                                             sub.dir.rename = sub.dir.rename,
                                                              limitTransmEvents = 7,
                                                              timewindow = c(30,40),
                                                              seq.cov = 40,
@@ -1054,7 +1175,10 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
                                                              age.group.40.50 = c(40,50))
   transm.clust.AR.c.cov.40.val <- sapply(transm.clust.AR.c.cov.40, mean)
   
-  transm.clust.AR.c.cov.45 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+  transm.clust.AR.c.cov.45 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, 
+                                                             work.dir = work.dir, 
+                                                             dirfasttree = dirfasttree, 
+                                                             sub.dir.rename = sub.dir.rename,
                                                              limitTransmEvents = 7,
                                                              timewindow = c(30,40),
                                                              seq.cov = 45,
@@ -1064,7 +1188,10 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
                                                              age.group.40.50 = c(40,50))
   transm.clust.AR.c.cov.45.val <- sapply(transm.clust.AR.c.cov.45, mean)
   
-  transm.clust.AR.c.cov.50 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+  transm.clust.AR.c.cov.50 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, 
+                                                             work.dir = work.dir,  
+                                                             dirfasttree = dirfasttree, 
+                                                             sub.dir.rename = sub.dir.rename,
                                                              limitTransmEvents = 7,
                                                              timewindow = c(30,40),
                                                              seq.cov = 50,
@@ -1074,7 +1201,10 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
                                                              age.group.40.50 = c(40,50))
   transm.clust.AR.c.cov.50.val <- sapply(transm.clust.AR.c.cov.50, mean)
   
-  transm.clust.AR.c.cov.55 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+  transm.clust.AR.c.cov.55 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, 
+                                                             work.dir = work.dir,  
+                                                             dirfasttree = dirfasttree,  
+                                                             sub.dir.rename = sub.dir.rename,
                                                              limitTransmEvents = 7,
                                                              timewindow = c(30,40),
                                                              seq.cov = 55,
@@ -1084,7 +1214,10 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
                                                              age.group.40.50 = c(40,50))
   transm.clust.AR.c.cov.55.val <- sapply(transm.clust.AR.c.cov.55, mean)
   
-  transm.clust.AR.c.cov.60 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+  transm.clust.AR.c.cov.60 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                             work.dir = work.dir,   
+                                                             dirfasttree = dirfasttree,  
+                                                             sub.dir.rename = sub.dir.rename,
                                                              limitTransmEvents = 7,
                                                              timewindow = c(30,40),
                                                              seq.cov = 60,
@@ -1096,7 +1229,10 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
   
   
   
-  transm.clust.AR.c.cov.65 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+  transm.clust.AR.c.cov.65 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, 
+                                                             work.dir = work.dir,  
+                                                             dirfasttree = dirfasttree,  
+                                                             sub.dir.rename = sub.dir.rename,
                                                              limitTransmEvents = 7,
                                                              timewindow = c(30,40),
                                                              seq.cov = 65,
@@ -1106,7 +1242,10 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
                                                              age.group.40.50 = c(40,50))
   transm.clust.AR.c.cov.65.val <- sapply(transm.clust.AR.c.cov.65, mean)
   
-  transm.clust.AR.c.cov.70 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+  transm.clust.AR.c.cov.70 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                             work.dir = work.dir,   
+                                                             dirfasttree = dirfasttree, 
+                                                             sub.dir.rename = sub.dir.rename,
                                                              limitTransmEvents = 7,
                                                              timewindow = c(30,40),
                                                              seq.cov = 70,
@@ -1116,7 +1255,10 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
                                                              age.group.40.50 = c(40,50))
   transm.clust.AR.c.cov.70.val <- sapply(transm.clust.AR.c.cov.70, mean)
   
-  transm.clust.AR.c.cov.75 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+  transm.clust.AR.c.cov.75 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, 
+                                                             work.dir = work.dir,   
+                                                             dirfasttree = dirfasttree,  
+                                                             sub.dir.rename = sub.dir.rename,
                                                              limitTransmEvents = 7,
                                                              timewindow = c(30,40),
                                                              seq.cov = 75,
@@ -1128,7 +1270,10 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
   
   
   
-  transm.clust.AR.c.cov.80 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+  transm.clust.AR.c.cov.80 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, 
+                                                             work.dir = work.dir,   
+                                                             dirfasttree = dirfasttree, 
+                                                             sub.dir.rename = sub.dir.rename,
                                                              limitTransmEvents = 7,
                                                              timewindow = c(30,40),
                                                              seq.cov = 80,
@@ -1140,7 +1285,10 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
   
   
   
-  transm.clust.AR.c.cov.85 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+  transm.clust.AR.c.cov.85 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, 
+                                                             work.dir = work.dir,  
+                                                             dirfasttree = dirfasttree, 
+                                                             sub.dir.rename = sub.dir.rename,
                                                              limitTransmEvents = 7,
                                                              timewindow = c(30,40),
                                                              seq.cov = 85,
@@ -1151,7 +1299,10 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
   transm.clust.AR.c.cov.85.val <- sapply(transm.clust.AR.c.cov.85, mean)
   
   
-  transm.clust.AR.c.cov.90 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+  transm.clust.AR.c.cov.90 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, 
+                                                             work.dir = work.dir,  
+                                                             dirfasttree = dirfasttree,  
+                                                             sub.dir.rename = sub.dir.rename,
                                                              limitTransmEvents = 7,
                                                              timewindow = c(30,40),
                                                              seq.cov = 90,
@@ -1163,7 +1314,10 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
   
   
   
-  transm.clust.AR.c.cov.95 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, work.dir = work.dir,   dirfasttree = dirfasttree,  sub.dir.rename = sub.dir.rename,
+  transm.clust.AR.c.cov.95 <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                             work.dir = work.dir,  
+                                                             dirfasttree = dirfasttree,  
+                                                             sub.dir.rename = sub.dir.rename,
                                                              limitTransmEvents = 7,
                                                              timewindow = c(30,40),
                                                              seq.cov = 95,
@@ -1177,7 +1331,7 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
   
   # Names
   
- 
+  
   name.lme <- names(lme.val)
   
   
@@ -1322,9 +1476,10 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
 # For age mix params
 
 inputvector <- c(-0.52, -0.05, 5, 7, 3, 0.25, -0.3, -0.1, 
-                         # 0.2,
-                         -1, -90, 0.5, 0.05, -0.14, 5, 7, 12, -2.7) # length(inputvector) = 18
+                 # 0.2,
+                 -1, -90, 0.5, 0.05, -0.14, 5, 7, 12, -2.7) # length(inputvector) = 18
 
+x <- LMEM.master.model.age.mixing.toy1(inputvector = inputvector)
 # 
 # 
 # cfg.list["formation.hazard.agegapry.baseline"] <- inputvector[4] # [3] # 2 c("unif", 1, 3)
@@ -1363,7 +1518,7 @@ features.matrix <- simpact.parallel(model = LMEM.master.model.age.mixing.toy1,
                                     seed_count = 124,
                                     n_cluster = 24)
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+
 
 # View(features.matrix)
 
