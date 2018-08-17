@@ -247,6 +247,11 @@ str(dragons)  # we took samples from three sites per mountain range and eight mo
 
 # Dummy data for age-mixing in transmission clusters
 
+library(data.table)
+library(nlme)
+library(ggplot2)
+
+
 female.age <- c(17:24, 32, 23, 21, 29, 19, 21, 23, 24, 18, 19, 19, 21, 17:24, 21:27, 19)
 male.age <- c(19, 21, 23, 24, 18, 19, 19, 21, 17:24, 21:27)
 
@@ -262,7 +267,6 @@ ageTransmClust <- rbind(female.df, male.df)
 ggplot(ageTransmClust, aes(age, fill = gender)) + geom_density(alpha = 0.2)
 
 
-library(ggplot2)
 
 # 1
 female.age1 <- c(17, 32, 23, 21, 29, 19, 21, 23, 24, 18, 19, 19, 21, 17:24, 21:27, 19)
@@ -388,6 +392,8 @@ ageTransmClusts <- list(ageTransmClust1, ageTransmClust2, ageTransmClust3,
                         ageTransmClust4, ageTransmClust5, ageTransmClust6,
                         ageTransmClust7)
 
+
+
 library(nlme)
 
 ageTransmClust1$id <- 1
@@ -406,11 +412,11 @@ AGEMIX <- do.call(rbind, ageTransmClusts.Clean)
 
 AGEMIX$id <- as.factor(AGEMIX$id)
 
-traclust <- lme(age ~ val, data = AGEMIX, random = ~ 1|id)
+traclust <- lme(age ~ gender, data = AGEMIX, random = ~ 1|id)
 
 library(lme4)
 
-traclust2 <- lmer(age ~ val +  (1|id), data = AGEMIX)
+traclust2 <- lmer(age ~ gender +  (1|id), data = AGEMIX)
 
 # Error in match.arg(name) : 
 #   'arg' should be one of “X”, “Z”, “Zt”, “Ztlist”, “mmList”, “y”, “mu”, “u”, “b”, 
@@ -437,3 +443,58 @@ beta <- coef(summary(traclust))[2] # or fixed.effects(summary(traclust))[2]
 b1 <- as.numeric(VarCorr(traclust)[3]) # between cluster variation
 
 b2 <- as.numeric(VarCorr(traclust)[4]) # within cluster variation
+
+
+
+############################## Clusters
+
+
+transmission.clust.list <-  vector("list", length(d)) # list() # initialise gender and age-structured data table of pairings in each transission cluster
+
+
+# Check how many indiv in a cluster
+
+# for (i in 1:length(d)) {
+#   
+#   clus.read <- read.table(file = paste0(paste0(sub.dir.rename,"/"),d[i]), header = FALSE) # Ids of each cluster
+#   
+#   t.v <- c(t.v, nrow(clus.read))
+#   
+# }
+
+for (i in 1:length(d)) {
+  
+  transm.df.cl.dat <- NULL
+  
+  clus.read <- read.table(file = paste0(paste0(sub.dir.rename,"/"),d[i]), header = FALSE) # Ids of each cluster
+  #size <- c(size, nrow(clus.read))
+  
+  transm.df.cl <- subset(transm.df, transm.df$id.lab%in%as.character(clus.read$V1)) # transmission data table of IDs of that cluster
+
+  transm.df.cl.dat$age <- transm.df.cl$age.samp.Rec
+  transm.df.cl.dat$gender <- transm.df.cl$GenderRec
+  transm.df.cl.dat$clust.id <- as.factor(rep(i, nrow(transm.df.cl)))
+  
+  transmission.clust.list[[i]] <- as.data.frame(transm.df.cl.dat)
+  
+}
+
+
+clust.table.df <- as.data.frame(do.call(rbind, transmission.clust.list)) # data.table & data.frame
+
+
+fit.lme.transm.clust <- lme(age ~ gender, data = clust.table.df, random = ~ 1|clust.id)
+
+
+
+a <- coef(summary(fit.lme.transm.clust))[1] # average age in transmission clusters
+
+beta <- coef(summary(fit.lme.transm.clust))[2] # average age difference in transmission clusters: 
+# seen as bridge width which shows potential cross-generation transmission
+
+
+b1 <- as.numeric(VarCorr(fit.lme.transm.clust)[3]) # between cluster variation
+
+b2 <- as.numeric(VarCorr(fit.lme.transm.clust)[4]) # within cluster variation
+
+
