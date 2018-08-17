@@ -34,6 +34,10 @@ MLmaster.model.age.mixing.toy1 <- function(inputvector = input.vector){
   source("~/phylosimpact_simulation_studies_2018/age_mixing_uncertainty/CAR.groups.fun.agemix.R")
   source("~/phylosimpact_simulation_studies_2018/age_mixing_uncertainty/MLphylo.CAR.groups.fun.agemix.R") 
   
+  
+  source("~/phylosimpact_simulation_studies_2018/age_mixing_uncertainty/CAR.groups.fun.agemix.R") 
+  
+  
   # work.dir <- "/home/david/Desktop/mastermodeltest" # on laptop
   
   work.dir <- "/home/niyukuri/Desktop/mastermodeltest" # on PC
@@ -523,18 +527,33 @@ MLmaster.model.age.mixing.toy1 <- function(inputvector = input.vector){
   # Table of age mixing in transmissions within differewnt age groups #
   #####################################################################
   
-  #  
-  #  # Age difference statistics #
-  #  #############################
-  #  AD <- abs(abs(agemixing.df.IDs$TOBDon) - abs(agemixing.df.IDs$TOBRec))
-  #  mean.AD <- mean(AD)
-  #  med.AD <- median(AD)
-  #  sd.AD <- sd(AD)
-  #  
-  #  # Mixed effect models #
-  #  #######################
-  # # fit.agemix.trans.women <- fit.agemix.trans.women(datatable = agemixing.df.IDs)
-  # # fit.agemix.trans.men <- fit.agemix.trans.men(datatable = agemixing.df.IDs)
+  
+  fit.lme.agemixing <- lme(AgeInfecRec ~ GenderRec, data = agemixing.df.IDs, random = ~ 1|DonId)
+  
+  
+  
+  a <- coef(summary(fit.lme.agemixing))[1] # average age in transmission clusters
+  
+  beta <- coef(summary(fit.lme.agemixing))[2] # average age difference in transmission clusters: 
+  # seen as bridge width which shows potential cross-generation transmission
+  
+  
+  b1 <- as.numeric(VarCorr(fit.lme.agemixing)[3]) # between cluster variation
+  
+  b2 <- as.numeric(VarCorr(fit.lme.agemixing)[4]) # within cluster variation
+  
+  lme.val <- c(a, beta, b1, b2)
+  
+  names(lme.val) <-  c("av.age.male", "av.age.diff", "between.transm.var", "within.transm.var")
+  
+  flag.lme <- NA
+  
+  if(abs(lme.val[[2]]) > 5){ # If average age difference is greater than 5, there is a cross-generation transmission
+    flag.lme <- 1
+  }else{
+    flag.lme <- 0
+  }
+  
   
   # I. MCAR
   
@@ -1844,7 +1863,7 @@ MLmaster.model.age.mixing.toy1 <- function(inputvector = input.vector){
                                name.clust.AR.c.90, name.clust.AR.c.95)
   
   # ALL names together
-  names.scenari <- c("flag.women", "flag.men", "Pop.mean.AD", "Pop.med.AD", "Pop.sd.AD",
+  names.scenari <- c("flag.women", "flag.men", "Pop.mean.AD", "Pop.med.AD", "Pop.sd.AD", names(lme.val), "flag.lme",
                      
                      name.MCAR.scenari, name.AR.a.scenari, name.AR.b.scenari, 
                      name.AR.c.scenari, name.clust.MCAR.scenari,
@@ -1852,7 +1871,7 @@ MLmaster.model.age.mixing.toy1 <- function(inputvector = input.vector){
                      name.clust.AR.c.scenari)
   
   
-  outputvector <- c(flag.women, flag.men, mean.AD, med.AD, sd.AD,
+  outputvector <- c(flag.women, flag.men, mean.AD, med.AD, sd.AD, lme.val, flag.lme,
                     
                     CAR.35, CAR.40, CAR.45, CAR.50, CAR.55, CAR.60, CAR.65, 
                     CAR.70, CAR.75, CAR.80, CAR.85, CAR.90, CAR.95,
