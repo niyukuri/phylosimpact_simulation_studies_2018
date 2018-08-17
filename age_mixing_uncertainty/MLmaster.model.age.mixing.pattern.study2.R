@@ -678,9 +678,18 @@ MLmaster.model.age.mixing.pattern.study2 <- function(inputvector = input.vector)
   #                
   #                "mean.AD", "median.AD", "sd.AD")
   
-  flag.women.val <- CAR.95[13] # partners.men.40.50.w.15.25
+  CAR.100 <- CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                  limitTransmEvents = 7,
+                                  timewindow = c(30,40),
+                                  seq.cov = 100,
+                                  #    seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                  age.group.15.25 = c(15,25),
+                                  age.group.25.40 = c(25,40),
+                                  age.group.40.50 = c(40,50))
   
-  flag.men.val <- CAR.95[9] # partners.men.15.25.w.40.50
+  flag.women.val <- CAR.100[13] # partners.men.40.50.w.15.25
+  
+  flag.men.val <- CAR.100[9] # partners.men.15.25.w.40.50
   
   flag.women <- NA
   flag.men <- NA
