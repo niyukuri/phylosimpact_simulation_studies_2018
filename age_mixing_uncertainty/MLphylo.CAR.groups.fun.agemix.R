@@ -368,6 +368,7 @@ MLphylo.CAR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net,
   
   ################## ADD PHYLOGENETIC FEATURES ############
   
+  # This is for machine learning purpose
   
   # 2. Mean, median, and Sd of weithed age-structured of number of individuals in transmission clusters
   #####################################################################################################
