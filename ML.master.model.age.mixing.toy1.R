@@ -34,8 +34,7 @@ MLmaster.model.age.mixing.toy1 <- function(inputvector = input.vector){
   source("~/phylosimpact_simulation_studies_2018/age_mixing_uncertainty/CAR.groups.fun.agemix.R")
   source("~/phylosimpact_simulation_studies_2018/age_mixing_uncertainty/MLphylo.CAR.groups.fun.agemix.R") 
   
-  
-  source("~/phylosimpact_simulation_studies_2018/age_mixing_uncertainty/CAR.groups.fun.agemix.R") 
+
   
   
   # work.dir <- "/home/david/Desktop/mastermodeltest" # on laptop
@@ -505,10 +504,9 @@ MLmaster.model.age.mixing.toy1 <- function(inputvector = input.vector){
   
   
   ##########################################################
-  # Step 3: Empirical data and age-mixing in transmissions #
+  # Step 3: Data and age-mixing in transmissions #
   ##########################################################
   
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
   
   
   agemixing.df <- agemixing.trans.df(trans.network = simpact.trans.net,
@@ -527,6 +525,8 @@ MLmaster.model.age.mixing.toy1 <- function(inputvector = input.vector){
   # Table of age mixing in transmissions within differewnt age groups #
   #####################################################################
   
+  if(nrow(agemixing.df.IDs) >= 5){
+    
   
   fit.lme.agemixing <- lme(AgeInfecRec ~ GenderRec, data = agemixing.df.IDs, random = ~ 1|DonId)
   
@@ -554,137 +554,18 @@ MLmaster.model.age.mixing.toy1 <- function(inputvector = input.vector){
     flag.lme <- 0
   }
   
+  }else{
+    
+    names.lme.val <-  c("av.age.male", "av.age.diff", "between.transm.var", "within.transm.var")
+    
+    lme.val <- rep(NA, length(names.lme.val))
+    
+    names(lme.val) <- names.lme.val
+    
+    flag.lme <- NA
+  }
   
-  # I. MCAR
-  
-  CAR.35 <- CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 35,
-                                  #    seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  
-  
-  CAR.40 <- CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 40,
-                                  #    seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  CAR.45 <- CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 45,
-                                  #    seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  CAR.50 <- CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 50,
-                                  #    seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  
-  
-  CAR.55 <- CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 55,
-                                  #    seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  
-  CAR.60 <- CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 60,
-                                  #    seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  
-  CAR.65 <- CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 65,
-                                  #    seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  
-  CAR.70 <- CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 70,
-                                  #    seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  
-  CAR.75 <- CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 75,
-                                  #    seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  
-  CAR.80 <- CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 80,
-                                  #    seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  
-  CAR.85 <- CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 85,
-                                  #    seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  
-  CAR.90 <- CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 90,
-                                  #    seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  
-  CAR.95 <- CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 95,
-                                  #    seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
+  # mixed.effect.fit.transmission.clusters <- function(clust.names=clust.names)
   
   
   # val.names <- c("num.men.15.25", "num.women.15.25",
@@ -726,397 +607,27 @@ MLmaster.model.age.mixing.toy1 <- function(inputvector = input.vector){
   }
   
   
-  # II. MAR
-  
-  # II.a.
-  
-  
-  AR.a.35 <- AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 35,
-                                  seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  
-  AR.a.40 <- AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 40,
-                                  seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  AR.a.45 <- AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 45,
-                                  seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  
-  
-  AR.a.50 <- AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 50,
-                                  seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  AR.a.55 <- AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 55,
-                                  seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  AR.a.60 <- AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 60,
-                                  seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  AR.a.65 <- AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 65,
-                                  seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  AR.a.70 <- AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 70,
-                                  seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  
-  AR.a.75 <- AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 75,
-                                  seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  AR.a.80 <- AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 80,
-                                  seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  AR.a.85 <- AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 85,
-                                  seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  AR.a.90 <- AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 90,
-                                  seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  AR.a.95 <- AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 95,
-                                  seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  
-  
-  
-  # II.b
-  
-  
-  
-  AR.b.35 <- AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 35,
-                                  seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  
-  AR.b.40 <- AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 40,
-                                  seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  AR.b.45 <- AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 45,
-                                  seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  
-  
-  AR.b.50 <- AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 50,
-                                  seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  AR.b.55 <- AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 55,
-                                  seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  AR.b.60 <- AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 60,
-                                  seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  AR.b.65 <- AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 65,
-                                  seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  AR.b.70 <- AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 70,
-                                  seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  
-  AR.b.75 <- AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 75,
-                                  seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  AR.b.80 <- AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 80,
-                                  seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  AR.b.85 <- AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 85,
-                                  seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  AR.b.90 <- AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 90,
-                                  seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  AR.b.95 <- AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 95,
-                                  seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  
-  
-  # II.c
-  
-  
-  
-  AR.c.35 <- AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 35,
-                                  seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  
-  AR.c.40 <- AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 40,
-                                  seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  AR.c.45 <- AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 45,
-                                  seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  
-  
-  AR.c.50 <- AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 50,
-                                  seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  AR.c.55 <- AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 55,
-                                  seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  AR.c.60 <- AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 60,
-                                  seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  AR.c.65 <- AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 65,
-                                  seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  AR.c.70 <- AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 70,
-                                  seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  
-  AR.c.75 <- AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 75,
-                                  seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  AR.c.80 <- AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 80,
-                                  seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  AR.c.85 <- AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 85,
-                                  seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  AR.c.90 <- AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 90,
-                                  seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  AR.c.95 <- AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 95,
-                                  seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50))
-  
-  
-  
+  # 
+  
+  # b <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+  #                                   work.dir = work.dir,
+  #                                   dirfasttree = dirfasttree,
+  #                                   sub.dir.rename = sub.dir.rename,
+  #                                   limitTransmEvents = 7,
+  #                                   timewindow = c(30,40),
+  #                                   seq.cov = 70,
+  #                                   seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+  #                                   age.group.15.25 = c(15,25),
+  #                                   age.group.25.40 = c(25,40),
+  #                                   age.group.40.50 = c(40,50))
   
   
   # Age difference statistics #
   #############################
-  AD <- abs(abs(agemixing.df.IDs$TOBDon) - abs(agemixing.df.IDs$TOBRec))
-  mean.AD <- mean(AD)
-  med.AD <- median(AD)
-  sd.AD <- sd(AD)
+  AD.tra <- abs(abs(agemixing.df.IDs$TOBDon) - abs(agemixing.df.IDs$TOBRec))
+  mean.AD.tra <- mean(AD.tra)
+  med.AD.tra <- median(AD.tra)
+  sd.AD.tra <- sd(AD.tra)
   
   
   
@@ -1698,91 +1209,14 @@ MLmaster.model.age.mixing.toy1 <- function(inputvector = input.vector){
                                                            age.group.15.25 = c(15,25),
                                                            age.group.25.40 = c(25,40),
                                                            age.group.40.50 = c(40,50))
+  
   transm.clust.AR.c.cov.95.val <- sapply(transm.clust.AR.c.cov.95, mean)
   
   
   
   # Names
   
-  name.CAR.35 <- paste0("CAR.35.",names(CAR.35))
-  name.CAR.40 <- paste0("CAR.40.",names(CAR.40))
-  name.CAR.45 <- paste0("CAR.45.",names(CAR.45))
-  name.CAR.50 <- paste0("CAR.50.",names(CAR.50))
-  name.CAR.55 <- paste0("CAR.55.",names(CAR.55))
-  name.CAR.60 <- paste0("CAR.60.",names(CAR.60))
-  name.CAR.65 <- paste0("CAR.65.",names(CAR.65))
-  name.CAR.70 <- paste0("CAR.70.",names(CAR.70))
-  name.CAR.75 <- paste0("CAR.75.",names(CAR.75))
-  name.CAR.80 <- paste0("CAR.80.",names(CAR.80))
-  name.CAR.85 <- paste0("CAR.85.",names(CAR.85))
-  name.CAR.90 <- paste0("CAR.90.",names(CAR.90))
-  name.CAR.95 <- paste0("CAR.95.",names(CAR.95))
-  
-  name.MCAR.scenari <- c(name.CAR.35, name.CAR.40, name.CAR.45, name.CAR.50,
-                         name.CAR.55, name.CAR.60, name.CAR.65, name.CAR.70,
-                         name.CAR.75, name.CAR.80, name.CAR.85,
-                         name.CAR.90, name.CAR.95)
-  
-  
-  name.AR.a.35 <- paste0("AR.a.35.",names(AR.a.35))
-  name.AR.a.40 <- paste0("AR.a.40.",names(AR.a.40))
-  name.AR.a.45 <- paste0("AR.a.45.",names(AR.a.45))
-  name.AR.a.50 <- paste0("AR.a.50.",names(AR.a.50))
-  name.AR.a.55 <- paste0("AR.a.55.",names(AR.a.55))
-  name.AR.a.60 <- paste0("AR.a.60.",names(AR.a.60))
-  name.AR.a.65 <- paste0("AR.a.65.",names(AR.a.65))
-  name.AR.a.70 <- paste0("AR.a.70.",names(AR.a.70))
-  name.AR.a.75 <- paste0("AR.a.75.",names(AR.a.75))
-  name.AR.a.80 <- paste0("AR.a.80.",names(AR.a.80))
-  name.AR.a.85 <- paste0("AR.a.95.",names(AR.a.85))
-  name.AR.a.90 <- paste0("AR.a.90.",names(AR.a.90))
-  name.AR.a.95 <- paste0("AR.a.95.",names(AR.a.95))
-  
-  name.AR.a.scenari <- c(name.AR.a.35, name.AR.a.40, name.AR.a.45, name.AR.a.50,
-                         name.AR.a.55, name.AR.a.60, name.AR.a.65, name.AR.a.70,
-                         name.AR.a.75, name.AR.a.80, name.AR.a.85,
-                         name.AR.a.90, name.AR.a.95)
-  
-  
-  name.AR.b.35 <- paste0("AR.b.35.",names(AR.b.35))
-  name.AR.b.40 <- paste0("AR.b.40.",names(AR.b.40))
-  name.AR.b.45 <- paste0("AR.b.45.",names(AR.b.45))
-  name.AR.b.50 <- paste0("AR.b.50.",names(AR.b.50))
-  name.AR.b.55 <- paste0("AR.b.55.",names(AR.b.55))
-  name.AR.b.60 <- paste0("AR.b.60.",names(AR.b.60))
-  name.AR.b.65 <- paste0("AR.b.65.",names(AR.b.65))
-  name.AR.b.70 <- paste0("AR.b.70.",names(AR.b.70))
-  name.AR.b.75 <- paste0("AR.b.75.",names(AR.b.75))
-  name.AR.b.80 <- paste0("AR.b.80.",names(AR.b.80))
-  name.AR.b.85 <- paste0("AR.b.85.",names(AR.b.85))
-  name.AR.b.90 <- paste0("AR.b.90.",names(AR.b.90))
-  name.AR.b.95 <- paste0("AR.b.95.",names(AR.b.95))
-  
-  name.AR.b.scenari <- c(name.AR.b.35, name.AR.b.40, name.AR.b.45, name.AR.b.50,
-                         name.AR.b.55, name.AR.b.60, name.AR.b.65, name.AR.b.70,
-                         name.AR.b.75, name.AR.b.80, name.AR.b.85,
-                         name.AR.b.90, name.AR.b.95)
-  
-  
-  name.AR.c.35 <- paste0("AR.c.35.",names(AR.c.35))
-  name.AR.c.40 <- paste0("AR.c.40.",names(AR.c.40))
-  name.AR.c.45 <- paste0("AR.c.45.",names(AR.c.45))
-  name.AR.c.50 <- paste0("AR.c.50.",names(AR.c.50))
-  name.AR.c.55 <- paste0("AR.c.55.",names(AR.c.55))
-  name.AR.c.60 <- paste0("AR.c.60.",names(AR.c.60))
-  name.AR.c.65 <- paste0("AR.c.65.",names(AR.c.65))
-  name.AR.c.70 <- paste0("AR.c.70.",names(AR.c.70))
-  name.AR.c.75 <- paste0("AR.c.75.",names(AR.c.75))
-  name.AR.c.80 <- paste0("AR.c.80.",names(AR.c.80))
-  name.AR.c.85 <- paste0("AR.c.85.",names(AR.c.85))
-  name.AR.c.90 <- paste0("AR.c.90.",names(AR.c.90))
-  name.AR.c.95 <- paste0("AR.c.95.",names(AR.c.95))
-  
-  name.AR.c.scenari <- c(name.AR.c.35, name.AR.c.40, name.AR.c.45, name.AR.c.50,
-                         name.AR.c.55, name.AR.c.60, name.AR.c.65, name.AR.c.70,
-                         name.AR.c.75, name.AR.c.80, name.AR.c.85,
-                         name.AR.c.90, name.AR.c.95)
-  
+  name.lme <- names(lme.val)
   
   name.clust.MCAR.35 <- paste0("clust.MCAR.35.",names(transm.clust.MCAR.cov.35.val))
   name.clust.MCAR.40 <- paste0("clust.MCAR.40.",names(transm.clust.MCAR.cov.40.val))
@@ -1863,7 +1297,7 @@ MLmaster.model.age.mixing.toy1 <- function(inputvector = input.vector){
                                name.clust.AR.c.90, name.clust.AR.c.95)
   
   # ALL names together
-  names.scenari <- c("flag.women", "flag.men", "Pop.mean.AD", "Pop.med.AD", "Pop.sd.AD", names(lme.val), "flag.lme",
+  names.scenari <- c("flag.women", "flag.men", "Pop.mean.AD.tra", "Pop.med.AD.tra", "Pop.sd.AD.tra", names(lme.val), "flag.lme",
                      
                      name.MCAR.scenari, name.AR.a.scenari, name.AR.b.scenari, 
                      name.AR.c.scenari, name.clust.MCAR.scenari,
@@ -1871,19 +1305,7 @@ MLmaster.model.age.mixing.toy1 <- function(inputvector = input.vector){
                      name.clust.AR.c.scenari)
   
   
-  outputvector <- c(flag.women, flag.men, mean.AD, med.AD, sd.AD, lme.val, flag.lme,
-                    
-                    CAR.35, CAR.40, CAR.45, CAR.50, CAR.55, CAR.60, CAR.65, 
-                    CAR.70, CAR.75, CAR.80, CAR.85, CAR.90, CAR.95,
-                    
-                    AR.a.35, AR.a.40, AR.a.45, AR.a.50, AR.a.55, AR.a.60, AR.a.65,
-                    AR.a.70, AR.a.75, AR.a.80, AR.a.85, AR.a.90, AR.a.95,
-                    
-                    AR.b.35, AR.b.40, AR.b.45, AR.b.50, AR.b.55, AR.b.60, AR.b.65,
-                    AR.b.70, AR.b.75, AR.b.80, AR.b.85, AR.b.90, AR.b.95,
-                    
-                    AR.c.35, AR.c.40, AR.c.45, AR.c.50, AR.c.55, AR.c.60, AR.c.65,
-                    AR.c.70, AR.c.75, AR.c.80, AR.c.85, AR.c.90, AR.c.95,
+  outputvector <- c(flag.women, flag.men, mean.AD.tra, med.AD.tra, sd.AD.tra, lme.val, flag.lme,
                     
                     transm.clust.MCAR.cov.35.val, transm.clust.MCAR.cov.40.val, transm.clust.MCAR.cov.45.val,
                     transm.clust.MCAR.cov.50.val, transm.clust.MCAR.cov.55.val, transm.clust.MCAR.cov.60.val,
