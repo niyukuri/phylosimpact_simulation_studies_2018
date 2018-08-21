@@ -1,4 +1,4 @@
-#' A function that returns age mixing patterns quantities in transmission clusters
+#' A function that returns age mixing patterns quantities in transmission clusters and phylogenetic features
 #' in scenarios where individuals are missing at completly at random
 #' @param simpact.trans.net a list of transmission networks produced by \code{\link{transm.network.builder}}
 #' @param work.dir working directory
