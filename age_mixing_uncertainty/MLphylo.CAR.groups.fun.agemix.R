@@ -156,7 +156,8 @@ MLphylo.CAR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net,
     #                                 limitTransmEvents = 7)
     
     
-    # define to filter pairings
+    # Function to count number of men and women in clusters and possible pairings within each cluster
+    
     sort.partners.fun.phylo <- function(partner.table = partner.table){ # for receivers
       
       # age and gender structured receiver individuals
@@ -264,6 +265,7 @@ MLphylo.CAR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net,
       
     }
     
+    
     if(length(d)>=1){
       
       pairings.clust.tab.list <-  vector("list", length(d)) # list() # initialise gender and age-structured data table of pairings in each transission cluster
@@ -281,15 +283,12 @@ MLphylo.CAR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net,
         
         # Age difference statistics #
         #############################
+        
         AD <- abs(abs(transm.df.cl$TOBDon) - abs(transm.df.cl$TOBRec))
         mean.AD <- mean(AD)
         med.AD <- median(AD)
         sd.AD <- sd(AD)
-        
-        # Mixed effect models #
-        #######################
-        # fit.agemix.trans.women <- fit.agemix.trans.women(datatable = data.transm.agemix)
-        # fit.agemix.trans.men <- fit.agemix.trans.men(datatable = data.transm.agemix)
+
         
         AD.stat <- c(mean.AD, med.AD, sd.AD)
         
@@ -601,12 +600,14 @@ MLphylo.CAR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net,
                               median.nodesDepths.feature, maxHeight.feature)
   
   
-  name.mean.clust.stat <- names(mean.clust.stat)
-  name.median.clust.stat <- names(median.clust.stat)
-  name.sd.clust.stat <- names(sd.clust.stat)
+  name.mean.clust.stat <- paste0("clust.mean.", names(mean.clust.stat)) # average number of men and women in different age groups
+  name.median.clust.stat <- paste0("clust.median.", names(median.clust.stat))
+  name.sd.clust.stat <- paste0("clust.SD.", names(sd.clust.stat))
+  
+  #   name.clust.AR.c.35 <- paste0("clust.AR.c.35.",names(transm.clust.AR.c.cov.35.val))
   
   features.names <- c(name.mean.clust.stat, name.median.clust.stat,name.sd.clust.stat,
-                      "mean.count.clust", "median.count.clust", "sd.count.clust",
+                      "mean.Sizes.clust", "median.Sizes.clust", "sd.Sizes.clust",
                       "colless.feature", "sackin.feature", "mean.height.internal.nodes",
                       "median.height.internal.nodes", "mean.nodesDepths.feature", 
                       "median.nodesDepths.feature", "maxHeight.feature")
