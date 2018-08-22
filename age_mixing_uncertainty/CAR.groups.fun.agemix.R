@@ -4,11 +4,14 @@ CAR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net,
                                   limitTransmEvents = 7,
                                   timewindow = c(30,40),
                                   seq.cov = 70,
-                                  #    seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
                                   age.group.15.25 = c(15,25),
                                   age.group.25.40 = c(25,40),
                                   age.group.40.50 = c(40,50)){
   
+  
+  # Data table of infected individuals with at least limitTransmEvents transmissions events
+  
+  # extract sampling time for further computations
   
   seeds.id <- length(simpact.trans.net)
   
@@ -74,6 +77,8 @@ CAR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net,
   infecttable <- rbindlist(infectionTable)
   
   
+  # IDs fro completely random subset of sequences within the given time window
+  
   mCAr.IDs <- IDs.Seq.Random(simpact.trans.net = simpact.trans.net, 
                              limitTransmEvents = limitTransmEvents,
                              timewindow = timewindow, 
@@ -82,8 +87,13 @@ CAR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net,
   
   
   
+  # Data table of infected individuals within the time window
+  
   data.transm.agemix <- dplyr::filter(infecttable, infecttable$id.lab%in%mCAr.IDs) 
   
+  
+  
+  # Function to sort transmissions pairings between different age groups
   
   sort.partners.fun <- function(partner.table = partner.table){ # for receivers
     
@@ -194,10 +204,7 @@ CAR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net,
   med.AD <- median(AD)
   sd.AD <- sd(AD)
   
-  # Mixed effect models #
-  #######################
-  # fit.agemix.trans.women <- fit.agemix.trans.women(datatable = data.transm.agemix)
-  # fit.agemix.trans.men <- fit.agemix.trans.men(datatable = data.transm.agemix)
+
   
   
   ouput.transm.dat.AD <- c(ouput.transm.dat, mean.AD, med.AD, sd.AD)
