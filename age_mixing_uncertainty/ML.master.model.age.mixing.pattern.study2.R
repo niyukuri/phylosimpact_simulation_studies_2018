@@ -23,7 +23,7 @@ pacman::p_load(snow, parallel, RSimpactCyan, RSimpactHelper, ape, Rsamtools)
 
 
 
-ML.master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector){
+ML.master.model.age.mixing.pattern.toy1 <- function(inputvector = input.vector){
   
   
   source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
@@ -501,8 +501,7 @@ ML.master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector
   ##########################################################
   # Step 3: Empirical data and age-mixing in transmissions #
   ##########################################################
-  
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+
   
   
   agemixing.df <- agemixing.trans.df(trans.network = simpact.trans.net,
@@ -522,7 +521,7 @@ ML.master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector
   #####################################################################
   
   
-  if(nrow(agemixing.df.IDs) >= 5){
+  if( nrow(agemixing.df.IDs) > length(unique(agemixing.df.IDs$parent)) & length(unique(agemixing.df.IDs$parent)) > 1 ){
     
     
     fit.lme.agemixing <- lme(AgeInfecRec ~ GenderRec, data = agemixing.df.IDs, random = ~ 1|DonId)
@@ -590,13 +589,13 @@ ML.master.model.age.mixing.pattern.study2 <- function(inputvector = input.vector
   flag.women <- NA
   flag.men <- NA
   
-  if(flag.women.val >=1){
+  if(flag.women.val >=1){  # If we have at least one transmission from older men to younger women 
     flag.women <- 1
   }else{
     flag.women <- 0
   }
   
-  if(flag.men.val >=1){
+  if(flag.men.val >=1){  # If we have at least one transmission from older women to younger men 
     flag.men <- 1
   }else{
     flag.men <- 0
@@ -1442,7 +1441,7 @@ inputmatrix <- matrix(rep(inputvector, reps), byrow = TRUE, nrow = reps)
 # 
 # sim.start.time <- proc.time()[3] # ! IDs.gender.men50.women50.age.group.features
 # 
-features.matrix <- simpact.parallel(model = ML.master.model.age.mixing.pattern.study2,
+features.matrix <- simpact.parallel(model = ML.master.model.age.mixing.pattern.toy1,
                                     actual.input.matrix = inputmatrix,
                                     seed_count = 124,
                                     n_cluster = 24)
