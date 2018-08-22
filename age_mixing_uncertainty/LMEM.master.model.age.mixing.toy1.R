@@ -508,6 +508,7 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
   ##########################################################
   
 
+  # Make a data table from all transmissions networks with at least limitTransmEvents transmission events
   
   agemixing.df <- agemixing.trans.df(trans.network = simpact.trans.net,
                                      limitTransmEvents = 7)
@@ -520,13 +521,11 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
   
   agemixing.df.IDs <- dplyr::filter(agemixing.df, agemixing.df$RecId%in%IDs.study)
   
-  # True age-mixing
-  
-  # Table of age mixing in transmissions within differewnt age groups #
-  #####################################################################
+  # True age mixing in transmissions within differewnt age groups seen by MELM #
+  ##############################################################################
   
   
-  if(nrow(agemixing.df.IDs) >= 5){
+  if( nrow(agemixing.df.IDs) > length(unique(agemixing.df.IDs$parent)) & length(unique(agemixing.df.IDs$parent)) > 1 ){
     
     
     fit.lme.agemixing <- lme(AgeInfecRec ~ GenderRec, data = agemixing.df.IDs, random = ~ 1|DonId)
@@ -565,8 +564,7 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
     
     flag.lme <- NA
   }
-  
-  # mixed.effect.fit.transmission.clusters <- function(clust.names=clust.names)
+
   
   
   # val.names <- c("num.men.15.25", "num.women.15.25",
@@ -583,7 +581,6 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
                                    limitTransmEvents = 7,
                                    timewindow = c(30,40),
                                    seq.cov = 100,
-                                   #    seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
                                    age.group.15.25 = c(15,25),
                                    age.group.25.40 = c(25,40),
                                    age.group.40.50 = c(40,50))
@@ -595,13 +592,13 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
   flag.women <- NA
   flag.men <- NA
   
-  if(flag.women.val >=1){
+  if(flag.women.val >=1){ # If we have at least one transmission from older men to younger women 
     flag.women <- 1
   }else{
     flag.women <- 0
   }
   
-  if(flag.men.val >=1){
+  if(flag.men.val >=1){  # If we have at least one transmission from older women to younger men 
     flag.men <- 1
   }else{
     flag.men <- 0
@@ -1457,6 +1454,17 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
                     transm.clust.AR.c.cov.65.val, transm.clust.AR.c.cov.70.val, transm.clust.AR.c.cov.75.val,
                     transm.clust.AR.c.cov.80.val, transm.clust.AR.c.cov.85.val, transm.clust.AR.c.cov.90.val,
                     transm.clust.AR.c.cov.95.val)
+  
+  # Population level metrics: "flag.women", "flag.men", "Pop.mean.AD", "Pop.med.AD", "Pop.sd.AD", 
+  # "av.age.male", "av.age.diff", "between.clust.var", "within.clust.var", "flag.lme", 
+  
+  # Sequence coverage metrics:
+  # "av.age.male", "av.age.diff", "between.clust.var", "within.clust.var"
+  
+  # Flags:  
+  # if we have at least one transmission from older men to younger women -->> flag.women
+  # if we have at least one transmission from older women to younger men -->> flag.men
+  # linear mixed effects models in transmission network given by av.age.diff > 5 -->> flag.lme
   
   outputvector <- as.numeric(outputvector)
   
