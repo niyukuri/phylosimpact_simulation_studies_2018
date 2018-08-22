@@ -287,14 +287,21 @@ phylogenetic.features.study1 <- function(tree.topo=tree,
                               median.height.internal.nodes, mean.nodesDepths.feature, 
                               median.nodesDepths.feature, maxHeight.feature)
   
+  # 
+  # name.mean.clust.stat <- names(mean.clust.stat)
+  # name.median.clust.stat <- names(median.clust.stat)
+  # name.sd.clust.stat <- names(sd.clust.stat)
   
-  name.mean.clust.stat <- names(mean.clust.stat)
-  name.median.clust.stat <- names(median.clust.stat)
-  name.sd.clust.stat <- names(sd.clust.stat)
+  
+  
+  name.mean.clust.stat <- paste0("clust.mean.", names(mean.clust.stat)) # average number of men and women in different age groups
+  name.median.clust.stat <- paste0("clust.median.", names(median.clust.stat))
+  name.sd.clust.stat <- paste0("clust.SD.", names(sd.clust.stat))
+  
   
   features.names <- c("count.coeff", "time.coeff",
                       name.mean.clust.stat, name.median.clust.stat,name.sd.clust.stat,
-                      "mean.count.clust", "median.count.clust", "sd.count.clust",
+                      "mean.Sizes.clust", "median.Sizes.clust", "sd.Sizes.clust",
                       "colless.feature", "sackin.feature", "mean.height.internal.nodes",
                       "median.height.internal.nodes", "mean.nodesDepths.feature", 
                       "median.nodesDepths.feature", "maxHeight.feature")
