@@ -233,6 +233,9 @@ LMEMphylo.CAR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.ne
                              seq.cov = seq.cov,
                              age.limit = age.group.40.50[2])
   
+  # nrow(agemixing.df.IDs) > length(unique(agemixing.df.IDs$parent)) & length(unique(agemixing.df.IDs$parent)) > 1 
+  
+  
   if(length(mCAr.IDs)>5){
     
     
