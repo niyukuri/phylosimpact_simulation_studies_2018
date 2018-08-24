@@ -437,3 +437,52 @@ beta <- coef(summary(traclust))[2] # or fixed.effects(summary(traclust))[2]
 b1 <- as.numeric(VarCorr(traclust)[3]) # between cluster variation
 
 b2 <- as.numeric(VarCorr(traclust)[4]) # within cluster variation
+
+
+
+toy.parallel <- function(input){
+  set.seed(input[1])
+  med.toy <- median(rnorm(n=input[2], mean = input[3], sd = 1))
+  val.toy <- med.toy + 6
+  val.ALL <- c(med.toy, val.toy)
+  names(val.ALL) <- c("med.toy", "val.toy")
+  return(val.ALL)
+}
+  
+input=c(777, 100,12)
+
+v <- toy.parallel(input = input)
+
+input <- c(100,12)
+reps <- 20
+inputmatrix <- matrix(rep(input, reps), byrow = TRUE, nrow = reps)
+
+library(parallel)
+
+seed_count = 0
+n_cluster = 8
+
+cl <- makeCluster(getOption("cl.cores", n_cluster))
+tab_simul_summarystat = NULL
+list_param <- list(NULL)
+tab_param <- NULL
+paramtemp <- NULL
+simultemp <- NULL
+
+nb_simul <- nrow(inputmatrix)
+
+for (i in 1:nb_simul) {
+  l <- ncol(inputmatrix)
+  param <- c((seed_count + i), inputmatrix[i, ])
+  list_param[[i]] <- param
+  tab_param <- rbind(tab_param, param[2:(l + 1)])
+  paramtemp <- rbind(paramtemp, param[2:(l + 1)])
+}
+list_simul_summarystat = parLapplyLB(cl, list_param,
+                                     toy.parallel)
+tab_simul_summarystat <- do.call(rbind, list_simul_summarystat)
+stopCluster(cl)
+
+results <- cbind(tab_simul_summarystat, seed_count + 1:nb_simul)
+
+write.csv(results, file = "toy.results.csv")
