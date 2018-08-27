@@ -501,7 +501,7 @@ ML.master.model.age.mixing.pattern.toy1 <- function(inputvector = input.vector){
   ##########################################################
   # Step 3: Empirical data and age-mixing in transmissions #
   ##########################################################
-
+  
   
   
   agemixing.df <- agemixing.trans.df(trans.network = simpact.trans.net,
@@ -562,7 +562,7 @@ ML.master.model.age.mixing.pattern.toy1 <- function(inputvector = input.vector){
   }
   
   
-
+  
   # val.names <- c("num.men.15.25", "num.women.15.25",
   #                "num.men.25.40", "num.women.25.40",
   #                "num.men.40.50", "num.women.40.50",
@@ -610,153 +610,166 @@ ML.master.model.age.mixing.pattern.toy1 <- function(inputvector = input.vector){
   
   # I. MCAR
   
-  ML.MCAR.cov.35 <- MLphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                  work.dir = work.dir,
-                                                  dirfasttree = dirfasttree,
-                                                  sub.dir.rename = sub.dir.rename,
-                                                  limitTransmEvents = 7,
-                                                  timewindow = c(30,40),
-                                                  seq.cov = 35,
-                                                  age.group.15.25 = c(15,25),
-                                                  age.group.25.40 = c(25,40),
-                                                  age.group.40.50 = c(40,50))
+  
+  
+  ML.MCAR.cov.35 <- tryCatch(MLphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                           work.dir = work.dir,
+                                                           dirfasttree = dirfasttree,
+                                                           sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 35,
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
   
   
-  ML.MCAR.cov.40 <- MLphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                  work.dir = work.dir,
-                                                  dirfasttree = dirfasttree,
-                                                  sub.dir.rename = sub.dir.rename,
-                                                  limitTransmEvents = 7,
-                                                  timewindow = c(30,40),
-                                                  seq.cov = 40,
-                                                  age.group.15.25 = c(15,25),
-                                                  age.group.25.40 = c(25,40),
-                                                  age.group.40.50 = c(40,50))
+  ML.MCAR.cov.40 <- tryCatch(MLphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                           work.dir = work.dir,
+                                                           dirfasttree = dirfasttree,
+                                                           sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 40,
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
-  ML.MCAR.cov.45 <- MLphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                  work.dir = work.dir,
-                                                  dirfasttree = dirfasttree,
-                                                  sub.dir.rename = sub.dir.rename,
-                                                  limitTransmEvents = 7,
-                                                  timewindow = c(30,40),
-                                                  seq.cov = 45,
-                                                  age.group.15.25 = c(15,25),
-                                                  age.group.25.40 = c(25,40),
-                                                  age.group.40.50 = c(40,50))
+  ML.MCAR.cov.45 <- tryCatch(MLphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                           work.dir = work.dir,
+                                                           dirfasttree = dirfasttree,
+                                                           sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 45,
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
   
-  ML.MCAR.cov.50 <- MLphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                  work.dir = work.dir,
-                                                  dirfasttree = dirfasttree,
-                                                  sub.dir.rename = sub.dir.rename,
-                                                  limitTransmEvents = 7,
-                                                  timewindow = c(30,40),
-                                                  seq.cov = 50,
-                                                  age.group.15.25 = c(15,25),
-                                                  age.group.25.40 = c(25,40),
-                                                  age.group.40.50 = c(40,50))
+  ML.MCAR.cov.50 <- tryCatch(MLphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                           work.dir = work.dir,
+                                                           dirfasttree = dirfasttree,
+                                                           sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 50,
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
-  ML.MCAR.cov.55 <- MLphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                  work.dir = work.dir,
-                                                  dirfasttree = dirfasttree,
-                                                  sub.dir.rename = sub.dir.rename,
-                                                  limitTransmEvents = 7,
-                                                  timewindow = c(30,40),
-                                                  seq.cov = 55,
-                                                  age.group.15.25 = c(15,25),
-                                                  age.group.25.40 = c(25,40),
-                                                  age.group.40.50 = c(40,50))
+  ML.MCAR.cov.55 <- tryCatch(MLphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                           work.dir = work.dir,
+                                                           dirfasttree = dirfasttree,
+                                                           sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 55,
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
-  ML.MCAR.cov.60 <- MLphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                  work.dir = work.dir,
-                                                  dirfasttree = dirfasttree,
-                                                  sub.dir.rename = sub.dir.rename,
-                                                  limitTransmEvents = 7,
-                                                  timewindow = c(30,40),
-                                                  seq.cov = 60,
-                                                  age.group.15.25 = c(15,25),
-                                                  age.group.25.40 = c(25,40),
-                                                  age.group.40.50 = c(40,50))
+  ML.MCAR.cov.60 <- tryCatch(MLphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                           work.dir = work.dir,
+                                                           dirfasttree = dirfasttree,
+                                                           sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 60,
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
-  ML.MCAR.cov.65 <- MLphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                  work.dir = work.dir,
-                                                  dirfasttree = dirfasttree,
-                                                  sub.dir.rename = sub.dir.rename,
-                                                  limitTransmEvents = 7,
-                                                  timewindow = c(30,40),
-                                                  seq.cov = 65,
-                                                  age.group.15.25 = c(15,25),
-                                                  age.group.25.40 = c(25,40),
-                                                  age.group.40.50 = c(40,50))
+  ML.MCAR.cov.65 <- tryCatch(MLphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                           work.dir = work.dir,
+                                                           dirfasttree = dirfasttree,
+                                                           sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 65,
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
-  ML.MCAR.cov.70 <- MLphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                  work.dir = work.dir,
-                                                  dirfasttree = dirfasttree,
-                                                  sub.dir.rename = sub.dir.rename,
-                                                  limitTransmEvents = 7,
-                                                  timewindow = c(30,40),
-                                                  seq.cov = 70,
-                                                  age.group.15.25 = c(15,25),
-                                                  age.group.25.40 = c(25,40),
-                                                  age.group.40.50 = c(40,50))
+  ML.MCAR.cov.70 <- tryCatch(MLphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                           work.dir = work.dir,
+                                                           dirfasttree = dirfasttree,
+                                                           sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 70,
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
-  ML.MCAR.cov.75 <- MLphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                  work.dir = work.dir,
-                                                  dirfasttree = dirfasttree,
-                                                  sub.dir.rename = sub.dir.rename,
-                                                  limitTransmEvents = 7,
-                                                  timewindow = c(30,40),
-                                                  seq.cov = 75,
-                                                  age.group.15.25 = c(15,25),
-                                                  age.group.25.40 = c(25,40),
-                                                  age.group.40.50 = c(40,50))
+  ML.MCAR.cov.75 <- tryCatch(MLphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                           work.dir = work.dir,
+                                                           dirfasttree = dirfasttree,
+                                                           sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 75,
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
-  ML.MCAR.cov.80 <- MLphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                  work.dir = work.dir,
-                                                  dirfasttree = dirfasttree,
-                                                  sub.dir.rename = sub.dir.rename,
-                                                  limitTransmEvents = 7,
-                                                  timewindow = c(30,40),
-                                                  seq.cov = 80,
-                                                  age.group.15.25 = c(15,25),
-                                                  age.group.25.40 = c(25,40),
-                                                  age.group.40.50 = c(40,50))
+  ML.MCAR.cov.80 <- tryCatch(MLphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                           work.dir = work.dir,
+                                                           dirfasttree = dirfasttree,
+                                                           sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 80,
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
-  ML.MCAR.cov.85 <- MLphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                  work.dir = work.dir,
-                                                  dirfasttree = dirfasttree,
-                                                  sub.dir.rename = sub.dir.rename,
-                                                  limitTransmEvents = 7,
-                                                  timewindow = c(30,40),
-                                                  seq.cov = 85,
-                                                  age.group.15.25 = c(15,25),
-                                                  age.group.25.40 = c(25,40),
-                                                  age.group.40.50 = c(40,50))
+  ML.MCAR.cov.85 <- tryCatch(MLphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                           work.dir = work.dir,
+                                                           dirfasttree = dirfasttree,
+                                                           sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 85,
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
-  ML.MCAR.cov.90 <- MLphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                  work.dir = work.dir,
-                                                  dirfasttree = dirfasttree,
-                                                  sub.dir.rename = sub.dir.rename,
-                                                  limitTransmEvents = 7,
-                                                  timewindow = c(30,40),
-                                                  seq.cov = 90,
-                                                  age.group.15.25 = c(15,25),
-                                                  age.group.25.40 = c(25,40),
-                                                  age.group.40.50 = c(40,50))
+  ML.MCAR.cov.90 <- tryCatch(MLphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                           work.dir = work.dir,
+                                                           dirfasttree = dirfasttree,
+                                                           sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 90,
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
-  ML.MCAR.cov.95 <- MLphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                  work.dir = work.dir,
-                                                  dirfasttree = dirfasttree,
-                                                  sub.dir.rename = sub.dir.rename,
-                                                  limitTransmEvents = 7,
-                                                  timewindow = c(30,40),
-                                                  seq.cov = 95,
-                                                  age.group.15.25 = c(15,25),
-                                                  age.group.25.40 = c(25,40),
-                                                  age.group.40.50 = c(40,50))
-  
-
+  ML.MCAR.cov.95 <- tryCatch(MLphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                           work.dir = work.dir,
+                                                           dirfasttree = dirfasttree,
+                                                           sub.dir.rename = sub.dir.rename,
+                                                           limitTransmEvents = 7,
+                                                           timewindow = c(30,40),
+                                                           seq.cov = 95,
+                                                           age.group.15.25 = c(15,25),
+                                                           age.group.25.40 = c(25,40),
+                                                           age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
   
   
@@ -764,492 +777,532 @@ ML.master.model.age.mixing.pattern.toy1 <- function(inputvector = input.vector){
   
   # II.a.
   
-  ML.AR.a.cov.35 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                 work.dir = work.dir,
-                                                 dirfasttree = dirfasttree,
-                                                 sub.dir.rename = sub.dir.rename,
-                                                 limitTransmEvents = 7,
-                                                 timewindow = c(30,40),
-                                                 seq.cov = 35,
-                                                 seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                                 age.group.15.25 = c(15,25),
-                                                 age.group.25.40 = c(25,40),
-                                                 age.group.40.50 = c(40,50))
+  ML.AR.a.cov.35 <- tryCatch(MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          work.dir = work.dir,
+                                                          dirfasttree = dirfasttree,
+                                                          sub.dir.rename = sub.dir.rename,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 35,
+                                                          seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
   
   
-  ML.AR.a.cov.40 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                 work.dir = work.dir,
-                                                 dirfasttree = dirfasttree,
-                                                 sub.dir.rename = sub.dir.rename,
-                                                 limitTransmEvents = 7,
-                                                 timewindow = c(30,40),
-                                                 seq.cov = 40,
-                                                 seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                                 age.group.15.25 = c(15,25),
-                                                 age.group.25.40 = c(25,40),
-                                                 age.group.40.50 = c(40,50))
+  ML.AR.a.cov.40 <- tryCatch(MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          work.dir = work.dir,
+                                                          dirfasttree = dirfasttree,
+                                                          sub.dir.rename = sub.dir.rename,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 40,
+                                                          seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
-  ML.AR.a.cov.45 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                 work.dir = work.dir,
-                                                 dirfasttree = dirfasttree,
-                                                 sub.dir.rename = sub.dir.rename,
-                                                 limitTransmEvents = 7,
-                                                 timewindow = c(30,40),
-                                                 seq.cov = 45,
-                                                 seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                                 age.group.15.25 = c(15,25),
-                                                 age.group.25.40 = c(25,40),
-                                                 age.group.40.50 = c(40,50))
+  ML.AR.a.cov.45 <- tryCatch(MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          work.dir = work.dir,
+                                                          dirfasttree = dirfasttree,
+                                                          sub.dir.rename = sub.dir.rename,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 45,
+                                                          seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
   
-  ML.AR.a.cov.50 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                 work.dir = work.dir,
-                                                 dirfasttree = dirfasttree,
-                                                 sub.dir.rename = sub.dir.rename,
-                                                 limitTransmEvents = 7,
-                                                 timewindow = c(30,40),
-                                                 seq.cov = 50,
-                                                 seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                                 age.group.15.25 = c(15,25),
-                                                 age.group.25.40 = c(25,40),
-                                                 age.group.40.50 = c(40,50))
+  ML.AR.a.cov.50 <- tryCatch(MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          work.dir = work.dir,
+                                                          dirfasttree = dirfasttree,
+                                                          sub.dir.rename = sub.dir.rename,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 50,
+                                                          seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
-  ML.AR.a.cov.55 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                 work.dir = work.dir,
-                                                 dirfasttree = dirfasttree,
-                                                 sub.dir.rename = sub.dir.rename,
-                                                 limitTransmEvents = 7,
-                                                 timewindow = c(30,40),
-                                                 seq.cov = 55,
-                                                 seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                                 age.group.15.25 = c(15,25),
-                                                 age.group.25.40 = c(25,40),
-                                                 age.group.40.50 = c(40,50))
+  ML.AR.a.cov.55 <- tryCatch(MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          work.dir = work.dir,
+                                                          dirfasttree = dirfasttree,
+                                                          sub.dir.rename = sub.dir.rename,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 55,
+                                                          seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
-  ML.AR.a.cov.60 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                 work.dir = work.dir,
-                                                 dirfasttree = dirfasttree,
-                                                 sub.dir.rename = sub.dir.rename,
-                                                 limitTransmEvents = 7,
-                                                 timewindow = c(30,40),
-                                                 seq.cov = 60,
-                                                 seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                                 age.group.15.25 = c(15,25),
-                                                 age.group.25.40 = c(25,40),
-                                                 age.group.40.50 = c(40,50))
+  ML.AR.a.cov.60 <- tryCatch(MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          work.dir = work.dir,
+                                                          dirfasttree = dirfasttree,
+                                                          sub.dir.rename = sub.dir.rename,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 60,
+                                                          seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
-  ML.AR.a.cov.65 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                 work.dir = work.dir,
-                                                 dirfasttree = dirfasttree,
-                                                 sub.dir.rename = sub.dir.rename,
-                                                 limitTransmEvents = 7,
-                                                 timewindow = c(30,40),
-                                                 seq.cov = 65,
-                                                 seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                                 age.group.15.25 = c(15,25),
-                                                 age.group.25.40 = c(25,40),
-                                                 age.group.40.50 = c(40,50))
+  ML.AR.a.cov.65 <- tryCatch(MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          work.dir = work.dir,
+                                                          dirfasttree = dirfasttree,
+                                                          sub.dir.rename = sub.dir.rename,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 65,
+                                                          seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
-  ML.AR.a.cov.70 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                 work.dir = work.dir,
-                                                 dirfasttree = dirfasttree,
-                                                 sub.dir.rename = sub.dir.rename,
-                                                 limitTransmEvents = 7,
-                                                 timewindow = c(30,40),
-                                                 seq.cov = 70,
-                                                 seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                                 age.group.15.25 = c(15,25),
-                                                 age.group.25.40 = c(25,40),
-                                                 age.group.40.50 = c(40,50))
+  ML.AR.a.cov.70 <- tryCatch(MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          work.dir = work.dir,
+                                                          dirfasttree = dirfasttree,
+                                                          sub.dir.rename = sub.dir.rename,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 70,
+                                                          seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
-  ML.AR.a.cov.75 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                 work.dir = work.dir,
-                                                 dirfasttree = dirfasttree,
-                                                 sub.dir.rename = sub.dir.rename,
-                                                 limitTransmEvents = 7,
-                                                 timewindow = c(30,40),
-                                                 seq.cov = 75,
-                                                 seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                                 age.group.15.25 = c(15,25),
-                                                 age.group.25.40 = c(25,40),
-                                                 age.group.40.50 = c(40,50))
+  ML.AR.a.cov.75 <- tryCatch(MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          work.dir = work.dir,
+                                                          dirfasttree = dirfasttree,
+                                                          sub.dir.rename = sub.dir.rename,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 75,
+                                                          seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
-  ML.AR.a.cov.80 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                 work.dir = work.dir,
-                                                 dirfasttree = dirfasttree,
-                                                 sub.dir.rename = sub.dir.rename,
-                                                 limitTransmEvents = 7,
-                                                 timewindow = c(30,40),
-                                                 seq.cov = 80,
-                                                 seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                                 age.group.15.25 = c(15,25),
-                                                 age.group.25.40 = c(25,40),
-                                                 age.group.40.50 = c(40,50))
+  ML.AR.a.cov.80 <- tryCatch(MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          work.dir = work.dir,
+                                                          dirfasttree = dirfasttree,
+                                                          sub.dir.rename = sub.dir.rename,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 80,
+                                                          seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
-  ML.AR.a.cov.85 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                 work.dir = work.dir,
-                                                 dirfasttree = dirfasttree,
-                                                 sub.dir.rename = sub.dir.rename,
-                                                 limitTransmEvents = 7,
-                                                 timewindow = c(30,40),
-                                                 seq.cov = 85,
-                                                 seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                                 age.group.15.25 = c(15,25),
-                                                 age.group.25.40 = c(25,40),
-                                                 age.group.40.50 = c(40,50))
+  ML.AR.a.cov.85 <- tryCatch(MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          work.dir = work.dir,
+                                                          dirfasttree = dirfasttree,
+                                                          sub.dir.rename = sub.dir.rename,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 85,
+                                                          seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
-  ML.AR.a.cov.90 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                 work.dir = work.dir,
-                                                 dirfasttree = dirfasttree,
-                                                 sub.dir.rename = sub.dir.rename,
-                                                 limitTransmEvents = 7,
-                                                 timewindow = c(30,40),
-                                                 seq.cov = 90,
-                                                 seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                                 age.group.15.25 = c(15,25),
-                                                 age.group.25.40 = c(25,40),
-                                                 age.group.40.50 = c(40,50))
+  ML.AR.a.cov.90 <- tryCatch(MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          work.dir = work.dir,
+                                                          dirfasttree = dirfasttree,
+                                                          sub.dir.rename = sub.dir.rename,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 90,
+                                                          seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
-  ML.AR.a.cov.95 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                 work.dir = work.dir,
-                                                 dirfasttree = dirfasttree,
-                                                 sub.dir.rename = sub.dir.rename,
-                                                 limitTransmEvents = 7,
-                                                 timewindow = c(30,40),
-                                                 seq.cov = 95,
-                                                 seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-                                                 age.group.15.25 = c(15,25),
-                                                 age.group.25.40 = c(25,40),
-                                                 age.group.40.50 = c(40,50))
+  ML.AR.a.cov.95 <- tryCatch(MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          work.dir = work.dir,
+                                                          dirfasttree = dirfasttree,
+                                                          sub.dir.rename = sub.dir.rename,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 95,
+                                                          seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
   
   
   # II.b
   
   
-  ML.AR.b.cov.35 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                 work.dir = work.dir,
-                                                 dirfasttree = dirfasttree,
-                                                 sub.dir.rename = sub.dir.rename,
-                                                 limitTransmEvents = 7,
-                                                 timewindow = c(30,40),
-                                                 seq.cov = 35,
-                                                 seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
-                                                 age.group.15.25 = c(15,25),
-                                                 age.group.25.40 = c(25,40),
-                                                 age.group.40.50 = c(40,50))
+  ML.AR.b.cov.35 <- tryCatch(MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          work.dir = work.dir,
+                                                          dirfasttree = dirfasttree,
+                                                          sub.dir.rename = sub.dir.rename,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 35,
+                                                          seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
   
   
-  ML.AR.b.cov.40 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                 work.dir = work.dir,
-                                                 dirfasttree = dirfasttree,
-                                                 sub.dir.rename = sub.dir.rename,
-                                                 limitTransmEvents = 7,
-                                                 timewindow = c(30,40),
-                                                 seq.cov = 40,
-                                                 seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
-                                                 age.group.15.25 = c(15,25),
-                                                 age.group.25.40 = c(25,40),
-                                                 age.group.40.50 = c(40,50))
+  ML.AR.b.cov.40 <- tryCatch(MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          work.dir = work.dir,
+                                                          dirfasttree = dirfasttree,
+                                                          sub.dir.rename = sub.dir.rename,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 40,
+                                                          seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
-  ML.AR.b.cov.45 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                 work.dir = work.dir,
-                                                 dirfasttree = dirfasttree,
-                                                 sub.dir.rename = sub.dir.rename,
-                                                 limitTransmEvents = 7,
-                                                 timewindow = c(30,40),
-                                                 seq.cov = 45,
-                                                 seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
-                                                 age.group.15.25 = c(15,25),
-                                                 age.group.25.40 = c(25,40),
-                                                 age.group.40.50 = c(40,50))
+  ML.AR.b.cov.45 <- tryCatch(MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          work.dir = work.dir,
+                                                          dirfasttree = dirfasttree,
+                                                          sub.dir.rename = sub.dir.rename,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 45,
+                                                          seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
   
-  ML.AR.b.cov.50 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                 work.dir = work.dir,
-                                                 dirfasttree = dirfasttree,
-                                                 sub.dir.rename = sub.dir.rename,
-                                                 limitTransmEvents = 7,
-                                                 timewindow = c(30,40),
-                                                 seq.cov = 50,
-                                                 seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
-                                                 age.group.15.25 = c(15,25),
-                                                 age.group.25.40 = c(25,40),
-                                                 age.group.40.50 = c(40,50))
+  ML.AR.b.cov.50 <- tryCatch(MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          work.dir = work.dir,
+                                                          dirfasttree = dirfasttree,
+                                                          sub.dir.rename = sub.dir.rename,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 50,
+                                                          seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
-  ML.AR.b.cov.55 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                 work.dir = work.dir,
-                                                 dirfasttree = dirfasttree,
-                                                 sub.dir.rename = sub.dir.rename,
-                                                 limitTransmEvents = 7,
-                                                 timewindow = c(30,40),
-                                                 seq.cov = 55,
-                                                 seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
-                                                 age.group.15.25 = c(15,25),
-                                                 age.group.25.40 = c(25,40),
-                                                 age.group.40.50 = c(40,50))
+  ML.AR.b.cov.55 <- tryCatch(MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          work.dir = work.dir,
+                                                          dirfasttree = dirfasttree,
+                                                          sub.dir.rename = sub.dir.rename,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 55,
+                                                          seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
-  ML.AR.b.cov.60 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                 work.dir = work.dir,
-                                                 dirfasttree = dirfasttree,
-                                                 sub.dir.rename = sub.dir.rename,
-                                                 limitTransmEvents = 7,
-                                                 timewindow = c(30,40),
-                                                 seq.cov = 60,
-                                                 seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
-                                                 age.group.15.25 = c(15,25),
-                                                 age.group.25.40 = c(25,40),
-                                                 age.group.40.50 = c(40,50))
+  ML.AR.b.cov.60 <- tryCatch(MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          work.dir = work.dir,
+                                                          dirfasttree = dirfasttree,
+                                                          sub.dir.rename = sub.dir.rename,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 60,
+                                                          seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
-  ML.AR.b.cov.65 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                 work.dir = work.dir,
-                                                 dirfasttree = dirfasttree,
-                                                 sub.dir.rename = sub.dir.rename,
-                                                 limitTransmEvents = 7,
-                                                 timewindow = c(30,40),
-                                                 seq.cov = 65,
-                                                 seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
-                                                 age.group.15.25 = c(15,25),
-                                                 age.group.25.40 = c(25,40),
-                                                 age.group.40.50 = c(40,50))
+  ML.AR.b.cov.65 <- tryCatch(MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          work.dir = work.dir,
+                                                          dirfasttree = dirfasttree,
+                                                          sub.dir.rename = sub.dir.rename,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 65,
+                                                          seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
-  ML.AR.b.cov.70 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                 work.dir = work.dir,
-                                                 dirfasttree = dirfasttree,
-                                                 sub.dir.rename = sub.dir.rename,
-                                                 limitTransmEvents = 7,
-                                                 timewindow = c(30,40),
-                                                 seq.cov = 70,
-                                                 seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
-                                                 age.group.15.25 = c(15,25),
-                                                 age.group.25.40 = c(25,40),
-                                                 age.group.40.50 = c(40,50))
+  ML.AR.b.cov.70 <- tryCatch(MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          work.dir = work.dir,
+                                                          dirfasttree = dirfasttree,
+                                                          sub.dir.rename = sub.dir.rename,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 70,
+                                                          seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
-  ML.AR.b.cov.75 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                 work.dir = work.dir,
-                                                 dirfasttree = dirfasttree,
-                                                 sub.dir.rename = sub.dir.rename,
-                                                 limitTransmEvents = 7,
-                                                 timewindow = c(30,40),
-                                                 seq.cov = 75,
-                                                 seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
-                                                 age.group.15.25 = c(15,25),
-                                                 age.group.25.40 = c(25,40),
-                                                 age.group.40.50 = c(40,50))
+  ML.AR.b.cov.75 <- tryCatch(MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          work.dir = work.dir,
+                                                          dirfasttree = dirfasttree,
+                                                          sub.dir.rename = sub.dir.rename,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 75,
+                                                          seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
-  ML.AR.b.cov.80 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                 work.dir = work.dir,
-                                                 dirfasttree = dirfasttree,
-                                                 sub.dir.rename = sub.dir.rename,
-                                                 limitTransmEvents = 7,
-                                                 timewindow = c(30,40),
-                                                 seq.cov = 80,
-                                                 seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
-                                                 age.group.15.25 = c(15,25),
-                                                 age.group.25.40 = c(25,40),
-                                                 age.group.40.50 = c(40,50))
+  ML.AR.b.cov.80 <- tryCatch(MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          work.dir = work.dir,
+                                                          dirfasttree = dirfasttree,
+                                                          sub.dir.rename = sub.dir.rename,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 80,
+                                                          seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
-  ML.AR.b.cov.85 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                 work.dir = work.dir,
-                                                 dirfasttree = dirfasttree,
-                                                 sub.dir.rename = sub.dir.rename,
-                                                 limitTransmEvents = 7,
-                                                 timewindow = c(30,40),
-                                                 seq.cov = 85,
-                                                 seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
-                                                 age.group.15.25 = c(15,25),
-                                                 age.group.25.40 = c(25,40),
-                                                 age.group.40.50 = c(40,50))
+  ML.AR.b.cov.85 <- tryCatch(MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          work.dir = work.dir,
+                                                          dirfasttree = dirfasttree,
+                                                          sub.dir.rename = sub.dir.rename,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 85,
+                                                          seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
-  ML.AR.b.cov.90 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                 work.dir = work.dir,
-                                                 dirfasttree = dirfasttree,
-                                                 sub.dir.rename = sub.dir.rename,
-                                                 limitTransmEvents = 7,
-                                                 timewindow = c(30,40),
-                                                 seq.cov = 90,
-                                                 seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
-                                                 age.group.15.25 = c(15,25),
-                                                 age.group.25.40 = c(25,40),
-                                                 age.group.40.50 = c(40,50))
+  ML.AR.b.cov.90 <- tryCatch(MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          work.dir = work.dir,
+                                                          dirfasttree = dirfasttree,
+                                                          sub.dir.rename = sub.dir.rename,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 90,
+                                                          seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
-  ML.AR.b.cov.95 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                 work.dir = work.dir,
-                                                 dirfasttree = dirfasttree,
-                                                 sub.dir.rename = sub.dir.rename,
-                                                 limitTransmEvents = 7,
-                                                 timewindow = c(30,40),
-                                                 seq.cov = 95,
-                                                 seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
-                                                 age.group.15.25 = c(15,25),
-                                                 age.group.25.40 = c(25,40),
-                                                 age.group.40.50 = c(40,50))
+  ML.AR.b.cov.95 <- tryCatch(MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          work.dir = work.dir,
+                                                          dirfasttree = dirfasttree,
+                                                          sub.dir.rename = sub.dir.rename,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 95,
+                                                          seq.gender.ratio = 0.3, # within same age group women have 30% of being sampled & men have 70%
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
   
   
   # II.c
   
   
-  ML.AR.c.cov.35 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                 work.dir = work.dir,
-                                                 dirfasttree = dirfasttree,
-                                                 sub.dir.rename = sub.dir.rename,
-                                                 limitTransmEvents = 7,
-                                                 timewindow = c(30,40),
-                                                 seq.cov = 35,
-                                                 seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
-                                                 age.group.15.25 = c(15,25),
-                                                 age.group.25.40 = c(25,40),
-                                                 age.group.40.50 = c(40,50))
+  ML.AR.c.cov.35 <- tryCatch(MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          work.dir = work.dir,
+                                                          dirfasttree = dirfasttree,
+                                                          sub.dir.rename = sub.dir.rename,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 35,
+                                                          seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
   
   
-  ML.AR.c.cov.40 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                 work.dir = work.dir,
-                                                 dirfasttree = dirfasttree,
-                                                 sub.dir.rename = sub.dir.rename,
-                                                 limitTransmEvents = 7,
-                                                 timewindow = c(30,40),
-                                                 seq.cov = 40,
-                                                 seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
-                                                 age.group.15.25 = c(15,25),
-                                                 age.group.25.40 = c(25,40),
-                                                 age.group.40.50 = c(40,50))
+  ML.AR.c.cov.40 <- tryCatch(MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          work.dir = work.dir,
+                                                          dirfasttree = dirfasttree,
+                                                          sub.dir.rename = sub.dir.rename,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 40,
+                                                          seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
-  ML.AR.c.cov.45 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                 work.dir = work.dir,
-                                                 dirfasttree = dirfasttree,
-                                                 sub.dir.rename = sub.dir.rename,
-                                                 limitTransmEvents = 7,
-                                                 timewindow = c(30,40),
-                                                 seq.cov = 45,
-                                                 seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
-                                                 age.group.15.25 = c(15,25),
-                                                 age.group.25.40 = c(25,40),
-                                                 age.group.40.50 = c(40,50))
+  ML.AR.c.cov.45 <- tryCatch(MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          work.dir = work.dir,
+                                                          dirfasttree = dirfasttree,
+                                                          sub.dir.rename = sub.dir.rename,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 45,
+                                                          seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
   
-  ML.AR.c.cov.50 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                 work.dir = work.dir,
-                                                 dirfasttree = dirfasttree,
-                                                 sub.dir.rename = sub.dir.rename,
-                                                 limitTransmEvents = 7,
-                                                 timewindow = c(30,40),
-                                                 seq.cov = 50,
-                                                 seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
-                                                 age.group.15.25 = c(15,25),
-                                                 age.group.25.40 = c(25,40),
-                                                 age.group.40.50 = c(40,50))
+  ML.AR.c.cov.50 <- tryCatch(MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          work.dir = work.dir,
+                                                          dirfasttree = dirfasttree,
+                                                          sub.dir.rename = sub.dir.rename,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 50,
+                                                          seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
-  ML.AR.c.cov.55 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                 work.dir = work.dir,
-                                                 dirfasttree = dirfasttree,
-                                                 sub.dir.rename = sub.dir.rename,
-                                                 limitTransmEvents = 7,
-                                                 timewindow = c(30,40),
-                                                 seq.cov = 55,
-                                                 seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
-                                                 age.group.15.25 = c(15,25),
-                                                 age.group.25.40 = c(25,40),
-                                                 age.group.40.50 = c(40,50))
+  ML.AR.c.cov.55 <- tryCatch(MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          work.dir = work.dir,
+                                                          dirfasttree = dirfasttree,
+                                                          sub.dir.rename = sub.dir.rename,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 55,
+                                                          seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
-  ML.AR.c.cov.60 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                 work.dir = work.dir,
-                                                 dirfasttree = dirfasttree,
-                                                 sub.dir.rename = sub.dir.rename,
-                                                 limitTransmEvents = 7,
-                                                 timewindow = c(30,40),
-                                                 seq.cov = 60,
-                                                 seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
-                                                 age.group.15.25 = c(15,25),
-                                                 age.group.25.40 = c(25,40),
-                                                 age.group.40.50 = c(40,50))
+  ML.AR.c.cov.60 <- tryCatch(MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          work.dir = work.dir,
+                                                          dirfasttree = dirfasttree,
+                                                          sub.dir.rename = sub.dir.rename,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 60,
+                                                          seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
-  ML.AR.c.cov.65 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                 work.dir = work.dir,
-                                                 dirfasttree = dirfasttree,
-                                                 sub.dir.rename = sub.dir.rename,
-                                                 limitTransmEvents = 7,
-                                                 timewindow = c(30,40),
-                                                 seq.cov = 65,
-                                                 seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
-                                                 age.group.15.25 = c(15,25),
-                                                 age.group.25.40 = c(25,40),
-                                                 age.group.40.50 = c(40,50))
+  ML.AR.c.cov.65 <- tryCatch(MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          work.dir = work.dir,
+                                                          dirfasttree = dirfasttree,
+                                                          sub.dir.rename = sub.dir.rename,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 65,
+                                                          seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
-  ML.AR.c.cov.70 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                 work.dir = work.dir,
-                                                 dirfasttree = dirfasttree,
-                                                 sub.dir.rename = sub.dir.rename,
-                                                 limitTransmEvents = 7,
-                                                 timewindow = c(30,40),
-                                                 seq.cov = 70,
-                                                 seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
-                                                 age.group.15.25 = c(15,25),
-                                                 age.group.25.40 = c(25,40),
-                                                 age.group.40.50 = c(40,50))
+  ML.AR.c.cov.70 <- tryCatch(MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          work.dir = work.dir,
+                                                          dirfasttree = dirfasttree,
+                                                          sub.dir.rename = sub.dir.rename,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 70,
+                                                          seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
-  ML.AR.c.cov.75 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                 work.dir = work.dir,
-                                                 dirfasttree = dirfasttree,
-                                                 sub.dir.rename = sub.dir.rename,
-                                                 limitTransmEvents = 7,
-                                                 timewindow = c(30,40),
-                                                 seq.cov = 75,
-                                                 seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
-                                                 age.group.15.25 = c(15,25),
-                                                 age.group.25.40 = c(25,40),
-                                                 age.group.40.50 = c(40,50))
+  ML.AR.c.cov.75 <- tryCatch(MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          work.dir = work.dir,
+                                                          dirfasttree = dirfasttree,
+                                                          sub.dir.rename = sub.dir.rename,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 75,
+                                                          seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
-  ML.AR.c.cov.80 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                 work.dir = work.dir,
-                                                 dirfasttree = dirfasttree,
-                                                 sub.dir.rename = sub.dir.rename,
-                                                 limitTransmEvents = 7,
-                                                 timewindow = c(30,40),
-                                                 seq.cov = 80,
-                                                 seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
-                                                 age.group.15.25 = c(15,25),
-                                                 age.group.25.40 = c(25,40),
-                                                 age.group.40.50 = c(40,50))
+  ML.AR.c.cov.80 <- tryCatch(MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          work.dir = work.dir,
+                                                          dirfasttree = dirfasttree,
+                                                          sub.dir.rename = sub.dir.rename,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 80,
+                                                          seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
-  ML.AR.c.cov.85 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                 work.dir = work.dir,
-                                                 dirfasttree = dirfasttree,
-                                                 sub.dir.rename = sub.dir.rename,
-                                                 limitTransmEvents = 7,
-                                                 timewindow = c(30,40),
-                                                 seq.cov = 85,
-                                                 seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
-                                                 age.group.15.25 = c(15,25),
-                                                 age.group.25.40 = c(25,40),
-                                                 age.group.40.50 = c(40,50))
+  ML.AR.c.cov.85 <- tryCatch(MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          work.dir = work.dir,
+                                                          dirfasttree = dirfasttree,
+                                                          sub.dir.rename = sub.dir.rename,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 85,
+                                                          seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
-  ML.AR.c.cov.90 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                 work.dir = work.dir,
-                                                 dirfasttree = dirfasttree,
-                                                 sub.dir.rename = sub.dir.rename,
-                                                 limitTransmEvents = 7,
-                                                 timewindow = c(30,40),
-                                                 seq.cov = 90,
-                                                 seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
-                                                 age.group.15.25 = c(15,25),
-                                                 age.group.25.40 = c(25,40),
-                                                 age.group.40.50 = c(40,50))
+  ML.AR.c.cov.90 <- tryCatch(MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          work.dir = work.dir,
+                                                          dirfasttree = dirfasttree,
+                                                          sub.dir.rename = sub.dir.rename,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 90,
+                                                          seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
   
-  ML.AR.c.cov.95 <- MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-                                                 work.dir = work.dir,
-                                                 dirfasttree = dirfasttree,
-                                                 sub.dir.rename = sub.dir.rename,
-                                                 limitTransmEvents = 7,
-                                                 timewindow = c(30,40),
-                                                 seq.cov = 95,
-                                                 seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
-                                                 age.group.15.25 = c(15,25),
-                                                 age.group.25.40 = c(25,40),
-                                                 age.group.40.50 = c(40,50))
+  ML.AR.c.cov.95 <- tryCatch(MLphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+                                                          work.dir = work.dir,
+                                                          dirfasttree = dirfasttree,
+                                                          sub.dir.rename = sub.dir.rename,
+                                                          limitTransmEvents = 7,
+                                                          timewindow = c(30,40),
+                                                          seq.cov = 95,
+                                                          seq.gender.ratio = 0.5, # within same age group women have 50% of being sampled & men have 50%
+                                                          age.group.15.25 = c(15,25),
+                                                          age.group.25.40 = c(25,40),
+                                                          age.group.40.50 = c(40,50)),
+                             error=function(e) return(rep(NA, 46)))
+  
   
   
   
@@ -1262,25 +1315,54 @@ ML.master.model.age.mixing.pattern.toy1 <- function(inputvector = input.vector){
   sd.AD.tra <- sd(AD.tra)
   
   
-
+  
   
   # Names
   
   name.lme <- names(lme.val)
   
-  name.CAR.35 <- paste0("CAR.35.",names(ML.MCAR.cov.35))
-  name.CAR.40 <- paste0("CAR.40.",names(ML.MCAR.cov.40))
-  name.CAR.45 <- paste0("CAR.45.",names(ML.MCAR.cov.45))
-  name.CAR.50 <- paste0("CAR.50.",names(ML.MCAR.cov.50))
-  name.CAR.55 <- paste0("CAR.55.",names(ML.MCAR.cov.55))
-  name.CAR.60 <- paste0("CAR.60.",names(ML.MCAR.cov.60))
-  name.CAR.65 <- paste0("CAR.65.",names(ML.MCAR.cov.65))
-  name.CAR.70 <- paste0("CAR.70.",names(ML.MCAR.cov.70))
-  name.CAR.75 <- paste0("CAR.75.",names(ML.MCAR.cov.75))
-  name.CAR.80 <- paste0("CAR.80.",names(ML.MCAR.cov.80))
-  name.CAR.85 <- paste0("CAR.85.",names(ML.MCAR.cov.85))
-  name.CAR.90 <- paste0("CAR.90.",names(ML.MCAR.cov.90))
-  name.CAR.95 <- paste0("CAR.95.",names(ML.MCAR.cov.95))
+  names.clust.raw <- c("num.men.15.25"              ,  "num.women.15.25"          ,    "num.men.25.40"              ,  "num.women.25.40"  ,           
+                       "num.men.40.50"               , "num.women.40.50"           ,   "partners.men.15.25.w.15.25" ,  "partners.men.15.25.w.25.40" , 
+                       "partners.men.15.25.w.40.50" ,  "partners.men.25.40.w.15.25" ,  "partners.men.25.40.w.25.40" ,  "partners.men.25.40.w.40.50" , 
+                       "partners.men.40.50.w.15.25"  , "partners.men.40.50.w.25.40" ,  "partners.men.40.50.w.40.50" ,  "mean.AD"                     ,
+                       "median.AD"                   , "sd.AD"                      ,  "clust.mean.av.men.25"       ,  "clust.mean.av.men.25.40"     ,
+                       "clust.mean.av.men.40.50"    ,  "clust.mean.av.women.25"     ,  "clust.mean.av.women.25.40"  ,  "clust.mean.av.women.40.50"   ,
+                       "clust.median.av.men.25"    ,   "clust.median.av.men.25.40"  ,  "clust.median.av.men.40.50"  ,  "clust.median.av.women.25"    ,
+                       "clust.median.av.women.25.40",  "clust.median.av.women.40.50",  "clust.SD.av.men.25"         ,  "clust.SD.av.men.25.40"       ,
+                       "clust.SD.av.men.40.50" ,       "clust.SD.av.women.25"       ,  "clust.SD.av.women.25.40"    ,  "clust.SD.av.women.40.50"     ,
+                       "mean.Sizes.clust"     ,        "median.Sizes.clust"         ,  "sd.Sizes.clust"             ,  "colless.feature"             ,
+                       "sackin.feature"      ,         "mean.height.internal.nodes" ,  "median.height.internal.nodes", "mean.nodesDepths.feature"    ,
+                       "median.nodesDepths.feature",   "maxHeight.feature")
+  
+  
+  name.CAR.35 <- paste0("CAR.35.",names(names.clust.raw))
+  name.CAR.40 <- paste0("CAR.40.",names(names.clust.raw))
+  name.CAR.45 <- paste0("CAR.45.",names(names.clust.raw))
+  name.CAR.50 <- paste0("CAR.50.",names(names.clust.raw))
+  name.CAR.55 <- paste0("CAR.55.",names(names.clust.raw))
+  name.CAR.60 <- paste0("CAR.60.",names(names.clust.raw))
+  name.CAR.65 <- paste0("CAR.65.",names(names.clust.raw))
+  name.CAR.70 <- paste0("CAR.70.",names(names.clust.raw))
+  name.CAR.75 <- paste0("CAR.75.",names(names.clust.raw))
+  name.CAR.80 <- paste0("CAR.80.",names(names.clust.raw))
+  name.CAR.85 <- paste0("CAR.85.",names(names.clust.raw))
+  name.CAR.90 <- paste0("CAR.90.",names(names.clust.raw))
+  name.CAR.95 <- paste0("CAR.95.",names(names.clust.raw))
+  
+  
+  # name.CAR.35 <- paste0("CAR.35.",names(ML.MCAR.cov.35))
+  # name.CAR.40 <- paste0("CAR.40.",names(ML.MCAR.cov.40))
+  # name.CAR.45 <- paste0("CAR.45.",names(ML.MCAR.cov.45))
+  # name.CAR.50 <- paste0("CAR.50.",names(ML.MCAR.cov.50))
+  # name.CAR.55 <- paste0("CAR.55.",names(ML.MCAR.cov.55))
+  # name.CAR.60 <- paste0("CAR.60.",names(ML.MCAR.cov.60))
+  # name.CAR.65 <- paste0("CAR.65.",names(ML.MCAR.cov.65))
+  # name.CAR.70 <- paste0("CAR.70.",names(ML.MCAR.cov.70))
+  # name.CAR.75 <- paste0("CAR.75.",names(ML.MCAR.cov.75))
+  # name.CAR.80 <- paste0("CAR.80.",names(ML.MCAR.cov.80))
+  # name.CAR.85 <- paste0("CAR.85.",names(ML.MCAR.cov.85))
+  # name.CAR.90 <- paste0("CAR.90.",names(ML.MCAR.cov.90))
+  # name.CAR.95 <- paste0("CAR.95.",names(ML.MCAR.cov.95))
   
   name.MCAR.scenari <- c(name.CAR.35, name.CAR.40, name.CAR.45, name.CAR.50,
                          name.CAR.55, name.CAR.60, name.CAR.65, name.CAR.70,
@@ -1288,39 +1370,69 @@ ML.master.model.age.mixing.pattern.toy1 <- function(inputvector = input.vector){
                          name.CAR.90, name.CAR.95)
   
   
-  name.AR.a.35 <- paste0("AR.a.35.",names(ML.AR.a.cov.35))
-  name.AR.a.40 <- paste0("AR.a.40.",names(ML.AR.a.cov.40))
-  name.AR.a.45 <- paste0("AR.a.45.",names(ML.AR.a.cov.45))
-  name.AR.a.50 <- paste0("AR.a.50.",names(ML.AR.a.cov.50))
-  name.AR.a.55 <- paste0("AR.a.55.",names(ML.AR.a.cov.55))
-  name.AR.a.60 <- paste0("AR.a.60.",names(ML.AR.a.cov.60))
-  name.AR.a.65 <- paste0("AR.a.65.",names(ML.AR.a.cov.65))
-  name.AR.a.70 <- paste0("AR.a.70.",names(ML.AR.a.cov.70))
-  name.AR.a.75 <- paste0("AR.a.75.",names(ML.AR.a.cov.75))
-  name.AR.a.80 <- paste0("AR.a.80.",names(ML.AR.a.cov.80))
-  name.AR.a.85 <- paste0("AR.a.95.",names(ML.AR.a.cov.85))
-  name.AR.a.90 <- paste0("AR.a.90.",names(ML.AR.a.cov.90))
-  name.AR.a.95 <- paste0("AR.a.95.",names(ML.AR.a.cov.95))
+  
+  name.AR.a.35 <- paste0("AR.a.35.",names(names.clust.raw))
+  name.AR.a.40 <- paste0("AR.a.40.",names(names.clust.raw))
+  name.AR.a.45 <- paste0("AR.a.45.",names(names.clust.raw))
+  name.AR.a.50 <- paste0("AR.a.50.",names(names.clust.raw))
+  name.AR.a.55 <- paste0("AR.a.55.",names(names.clust.raw))
+  name.AR.a.60 <- paste0("AR.a.60.",names(names.clust.raw))
+  name.AR.a.65 <- paste0("AR.a.65.",names(names.clust.raw))
+  name.AR.a.70 <- paste0("AR.a.70.",names(names.clust.raw))
+  name.AR.a.75 <- paste0("AR.a.75.",names(names.clust.raw))
+  name.AR.a.80 <- paste0("AR.a.80.",names(names.clust.raw))
+  name.AR.a.85 <- paste0("AR.a.95.",names(names.clust.raw))
+  name.AR.a.90 <- paste0("AR.a.90.",names(names.clust.raw))
+  name.AR.a.95 <- paste0("AR.a.95.",names(names.clust.raw))
+  
+  
+  # name.AR.a.35 <- paste0("AR.a.35.",names(ML.AR.a.cov.35))
+  # name.AR.a.40 <- paste0("AR.a.40.",names(ML.AR.a.cov.40))
+  # name.AR.a.45 <- paste0("AR.a.45.",names(ML.AR.a.cov.45))
+  # name.AR.a.50 <- paste0("AR.a.50.",names(ML.AR.a.cov.50))
+  # name.AR.a.55 <- paste0("AR.a.55.",names(ML.AR.a.cov.55))
+  # name.AR.a.60 <- paste0("AR.a.60.",names(ML.AR.a.cov.60))
+  # name.AR.a.65 <- paste0("AR.a.65.",names(ML.AR.a.cov.65))
+  # name.AR.a.70 <- paste0("AR.a.70.",names(ML.AR.a.cov.70))
+  # name.AR.a.75 <- paste0("AR.a.75.",names(ML.AR.a.cov.75))
+  # name.AR.a.80 <- paste0("AR.a.80.",names(ML.AR.a.cov.80))
+  # name.AR.a.85 <- paste0("AR.a.95.",names(ML.AR.a.cov.85))
+  # name.AR.a.90 <- paste0("AR.a.90.",names(ML.AR.a.cov.90))
+  # name.AR.a.95 <- paste0("AR.a.95.",names(ML.AR.a.cov.95))
   
   name.AR.a.scenari <- c(name.AR.a.35, name.AR.a.40, name.AR.a.45, name.AR.a.50,
                          name.AR.a.55, name.AR.a.60, name.AR.a.65, name.AR.a.70,
                          name.AR.a.75, name.AR.a.80, name.AR.a.85,
                          name.AR.a.90, name.AR.a.95)
   
+  name.AR.b.35 <- paste0("AR.b.35.",names(names.clust.raw))
+  name.AR.b.40 <- paste0("AR.b.40.",names(names.clust.raw))
+  name.AR.b.45 <- paste0("AR.b.45.",names(names.clust.raw))
+  name.AR.b.50 <- paste0("AR.b.50.",names(names.clust.raw))
+  name.AR.b.55 <- paste0("AR.b.55.",names(names.clust.raw))
+  name.AR.b.60 <- paste0("AR.b.60.",names(names.clust.raw))
+  name.AR.b.65 <- paste0("AR.b.65.",names(names.clust.raw))
+  name.AR.b.70 <- paste0("AR.b.70.",names(names.clust.raw))
+  name.AR.b.75 <- paste0("AR.b.75.",names(names.clust.raw))
+  name.AR.b.80 <- paste0("AR.b.80.",names(names.clust.raw))
+  name.AR.b.85 <- paste0("AR.b.95.",names(names.clust.raw))
+  name.AR.b.90 <- paste0("AR.b.90.",names(names.clust.raw))
+  name.AR.b.95 <- paste0("AR.b.95.",names(names.clust.raw))
   
-  name.AR.b.35 <- paste0("AR.b.35.",names(ML.AR.b.cov.35))
-  name.AR.b.40 <- paste0("AR.b.40.",names(ML.AR.b.cov.40))
-  name.AR.b.45 <- paste0("AR.b.45.",names(ML.AR.b.cov.45))
-  name.AR.b.50 <- paste0("AR.b.50.",names(ML.AR.b.cov.50))
-  name.AR.b.55 <- paste0("AR.b.55.",names(ML.AR.b.cov.55))
-  name.AR.b.60 <- paste0("AR.b.60.",names(ML.AR.b.cov.60))
-  name.AR.b.65 <- paste0("AR.b.65.",names(ML.AR.b.cov.65))
-  name.AR.b.70 <- paste0("AR.b.70.",names(ML.AR.b.cov.70))
-  name.AR.b.75 <- paste0("AR.b.75.",names(ML.AR.b.cov.75))
-  name.AR.b.80 <- paste0("AR.b.80.",names(ML.AR.b.cov.80))
-  name.AR.b.85 <- paste0("AR.b.95.",names(ML.AR.b.cov.85))
-  name.AR.b.90 <- paste0("AR.b.90.",names(ML.AR.b.cov.90))
-  name.AR.b.95 <- paste0("AR.b.95.",names(ML.AR.b.cov.95))
+  
+  # name.AR.b.35 <- paste0("AR.b.35.",names(ML.AR.b.cov.35))
+  # name.AR.b.40 <- paste0("AR.b.40.",names(ML.AR.b.cov.40))
+  # name.AR.b.45 <- paste0("AR.b.45.",names(ML.AR.b.cov.45))
+  # name.AR.b.50 <- paste0("AR.b.50.",names(ML.AR.b.cov.50))
+  # name.AR.b.55 <- paste0("AR.b.55.",names(ML.AR.b.cov.55))
+  # name.AR.b.60 <- paste0("AR.b.60.",names(ML.AR.b.cov.60))
+  # name.AR.b.65 <- paste0("AR.b.65.",names(ML.AR.b.cov.65))
+  # name.AR.b.70 <- paste0("AR.b.70.",names(ML.AR.b.cov.70))
+  # name.AR.b.75 <- paste0("AR.b.75.",names(ML.AR.b.cov.75))
+  # name.AR.b.80 <- paste0("AR.b.80.",names(ML.AR.b.cov.80))
+  # name.AR.b.85 <- paste0("AR.b.95.",names(ML.AR.b.cov.85))
+  # name.AR.b.90 <- paste0("AR.b.90.",names(ML.AR.b.cov.90))
+  # name.AR.b.95 <- paste0("AR.b.95.",names(ML.AR.b.cov.95))
   
   name.AR.b.scenari <- c(name.AR.b.35, name.AR.b.40, name.AR.b.45, name.AR.b.50,
                          name.AR.b.55, name.AR.b.60, name.AR.b.65, name.AR.b.70,
@@ -1328,26 +1440,41 @@ ML.master.model.age.mixing.pattern.toy1 <- function(inputvector = input.vector){
                          name.AR.b.90, name.AR.b.95)
   
   
-  name.AR.c.35 <- paste0("AR.c.35.",names(ML.AR.c.cov.35))
-  name.AR.c.40 <- paste0("AR.c.40.",names(ML.AR.c.cov.40))
-  name.AR.c.45 <- paste0("AR.c.45.",names(ML.AR.c.cov.45))
-  name.AR.c.50 <- paste0("AR.c.50.",names(ML.AR.c.cov.50))
-  name.AR.c.55 <- paste0("AR.c.55.",names(ML.AR.c.cov.55))
-  name.AR.c.60 <- paste0("AR.c.60.",names(ML.AR.c.cov.60))
-  name.AR.c.65 <- paste0("AR.c.65.",names(ML.AR.c.cov.65))
-  name.AR.c.70 <- paste0("AR.c.70.",names(ML.AR.c.cov.70))
-  name.AR.c.75 <- paste0("AR.c.75.",names(ML.AR.c.cov.75))
-  name.AR.c.80 <- paste0("AR.c.80.",names(ML.AR.c.cov.80))
-  name.AR.c.85 <- paste0("AR.c.95.",names(ML.AR.c.cov.85))
-  name.AR.c.90 <- paste0("AR.c.90.",names(ML.AR.c.cov.90))
-  name.AR.c.95 <- paste0("AR.c.95.",names(ML.AR.c.cov.95))
+  name.AR.c.35 <- paste0("AR.c.35.",names(names.clust.raw))
+  name.AR.c.40 <- paste0("AR.c.40.",names(names.clust.raw))
+  name.AR.c.45 <- paste0("AR.c.45.",names(names.clust.raw))
+  name.AR.c.50 <- paste0("AR.c.50.",names(names.clust.raw))
+  name.AR.c.55 <- paste0("AR.c.55.",names(names.clust.raw))
+  name.AR.c.60 <- paste0("AR.c.60.",names(names.clust.raw))
+  name.AR.c.65 <- paste0("AR.c.65.",names(names.clust.raw))
+  name.AR.c.70 <- paste0("AR.c.70.",names(names.clust.raw))
+  name.AR.c.75 <- paste0("AR.c.75.",names(names.clust.raw))
+  name.AR.c.80 <- paste0("AR.c.80.",names(names.clust.raw))
+  name.AR.c.85 <- paste0("AR.c.95.",names(names.clust.raw))
+  name.AR.c.90 <- paste0("AR.c.90.",names(names.clust.raw))
+  name.AR.c.95 <- paste0("AR.c.95.",names(names.clust.raw))
+  
+  
+  # name.AR.c.35 <- paste0("AR.c.35.",names(ML.AR.c.cov.35))
+  # name.AR.c.40 <- paste0("AR.c.40.",names(ML.AR.c.cov.40))
+  # name.AR.c.45 <- paste0("AR.c.45.",names(ML.AR.c.cov.45))
+  # name.AR.c.50 <- paste0("AR.c.50.",names(ML.AR.c.cov.50))
+  # name.AR.c.55 <- paste0("AR.c.55.",names(ML.AR.c.cov.55))
+  # name.AR.c.60 <- paste0("AR.c.60.",names(ML.AR.c.cov.60))
+  # name.AR.c.65 <- paste0("AR.c.65.",names(ML.AR.c.cov.65))
+  # name.AR.c.70 <- paste0("AR.c.70.",names(ML.AR.c.cov.70))
+  # name.AR.c.75 <- paste0("AR.c.75.",names(ML.AR.c.cov.75))
+  # name.AR.c.80 <- paste0("AR.c.80.",names(ML.AR.c.cov.80))
+  # name.AR.c.85 <- paste0("AR.c.95.",names(ML.AR.c.cov.85))
+  # name.AR.c.90 <- paste0("AR.c.90.",names(ML.AR.c.cov.90))
+  # name.AR.c.95 <- paste0("AR.c.95.",names(ML.AR.c.cov.95))
   
   name.AR.c.scenari <- c(name.AR.c.35, name.AR.c.40, name.AR.c.45, name.AR.c.50,
                          name.AR.c.55, name.AR.c.60, name.AR.c.65, name.AR.c.70,
                          name.AR.c.75, name.AR.c.80, name.AR.c.85,
                          name.AR.c.90, name.AR.c.95)
   
-
+  
   
   # ALL names together
   names.scenari <- c("flag.women", "flag.men", "Pop.mean.AD.tra", "Pop.med.AD.tra", "Pop.sd.AD.tra", name.lme, "flag.lme", 
