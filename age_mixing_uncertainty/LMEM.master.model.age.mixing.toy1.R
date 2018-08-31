@@ -264,8 +264,8 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
   #
   cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
                                    population.simtime = 50, 
-                                   population.nummen = 1000, 
-                                   population.numwomen = 1000,
+                                   population.nummen = 3000, 
+                                   population.numwomen = 3000,
                                    hivseed.time = 10, 
                                    hivseed.type = "amount",
                                    hivseed.amount = 20, 
@@ -1430,19 +1430,19 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
                                name.clust.MCAR.90, name.clust.MCAR.95)
   
   
-  name.clust.AR.c.35 <- paste0("clust.AR.c.35.",c("av.age.male", "av.age.diff", "between.clust.var", "within.clust.var"))
-  name.clust.AR.c.40 <- paste0("clust.AR.c.40.",c("av.age.male", "av.age.diff", "between.clust.var", "within.clust.var"))
-  name.clust.AR.c.45 <- paste0("clust.AR.c.45.",c("av.age.male", "av.age.diff", "between.clust.var", "within.clust.var"))
-  name.clust.AR.c.50 <- paste0("clust.AR.c.50.",c("av.age.male", "av.age.diff", "between.clust.var", "within.clust.var"))
-  name.clust.AR.c.55 <- paste0("clust.AR.c.55.",c("av.age.male", "av.age.diff", "between.clust.var", "within.clust.var"))
-  name.clust.AR.c.60 <- paste0("clust.AR.c.60.",c("av.age.male", "av.age.diff", "between.clust.var", "within.clust.var"))
-  name.clust.AR.c.65 <- paste0("clust.AR.c.65.",c("av.age.male", "av.age.diff", "between.clust.var", "within.clust.var"))
-  name.clust.AR.c.70 <- paste0("clust.AR.c.70.",c("av.age.male", "av.age.diff", "between.clust.var", "within.clust.var"))
-  name.clust.AR.c.75 <- paste0("clust.AR.c.75.",c("av.age.male", "av.age.diff", "between.clust.var", "within.clust.var"))
-  name.clust.AR.c.80 <- paste0("clust.AR.c.80.",c("av.age.male", "av.age.diff", "between.clust.var", "within.clust.var"))
-  name.clust.AR.c.85 <- paste0("clust.AR.c.85.",c("av.age.male", "av.age.diff", "between.clust.var", "within.clust.var"))
-  name.clust.AR.c.90 <- paste0("clust.AR.c.90.",c("av.age.male", "av.age.diff", "between.clust.var", "within.clust.var"))
-  name.clust.AR.c.95 <- paste0("clust.AR.c.95.",c("av.age.male", "av.age.diff", "between.clust.var", "within.clust.var"))
+  name.clust.AR.a.35 <- paste0("clust.AR.a.35.",c("av.age.male", "av.age.diff", "between.clust.var", "within.clust.var"))
+  name.clust.AR.a.40 <- paste0("clust.AR.a.40.",c("av.age.male", "av.age.diff", "between.clust.var", "within.clust.var"))
+  name.clust.AR.a.45 <- paste0("clust.AR.a.45.",c("av.age.male", "av.age.diff", "between.clust.var", "within.clust.var"))
+  name.clust.AR.a.50 <- paste0("clust.AR.a.50.",c("av.age.male", "av.age.diff", "between.clust.var", "within.clust.var"))
+  name.clust.AR.a.55 <- paste0("clust.AR.a.55.",c("av.age.male", "av.age.diff", "between.clust.var", "within.clust.var"))
+  name.clust.AR.a.60 <- paste0("clust.AR.a.60.",c("av.age.male", "av.age.diff", "between.clust.var", "within.clust.var"))
+  name.clust.AR.a.65 <- paste0("clust.AR.a.65.",c("av.age.male", "av.age.diff", "between.clust.var", "within.clust.var"))
+  name.clust.AR.a.70 <- paste0("clust.AR.a.70.",c("av.age.male", "av.age.diff", "between.clust.var", "within.clust.var"))
+  name.clust.AR.a.75 <- paste0("clust.AR.a.75.",c("av.age.male", "av.age.diff", "between.clust.var", "within.clust.var"))
+  name.clust.AR.a.80 <- paste0("clust.AR.a.80.",c("av.age.male", "av.age.diff", "between.clust.var", "within.clust.var"))
+  name.clust.AR.a.85 <- paste0("clust.AR.a.85.",c("av.age.male", "av.age.diff", "between.clust.var", "within.clust.var"))
+  name.clust.AR.a.90 <- paste0("clust.AR.a.90.",c("av.age.male", "av.age.diff", "between.clust.var", "within.clust.var"))
+  name.clust.AR.a.95 <- paste0("clust.AR.a.95.",c("av.age.male", "av.age.diff", "between.clust.var", "within.clust.var"))
   
   
   
@@ -1633,7 +1633,7 @@ inputvector <- c(-0.52, -0.05, 5, 7, 3, 0.25, -0.3, -0.1,
 # # replication number
 # 
 
-reps <- 100
+reps <- 4
 
 # 
 # 
