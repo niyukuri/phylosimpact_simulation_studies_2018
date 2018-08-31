@@ -263,12 +263,12 @@ LMEMphylo.CAR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.ne
     
     # Read clusters' files
     
-    d <- list.files(path = paste0(sub.dir.rename), pattern = paste0(paste0("cov.",seq.cov, ".mCAr.IDs.C.Epidemic.Fasta"),"_",paste0("cov.",seq.cov, ".mCAr.IDs.C.Epidemic.Fasta"),"_","clusterPicks_cluste"),
+    dd <- list.files(path = paste0(sub.dir.rename), pattern = paste0(paste0("cov.",seq.cov, ".mCAr.IDs.C.Epidemic.Fasta"),"_",paste0("cov.",seq.cov, ".mCAr.IDs.C.Epidemic.Fasta"),"_","clusterPicks_cluste"),
                     all.files = FALSE,
                     full.names = FALSE, recursive = FALSE)
     
     
-    clust.fit.params <- mixed.effect.fit.transmission.clusters(clust.names=d, 
+    clust.fit.params <- mixed.effect.fit.transmission.clusters(clust.names=dd, 
                                                                simpact.trans.net = simpact.trans.net,
                                                                limitTransmEvents = 7)
     
