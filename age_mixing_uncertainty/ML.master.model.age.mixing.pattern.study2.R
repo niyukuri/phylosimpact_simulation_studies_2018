@@ -261,8 +261,8 @@ ML.master.model.age.mixing.pattern.toy1 <- function(inputvector = input.vector){
   #
   cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
                                    population.simtime = 50, 
-                                   population.nummen = 2000, 
-                                   population.numwomen = 2000,
+                                   population.nummen = 1000, 
+                                   population.numwomen = 1000,
                                    hivseed.time = 10, 
                                    hivseed.type = "amount",
                                    hivseed.amount = 20, 
