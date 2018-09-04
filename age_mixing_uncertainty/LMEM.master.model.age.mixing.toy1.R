@@ -797,6 +797,22 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
   transm.clust.MCAR.cov.95.val <- sapply(transm.clust.MCAR.cov.95, mean)
   
   
+  transm.clust.MCAR.cov.100 <- tryCatch(LMEMphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, 
+                                                                       work.dir = work.dir,  
+                                                                       dirfasttree = dirfasttree, 
+                                                                       sub.dir.rename = sub.dir.rename,
+                                                                       limitTransmEvents = 7,
+                                                                       timewindow = c(30,40),
+                                                                       seq.cov = 100,
+                                                                       age.group.15.25 = c(15,25),
+                                                                       age.group.25.40 = c(25,40),
+                                                                       age.group.40.50 = c(40,50)),
+                                       error=function(e) return(rep(NA, 4)))
+  transm.clust.MCAR.cov.100.val <- sapply(transm.clust.MCAR.cov.100, mean)
+  
+  
+  
+  
   
   
   
@@ -1410,6 +1426,9 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
   name.clust.MCAR.95 <- paste0("clust.MCAR.95.",c("av.age.male", "av.age.diff", "between.clust.var", "within.clust.var"))
   
   
+  name.clust.MCAR.100 <- paste0("clust.MCAR.100.",c("av.age.male", "av.age.diff", "between.clust.var", "within.clust.var"))
+  
+  
   # name.clust.MCAR.35 <- paste0("clust.MCAR.35.",names(transm.clust.MCAR.cov.35.val))
   # name.clust.MCAR.40 <- paste0("clust.MCAR.40.",names(transm.clust.MCAR.cov.40.val))
   # name.clust.MCAR.45 <- paste0("clust.MCAR.45.",names(transm.clust.MCAR.cov.45.val))
@@ -1445,6 +1464,7 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
   name.clust.AR.a.95 <- paste0("clust.AR.a.95.",c("av.age.male", "av.age.diff", "between.clust.var", "within.clust.var"))
   
   
+
   
   # name.clust.AR.a.35 <- paste0("clust.AR.a.35.",names(transm.clust.AR.a.cov.35.val))
   # name.clust.AR.a.40 <- paste0("clust.AR.a.40.",names(transm.clust.AR.a.cov.40.val))
@@ -1514,7 +1534,7 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
   name.clust.AR.c.85 <- paste0("clust.AR.c.85.",c("av.age.male", "av.age.diff", "between.clust.var", "within.clust.var"))
   name.clust.AR.c.90 <- paste0("clust.AR.c.90.",c("av.age.male", "av.age.diff", "between.clust.var", "within.clust.var"))
   name.clust.AR.c.95 <- paste0("clust.AR.c.95.",c("av.age.male", "av.age.diff", "between.clust.var", "within.clust.var"))
-  
+
   
   # name.clust.AR.c.35 <- paste0("clust.AR.c.35.",names(transm.clust.AR.c.cov.35.val))
   # name.clust.AR.c.40 <- paste0("clust.AR.c.40.",names(transm.clust.AR.c.cov.40.val))
@@ -1539,7 +1559,9 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
   names.scenari <- c("flag.women", "flag.men", "Pop.mean.AD", "Pop.med.AD", "Pop.sd.AD", name.lme, "flag.lme", 
                      name.clust.MCAR.scenari,
                      name.clust.AR.a.scenari, name.clust.AR.b.scenari, 
-                     name.clust.AR.c.scenari)
+                     name.clust.AR.c.scenari,
+                     
+                     name.clust.MCAR.100)
   
   
   outputvector <- c(flag.women, flag.men, mean.AD, med.AD, sd.AD, lme.val, flag.lme,
@@ -1566,7 +1588,9 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
                     transm.clust.AR.c.cov.50.val, transm.clust.AR.c.cov.55.val, transm.clust.AR.c.cov.60.val,
                     transm.clust.AR.c.cov.65.val, transm.clust.AR.c.cov.70.val, transm.clust.AR.c.cov.75.val,
                     transm.clust.AR.c.cov.80.val, transm.clust.AR.c.cov.85.val, transm.clust.AR.c.cov.90.val,
-                    transm.clust.AR.c.cov.95.val)
+                    transm.clust.AR.c.cov.95.val, 
+                    
+                    transm.clust.MCAR.cov.100)
   
   # Population level metrics: "flag.women", "flag.men", "Pop.mean.AD", "Pop.med.AD", "Pop.sd.AD", 
   # "av.age.male", "av.age.diff", "between.clust.var", "within.clust.var", "flag.lme", 
