@@ -271,8 +271,8 @@ ggplot(ageTransmClust, aes(age, fill = gender)) + geom_density(alpha = 0.2)
 
 
 # 1
-female.age1 <- c(17, 32, 23, 21, 29, 19, 21, 23, 24, 18, 19, 19, 21, 17:24, 21:27, 19)
-male.age1 <- c(42, 40, 35, 49, 50, 37, 45, 49, 39, 41)
+female.age1 <- c(17:25,17:26, 32, 23, 21, 29, 19, 21, 23, 24, 18, 19, 19, 21, 17:24, 21:27, 19)
+male.age1 <- c(42, 40, 49, 50, 37, 45, 49, 41)
 
 
 female.df1 <- data.frame(age=female.age1)
@@ -284,6 +284,9 @@ male.df1$gender <- "male"
 ageTransmClust1 <- rbind(female.df1, male.df1)
 
 ggplot(ageTransmClust1, aes(age, fill = gender)) + geom_density(alpha = 0.2)
+
+
+
 
 # 2
 
@@ -415,6 +418,18 @@ AGEMIX <- do.call(rbind, ageTransmClusts.Clean)
 AGEMIX$id <- as.factor(AGEMIX$id)
 
 traclust <- lme(age ~ gender, data = AGEMIX, random = ~ 1|id)
+
+
+traclust1 <- lme(age ~ gender, data = AGEMIX, random = ~ 1|id,
+                 weights = varIdent( c(female = 0.5), ~ 1 |gender ))
+
+
+summary(traclust1)
+
+
+sigma2vec.b <- matrix((1/unique(attributes(traclust1$modelStruct$varStruct)$weights)*traclust1$sigma)^2,nrow=1,byrow=TRUE)
+
+
 
 library(lme4)
 
@@ -580,4 +595,35 @@ res.z <- foreach(icount(n), .combine=cbind) %dopar% {
   
   
 }
+
+
+
+##########################
+
+# 1
+female.age1 <- c(17:25,17:26, 32, 23, 21, 29, 19, 21, 23, 24, 18, 19, 19, 21, 17:24, 21:27, 19)
+male.age1 <- c(42, 40, 49, 50, 37, 45, 49, 41)
+
+
+female.df1 <- data.frame(age=female.age1)
+male.df1 <- data.frame(age=male.age1)
+
+female.df1$gender <- 1
+male.df1$gender <- 0
+
+ageTransmClust1 <- rbind(female.df1, male.df1)
+
+ggplot(ageTransmClust1, aes(age, fill = gender)) + geom_density(alpha = 0.2)
+
+LM <- lm(formula = age ~ gender, data = ageTransmClust1)
+
+
+plot(ageTransmClust1$gender, ageTransmClust1$age, ylim=c(-50,60), xlim=c(-1,1), pch = 16, cex = 1.3, col = "blue", xlab = "Gender", ylab = "Age")
+
+
+lm(ageTransmClust1$gender ~ ageTransmClust1$age)
+
+abline(1.79765, -0.03767)
+
+abline(lm(ageTransmClust1$gender ~ ageTransmClust1$age))
 
