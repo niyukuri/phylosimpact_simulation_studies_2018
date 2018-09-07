@@ -500,6 +500,140 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
   write.dna(sequ.dna, file = paste0(sub.dir.rename,"/C.Epidemic.fas") , format = "fasta")
   
   
+  
+  
+  # (i) Age mixing in relationships
+  
+  # 
+  
+  agemix.rels.df <- agemix.df.maker(datalist.agemix)
+  
+  # 
+  agemix.model <- pattern.modeller(dataframe = agemix.rels.df,
+                                   agegroup = c(15, 50),
+                                   timepoint = 40, # datalist.agemix$itable$population.simtime[1],
+                                   timewindow = 10)#1)#3)
+  # 
+  # # men.lme <- tryCatch(agemixing.lme.fitter(data = dplyr::filter(agemix.model[[1]], Gender =="male")),
+  # #                     error = agemixing.lme.errFunction) # Returns an empty list if the lme model can't be fitted
+  #
+  # men.lmer <- ampmodel(data = dplyr::filter(agemix.model[[1]], Gender =="male"))
+  
+  data = dplyr::filter(agemix.model[[1]], Gender =="male")
+  
+  if( nrow(data) > length(unique(data$ID)) & length(unique(data$ID)) > 1 ){
+    
+    men.lmer <- lmer(pagerelform ~ agerelform0 + (1 | ID),
+                     data = dplyr::filter(agemix.model[[1]], Gender =="male"),
+                     REML = TRUE,
+                     control=lmerControl(check.nobs.vs.nlev = "ignore",
+                                         check.nobs.vs.rankZ = "ignore",
+                                         check.nobs.vs.nRE="ignore"))
+    
+    bignumber <- NA # let's try if NA works (instead of 9999 for example)
+    AAD.male <- ifelse(length(men.lmer) > 0, mean(dplyr::filter(agemix.model[[1]], Gender =="male")$AgeGap), bignumber)
+    SDAD.male <- ifelse(length(men.lmer) > 0, sd(dplyr::filter(agemix.model[[1]], Gender =="male")$AgeGap), bignumber)
+    #powerm <- ifelse(length(men.lme) > 0, as.numeric(attributes(men.lme$apVar)$Pars["varStruct.power"]), bignumber)
+    slope.male <- ifelse(length(men.lmer) > 0, summary(men.lmer)$coefficients[2, 1], bignumber) #summary(men.lmer)$tTable[2, 1], bignumber)
+    WSD.male <- ifelse(length(men.lmer) > 0, summary(men.lmer)$sigma, bignumber) #WVAD.base <- ifelse(length(men.lme) > 0, men.lme$sigma^2, bignumber)
+    
+    BSD.male <- ifelse(length(men.lmer) > 0, bvar(men.lmer), bignumber) # Bad name for the function because it actually extracts between subject standard deviation # BVAD <- ifelse(length(men.lmer) > 0, getVarCov(men.lme)[1,1], bignumber)
+    
+    intercept.male <- ifelse(length(men.lmer) > 0, summary(men.lmer)$coefficients[1,1] - 15, bignumber)
+    
+    # c(AAD.male, SDAD.male, slope.male, WSD.male, BSD.male, intercept.male)
+    
+    ## AAD: average age difference across all relationship
+    ## VAD: variance of these age differences
+    ## SDAD: standard deviation of age differences
+    ## BSD: between-subject standard deviation of age differences
+    
+    mix.rels.dat <- c(AAD.male, SDAD.male, slope.male, WSD.male, BSD.male, intercept.male)
+    
+  }else{
+    
+    mix.rels.dat <- rep(NA, 6)
+    
+  }
+  
+  # age.scatter.df <- agemix.model[[1]]
+  
+  #  (ii) Point 	prevalence of concurrency in the adult population:
+  
+  # Concurrency point prevalence 6 months before a survey, among men
+  
+  
+  pp.cp.6months.male <- tryCatch(concurr.pointprev.calculator(datalist = datalist.agemix,
+                                                              timepoint = 40 - 0.5), error=function(e) return(NA))
+  
+  
+  # (iii) Prevalence
+  
+  hiv.prev.lt25.women <- prevalence.calculator(datalist = datalist.agemix,
+                                               agegroup = c(15, 25),
+                                               timepoint = 40)$pointprevalence[2]
+  hiv.prev.lt25.men <- prevalence.calculator(datalist = datalist.agemix,
+                                             agegroup = c(15, 25),
+                                             timepoint = 40)$pointprevalence[1]
+  
+  hiv.prev.25.40.women <- prevalence.calculator(datalist = datalist.agemix,
+                                                agegroup = c(25, 40),
+                                                timepoint = 40)$pointprevalence[2]
+  hiv.prev.25.40.men <- prevalence.calculator(datalist = datalist.agemix,
+                                              agegroup = c(25, 40),
+                                              timepoint = 40)$pointprevalence[1]
+  
+  hiv.prev.40.50.women <- prevalence.calculator(datalist = datalist.agemix,
+                                                agegroup = c(40, 50),
+                                                timepoint = 40)$pointprevalence[2]
+  hiv.prev.40.50.men <- prevalence.calculator(datalist = datalist.agemix,
+                                              agegroup = c(40, 50),
+                                              timepoint = 40)$pointprevalence[1]
+  
+  
+  # (iv) Incidence
+  
+  incidence.df.15.24 <- incidence.calculator(datalist = datalist.agemix,
+                                             agegroup = c(15, 25), timewindow = c(30, 40))
+  
+  METRICS.incidence.df.15.24 <- incidence.df.15.24$incidence[3]
+  
+  METRICS.incidence.df.15.24.men <- incidence.df.15.24$incidence[1]
+  METRICS.incidence.df.15.24.women <- incidence.df.15.24$incidence[2]
+  
+  
+  incidence.df.25.39 <- incidence.calculator(datalist = datalist.agemix,
+                                             agegroup = c(25, 40), timewindow = c(30, 40))
+  
+  METRICS.incidence.df.25.39 <- incidence.df.25.39$incidence[3]
+  
+  METRICS.incidence.df.25.39.men <- incidence.df.25.39$incidence[1]
+  METRICS.incidence.df.25.39.women <- incidence.df.25.39$incidence[2]
+  
+  
+  incidence.df.40.49 <- incidence.calculator(datalist = datalist.agemix,
+                                             agegroup = c(25, 40), timewindow = c(30, 40))
+  
+  METRICS.incidence.df.40.49 <- incidence.df.40.49$incidence[3]
+  
+  METRICS.incidence.df.40.49.men <- incidence.df.40.49$incidence[1] # res
+  METRICS.incidence.df.40.49.women <- incidence.df.40.49$incidence[2] # res
+  
+  
+  
+  summary.epidemic.df <- c(hiv.prev.lt25.women, hiv.prev.lt25.men, 
+                           hiv.prev.25.40.women, hiv.prev.25.40.men,
+                           hiv.prev.40.50.women, hiv.prev.40.50.men, 
+                           mix.rels.dat,
+                           pp.cp.6months.male,
+                           
+                           METRICS.incidence.df.15.24.men, METRICS.incidence.df.15.24.women, 
+                           METRICS.incidence.df.25.39.men, METRICS.incidence.df.25.39.women,
+                           METRICS.incidence.df.40.49.men, METRICS.incidence.df.40.49.women)
+  
+  
+  
+  
   ##########################################################
   # Step 3: Data and age-mixing in transmissions #
   ##########################################################
@@ -798,16 +932,16 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
   
   
   transm.clust.MCAR.cov.100 <- tryCatch(LMEMphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, 
-                                                                       work.dir = work.dir,  
-                                                                       dirfasttree = dirfasttree, 
-                                                                       sub.dir.rename = sub.dir.rename,
-                                                                       limitTransmEvents = 7,
-                                                                       timewindow = c(30,40),
-                                                                       seq.cov = 100,
-                                                                       age.group.15.25 = c(15,25),
-                                                                       age.group.25.40 = c(25,40),
-                                                                       age.group.40.50 = c(40,50)),
-                                       error=function(e) return(rep(NA, 4)))
+                                                                        work.dir = work.dir,  
+                                                                        dirfasttree = dirfasttree, 
+                                                                        sub.dir.rename = sub.dir.rename,
+                                                                        limitTransmEvents = 7,
+                                                                        timewindow = c(30,40),
+                                                                        seq.cov = 100,
+                                                                        age.group.15.25 = c(15,25),
+                                                                        age.group.25.40 = c(25,40),
+                                                                        age.group.40.50 = c(40,50)),
+                                        error=function(e) return(rep(NA, 4)))
   transm.clust.MCAR.cov.100.val <- sapply(transm.clust.MCAR.cov.100, mean)
   
   
@@ -1407,6 +1541,20 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
   # Names
   
   
+  names.epidemic.df <- c("hiv.prev.lt25.women", "hiv.prev.lt25.men", 
+                         "hiv.prev.25.40.women", "hiv.prev.25.40.men",
+                         "hiv.prev.40.50.women", "hiv.prev.40.50.men", 
+                         "AAD.male", "SDAD.male", "slope.male", "WSD.male", "BSD.male", "intercept.male",
+                         
+                         "pp.cp.6months.male",
+                         
+                         "METRICS.incidence.df.15.24.men", "METRICS.incidence.df.15.24.women", 
+                         "METRICS.incidence.df.25.39.men", "METRICS.incidence.df.25.39.women",
+                         "METRICS.incidence.df.40.49.men", "METRICS.incidence.df.40.49.women")
+  
+  
+  
+  
   name.lme <- names(lme.val)
   
   # same names all and we may have NA for low coverage
@@ -1464,7 +1612,7 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
   name.clust.AR.a.95 <- paste0("clust.AR.a.95.",c("av.age.male", "av.age.diff", "between.clust.var", "within.clust.var"))
   
   
-
+  
   
   # name.clust.AR.a.35 <- paste0("clust.AR.a.35.",names(transm.clust.AR.a.cov.35.val))
   # name.clust.AR.a.40 <- paste0("clust.AR.a.40.",names(transm.clust.AR.a.cov.40.val))
@@ -1534,7 +1682,7 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
   name.clust.AR.c.85 <- paste0("clust.AR.c.85.",c("av.age.male", "av.age.diff", "between.clust.var", "within.clust.var"))
   name.clust.AR.c.90 <- paste0("clust.AR.c.90.",c("av.age.male", "av.age.diff", "between.clust.var", "within.clust.var"))
   name.clust.AR.c.95 <- paste0("clust.AR.c.95.",c("av.age.male", "av.age.diff", "between.clust.var", "within.clust.var"))
-
+  
   
   # name.clust.AR.c.35 <- paste0("clust.AR.c.35.",names(transm.clust.AR.c.cov.35.val))
   # name.clust.AR.c.40 <- paste0("clust.AR.c.40.",names(transm.clust.AR.c.cov.40.val))
@@ -1561,7 +1709,9 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
                      name.clust.AR.a.scenari, name.clust.AR.b.scenari, 
                      name.clust.AR.c.scenari,
                      
-                     name.clust.MCAR.100)
+                     name.clust.MCAR.100,
+                     
+                     names.epidemic.df)
   
   
   outputvector <- c(flag.women, flag.men, mean.AD, med.AD, sd.AD, lme.val, flag.lme,
@@ -1590,7 +1740,10 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
                     transm.clust.AR.c.cov.80.val, transm.clust.AR.c.cov.85.val, transm.clust.AR.c.cov.90.val,
                     transm.clust.AR.c.cov.95.val, 
                     
-                    transm.clust.MCAR.cov.100)
+                    transm.clust.MCAR.cov.100,
+                    
+                    
+                    summary.epidemic.df)
   
   # Population level metrics: "flag.women", "flag.men", "Pop.mean.AD", "Pop.med.AD", "Pop.sd.AD", 
   # "av.age.male", "av.age.diff", "between.clust.var", "within.clust.var", "flag.lme", 
@@ -1626,15 +1779,18 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
 # 
 # test.all <- wrapper.phylo.simpact.study.1(inputvector = inputvector) # L = 437
 
-# inputvector <- c(-0.52, -0.05, 2.8, 0, 3, 0.25, -0.3, -0.1, 
-#                  # 0.2,
-#                  -1, -90, 0.5, 0.05, -0.14, 5, 7, 12, -2.7) # length(inputvector) = 18
 
-# For age mix params
+# Without age-mixing
 
-inputvector <- c(-0.52, -0.05, 5, 7, 3, 0.25, -0.3, -0.1, 
+inputvector <- c(-0.52, -0.05, 2, 0, 2, 0.25, -0.3, -0.1,
                  # 0.2,
                  -1, -90, 0.5, 0.05, -0.14, 5, 7, 12, -2.7) # length(inputvector) = 18
+
+# With age-mixing
+# 
+# inputvector <- c(-0.52, -0.05, 5, 7, 3, 0.25, -0.3, -0.1, 
+#                  # 0.2,
+#                  -1, -90, 0.5, 0.05, -0.14, 5, 7, 12, -2.7) # length(inputvector) = 18
 
 
 # 
