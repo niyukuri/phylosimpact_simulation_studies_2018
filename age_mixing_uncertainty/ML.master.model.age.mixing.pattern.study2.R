@@ -23,6 +23,12 @@ pacman::p_load(snow, parallel, RSimpactCyan, RSimpactHelper, ape, Rsamtools)
 
 
 
+# inputvector <- c(123,-0.52, -0.05, 5, 7, 3, 0.25, -0.3, -0.1, 
+#                  # 0.2,
+#                  -1, -90, 0.5, 0.05, -0.14, 5, 7, 12, -2.7) # length(inputvector) = 18
+
+
+
 ML.master.model.age.mixing.pattern.toy1 <- function(inputvector = input.vector){
   
   
