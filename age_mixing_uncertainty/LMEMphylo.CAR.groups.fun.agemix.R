@@ -1,3 +1,39 @@
+#' A function that returns age mixing patterns quantities based on fitting mixed effect models to  transmission clusters
+#' in scenarios where individuals are missing at completly at random
+#' @param simpact.trans.net a list of transmission networks produced by \code{\link{transm.network.builder}}
+#' @param work.dir Working directory
+#' @param dirfasttree Directory where FastTree is located
+#' @param sub.dir.rename Subdirectory each run when we perform parallelization
+#' @param limitTransmEvents Number of minimum transmission events to be considered in each transmission networks
+#' @param timewindow Time interval
+#' @param seq.cov Percentage of individulas considered for this transmission pattern scenario
+#' @param age.group.15.25 age group between 15 and 25 years old
+#' @param age.group.25.40 age group between 25 and 40 years old
+#' @param age.group.40.50 age group between 40 and 50 years old
+#' @return a vector of number of men and women in different age group, number of transmissions within all age groups, and mean and SD of age different between infectors and infectees
+#' @examples
+#' w <- LMEMphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+#'                                      work.dir = work.dir,
+#'                                      dirfasttree = dirfasttree,
+#'                                      sub.dir.rename = sub.dir.rename,
+#'                                      limitTransmEvents = 7,
+#'                                      timewindow = c(30,40),
+#'                                      seq.cov = 70,
+#'                                      age.group.15.25 = c(15,25),
+#'                                      age.group.25.40 = c(25,40),
+#'                                      age.group.40.50 = c(40,50))
+
+#'
+#' @importFrom magrittr %>%
+#' @importFrom dplyr filter
+#' @export
+#'
+
+
+# true we record of infection - infection time
+
+
+# true we record of infection - infection time
 
 LMEMphylo.CAR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net,
                                             work.dir = work.dir,
@@ -172,22 +208,17 @@ LMEMphylo.CAR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.ne
     transmission.clust.list <-  vector("list", length(d)) # list() # initialise gender and age-structured data table of pairings in each transission cluster
     
     
-    # Check how many indiv in a cluster
+    # Binding all data tables of clusters (age, gender, number of cluster)
     
-    # for (i in 1:length(d)) {
-    #   
-    #   clus.read <- read.table(file = paste0(paste0(sub.dir.rename,"/"),d[i]), header = FALSE) # Ids of each cluster
-    #   
-    #   t.v <- c(t.v, nrow(clus.read))
-    #   
-    # }
+    clust.size <- vector() # size of each cluster
     
     for (i in 1:length(d)) {
       
       transm.df.cl.dat <- NULL
       
       clus.read <- read.table(file = paste0(paste0(sub.dir.rename,"/"),d[i]), header = FALSE) # Ids of each cluster
-      #size <- c(size, nrow(clus.read))
+      
+      clust.size <- c(clust.size, nrow(clus.read))
       
       transm.df.cl <- subset(transm.df, transm.df$id.lab%in%as.character(clus.read$V1)) # transmission data table of IDs of that cluster
       
@@ -209,7 +240,7 @@ LMEMphylo.CAR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.ne
     
     a <- coef(summary(fit.lme.transm.clust))[1] # average age in transmission clusters
     
-    beta <- coef(summary(fit.lme.transm.clust))[2] # average age difference in transmission clusters: 
+    beta.va <- coef(summary(fit.lme.transm.clust))[2] # average age difference in transmission clusters: 
     # seen as bridge width which shows potential cross-generation transmission
     
     
@@ -217,14 +248,23 @@ LMEMphylo.CAR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.ne
     
     b2 <- as.numeric(VarCorr(fit.lme.transm.clust)[4]) # within cluster variation
     
-    clust.lme.val <- c(a, beta, b1, b2)
+    clust.lme.val <- c(a, beta.va, b1, b2)
     
-    names(clust.lme.val) <- c("av.age.male", "av.age.diff", "between.clust.var", "within.clust.var")
     
-    return(clust.lme.val)
+    Num.Clus <- length(d)
+    
+    av.Clust.size <- sum(clust.size)/length(d)
+    
+    ouptuvector.clust <- c(clust.lme.val, Num.Clus, av.Clust.size)
+    
+    names(ouptuvector.clust) <- c("av.age.clust.male", "gendEffect.clust", "between.clust.var", "within.clust.var", "Num.Clusters", "av.Clust.Size")
+    
+    return(ouptuvector.clust)
     
     
   }
+  
+  
   
   
   mCAr.IDs <- IDs.Seq.Random(simpact.trans.net = simpact.trans.net,
@@ -264,16 +304,15 @@ LMEMphylo.CAR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.ne
     # Read clusters' files
     
     dd <- list.files(path = paste0(sub.dir.rename), pattern = paste0(paste0("cov.",seq.cov, ".mCAr.IDs.C.Epidemic.Fasta"),"_",paste0("cov.",seq.cov, ".mCAr.IDs.C.Epidemic.Fasta"),"_","clusterPicks_cluste"),
-                    all.files = FALSE,
-                    full.names = FALSE, recursive = FALSE)
+                     all.files = FALSE,
+                     full.names = FALSE, recursive = FALSE)
     
     
     clust.fit.params <- mixed.effect.fit.transmission.clusters(clust.names=dd, 
                                                                simpact.trans.net = simpact.trans.net,
                                                                limitTransmEvents = 7)
     
-    
-  }
+   }
   
   return(clust.fit.params)
   
