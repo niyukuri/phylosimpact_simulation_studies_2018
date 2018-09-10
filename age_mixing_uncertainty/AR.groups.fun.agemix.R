@@ -1,3 +1,32 @@
+#' A function that returns age mixing patterns quantities in transmission networks
+#' in scenarios where individuals are missing at random
+#' @param simpact.trans.net a list of transmission networks produced by \code{\link{transm.network.builder}}
+#' @param limitTransmEvents Number of minimum transmission events to be considered in each transmission networks
+#' @param timewindow Time interval
+#' @param seq.cov Percentage of individulas considered for this transmission pattern scenario
+#' @param seq.gender.ratio Gender ratio
+#' @param age.group.15.25 age group between 15 and 25 years old
+#' @param age.group.25.40 age group between 25 and 40 years old
+#' @param age.group.40.50 age group between 40 and 50 years old
+#' @return a vector of number of men and women in different age group, number of transmissions within all age groups, and mean and SD of age different between infectors and infectees
+#' @examples
+#' w <- AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+#'                            limitTransmEvents = 7,
+#'                            timewindow = c(30,40),
+#'                            seq.cov = 70,
+#'                            seq.gender.ratio = 0.7,
+#'                            age.group.15.25 = c(15,25),
+#'                            age.group.25.40 = c(25,40),
+#'                            age.group.40.50 = c(40,50))
+
+#'
+#' @importFrom magrittr %>%
+#' @importFrom dplyr filter
+#' @export
+#'
+
+
+# true we record of infection - infection time
 # true we record of infection - infection time
 
 AR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net,
