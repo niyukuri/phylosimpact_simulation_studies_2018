@@ -185,25 +185,46 @@ CAR.groups.fun.agemixBIS <- function(simpact.trans.net = simpact.trans.net,
   
   
   # (ii) Fiting age mixing transmission table with mixed-effect linear model
+
   
+  # SD for the two strata
   
-  fit.lme.transm.df <- lme(age.samp.Rec ~ GenderRec, data = data.transm.agemix, random = ~ 1|DonId)
+  het.fit.lme.agemixing <- lme(age.samp.Rec ~ GenderRec, data = data.transm.agemix, random = ~ 1|DonId,
+                               weights = varIdent( c("1" = 0.5), ~ 1 |GenderRec ))
   
+  het.a <- coef(summary(het.fit.lme.agemixing))[1] # average age in transmission clusters
   
-  
-  a <- coef(summary(fit.lme.transm.df))[1] # average age in transmission clusters
-  
-  beta <- coef(summary(fit.lme.transm.df))[2] # average age difference in transmission clusters: 
+  het.beta <- coef(summary(het.fit.lme.agemixing))[2] # average age difference in transmission clusters: 
   # seen as bridge width which shows potential cross-generation transmission
   
   
-  b1 <- as.numeric(VarCorr(fit.lme.transm.df)[3]) # between cluster variation
+  het.b1 <- as.numeric(VarCorr(het.fit.lme.agemixing)[3]) # between cluster variation
   
-  b2 <- as.numeric(VarCorr(fit.lme.transm.df)[4]) # within cluster variation
+  het.b2 <- as.numeric(VarCorr(het.fit.lme.agemixing)[4]) # within cluster variation
   
-  transm.lme.val <- c(a, beta, b1, b2)
   
-  # names.transm.lme.val <- c("T.av.age.male", "T.gendEffect", "T.between.indiv.var", "T.within.indiv.var")
+  # SD for the two strata
+  
+  unique.val.strat <- unique(attributes(het.fit.lme.agemixing$modelStruct$varStruct)$weights)
+  
+  het.fit.lme.agemixing$modelStruct$varStruct
+  
+  # reference group: female == 1
+  delta.female <- 1
+  
+  female.val <- unique.val.strat[1]
+  male.val <- unique.val.strat[2]
+  
+  delta.male <- female.val/male.val # delta_ref_group / val
+  
+  SD.female <- as.numeric(VarCorr(het.fit.lme.agemixing)[4])
+  SD.male <- delta.male * SD.female 
+  
+  
+  het.lme.val <- c(het.a, het.beta, het.b1, het.b2, SD.female, SD.male)
+  
+  names(het.lme.val) <-  c("het.av.age.male", "het.gendEffect.clust", "het.between.transm.var", "het.within.transm.var", "het.SD.female", "het.SD.male")
+  
   
   
   
@@ -327,7 +348,7 @@ CAR.groups.fun.agemixBIS <- function(simpact.trans.net = simpact.trans.net,
                            
                            mix.rels.dat,
                            
-                           transm.lme.val)
+                           as.numeric(het.lme.val)) 
   
   
   val.names <- c("num.men.15.25", "num.women.15.25",
@@ -342,7 +363,7 @@ CAR.groups.fun.agemixBIS <- function(simpact.trans.net = simpact.trans.net,
                  
                  "RT.AAD.male", "RT.SDAD.male", "RT.slope.male", "RT.WSD.male", "RT.BSD.male", "RT.intercept.male",
                  
-                 "T.av.age.male", "T.gendEffect", "T.between.indiv.var", "T.within.indiv.var")
+                 "T.het.av.age.male", "T.het.gendEffect", "T.het.between.transm.var", "T.het.within.transm.var", "T.het.SD.female", "T.het.SD.male")
   
   
   names(ouput.transm.dat.AD) <- val.names
@@ -350,20 +371,5 @@ CAR.groups.fun.agemixBIS <- function(simpact.trans.net = simpact.trans.net,
   
   return(ouput.transm.dat.AD)
 }
-
-### ----------------------------------------
-
-# 
-# w <- CAR.groups.fun.agemixBIS(simpact.trans.net = simpact.trans.net,
-#                               datalist = datalist.agemix,
-#                               limitTransmEvents = 7,
-#                               timewindow = c(30,40),
-#                               seq.cov = 70,
-#                               #    seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-#                               age.group.15.25 = c(15,25),
-#                               age.group.25.40 = c(25,40),
-#                               age.group.40.50 = c(40,50))
-
-
 
 
