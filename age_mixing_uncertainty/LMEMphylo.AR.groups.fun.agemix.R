@@ -7,12 +7,13 @@
 #' @param limitTransmEvents Number of minimum transmission events to be considered in each transmission networks
 #' @param timewindow Time interval
 #' @param seq.cov Percentage of individulas considered for this transmission pattern scenario
+#' @param seq.gender.ratio percentage of women in the population 
 #' @param age.group.15.25 age group between 15 and 25 years old
 #' @param age.group.25.40 age group between 25 and 40 years old
 #' @param age.group.40.50 age group between 40 and 50 years old
 #' @return a vector of number of men and women in different age group, number of transmissions within all age groups, and mean and SD of age different between infectors and infectees
 #' @examples
-#' w <- LMEMphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+#' w <- LMEMphylo.AR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
 #'                                      work.dir = work.dir,
 #'                                      dirfasttree = dirfasttree,
 #'                                      sub.dir.rename = sub.dir.rename,
@@ -124,6 +125,7 @@ LMEMphylo.AR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net
   
   # Function for linear mixed effect models
   ##########################################
+ 
   
   mixed.effect.fit.transmission.clusters <- function(clust.names=clust.names,
                                                      simpact.trans.net = simpact.trans.net,
@@ -205,7 +207,7 @@ LMEMphylo.AR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net
     
     transmission.clust.list <-  vector("list", length(d)) # list() # initialise gender and age-structured data table of pairings in each transission cluster
     
-  
+    
     # Binding all data tables of clusters (age, gender, number of cluster)
     
     clust.size <- vector() # size of each cluster
@@ -232,21 +234,40 @@ LMEMphylo.AR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net
     clust.table.df <- as.data.frame(do.call(rbind, transmission.clust.list)) # data.table & data.frame
     
     
-    fit.lme.transm.clust <- lme(age ~ gender, data = clust.table.df, random = ~ 1|clust.id)
+    het.fit.lme.agemixing <- lme(age ~ gender, data = clust.table.df, random = ~ 1|clust.id,
+                                 weights = varIdent( c("1" = 0.5), ~ 1 |gender))
     
     
+    het.a <- coef(summary(het.fit.lme.agemixing))[1] # average age in transmission clusters
     
-    a <- coef(summary(fit.lme.transm.clust))[1] # average age in transmission clusters
-    
-    beta.va <- coef(summary(fit.lme.transm.clust))[2] # average age difference in transmission clusters: 
+    het.beta <- coef(summary(het.fit.lme.agemixing))[2] # average age difference in transmission clusters: 
     # seen as bridge width which shows potential cross-generation transmission
     
     
-    b1 <- as.numeric(VarCorr(fit.lme.transm.clust)[3]) # between cluster variation
+    het.b1 <- as.numeric(VarCorr(het.fit.lme.agemixing)[3]) # between cluster variation
     
-    b2 <- as.numeric(VarCorr(fit.lme.transm.clust)[4]) # within cluster variation
+    het.b2 <- as.numeric(VarCorr(het.fit.lme.agemixing)[4]) # within cluster variation
     
-    clust.lme.val <- c(a, beta.va, b1, b2)
+    
+    # SD for the two strata
+    
+    unique.val.strat <- unique(attributes(het.fit.lme.agemixing$modelStruct$varStruct)$weights)
+    
+    het.fit.lme.agemixing$modelStruct$varStruct
+    
+    # reference group: female == 1
+    delta.female <- 1
+    
+    female.val <- unique.val.strat[1]
+    male.val <- unique.val.strat[2]
+    
+    delta.male <- female.val/male.val # delta_ref_group / val
+    
+    SD.female <- as.numeric(VarCorr(het.fit.lme.agemixing)[4])
+    SD.male <- delta.male * SD.female 
+    
+    
+    clust.lme.val <- c(het.a, het.beta, het.b1, het.b2, SD.female, SD.male)
     
     
     Num.Clus <- length(d)
@@ -255,7 +276,7 @@ LMEMphylo.AR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net
     
     ouptuvector.clust <- c(clust.lme.val, Num.Clus, av.Clust.size)
     
-    names(ouptuvector.clust) <- c("av.age.clust.male", "gendEffect.clust", "between.clust.var", "within.clust.var", "Num.Clusters", "av.Clust.Size")
+    names(ouptuvector.clust) <- c("clust.av.age.male", "clust.gendEffect", "clust.between.transm.var", "clust.within.transm.var", "clust.SD.female", "clust.SD.male", "Num.Clusters", "av.Clust.Size")
     
     return(ouptuvector.clust)
     
@@ -297,6 +318,7 @@ LMEMphylo.AR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net
     
     
     # run ClusterPicker
+    
     
     system(paste("java -jar ", paste(paste0(work.dir,"/ClusterPicker_1.2.3.jar"), paste0(sub.dir.rename,"/", paste0("cov.",seq.cov, ".mAr.IDs.C.Epidemic.Fasta")), paste0(sub.dir.rename,"/",paste0("cov.",seq.cov, ".mAr.IDs.C.Epidemic.Fasta.nwk")),  paste0("0.9 0.9 0.045 2 gap"))))
     
