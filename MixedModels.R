@@ -426,6 +426,23 @@ traclust1 <- lme(age ~ gender, data = AGEMIX, random = ~ 1|id,
 
 summary(traclust1)
 
+# Heteroscedasticity: model variance component of within-group errors
+
+unique.val.strat <- unique(attributes(traclust1$modelStruct$varStruct)$weights)
+
+traclust1$modelStruct$varStruct
+
+# reference group: female == 1
+delta.female <- 1
+
+female.val <- unique.val.strat[1]
+male.val <- unique.val.strat[2]
+
+delta.male <- female.val/male.val # delta_ref_group / val
+
+SD.female <- as.numeric(VarCorr(traclust1)[4])
+SD.male <- delta.male * SD.female 
+
 
 sigma2vec.b <- matrix((1/unique(attributes(traclust1$modelStruct$varStruct)$weights)*traclust1$sigma)^2,nrow=1,byrow=TRUE)
 
@@ -513,6 +530,41 @@ beta <- coef(summary(fit.lme.transm.clust))[2] # average age difference in trans
 b1 <- as.numeric(VarCorr(fit.lme.transm.clust)[3]) # between cluster variation
 
 b2 <- as.numeric(VarCorr(fit.lme.transm.clust)[4]) # within cluster variation
+
+
+## Varying the variance
+library(nlme)
+data('Orthodont')
+
+
+fm4Orth.lme <- lme(distance~Sex*I(age-11), data=Orthodont, random=~I(age-11)|Subject,
+                   weights=varIdent(form=~1|Sex), correlation=corCAR1(form=~I(age-11)|Subject))
+
+
+summary(fm4Orth.lme)
+
+
+a <- coef(summary(fm4Orth.lme))[1] 
+
+beta <- coef(summary(fm4Orth.lme))[2] 
+
+b1 <- as.numeric(VarCorr(fm4Orth.lme)[3]) # between cluster variation - sigma_beta
+
+b2 <- as.numeric(VarCorr(fm4Orth.lme)[4]) # within cluster variation - residual - sigma
+
+
+fm4Orth.lme$modelStruct$varStruct
+
+as.numeric(fm4Orth.lme$modelStruct$varStruct)
+
+
+unique.val.strat <- unique(attributes(fm4Orth.lme$modelStruct$varStruct)$weights)
+fm4Orth.lme$modelStruct$varStruct
+# reference group: delta.male == 1
+male.val <- unique.val.strat[1]
+female.val <- unique.val.strat[2]
+
+delta.female <- male.val / female.val # delta_ref_group / val
 
 
 
