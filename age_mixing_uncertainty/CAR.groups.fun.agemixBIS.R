@@ -223,7 +223,7 @@ CAR.groups.fun.agemixBIS <- function(simpact.trans.net = simpact.trans.net,
   
   het.lme.val <- c(het.a, het.beta, het.b1, het.b2, SD.female, SD.male)
   
-  names(het.lme.val) <-  c("het.av.age.male", "het.gendEffect.clust", "het.between.transm.var", "het.within.transm.var", "het.SD.female", "het.SD.male")
+  names(het.lme.val) <-  c("het.av.age.male", "het.gendEffect", "het.between.transm.var", "het.within.transm.var", "het.SD.female", "het.SD.male")
   
   
   
