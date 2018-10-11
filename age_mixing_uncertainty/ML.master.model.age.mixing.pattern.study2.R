@@ -527,30 +527,82 @@ ML.master.model.age.mixing.pattern.toy1 <- function(inputvector = input.vector){
   #####################################################################
   
   
+
+  
   if( nrow(agemixing.df.IDs) > length(unique(agemixing.df.IDs$parent)) & length(unique(agemixing.df.IDs$parent)) > 1 ){
     
     
-    fit.lme.agemixing <- lme(AgeInfecRec ~ GenderRec, data = agemixing.df.IDs, random = ~ 1|DonId)
+    # Simple LMM
+    #############
+    # 
+    # fit.lme.agemixing <- lme(AgeInfecRec ~ GenderRec, data = agemixing.df.IDs, random = ~ 1|DonId)
+    # 
+    # 
+    # 
+    # a <- coef(summary(fit.lme.agemixing))[1] # average age in transmission clusters
+    # 
+    # beta <- coef(summary(fit.lme.agemixing))[2] # average age difference in transmission clusters: 
+    # # seen as bridge width which shows potential cross-generation transmission
+    # 
+    # 
+    # b1 <- as.numeric(VarCorr(fit.lme.agemixing)[3]) # between cluster variation
+    # 
+    # b2 <- as.numeric(VarCorr(fit.lme.agemixing)[4]) # within cluster variation
+    # 
+    # lme.val <- c(a, beta, b1, b2)
+    # 
+    # names(lme.val) <-  c("av.age.male", "gendEffect.clust", "between.transm.var", "within.transm.var")
+    # 
+    # 
+    # 
+    
+    # Heteroscedasticity: model variance component of within-group errors
+    ######################################################################
     
     
+    het.fit.lme.agemixing <- lme(AgeInfecRec ~ GenderRec, data = agemixing.df.IDs, random = ~ 1|DonId,
+                                 weights = varIdent( c("1" = 0.5), ~ 1 |GenderRec ))
     
-    a <- coef(summary(fit.lme.agemixing))[1] # average age in transmission clusters
     
-    beta <- coef(summary(fit.lme.agemixing))[2] # average age difference in transmission clusters: 
+    het.a <- coef(summary(het.fit.lme.agemixing))[1] # average age in transmission clusters
+    
+    het.beta <- coef(summary(het.fit.lme.agemixing))[2] # average age difference in transmission clusters: 
     # seen as bridge width which shows potential cross-generation transmission
     
     
-    b1 <- as.numeric(VarCorr(fit.lme.agemixing)[3]) # between cluster variation
+    het.b1 <- as.numeric(VarCorr(het.fit.lme.agemixing)[3]) # between cluster variation
     
-    b2 <- as.numeric(VarCorr(fit.lme.agemixing)[4]) # within cluster variation
+    het.b2 <- as.numeric(VarCorr(het.fit.lme.agemixing)[4]) # within cluster variation
     
-    lme.val <- c(a, beta, b1, b2)
     
-    names(lme.val) <-  c("av.age.male", "av.age.diff", "between.transm.var", "within.transm.var")
+    # SD for the two strata
+    
+    unique.val.strat <- unique(attributes(het.fit.lme.agemixing$modelStruct$varStruct)$weights)
+    
+    het.fit.lme.agemixing$modelStruct$varStruct
+    
+    # reference group: female == 1
+    delta.female <- 1
+    
+    female.val <- unique.val.strat[1]
+    male.val <- unique.val.strat[2]
+    
+    delta.male <- female.val/male.val # delta_ref_group / val
+    
+    SD.female <- as.numeric(VarCorr(het.fit.lme.agemixing)[4])
+    SD.male <- delta.male * SD.female 
+    
+    
+    het.lme.val <- c(het.a, het.beta, het.b1, het.b2, SD.female, SD.male)
+    
+    names(het.lme.val) <-  c("het.av.age.male", "het.gendEffect.clust", "het.between.transm.var", "het.within.transm.var", "SD.female", "SD.male")
+    
+    
+    
     
     flag.lme <- NA
     
-    if(abs(lme.val[[2]]) > 5){ # If average age difference is greater than 5, there is a cross-generation transmission
+    if(abs(het.lme.val[[2]]) > 5){ # If average age difference is greater than 5, there is a cross-generation transmission
       flag.lme <- 1
     }else{
       flag.lme <- 0
@@ -558,11 +610,13 @@ ML.master.model.age.mixing.pattern.toy1 <- function(inputvector = input.vector){
     
   }else{
     
-    names.lme.val <-  c("av.age.male", "av.age.diff", "between.transm.var", "within.transm.var")
+    names.lme.val <-  c("het.av.age.male", "het.gendEffect.clust", "het.between.transm.var", "het.within.transm.var", "SD.female", "SD.male")
     
-    lme.val <- rep(NA, length(names.lme.val))
+    # c("av.age.male", "gendEffect.clust", "between.transm.var", "within.transm.var")
     
-    names(lme.val) <- names.lme.val
+    het.lme.val <- rep(NA, length(names.lme.val))
+    
+    names(het.lme.val) <- names.lme.val
     
     flag.lme <- NA
   }
