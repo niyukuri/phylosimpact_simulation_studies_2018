@@ -230,7 +230,7 @@ MLphylo.CAR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net,
       pairs.25.40.men.women.40.50 <- comb(1, nrow(num.25.40.men)) * comb(1, nrow(num.40.50.women))
       # tryCatch(comb(nrow(num.25.40.men), nrow(num.40.50.women)),
       #                                       error=function(e) return(NA))
-      #
+      #z
       pairs.40.50.men.women.40.50 <-  comb(1, nrow(num.25.40.men)) * comb(1, nrow(num.40.50.women))
       # tryCatch(comb(nrow(num.40.50.men), nrow(num.40.50.women)),
       #                                       error=function(e) return(NA))
