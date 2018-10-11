@@ -123,8 +123,8 @@ LMEMphylo.CAR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.ne
   
   
   
-  # Function for linear mixed effect models
-  #########################################
+  # Function for linear mixed effect models in transmission clusters
+  ###################################################################
   
   
   mixed.effect.fit.transmission.clusters <- function(clust.names=clust.names,
