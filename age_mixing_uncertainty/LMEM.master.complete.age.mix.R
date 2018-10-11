@@ -729,8 +729,6 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
     names(het.lme.val) <-  c("het.av.age.male", "het.gendEffect.clust", "het.between.transm.var", "het.within.transm.var", "SD.female", "SD.male")
     
     
-    
-    
     flag.lme <- NA
     
     if(abs(het.lme.val[[2]]) > 5){ # If average age difference is greater than 5, there is a cross-generation transmission
@@ -765,6 +763,7 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
   #                "mean.AD", "median.AD", "sd.AD")
   
   CAR.100 <- CAR.groups.fun.agemixBIS(simpact.trans.net = simpact.trans.net,
+                                      datalist = datalist.agemix,
                                       limitTransmEvents = 7,
                                       timewindow = c(30,40),
                                       seq.cov = 100,
