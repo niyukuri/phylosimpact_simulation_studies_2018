@@ -64,6 +64,12 @@ master.epic.metric.class.phylo.features.cov <- function(inputvector){
   library(robustbase) # colMedians
   
   
+  library(mgcv)
+  library(phytools)
+  library(phyloTop)
+  
+  
+  
   age.distr <- agedistr.creator(shape = 5, scale = 65)
   #
   cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
