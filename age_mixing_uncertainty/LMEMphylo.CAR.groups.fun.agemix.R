@@ -311,10 +311,7 @@ LMEMphylo.CAR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.ne
                                                           count.start = 1977,
                                                           endsim = 40,
                                                           clust = FALSE)
-    
-    tree.cal.cov.35.IDs <- read.tree(paste0(sub.dir.rename, paste0("/cov.",seq.cov, ".mCAr.IDs.C.Epidemic.Fasta.nwk")))
-    
-    
+  
     
     # run ClusterPicker
     
