@@ -3,17 +3,17 @@
 
 
 MAR.compute.summary.statistics.phylo <- function(datalist = datalist.agemix,
-                                                  work.dir = work.dir,
-                                                  sub.dir.rename = sub.dir.rename,
-                                                  dirfasttree = work.dir,
-                                                  datalist = datalist,
-                                                  limitTransmEvents = 7,
-                                                  seq.cov = 35,
-                                                  age.group.15.25 = c(15,25),
-                                                  age.group.25.40 = c(25,40),
-                                                  age.group.40.50 = c(40,50),
-                                                  endpoint = 40,
-                                                  timewindow = c(30,40)){
+                                                 work.dir = work.dir,
+                                                 sub.dir.rename = sub.dir.rename,
+                                                 dirfasttree = work.dir,
+                                                 limitTransmEvents = 7,
+                                                 seq.cov = 35,
+                                                 seq.gender.ratio = 0.7,
+                                                 age.group.15.25 = c(15,25),
+                                                 age.group.25.40 = c(25,40),
+                                                 age.group.40.50 = c(40,50),
+                                                 endpoint = 40,
+                                                 timewindow = c(30,40)){
   
   
   
@@ -31,10 +31,8 @@ MAR.compute.summary.statistics.phylo <- function(datalist = datalist.agemix,
   # New datalist for relationships
   
   
-  age.limit = age.group.40.50[2]
-  
-  
   datalist.new <- datalist
+  
   
   person.datalist.new <- datalist.new$ptable
   
@@ -42,24 +40,180 @@ MAR.compute.summary.statistics.phylo <- function(datalist = datalist.agemix,
   
   person.TOB.datalist.new <- person.datalist.new
   
-  person.TOB.datalist.new$TOB <- abs(person.TOB.datalist.new$TOB) + person.TOB.datalist.new$TOD
+  person.TOB.datalist.new$AgeDeath <- abs(person.TOB.datalist.new$TOB) + person.TOB.datalist.new$TOD
   
-  person.datalist.new.df <- dplyr::filter(person.TOB.datalist.new, person.TOB.datalist.new$TOB <= age.limit)
+  person.TOB.datalist.new$AgEndpoint <- abs(person.TOB.datalist.new$TOB) + endpoint
   
-  perc.100.limit <- nrow(person.datalist.new.df)
+  person.TOB.datalist.new$AgeLowWindow <- abs(person.TOB.datalist.new$TOB) + timewindow[1]
   
-  men.datalist.new.df <- dplyr::filter(person.datalist.new.df, person.datalist.new.df$Gender=="0" & person.datalist.new.df$TOB >= timewindow[1]) # & person.datalist.new.df$TOB <= timewindow[2])
-  
-  women.datalist.new.df <- dplyr::filter(person.datalist.new.df, person.datalist.new.df$Gender=="1" & person.datalist.new.df$TOB >= timewindow[1]) # & person.datalist.new.df$TOB <= timewindow[2])
-  
-  perc.100.limit.window <- nrow(men.datalist.new.df) + nrow(women.datalist.new.df) # total number of individuals with age limit
-  
-  men.women.datalist.new.df <- rbind(men.datalist.new.df, women.datalist.new.df)
-  
-  perc.seq.coverage <- round(perc.100.limit.window*seq.cov/100) # total number of wanted individuals at seq.cov sequence coverage
+  person.TOB.datalist.new$AgeUppWindow <- abs(person.TOB.datalist.new$TOB) + timewindow[2]
   
   
-  samp.IDs <- sample(men.women.datalist.new.df$ID, perc.seq.coverage)
+  men.women.datalist.new.df.alive <- dplyr::filter(person.TOB.datalist.new, 
+                                                   person.TOB.datalist.new$AgeDeath=="Inf" & person.TOB.datalist.new$AgeLowWindow >= age.group.15.25[1] & person.TOB.datalist.new$AgeUppWindow < age.group.40.50[2])
+  
+  men.women.datalist.new.df.died <- dplyr::filter(person.TOB.datalist.new, 
+                                                  person.TOB.datalist.new$AgeDeath!="Inf" & person.TOB.datalist.new$AgeDeath >= age.group.15.25[1] & person.TOB.datalist.new$AgeDeath < age.group.40.50[2])
+  
+  
+  men.women.datalist.new.df <- rbind(men.women.datalist.new.df.alive, men.women.datalist.new.df.died)
+  
+  
+  men.datalist.new.df <- dplyr::filter(men.women.datalist.new.df, men.women.datalist.new.df$Gender=="0")
+  
+  women.datalist.new.df <- dplyr::filter(men.women.datalist.new.df, men.women.datalist.new.df$Gender=="1")
+  
+  
+  # Group 15 - 25
+  ###############
+  
+  sum.men.alive.15.25 <- dplyr::filter(men.women.datalist.new.df.alive, men.women.datalist.new.df.alive$Gender=="0", men.women.datalist.new.df.alive$AgeLowWindow>=age.group.15.25[1] & men.women.datalist.new.df.alive$AgeUppWindow<age.group.15.25[2])
+  sum.women.alive.15.25 <- dplyr::filter(men.women.datalist.new.df.alive, men.women.datalist.new.df.alive$Gender=="1", men.women.datalist.new.df.alive$AgeLowWindow>=age.group.15.25[1] & men.women.datalist.new.df.alive$AgeUppWindow<age.group.15.25[2])
+  
+  sum.men.died.15.25 <- dplyr::filter(men.women.datalist.new.df.died, men.women.datalist.new.df.died$Gender=="0", men.women.datalist.new.df.died$AgeDeath>=age.group.15.25[1] & men.women.datalist.new.df.died$AgeDeath<age.group.15.25[2])
+  sum.women.died.15.25 <- dplyr::filter(men.women.datalist.new.df.died, men.women.datalist.new.df.died$Gender=="1", men.women.datalist.new.df.died$AgeDeath>=age.group.15.25[1] & men.women.datalist.new.df.died$AgeDeath<age.group.15.25[2])
+  
+  sum.men.15.25 <- rbind(sum.men.alive.15.25, sum.men.died.15.25)
+  sum.women.15.25 <- rbind(sum.women.alive.15.25, sum.women.died.15.25)
+  
+  
+  perc.100.15.25 <- nrow(sum.men.alive.15.25) + nrow(sum.women.alive.15.25) + nrow(sum.men.died.15.25) + nrow(sum.women.died.15.25)
+  
+  
+  perc.women.15.25 <- round(perc.100.15.25 * seq.cov * seq.gender.ratio/100)
+  
+  
+  perc.men.15.25 <- round(perc.100.15.25 * seq.cov * (1-seq.gender.ratio)/100)
+  
+  
+  if(perc.men.15.25 <= length(sum.men.15.25$ID)){
+    
+    x.id.15.25 <- sample(sum.men.15.25$ID, perc.men.15.25)
+    
+  }else{
+    
+    x.id.15.25 <- sample(sum.men.15.25$ID, length(sum.men.15.25$ID))
+    
+  }
+  
+  
+  if(perc.women.15.25 <= length(sum.women.15.25$ID)){
+    
+    y.id.15.25 <- sample(sum.women.15.25$ID, perc.women.15.25)
+    
+  }else{
+    
+    y.id.15.25 <- sample(sum.women.15.25$ID, length(sum.women.15.25$ID))
+    
+  }
+  
+  
+  samp.all.15.25 <- c(x.id.15.25, y.id.15.25)
+  
+  
+  
+  # Group 25 - 40
+  ###############
+  
+  
+  sum.men.alive.25.40 <- dplyr::filter(men.women.datalist.new.df.alive, men.women.datalist.new.df.alive$Gender=="0", men.women.datalist.new.df.alive$AgeLowWindow>=age.group.25.40[1] & men.women.datalist.new.df.alive$AgeUppWindow<age.group.25.40[2])
+  sum.women.alive.25.40 <- dplyr::filter(men.women.datalist.new.df.alive, men.women.datalist.new.df.alive$Gender=="1", men.women.datalist.new.df.alive$AgeLowWindow>=age.group.25.40[1] & men.women.datalist.new.df.alive$AgeUppWindow<age.group.25.40[2])
+  
+  sum.men.died.25.40 <- dplyr::filter(men.women.datalist.new.df.died, men.women.datalist.new.df.died$Gender=="0", men.women.datalist.new.df.died$AgeDeath>=age.group.25.40[1] & men.women.datalist.new.df.died$AgeDeath<age.group.25.40[2])
+  sum.women.died.25.40 <- dplyr::filter(men.women.datalist.new.df.died, men.women.datalist.new.df.died$Gender=="1", men.women.datalist.new.df.died$AgeDeath>=age.group.25.40[1] & men.women.datalist.new.df.died$AgeDeath<age.group.25.40[2])
+  
+  sum.men.25.40 <- rbind(sum.men.alive.25.40, sum.men.died.25.40)
+  sum.women.25.40 <- rbind(sum.women.alive.25.40, sum.women.died.25.40)
+  
+  
+  perc.100.25.40 <- nrow(sum.men.alive.25.40) + nrow(sum.women.alive.25.40) + nrow(sum.men.died.25.40) + nrow(sum.women.died.25.40)
+  
+  
+  perc.women.25.40 <- round(perc.100.25.40 * seq.cov * seq.gender.ratio/100)
+  
+  
+  perc.men.25.40 <- round(perc.100.25.40 * seq.cov * (1-seq.gender.ratio)/100)
+  
+  
+  if(perc.men.25.40 <= length(sum.men.25.40$ID)){
+    
+    x.id.25.40 <- sample(sum.men.25.40$ID, perc.men.25.40)
+    
+  }else{
+    
+    x.id.25.40 <- sample(sum.men.25.40$ID, length(sum.men.25.40$ID))
+    
+  }
+  
+  
+  if(perc.women.25.40 <= length(sum.women.25.40$ID)){
+    
+    y.id.25.40 <- sample(sum.women.25.40$ID, perc.women.25.40)
+    
+  }else{
+    
+    y.id.25.40 <- sample(sum.women.25.40$ID, length(sum.women.25.40$ID))
+    
+  }
+  
+  
+  samp.all.25.40 <- c(x.id.25.40, y.id.25.40)
+  
+  
+  # Group 40 - 50
+  ###############
+  
+  
+  sum.men.alive.40.50 <- dplyr::filter(men.women.datalist.new.df.alive, men.women.datalist.new.df.alive$Gender=="0", men.women.datalist.new.df.alive$AgeLowWindow>=age.group.40.50[1] & men.women.datalist.new.df.alive$AgeUppWindow<age.group.40.50[2])
+  sum.women.alive.40.50 <- dplyr::filter(men.women.datalist.new.df.alive, men.women.datalist.new.df.alive$Gender=="1", men.women.datalist.new.df.alive$AgeLowWindow>=age.group.40.50[1] & men.women.datalist.new.df.alive$AgeUppWindow<age.group.40.50[2])
+  
+  sum.men.died.40.50 <- dplyr::filter(men.women.datalist.new.df.died, men.women.datalist.new.df.died$Gender=="0", men.women.datalist.new.df.died$AgeDeath>=age.group.40.50[1] & men.women.datalist.new.df.died$AgeDeath<age.group.40.50[2])
+  sum.women.died.40.50 <- dplyr::filter(men.women.datalist.new.df.died, men.women.datalist.new.df.died$Gender=="1", men.women.datalist.new.df.died$AgeDeath>=age.group.40.50[1] & men.women.datalist.new.df.died$AgeDeath<age.group.40.50[2])
+  
+  sum.men.40.50 <- rbind(sum.men.alive.40.50, sum.men.died.40.50)
+  sum.women.40.50 <- rbind(sum.women.alive.40.50, sum.women.died.40.50)
+  
+  
+  perc.100.40.50 <- nrow(sum.men.alive.40.50) + nrow(sum.women.alive.40.50) + nrow(sum.men.died.40.50) + nrow(sum.women.died.40.50)
+  
+  
+  perc.women.40.50 <- round(perc.100.40.50 * seq.cov * seq.gender.ratio/100)
+  
+  
+  perc.men.40.50 <- round(perc.100.40.50 * seq.cov * (1-seq.gender.ratio)/100)
+  
+  
+  if(perc.men.40.50 <= length(sum.men.40.50$ID)){
+    
+    x.id.40.50 <- sample(sum.men.40.50$ID, perc.men.40.50)
+    
+  }else{
+    
+    x.id.40.50 <- sample(sum.men.40.50$ID, length(sum.men.40.50$ID))
+    
+  }
+  
+  
+  if(perc.women.40.50 <= length(sum.women.40.50$ID)){
+    
+    y.id.40.50 <- sample(sum.women.40.50$ID, perc.women.40.50)
+    
+  }else{
+    
+    y.id.40.50 <- sample(sum.women.40.50$ID, length(sum.women.40.50$ID))
+    
+  }
+  
+  
+  samp.all.40.50 <- c(x.id.40.50, y.id.40.50)
+  
+  
+  
+  samp.all <- c(samp.all.15.25, samp.all.25.40, samp.all.40.50)
+  
+  
+  samp.IDs <- samp.all
+  
   
   
   # Persons' table of selected individuals within the time winedow
@@ -110,7 +264,7 @@ MAR.compute.summary.statistics.phylo <- function(datalist = datalist.agemix,
                                              timepoint = endpoint)$pointprevalence[1]
   hiv.prev.25.34.women <- prevalence.calculator(datalist = datalist.agemix,
                                                 agegroup = age.group.25.40,
-                                                timepoint = endpoint)$poidirfasttreentprevalence[2]
+                                                timepoint = endpoint)$pointprevalence[2]
   hiv.prev.25.34.men <- prevalence.calculator(datalist = datalist.agemix,
                                               agegroup = age.group.25.40,
                                               timepoint = endpoint)$pointprevalence[1]
@@ -121,7 +275,7 @@ MAR.compute.summary.statistics.phylo <- function(datalist = datalist.agemix,
                                               agegroup = age.group.40.50,
                                               timepoint = endpoint)$pointprevalence[1]
   
-  e
+  
   # (ii) Transmission 	rate (transmission.rate.calculator function)
   
   # transm.rate <- transmission.rate.calculator(datalist = datalist.agemix,
@@ -335,17 +489,23 @@ MAR.compute.summary.statistics.phylo <- function(datalist = datalist.agemix,
   
   # IDs fro completely random subset of sequences within the given time window
   
-  mCAr.IDs <- IDs.Seq.Random(simpact.trans.net = simpact.trans.net, 
-                             limitTransmEvents = limitTransmEvents,
-                             timewindow = timewindow, 
-                             seq.cov = seq.cov, 
-                             age.limit = age.group.40.50[2])
-  outputvector.epi.behav
+  
+  
+  mAr.IDs <- IDs.Seq.Age.Groups(simpact.trans.net = simpact.trans.net,
+                                limitTransmEvents = limitTransmEvents,
+                                timewindow = timewindow,
+                                seq.cov = seq.cov,
+                                seq.gender.ratio = seq.gender.ratio,
+                                age.group.15.25 = age.group.15.25,
+                                age.group.25.40 = age.group.25.40,
+                                age.group.40.50 = age.group.40.50)
+  
+  
   
   
   # Data table of infected individuals within the time window
   
-  data.transm.agemix <- dplyr::filter(infecttable, infecttable$id.lab%in%mCAr.IDs) 
+  data.transm.agemix <- dplyr::filter(infecttable, infecttable$id.lab%in%mAr.IDs) 
   
   
   # Data list of infected individuals within the time window
@@ -619,11 +779,14 @@ MAR.compute.summary.statistics.phylo <- function(datalist = datalist.agemix,
   
   
   
-  mCAr.IDs <- IDs.Seq.Random(simpact.trans.net = simpact.trans.net,
-                             limitTransmEvents = limitTransmEvents,
-                             timewindow = timewindow,
-                             seq.cov = seq.cov,
-                             age.limit = age.group.40.50[2])
+  mAr.IDs <- IDs.Seq.Age.Groups(simpact.trans.net = simpact.trans.net,
+                                limitTransmEvents = limitTransmEvents,
+                                timewindow = timewindow,
+                                seq.cov = seq.cov,
+                                seq.gender.ratio = seq.gender.ratio,
+                                age.group.15.25 = age.group.15.25,
+                                age.group.25.40 = age.group.25.40,
+                                age.group.40.50 = age.group.40.50)
   
   # nrow(agemixing.df.IDs) > length(unique(agemixing.df.IDs$parent)) & length(unique(agemixing.df.IDs$parent)) > 1 
   
@@ -631,34 +794,35 @@ MAR.compute.summary.statistics.phylo <- function(datalist = datalist.agemix,
   
   
   
-  if(length(mCAr.IDs)>5){
+  if(length(mAr.IDs)>5){
     
     
     choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.fas"),
-                        select.vec = mCAr.IDs,
-                        name.file = paste0(sub.dir.rename,"/",paste0("cov.",seq.cov, ".mCAr.IDs.C.Epidemic.Fasta")))
+                        select.vec = mAr.IDs,
+                        name.file = paste0(sub.dir.rename,"/",paste0("cov.",seq.cov, ".mAr.IDs.C.Epidemic.Fasta")))
     
     
-    mCAr.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
-                                                          sub.dir.rename = sub.dir.rename,
-                                                          fasttree.tool = "FastTree",
-                                                          calendar.dates = "samplingtimes.all.csv",
-                                                          simseqfile = paste0("cov.",seq.cov, ".mCAr.IDs.C.Epidemic.Fasta"),
-                                                          count.start = 1977,
-                                                          endsim = endpoint,
-                                                          clust = FALSE)
+    mAr.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
+                                                         sub.dir.rename = sub.dir.rename,
+                                                         fasttree.tool = "FastTree",
+                                                         calendar.dates = "samplingtimes.all.csv",
+                                                         simseqfile = paste0("cov.",seq.cov, ".mAr.IDs.C.Epidemic.Fasta"),
+                                                         count.start = 1977,
+                                                         endsim = endpoint,
+                                                         clust = FALSE)
     
-    tree.cal.cov.35.IDs <- read.tree(paste0(sub.dir.rename, paste0("/cov.",seq.cov, ".mCAr.IDs.C.Epidemic.Fasta.nwk")))
+    
+    tree.cal.cov.35.IDs <- read.tree(paste0(sub.dir.rename, paste0("/calibrated.tree.cov.",seq.cov, ".mAr.IDs.C.Epidemic.Fasta.tree")))
     
     
     
     # run ClusterPicker
     
-    system(paste("java -jar ", paste(paste0(work.dir,"/ClusterPicker_1.2.3.jar"), paste0(sub.dir.rename,"/", paste0("cov.",seq.cov, ".mCAr.IDs.C.Epidemic.Fasta")), paste0(sub.dir.rename,"/",paste0("cov.",seq.cov, ".mCAr.IDs.C.Epidemic.Fasta.nwk")),  paste0("0.9 0.9 0.045 2 gap"))))
+    system(paste("java -jar ", paste(paste0(work.dir,"/ClusterPicker_1.2.3.jar"), paste0(sub.dir.rename,"/", paste0("cov.",seq.cov, ".mAr.IDs.C.Epidemic.Fasta")), paste0(sub.dir.rename,"/",paste0("cov.",seq.cov, ".mAr.IDs.C.Epidemic.Fasta.nwk")),  paste0("0.9 0.9 0.045 2 gap"))))
     
     # Read clusters' files
     
-    dd <- list.files(path = paste0(sub.dir.rename), pattern = paste0(paste0("cov.",seq.cov, ".mCAr.IDs.C.Epidemic.Fasta"),"_",paste0("cov.",seq.cov, ".mCAr.IDs.C.Epidemic.Fasta"),"_","clusterPicks_cluste"),
+    dd <- list.files(path = paste0(sub.dir.rename), pattern = paste0(paste0("cov.",seq.cov, ".mAr.IDs.C.Epidemic.Fasta"),"_",paste0("cov.",seq.cov, ".mAr.IDs.C.Epidemic.Fasta"),"_","clusterPicks_cluste"),
                      all.files = FALSE,
                      full.names = FALSE, recursive = FALSE)
     
@@ -735,7 +899,6 @@ MAR.compute.summary.statistics.phylo <- function(datalist = datalist.agemix,
   }
   
   
-  
   outputvector.phylo <-  clust.phylo.fit.params
   
   
@@ -746,4 +909,17 @@ MAR.compute.summary.statistics.phylo <- function(datalist = datalist.agemix,
   
 }
 
-
+# 
+# w <- MAR.compute.summary.statistics.phylo (datalist = datalist.agemix,
+#                                            work.dir = work.dir,
+#                                            sub.dir.rename = sub.dir.rename,
+#                                            dirfasttree = work.dir,
+#                                            limitTransmEvents = 7,
+#                                            seq.cov = 35,
+#                                            seq.gender.ratio = 0.7,
+#                                            age.group.15.25 = c(15,25),
+#                                            age.group.25.40 = c(25,40),
+#                                            age.group.40.50 = c(40,50),
+#                                            endpoint = 40,
+#                                            timewindow = c(30,40))
+# 
