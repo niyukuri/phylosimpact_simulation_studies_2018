@@ -6,7 +6,6 @@ MCAR.compute.summary.statistics.phylo <- function(datalist = datalist.agemix,
                                                   work.dir = work.dir,
                                                   sub.dir.rename = sub.dir.rename,
                                                   dirfasttree = work.dir,
-                                                  datalist = datalist,
                                                   limitTransmEvents = 7,
                                                   seq.cov = 35,
                                                   age.group.15.25 = c(15,25),
@@ -36,30 +35,42 @@ MCAR.compute.summary.statistics.phylo <- function(datalist = datalist.agemix,
   
   datalist.new <- datalist
   
+  
   person.datalist.new <- datalist.new$ptable
   
   perc.100 <- nrow(person.datalist.new)
   
   person.TOB.datalist.new <- person.datalist.new
   
-  person.TOB.datalist.new$TOB <- abs(person.TOB.datalist.new$TOB) + person.TOB.datalist.new$TOD
+  person.TOB.datalist.new$AgeDeath <- abs(person.TOB.datalist.new$TOB) + person.TOB.datalist.new$TOD
   
-  person.datalist.new.df <- dplyr::filter(person.TOB.datalist.new, person.TOB.datalist.new$TOB <= age.limit)
+  person.TOB.datalist.new$AgEndpoint <- abs(person.TOB.datalist.new$TOB) + endpoint
   
-  perc.100.limit <- nrow(person.datalist.new.df)
+  person.TOB.datalist.new$AgeLowWindow <- abs(person.TOB.datalist.new$TOB) + timewindow[1]
   
-  men.datalist.new.df <- dplyr::filter(person.datalist.new.df, person.datalist.new.df$Gender=="0" & person.datalist.new.df$TOB >= timewindow[1]) # & person.datalist.new.df$TOB <= timewindow[2])
+  person.TOB.datalist.new$AgeUppWindow <- abs(person.TOB.datalist.new$TOB) + timewindow[2]
   
-  women.datalist.new.df <- dplyr::filter(person.datalist.new.df, person.datalist.new.df$Gender=="1" & person.datalist.new.df$TOB >= timewindow[1]) # & person.datalist.new.df$TOB <= timewindow[2])
   
-  perc.100.limit.window <- nrow(men.datalist.new.df) + nrow(women.datalist.new.df) # total number of individuals with age limit
+  men.women.datalist.new.df.alive <- dplyr::filter(person.TOB.datalist.new, 
+                                                   person.TOB.datalist.new$AgeDeath=="Inf" & person.TOB.datalist.new$AgeLowWindow >= age.group.15.25[1] & person.TOB.datalist.new$AgeUppWindow < age.group.40.50[2])
   
-  men.women.datalist.new.df <- rbind(men.datalist.new.df, women.datalist.new.df)
+  men.women.datalist.new.df.died <- dplyr::filter(person.TOB.datalist.new, 
+                                                  person.TOB.datalist.new$AgeDeath!="Inf" & person.TOB.datalist.new$AgeDeath >= age.group.15.25[1] & person.TOB.datalist.new$AgeDeath < age.group.40.50[2])
+  
+  
+  men.women.datalist.new.df <- rbind(men.women.datalist.new.df.alive, men.women.datalist.new.df.died)
+  
+  
+  perc.100.limit.window <- nrow(men.women.datalist.new.df)
+  
   
   perc.seq.coverage <- round(perc.100.limit.window*seq.cov/100) # total number of wanted individuals at seq.cov sequence coverage
   
   
   samp.IDs <- sample(men.women.datalist.new.df$ID, perc.seq.coverage)
+  
+  
+  
   
   
   # Persons' table of selected individuals within the time winedow
@@ -110,7 +121,7 @@ MCAR.compute.summary.statistics.phylo <- function(datalist = datalist.agemix,
                                              timepoint = endpoint)$pointprevalence[1]
   hiv.prev.25.34.women <- prevalence.calculator(datalist = datalist.agemix,
                                                 agegroup = age.group.25.40,
-                                                timepoint = endpoint)$poidirfasttreentprevalence[2]
+                                                timepoint = endpoint)$pointprevalence[2]
   hiv.prev.25.34.men <- prevalence.calculator(datalist = datalist.agemix,
                                               agegroup = age.group.25.40,
                                               timepoint = endpoint)$pointprevalence[1]
@@ -121,7 +132,7 @@ MCAR.compute.summary.statistics.phylo <- function(datalist = datalist.agemix,
                                               agegroup = age.group.40.50,
                                               timepoint = endpoint)$pointprevalence[1]
   
-  e
+  
   # (ii) Transmission 	rate (transmission.rate.calculator function)
   
   # transm.rate <- transmission.rate.calculator(datalist = datalist.agemix,
@@ -340,7 +351,7 @@ MCAR.compute.summary.statistics.phylo <- function(datalist = datalist.agemix,
                              timewindow = timewindow, 
                              seq.cov = seq.cov, 
                              age.limit = age.group.40.50[2])
-  outputvector.epi.behav
+  
   
   
   # Data table of infected individuals within the time window
@@ -648,7 +659,8 @@ MCAR.compute.summary.statistics.phylo <- function(datalist = datalist.agemix,
                                                           endsim = endpoint,
                                                           clust = FALSE)
     
-    tree.cal.cov.35.IDs <- read.tree(paste0(sub.dir.rename, paste0("/cov.",seq.cov, ".mCAr.IDs.C.Epidemic.Fasta.nwk")))
+    
+    tree.cal.cov.35.IDs <- read.tree(paste0(sub.dir.rename, paste0("/calibrated.tree.cov.",seq.cov, ".mCAr.IDs.C.Epidemic.Fasta.tree")))
     
     
     
@@ -746,4 +758,16 @@ MCAR.compute.summary.statistics.phylo <- function(datalist = datalist.agemix,
   
 }
 
-
+# 
+# v <- MCAR.compute.summary.statistics.phylo(datalist = datalist.agemix,
+#                                            work.dir = work.dir,
+#                                            sub.dir.rename = sub.dir.rename,
+#                                            dirfasttree = work.dir,
+#                                            limitTransmEvents = 7,
+#                                            seq.cov = 35,
+#                                            age.group.15.25 = c(15,25),
+#                                            age.group.25.40 = c(25,40),
+#                                            age.group.40.50 = c(40,50),
+#                                            endpoint = 40,
+#                                            timewindow = c(30,40))
+# 
