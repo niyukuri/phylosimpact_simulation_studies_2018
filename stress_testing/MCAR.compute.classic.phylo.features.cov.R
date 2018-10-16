@@ -4,16 +4,16 @@
 
 MCAR.compute.classic.phylo.features.cov <- function(datalist = datalist.agemix,
                                                     simpact.trans.net = simpact.trans.net,
-                                                  work.dir = work.dir,
-                                                  sub.dir.rename = sub.dir.rename,
-                                                  dirfasttree = work.dir,
-                                                  limitTransmEvents = 7,
-                                                  seq.cov = 35,
-                                                  age.group.15.25 = c(15,25),
-                                                  age.group.25.40 = c(25,40),
-                                                  age.group.40.50 = c(40,50),
-                                                  endpoint = 40,
-                                                  timewindow = c(30,40)){
+                                                    work.dir = work.dir,
+                                                    sub.dir.rename = sub.dir.rename,
+                                                    dirfasttree = work.dir,
+                                                    limitTransmEvents = 7,
+                                                    seq.cov = 35,
+                                                    age.group.15.25 = c(15,25),
+                                                    age.group.25.40 = c(25,40),
+                                                    age.group.40.50 = c(40,50),
+                                                    endpoint = 40,
+                                                    timewindow = c(30,40)){
   
   
   
@@ -114,7 +114,7 @@ MCAR.compute.classic.phylo.features.cov <- function(datalist = datalist.agemix,
   #                                                agegroup = c(15, 25),
   #                                                timepoint = datalist.agemix$itable$population.simtime[1])$pointprevalence[2]
   #   
-
+  
   hiv.prev.15.25.women <- prevalence.calculator(datalist = datalist.agemix,
                                                 agegroup = age.group.15.25,
                                                 timepoint = endpoint)$pointprevalence[2]
@@ -239,7 +239,7 @@ MCAR.compute.classic.phylo.features.cov <- function(datalist = datalist.agemix,
   
   pp.cp.6months.male <- concurr.pointprev.calculator(datalist = datalist.agemix,
                                                      timepoint = endpoint - 0.5)
-
+  
   
   classic.features <- c(growthrate, 
                         
@@ -462,6 +462,8 @@ MCAR.compute.classic.phylo.features.cov <- function(datalist = datalist.agemix,
   
   outputvector.transmission <- het.lme.val
   
+  
+  
   ##############################
   # III. Phylogenetic features #
   ##############################
@@ -473,9 +475,10 @@ MCAR.compute.classic.phylo.features.cov <- function(datalist = datalist.agemix,
   ###################################################################
   
   
+  
   mixed.effect.fit.transmission.clusters <- function(clust.names=clust.names,
                                                      simpact.trans.net = simpact.trans.net,
-                                                     limitTransmEvents = 7){
+                                                     limitTransmEvents = limitTransmEvents){
     
     seeds.id <- length(simpact.trans.net)
     
@@ -579,55 +582,71 @@ MCAR.compute.classic.phylo.features.cov <- function(datalist = datalist.agemix,
     
     clust.table.df <- as.data.frame(do.call(rbind, transmission.clust.list)) # data.table & data.frame
     
-    
-    het.fit.lme.agemixing <- lme(age ~ gender, data = clust.table.df, random = ~ 1|clust.id,
-                                 weights = varIdent( c("1" = 0.5), ~ 1 |gender))
-    
-    
-    het.a <- coef(summary(het.fit.lme.agemixing))[1] # average age in transmission clusters
-    
-    het.beta <- coef(summary(het.fit.lme.agemixing))[2] # average age difference in transmission clusters: 
-    # seen as bridge width which shows potential cross-generation transmission
-    
-    
-    het.b1 <- as.numeric(VarCorr(het.fit.lme.agemixing)[3]) # between cluster variation
-    
-    het.b2 <- as.numeric(VarCorr(het.fit.lme.agemixing)[4]) # within cluster variation
-    
-    
-    # SD for the two strata
-    
-    unique.val.strat <- unique(attributes(het.fit.lme.agemixing$modelStruct$varStruct)$weights)
-    
-    het.fit.lme.agemixing$modelStruct$varStruct
-    
-    # reference group: female == 1
-    delta.female <- 1
-    
-    female.val <- unique.val.strat[1]
-    male.val <- unique.val.strat[2]
-    
-    delta.male <- female.val/male.val # delta_ref_group / val
-    
-    SD.female <- as.numeric(VarCorr(het.fit.lme.agemixing)[4])
-    SD.male <- delta.male * SD.female 
-    
-    
-    clust.lme.val <- c(het.a, het.beta, het.b1, het.b2, SD.female, SD.male)
-    
-    
-    Num.Clus <- length(d)
-    
-    av.Clust.size <- sum(clust.size)/length(d)
-    
-    ouptuvector.clust <- c(clust.lme.val, Num.Clus, av.Clust.size)
-    
-    names(ouptuvector.clust) <- c("clust.av.age.male", "clust.gendEffect", "clust.between.transm.var", "clust.within.transm.var", "clust.SD.female", "clust.SD.male", "Num.Clusters", "av.Clust.Size")
+    if(nrow(clust.table.df) >= length(d)){
+      
+      het.fit.lme.agemixing <- lme(age ~ gender, data = clust.table.df, random = ~ 1|clust.id,
+                                   weights = varIdent( c("1" = 0.5), ~ 1 |gender))
+      
+      
+      het.a <- coef(summary(het.fit.lme.agemixing))[1] # average age in transmission clusters
+      
+      het.beta <- coef(summary(het.fit.lme.agemixing))[2] # average age difference in transmission clusters: 
+      # seen as bridge width which shows potential cross-generation transmission
+      
+      
+      het.b1 <- as.numeric(VarCorr(het.fit.lme.agemixing)[3]) # between cluster variation
+      
+      het.b2 <- as.numeric(VarCorr(het.fit.lme.agemixing)[4]) # within cluster variation
+      
+      
+      # SD for the two strata
+      
+      unique.val.strat <- unique(attributes(het.fit.lme.agemixing$modelStruct$varStruct)$weights)
+      
+      het.fit.lme.agemixing$modelStruct$varStruct
+      
+      # reference group: female == 1
+      delta.female <- 1
+      
+      female.val <- unique.val.strat[1]
+      male.val <- unique.val.strat[2]
+      
+      delta.male <- female.val/male.val # delta_ref_group / val
+      
+      SD.female <- as.numeric(VarCorr(het.fit.lme.agemixing)[4])
+      SD.male <- delta.male * SD.female 
+      
+      
+      clust.lme.val <- c(het.a, het.beta, het.b1, het.b2, SD.female, SD.male)
+      
+      
+      Num.Clus <- length(d)
+      
+      av.Clust.size <- sum(clust.size)/length(d)
+      
+      ouptuvector.clust <- c(clust.lme.val, Num.Clus, av.Clust.size)
+      
+      names(ouptuvector.clust) <- c("clust.av.age.male", "clust.gendEffect", "clust.between.transm.var", "clust.within.transm.var", "clust.SD.female", "clust.SD.male", "Num.Clusters", "av.Clust.Size")
+      
+      
+    }else{
+      
+      ouptuvector.clust <- c(clust.lme.val, Num.Clus, av.Clust.size)
+      
+      clust.stat.names <- c("clust.av.age.male", "clust.gendEffect", "clust.between.transm.var", "clust.within.transm.var", "clust.SD.female", "clust.SD.male", "Num.Clusters", "av.Clust.Size")
+      
+      ouptuvector.clust <- rep(NA, length(clust.stat.names))
+      
+      names(ouptuvector.clust) <- clust.stat.names
+      
+      
+    }
     
     return(ouptuvector.clust)
     
     
   }
+  
   
   
   
