@@ -2,18 +2,19 @@
 
 
 
-MAR.compute.summary.statistics.phylo <- function(datalist = datalist.agemix,
-                                                 work.dir = work.dir,
-                                                 sub.dir.rename = sub.dir.rename,
-                                                 dirfasttree = work.dir,
-                                                 limitTransmEvents = 7,
-                                                 seq.cov = 35,
-                                                 seq.gender.ratio = 0.7,
-                                                 age.group.15.25 = c(15,25),
-                                                 age.group.25.40 = c(25,40),
-                                                 age.group.40.50 = c(40,50),
-                                                 endpoint = 40,
-                                                 timewindow = c(30,40)){
+MAR.compute.classic.phylo.features.cov <- function(datalist = datalist.agemix,
+                                                   simpact.trans.net = simpact.trans.net, 
+                                                   work.dir = work.dir,
+                                                   sub.dir.rename = sub.dir.rename,
+                                                   dirfasttree = work.dir,
+                                                   limitTransmEvents = 7,
+                                                   seq.cov = 35,
+                                                   seq.gender.ratio = 0.7,
+                                                   age.group.15.25 = c(15,25),
+                                                   age.group.25.40 = c(25,40),
+                                                   age.group.40.50 = c(40,50),
+                                                   endpoint = 40,
+                                                   timewindow = c(30,40)){
   
   
   
@@ -256,22 +257,22 @@ MAR.compute.summary.statistics.phylo <- function(datalist = datalist.agemix,
   #                                                agegroup = c(15, 25),
   #                                                timepoint = datalist.agemix$itable$population.simtime[1])$pointprevalence[2]
   #   
-  hiv.prev.lt25.women <- prevalence.calculator(datalist = datalist.agemix,
-                                               agegroup = age.group.15.25,
-                                               timepoint = endpoint)$pointprevalence[2]
-  hiv.prev.lt25.men <- prevalence.calculator(datalist = datalist.agemix,
-                                             agegroup = age.group.15.25,
-                                             timepoint = endpoint)$pointprevalence[1]
-  hiv.prev.25.34.women <- prevalence.calculator(datalist = datalist.agemix,
+  hiv.prev.15.25.women <- prevalence.calculator(datalist = datalist.agemix,
+                                                agegroup = age.group.15.25,
+                                                timepoint = endpoint)$pointprevalence[2]
+  hiv.prev.15.25.men <- prevalence.calculator(datalist = datalist.agemix,
+                                              agegroup = age.group.15.25,
+                                              timepoint = endpoint)$pointprevalence[1]
+  hiv.prev.25.40.women <- prevalence.calculator(datalist = datalist.agemix,
                                                 agegroup = age.group.25.40,
                                                 timepoint = endpoint)$pointprevalence[2]
-  hiv.prev.25.34.men <- prevalence.calculator(datalist = datalist.agemix,
+  hiv.prev.25.40.men <- prevalence.calculator(datalist = datalist.agemix,
                                               agegroup = age.group.25.40,
                                               timepoint = endpoint)$pointprevalence[1]
-  hiv.prev.35.44.women <- prevalence.calculator(datalist = datalist.agemix,
+  hiv.prev.40.50.women <- prevalence.calculator(datalist = datalist.agemix,
                                                 agegroup = age.group.40.50,
                                                 timepoint = endpoint)$pointprevalence[2]
-  hiv.prev.35.44.men <- prevalence.calculator(datalist = datalist.agemix,
+  hiv.prev.40.50.men <- prevalence.calculator(datalist = datalist.agemix,
                                               agegroup = age.group.40.50,
                                               timepoint = endpoint)$pointprevalence[1]
   
@@ -385,8 +386,8 @@ MAR.compute.summary.statistics.phylo <- function(datalist = datalist.agemix,
   
   classic.features <- c(growthrate, 
                         
-                        hiv.prev.lt25.women, hiv.prev.lt25.men, hiv.prev.25.34.women,
-                        hiv.prev.25.34.men, hiv.prev.35.44.women, hiv.prev.35.44.men, 
+                        hiv.prev.15.25.women, hiv.prev.15.25.men, hiv.prev.25.40.women,
+                        hiv.prev.25.40.men, hiv.prev.40.50.women, hiv.prev.40.50.men, 
                         
                         relsperpersonperyear, agegapsd,
                         
@@ -397,8 +398,8 @@ MAR.compute.summary.statistics.phylo <- function(datalist = datalist.agemix,
   
   classic.features.names <- c("Pop.growthrate", 
                               
-                              "hiv.prev.lt25.women", "hiv.prev.lt25.men", "hiv.prev.25.34.women",
-                              "hiv.prev.25.34.men", "hiv.prev.35.44.women", "hiv.prev.35.44.men",
+                              "hiv.prev.15.25.women", "hiv.prev.15.25.men", "hiv.prev.25.40.women",
+                              "hiv.prev.25.40.men", "hiv.prev.40.50.women", "hiv.prev.40.50.men",
                               
                               "relsperpersonperyear", "agegapsd",
                               
