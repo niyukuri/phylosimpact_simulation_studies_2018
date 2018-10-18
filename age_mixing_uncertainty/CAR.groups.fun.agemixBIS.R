@@ -1,6 +1,8 @@
 #' A function that returns age mixing patterns quantities in transmission networks
 #' in scenarios where individuals are missing at completly at random
+#' Quantities from fitting mixed effect models to true relationships and transmission records
 #' @param simpact.trans.net a list of transmission networks produced by \code{\link{transm.network.builder}}
+#' @param datalist a list of data frame produced by simpact
 #' @param limitTransmEvents Number of minimum transmission events to be considered in each transmission networks
 #' @param timewindow Time interval
 #' @param seq.cov Percentage of individulas considered for this transmission pattern scenario
@@ -9,7 +11,7 @@
 #' @param age.group.40.50 age group between 40 and 50 years old
 #' @return a vector of number of men and women in different age group, number of transmissions within all age groups, and mean and SD of age different between infectors and infectees
 #' @examples
-#' w <- CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
+#' w <- CAR.groups.fun.agemixBIS(simpact.trans.net = simpact.trans.net,
 #'                            limitTransmEvents = 7,
 #'                            timewindow = c(30,40),
 #'                            seq.cov = 70,
@@ -29,13 +31,14 @@
 
 # true we record of infection - infection time
 
-CAR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net,
-                                  limitTransmEvents = 7,
-                                  timewindow = c(30,40),
-                                  seq.cov = 70,
-                                  age.group.15.25 = c(15,25),
-                                  age.group.25.40 = c(25,40),
-                                  age.group.40.50 = c(40,50)){
+CAR.groups.fun.agemixBIS <- function(simpact.trans.net = simpact.trans.net,
+                                     datalist = datalist.agemix,
+                                     limitTransmEvents = 7,
+                                     timewindow = c(30,40),
+                                     seq.cov = 70,
+                                     age.group.15.25 = c(15,25),
+                                     age.group.25.40 = c(25,40),
+                                     age.group.40.50 = c(40,50)){
   
   
   # Data table of infected individuals with at least limitTransmEvents transmissions events
@@ -121,6 +124,111 @@ CAR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net,
   data.transm.agemix <- dplyr::filter(infecttable, infecttable$id.lab%in%mCAr.IDs) 
   
   
+  # Data list of infected individuals within the time window
+  
+  datalist.agemix.transm <- datalist
+  
+  datalist.agemix.transm$ptable <- dplyr::filter(datalist.agemix.transm$ptable, datalist.agemix.transm$ptable$ID%in%data.transm.agemix$RecId)
+  
+  
+  # (i) Age mixing in transmissions
+  
+  agemix.transm.df <- agemix.df.maker(datalist.agemix.transm)
+  
+  # 
+  agemix.model <- pattern.modeller(dataframe = agemix.transm.df,
+                                   agegroup = c(15, 50),
+                                   timepoint = 40, # datalist.agemix$itable$population.simtime[1],
+                                   timewindow = 10)#1)#3)
+  # 
+  # # men.lme <- tryCatch(agemixing.lme.fitter(data = dplyr::filter(agemix.model[[1]], Gender =="male")),
+  # #                     error = agemixing.lme.errFunction) # Returns an empty list if the lme model can't be fitted
+  #
+  # men.lmer <- ampmodel(data = dplyr::filter(agemix.model[[1]], Gender =="male"))
+  
+  data = dplyr::filter(agemix.model[[1]], Gender =="male")
+  
+  if( nrow(data) > length(unique(data$ID)) & length(unique(data$ID)) > 1 ){
+    
+    men.lmer <- lmer(pagerelform ~ agerelform0 + (1 | ID),
+                     data = dplyr::filter(agemix.model[[1]], Gender =="male"),
+                     REML = TRUE,
+                     control=lmerControl(check.nobs.vs.nlev = "ignore",
+                                         check.nobs.vs.rankZ = "ignore",
+                                         check.nobs.vs.nRE="ignore"))
+    
+    bignumber <- NA # let's try if NA works (instead of 9999 for example)
+    AAD.male <- ifelse(length(men.lmer) > 0, mean(dplyr::filter(agemix.model[[1]], Gender =="male")$AgeGap), bignumber)
+    SDAD.male <- ifelse(length(men.lmer) > 0, sd(dplyr::filter(agemix.model[[1]], Gender =="male")$AgeGap), bignumber)
+    #powerm <- ifelse(length(men.lme) > 0, as.numeric(attributes(men.lme$apVar)$Pars["varStruct.power"]), bignumber)
+    slope.male <- ifelse(length(men.lmer) > 0, summary(men.lmer)$coefficients[2, 1], bignumber) #summary(men.lmer)$tTable[2, 1], bignumber)
+    WSD.male <- ifelse(length(men.lmer) > 0, summary(men.lmer)$sigma, bignumber) #WVAD.base <- ifelse(length(men.lme) > 0, men.lme$sigma^2, bignumber)
+    
+    BSD.male <- ifelse(length(men.lmer) > 0, bvar(men.lmer), bignumber) # Bad name for the function because it actually extracts between subject standard deviation # BVAD <- ifelse(length(men.lmer) > 0, getVarCov(men.lme)[1,1], bignumber)
+    
+    intercept.male <- ifelse(length(men.lmer) > 0, summary(men.lmer)$coefficients[1,1] - 15, bignumber)
+    
+    # c(AAD.male, SDAD.male, slope.male, WSD.male, BSD.male, intercept.male)
+    
+    ## AAD: average age difference across all relationship
+    ## VAD: variance of these age differences
+    ## SDAD: standard deviation of age differences
+    ## BSD: between-subject standard deviation of age differences
+    
+    mix.rels.dat <- c(AAD.male, SDAD.male, slope.male, WSD.male, BSD.male, intercept.male)
+    
+  }else{
+    
+    mix.rels.dat <- rep(NA, 6)
+    
+  }
+  
+  
+  # (ii) Fiting age mixing transmission table with mixed-effect linear model
+
+  
+  # SD for the two strata
+  
+  het.fit.lme.agemixing <- lme(age.samp.Rec ~ GenderRec, data = data.transm.agemix, random = ~ 1|DonId,
+                               weights = varIdent( c("1" = 0.5), ~ 1 |GenderRec ))
+  
+  het.a <- coef(summary(het.fit.lme.agemixing))[1] # average age in transmission clusters
+  
+  het.beta <- coef(summary(het.fit.lme.agemixing))[2] # average age difference in transmission clusters: 
+  # seen as bridge width which shows potential cross-generation transmission
+  
+  
+  het.b1 <- as.numeric(VarCorr(het.fit.lme.agemixing)[3]) # between cluster variation
+  
+  het.b2 <- as.numeric(VarCorr(het.fit.lme.agemixing)[4]) # within cluster variation
+  
+  
+  # SD for the two strata
+  
+  unique.val.strat <- unique(attributes(het.fit.lme.agemixing$modelStruct$varStruct)$weights)
+  
+  het.fit.lme.agemixing$modelStruct$varStruct
+  
+  # reference group: female == 1
+  delta.female <- 1
+  
+  female.val <- unique.val.strat[1]
+  male.val <- unique.val.strat[2]
+  
+  delta.male <- female.val/male.val # delta_ref_group / val
+  
+  SD.female <- as.numeric(VarCorr(het.fit.lme.agemixing)[4])
+  SD.male <- delta.male * SD.female 
+  
+  
+  het.lme.val <- c(het.a, het.beta, het.b1, het.b2, SD.female, SD.male)
+  
+  names(het.lme.val) <-  c("het.av.age.male", "het.gendEffect", "het.between.transm.var", "het.within.transm.var", "het.SD.female", "het.SD.male")
+  
+  
+  
+  
+  # (iii) Age mixing in relationships
   
   # Function to sort transmissions pairings between different age groups
   
@@ -233,10 +341,14 @@ CAR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net,
   med.AD <- median(AD)
   sd.AD <- sd(AD)
   
-
   
   
-  ouput.transm.dat.AD <- c(ouput.transm.dat, mean.AD, med.AD, sd.AD)
+  
+  ouput.transm.dat.AD <- c(ouput.transm.dat, mean.AD, med.AD, sd.AD,
+                           
+                           mix.rels.dat,
+                           
+                           as.numeric(het.lme.val)) 
   
   
   val.names <- c("num.men.15.25", "num.women.15.25",
@@ -247,7 +359,11 @@ CAR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net,
                  "partners.men.25.40.w.15.25", "partners.men.25.40.w.25.40", "partners.men.25.40.w.40.50",
                  "partners.men.40.50.w.15.25", "partners.men.40.50.w.25.40", "partners.men.40.50.w.40.50",
                  
-                 "mean.AD", "median.AD", "sd.AD")
+                 "mean.AD", "median.AD", "sd.AD",
+                 
+                 "RT.AAD.male", "RT.SDAD.male", "RT.slope.male", "RT.WSD.male", "RT.BSD.male", "RT.intercept.male",
+                 
+                 "T.het.av.age.male", "T.het.gendEffect", "T.het.between.transm.var", "T.het.within.transm.var", "T.het.SD.female", "T.het.SD.male")
   
   
   names(ouput.transm.dat.AD) <- val.names
@@ -255,19 +371,5 @@ CAR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net,
   
   return(ouput.transm.dat.AD)
 }
-
-### ----------------------------------------
-
-# 
-# w <- CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net,
-#                            limitTransmEvents = 7,
-#                            timewindow = c(30,40),
-#                            seq.cov = 70,
-#                            #    seq.gender.ratio = 0.7, # within same age group women have 70% of being sampled & men have only 30%
-#                            age.group.15.25 = c(15,25),
-#                            age.group.25.40 = c(25,40),
-#                            age.group.40.50 = c(40,50))
-
-
 
 

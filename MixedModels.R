@@ -1,4 +1,6 @@
-# Linear models	 and	 linear	mixed	effects	models	in	R	with	linguistic	applications	
+
+
+# Linear models    and    linear    mixed    effects    models    in    R    with    linguistic    applications    
 
 # Pitch and sex
 
@@ -247,6 +249,11 @@ str(dragons)  # we took samples from three sites per mountain range and eight mo
 
 # Dummy data for age-mixing in transmission clusters
 
+library(data.table)
+library(nlme)
+library(ggplot2)
+
+
 female.age <- c(17:24, 32, 23, 21, 29, 19, 21, 23, 24, 18, 19, 19, 21, 17:24, 21:27, 19)
 male.age <- c(19, 21, 23, 24, 18, 19, 19, 21, 17:24, 21:27)
 
@@ -262,11 +269,10 @@ ageTransmClust <- rbind(female.df, male.df)
 ggplot(ageTransmClust, aes(age, fill = gender)) + geom_density(alpha = 0.2)
 
 
-library(ggplot2)
 
 # 1
-female.age1 <- c(17, 32, 23, 21, 29, 19, 21, 23, 24, 18, 19, 19, 21, 17:24, 21:27, 19)
-male.age1 <- c(42, 40, 35, 49, 50, 37, 45, 49, 39, 41)
+female.age1 <- c(17:25,17:26, 32, 23, 21, 29, 19, 21, 23, 24, 18, 19, 19, 21, 17:24, 21:27, 19)
+male.age1 <- c(42, 40, 49, 50, 37, 45, 49, 41)
 
 
 female.df1 <- data.frame(age=female.age1)
@@ -278,6 +284,9 @@ male.df1$gender <- "male"
 ageTransmClust1 <- rbind(female.df1, male.df1)
 
 ggplot(ageTransmClust1, aes(age, fill = gender)) + geom_density(alpha = 0.2)
+
+
+
 
 # 2
 
@@ -388,6 +397,8 @@ ageTransmClusts <- list(ageTransmClust1, ageTransmClust2, ageTransmClust3,
                         ageTransmClust4, ageTransmClust5, ageTransmClust6,
                         ageTransmClust7)
 
+
+
 library(nlme)
 
 ageTransmClust1$id <- 1
@@ -406,11 +417,40 @@ AGEMIX <- do.call(rbind, ageTransmClusts.Clean)
 
 AGEMIX$id <- as.factor(AGEMIX$id)
 
-traclust <- lme(age ~ val, data = AGEMIX, random = ~ 1|id)
+traclust <- lme(age ~ gender, data = AGEMIX, random = ~ 1|id)
+
+
+traclust1 <- lme(age ~ gender, data = AGEMIX, random = ~ 1|id,
+                 weights = varIdent( c(female = 0.5), ~ 1 |gender ))
+
+
+summary(traclust1)
+
+# Heteroscedasticity: model variance component of within-group errors
+
+unique.val.strat <- unique(attributes(traclust1$modelStruct$varStruct)$weights)
+
+traclust1$modelStruct$varStruct
+
+# reference group: female == 1
+delta.female <- 1
+
+female.val <- unique.val.strat[1]
+male.val <- unique.val.strat[2]
+
+delta.male <- female.val/male.val # delta_ref_group / val
+
+SD.female <- as.numeric(VarCorr(traclust1)[4])
+SD.male <- delta.male * SD.female 
+
+
+sigma2vec.b <- matrix((1/unique(attributes(traclust1$modelStruct$varStruct)$weights)*traclust1$sigma)^2,nrow=1,byrow=TRUE)
+
+
 
 library(lme4)
 
-traclust2 <- lmer(age ~ val +  (1|id), data = AGEMIX)
+traclust2 <- lmer(age ~ gender +  (1|id), data = AGEMIX)
 
 # Error in match.arg(name) : 
 #   'arg' should be one of “X”, “Z”, “Zt”, “Ztlist”, “mmList”, “y”, “mu”, “u”, “b”, 
@@ -427,15 +467,219 @@ coef(summary(traclust))[2] #
 
 ranef(traclust)[[1]][[1]]
 
-a <- coef(summary(traclust))[1] # 
+a <- coef(summary(traclust))[1] # intercept - alpha
 
-beta <- coef(summary(traclust))[2] # or fixed.effects(summary(traclust))[2] 
+beta <- coef(summary(traclust))[2] # or fixed.effects(summary(traclust))[2] gender effect - gamma
 # getME(traclust2,"beta")[2] < this is bridge.width 
 
 # b <- getME(traclust2,"sigma") # between cluster var
 
-b1 <- as.numeric(VarCorr(traclust)[3]) # between cluster variation
+b1 <- as.numeric(VarCorr(traclust)[3]) # between cluster variation - sigma_beta
 
+b2 <- as.numeric(VarCorr(traclust)[4]) # within cluster variation - residual - sigma
+
+
+
+############################## Clusters
+
+
+transmission.clust.list <-  vector("list", length(d)) # list() # initialise gender and age-structured data table of pairings in each transission cluster
+
+
+# Check how many indiv in a cluster
+
+# for (i in 1:length(d)) {
+#   
+#   clus.read <- read.table(file = paste0(paste0(sub.dir.rename,"/"),d[i]), header = FALSE) # Ids of each cluster
+#   
+#   t.v <- c(t.v, nrow(clus.read))
+#   
+# }
+
+for (i in 1:length(d)) {
+  
+  transm.df.cl.dat <- NULL
+  
+  clus.read <- read.table(file = paste0(paste0(sub.dir.rename,"/"),d[i]), header = FALSE) # Ids of each cluster
+  #size <- c(size, nrow(clus.read))
+  
+  transm.df.cl <- subset(transm.df, transm.df$id.lab%in%as.character(clus.read$V1)) # transmission data table of IDs of that cluster
+  
+  transm.df.cl.dat$age <- transm.df.cl$age.samp.Rec
+  transm.df.cl.dat$gender <- transm.df.cl$GenderRec
+  transm.df.cl.dat$clust.id <- as.factor(rep(i, nrow(transm.df.cl)))
+  
+  transmission.clust.list[[i]] <- as.data.frame(transm.df.cl.dat)
+  
+}
+
+
+clust.table.df <- as.data.frame(do.call(rbind, transmission.clust.list)) # data.table & data.frame
+
+
+fit.lme.transm.clust <- lme(age ~ gender, data = clust.table.df, random = ~ 1|clust.id)
+
+
+
+a <- coef(summary(fit.lme.transm.clust))[1] # average age in transmission clusters
+
+beta <- coef(summary(fit.lme.transm.clust))[2] # average age difference in transmission clusters: 
+# seen as bridge width which shows potential cross-generation transmission
+
+
+b1 <- as.numeric(VarCorr(fit.lme.transm.clust)[3]) # between cluster variation
+
+b2 <- as.numeric(VarCorr(fit.lme.transm.clust)[4]) # within cluster variation
+
+
+## Varying the variance
+library(nlme)
+data('Orthodont')
+
+
+fm4Orth.lme <- lme(distance~Sex*I(age-11), data=Orthodont, random=~I(age-11)|Subject,
+                   weights=varIdent(form=~1|Sex), correlation=corCAR1(form=~I(age-11)|Subject))
+
+
+summary(fm4Orth.lme)
+
+
+a <- coef(summary(fm4Orth.lme))[1] 
+
+beta <- coef(summary(fm4Orth.lme))[2] 
+
+b1 <- as.numeric(VarCorr(fm4Orth.lme)[3]) # between cluster variation - sigma_beta
+
+b2 <- as.numeric(VarCorr(fm4Orth.lme)[4]) # within cluster variation - residual - sigma
+
+
+fm4Orth.lme$modelStruct$varStruct
+
+as.numeric(fm4Orth.lme$modelStruct$varStruct)
+
+
+unique.val.strat <- unique(attributes(fm4Orth.lme$modelStruct$varStruct)$weights)
+fm4Orth.lme$modelStruct$varStruct
+# reference group: delta.male == 1
+male.val <- unique.val.strat[1]
+female.val <- unique.val.strat[2]
+
+delta.female <- male.val / female.val # delta_ref_group / val
+
+
+
+toy.parallel <- function(input){
+  set.seed(input[1])
+  med.toy <- median(rnorm(n=input[2], mean = input[3], sd = 1))
+  val.toy <- med.toy + 6
+  val.ALL <- c(med.toy, val.toy)
+  names(val.ALL) <- c("med.toy", "val.toy")
+  return(val.ALL)
+}
+
+input=c(777, 100,12)
+
+v <- toy.parallel(input = input)
+
+input <- c(100,12)
+reps <- 20
+inputmatrix <- matrix(rep(input, reps), byrow = TRUE, nrow = reps)
+
+library(parallel)
+
+seed_count = 0
+n_cluster = 8
+
+cl <- makeCluster(getOption("cl.cores", n_cluster))
+tab_simul_summarystat = NULL
+list_param <- list(NULL)
+tab_param <- NULL
+paramtemp <- NULL
+simultemp <- NULL
+
+nb_simul <- nrow(inputmatrix)
+
+for (i in 1:nb_simul) {
+  l <- ncol(inputmatrix)
+  param <- c((seed_count + i), inputmatrix[i, ])
+  list_param[[i]] <- param
+  tab_param <- rbind(tab_param, param[2:(l + 1)])
+  paramtemp <- rbind(paramtemp, param[2:(l + 1)])
+}
+list_simul_summarystat = parLapplyLB(cl, list_param,
+                                     toy.parallel)
+tab_simul_summarystat <- do.call(rbind, list_simul_summarystat)
+stopCluster(cl)
+
+results <- cbind(tab_simul_summarystat, seed_count + 1:nb_simul)
+
+write.csv(results, file = "toy.results.csv")
+
+
+## another try: foreach
+
+library(foreach)
+library(doParallel)
+
+cl<-makeCluster(n_cores)
+registerDoParallel(cl)
+
+
+n <- n_cores
+
+res <- foreach(icount(n), .combine=rbind) %dopar% {
+  
+  v <- list_param[[i]]
+  
+  toy.parallel(input = v)
+  
+}
+
+stopImplicitCluster()
+
+d = as.data.frame(res)
+
+
+res.z <- foreach(icount(n), .combine=cbind) %dopar% {
+  
+  
+  fun.raba(10)
+  
+  
+}
+
+
+
+##########################
+
+# 1
+female.age1 <- c(17:25,17:26, 32, 23, 21, 29, 19, 21, 23, 24, 18, 19, 19, 21, 17:24, 21:27, 19)
+male.age1 <- c(42, 40, 49, 50, 37, 45, 49, 41)
+
+
+female.df1 <- data.frame(age=female.age1)
+male.df1 <- data.frame(age=male.age1)
+
+female.df1$gender <- 1
+male.df1$gender <- 0
+
+ageTransmClust1 <- rbind(female.df1, male.df1)
+
+ggplot(ageTransmClust1, aes(age, fill = gender)) + geom_density(alpha = 0.2)
+
+LM <- lm(formula = age ~ gender, data = ageTransmClust1)
+
+
+plot(ageTransmClust1$gender, ageTransmClust1$age, ylim=c(-50,60), xlim=c(-1,1), pch = 16, cex = 1.3, col = "blue", xlab = "Gender", ylab = "Age")
+
+
+lm(ageTransmClust1$gender ~ ageTransmClust1$age)
+
+abline(1.79765, -0.03767)
+
+abline(lm(ageTransmClust1$gender ~ ageTransmClust1$age))
+
+<<<<<<< HEAD
 b2 <- as.numeric(VarCorr(traclust)[4]) # within cluster variation
 
 
@@ -486,3 +730,5 @@ stopCluster(cl)
 results <- cbind(tab_simul_summarystat, seed_count + 1:nb_simul)
 
 write.csv(results, file = "toy.results.csv")
+=======
+>>>>>>> master

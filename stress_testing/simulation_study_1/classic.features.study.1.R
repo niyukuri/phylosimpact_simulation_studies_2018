@@ -147,7 +147,7 @@ classic.features.study.1 <- function(datalist = datalist.agemix,
     
     data = dplyr::filter(agemix.model[[1]], Gender =="male")
     
-    if( length(data$ID) > length(unique(data$ID)) ){
+    if( nrow(data) > length(unique(data$ID)) & length(unique(data$ID)) > 1 ){
     
     men.lmer <- lmer(pagerelform ~ agerelform0 + (1 | ID),
                      data = dplyr::filter(agemix.model[[1]], Gender =="male"),

@@ -1,4 +1,4 @@
-#' A function that returns age mixing patterns quantities in transmission clusters
+#' A function that returns age mixing patterns quantities in transmission clusters and phylogenetic features
 #' in scenarios where individuals are missing at random
 #' @param simpact.trans.net a list of transmission networks produced by \code{\link{transm.network.builder}}
 #' @param work.dir working directory
@@ -609,12 +609,18 @@ MLphylo.AR.groups.fun.agemix <- function(simpact.trans.net = simpact.trans.net,
                               median.nodesDepths.feature, maxHeight.feature)
   
   
-  name.mean.clust.stat <- names(mean.clust.stat)
-  name.median.clust.stat <- names(median.clust.stat)
-  name.sd.clust.stat <- names(sd.clust.stat)
+  # name.mean.clust.stat <- names(mean.clust.stat)
+  # name.median.clust.stat <- names(median.clust.stat)
+  # name.sd.clust.stat <- names(sd.clust.stat)
+  # 
+  # 
+  
+  name.mean.clust.stat <- paste0("clust.mean.", names(mean.clust.stat)) # average number of men and women in different age groups
+  name.median.clust.stat <- paste0("clust.median.", names(median.clust.stat))
+  name.sd.clust.stat <- paste0("clust.SD.", names(sd.clust.stat))
   
   features.names <- c(name.mean.clust.stat, name.median.clust.stat,name.sd.clust.stat,
-                      "mean.count.clust", "median.count.clust", "sd.count.clust",
+                      "mean.Sizes.clust", "median.Sizes.clust", "sd.Sizes.clust",
                       "colless.feature", "sackin.feature", "mean.height.internal.nodes",
                       "median.height.internal.nodes", "mean.nodesDepths.feature", 
                       "median.nodesDepths.feature", "maxHeight.feature")
