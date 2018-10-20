@@ -36,9 +36,9 @@ complete.master.epic.metric.class.phylo.features.cov <- function(inputvector){
   # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
   
   # destDir <- "/home/niyukuri/Desktop/mastermodeltest/temp" # on PC
-
   
-
+  
+  
   
   # library(EasyABC)
   library(RSimpactCyan)
@@ -255,17 +255,18 @@ complete.master.epic.metric.class.phylo.features.cov <- function(inputvector){
   
   sub.dir.rename <- paste0(work.dir,"/temp/",generate.filename(10))
   
-
+  
   #######################
   # Step 1: Run Simpact #
   #######################
   
   
-  results <- simpact.run(configParams = cfg.list,
-                         destDir = sub.dir.rename,
-                         agedist = age.distr,
-                         seed = seedid,
-                         intervention = intervention)
+  results <- tryCatch(simpact.run(configParams = cfg.list,
+                                  destDir = sub.dir.rename,
+                                  agedist = age.distr,
+                                  seed = seedid,
+                                  intervention = intervention),
+                      error = simpact.errFunction)
   
   
   
@@ -273,7 +274,7 @@ complete.master.epic.metric.class.phylo.features.cov <- function(inputvector){
   
   datalist.agemix <- datalist.ALL
   
- 
+  
   ###########################################
   # Step 2: Construct transmission networks #
   ###########################################
@@ -1631,6 +1632,7 @@ complete.master.epic.metric.class.phylo.features.cov <- function(inputvector){
   
   outputvector.full <- outputvector.values
   
+  unlink(paste0(sub.dir.rename), recursive = TRUE)
   
   return(outputvector.full)
   
