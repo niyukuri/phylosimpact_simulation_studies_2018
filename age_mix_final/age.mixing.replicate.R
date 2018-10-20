@@ -6,7 +6,7 @@
 # work.dir <- "/home/david/Desktop/mastermodeltest" # on laptop
 
 
-work.dir <- "/home/niyukuri/Desktop/mastermodeltest" # on PC
+work.dir <- "/home/david/Desktop/mastermodeltest" # on PC
 
 
 setwd(paste0(work.dir))
@@ -31,7 +31,7 @@ source("~/phylosimpact_simulation_studies_2018/age_mixing_uncertainty/LMEMphylo.
 
 # work.dir <- "/home/david/Desktop/mastermodeltest" # on laptop
 
-work.dir <- "/home/niyukuri/Desktop/mastermodeltest" # on PC
+# work.dir <- "/home/niyukuri/Desktop/mastermodeltest" # on PC
 
 # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
 
@@ -265,8 +265,8 @@ age.distr <- agedistr.creator(shape = 5, scale = 65)
 #
 cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
                                  population.simtime = 50, 
-                                 population.nummen = 2000, 
-                                 population.numwomen = 2000,
+                                 population.nummen = 1000, 
+                                 population.numwomen = 1000,
                                  hivseed.time = 10, 
                                  hivseed.type = "amount",
                                  hivseed.amount = 20, 
@@ -506,7 +506,7 @@ seeds.num <- inputvector[1]
 
 sequence.simulation.seqgen.par(dir.seq = dirseqgen,
                                sub.dir.rename = sub.dir.rename,
-                               simpact.trans.net = simpact.trans.net,
+                               simpact.trans.net = simpact.trans.net.adv, # simpact.trans.net,
                                seq.gen.tool = "seq-gen",
                                seeds.num = seeds.num,
                                endpoint = 40,
@@ -660,7 +660,7 @@ summary.epidemic.df <- c(hiv.prev.lt25.women, hiv.prev.lt25.men,
 
 # Make a data table from all transmissions networks with at least limitTransmEvents transmission events
 
-agemixing.df <- agemixing.trans.df(trans.network = simpact.trans.net,
+agemixing.df <- agemixing.trans.df(trans.network = simpact.trans.net.adv, # simpact.trans.net
                                    limitTransmEvents = 7)
 
 
@@ -778,7 +778,7 @@ if( nrow(agemixing.df.IDs) > length(unique(agemixing.df.IDs$parent)) & length(un
 #                
 #                "mean.AD", "median.AD", "sd.AD")
 
-CAR.100 <- CAR.groups.fun.agemixBIS(simpact.trans.net = simpact.trans.net,
+CAR.100 <- CAR.groups.fun.agemixBIS(simpact.trans.net = simpact.trans.net.adv, # simpact.trans.net
                                     datalist = datalist.agemix,
                                     limitTransmEvents = 7,
                                     timewindow = c(30,40),
@@ -823,13 +823,40 @@ dirfasttree <- work.dir
 
 age.group.40.50 = c(40, 50)
 timewindow = c(30, 40)
-seq.cov = 100
+seq.cov = 20
 
-mCAr.IDs <- IDs.Seq.Random(simpact.trans.net = simpact.trans.net, 
+mCAr.IDs <- IDs.Seq.Random(simpact.trans.net = simpact.trans.net.adv, # simpact.trans.net 
                            limitTransmEvents = 7,
                            timewindow = timewindow, 
                            seq.cov = seq.cov, 
                            age.limit = age.group.40.50[2])
+
+
+### Transmission network table
+
+infectionTable <- vector("list", length(simpact.trans.net.adv))
+
+for(j in 1:length(simpact.trans.net.adv)){
+  
+  p <- j
+  
+  trans.network.i <- as.data.frame(simpact.trans.net.adv[[p]])
+  
+  # trans.network.i <- trans.network.i[-1,]
+  
+  id.lab <- paste0(p,".",trans.network.i$id,".C")
+  
+  trans.network.i$id.lab <- id.lab
+  
+  infectionTable[[p]] <- trans.network.i
+}
+
+
+infecttable <- rbindlist(infectionTable)
+
+
+table.simpact.trans.net.adv <- infecttable # rbindlist(simpact.trans.net.adv)
+
 
 if(length(mCAr.IDs)>5){
   
@@ -845,8 +872,36 @@ if(length(mCAr.IDs)>5){
                                                         calendar.dates = "samplingtimes.all.csv",
                                                         simseqfile = paste0("cov.",seq.cov, ".mCAr.IDs.C.Epidemic.Fasta"),
                                                         count.start = 1977,
-                                                        endsim = endpoint,
+                                                        endsim = 40,
                                                         clust = FALSE)
+  
+  
+  tree <- mCAr.IDs.tree.calib
+  sim.start.year <- 1987
+  first.transmission <- min(mCAr.IDs.tree.calib$sts)
+  mrsd <- max(mCAr.IDs.tree.calib$sts)
+  
+  class(tree) <- "phylo"
+  
+  dates <- format(date_decimal(c(mrsd, first.transmission)), "%Y-%m-%d")
+  tree$root.edge <-  - sim.start.year
+  phylotree.plot <- ggtree(tree, mrsd = dates[1]) +
+    theme_tree2() +
+    theme_grey() +
+    theme(axis.line.x = element_line(),
+          axis.text.y = element_blank(),
+          axis.ticks.y = element_blank()) +
+    scale_x_continuous(limits = c(1985, 2020),
+                       breaks = seq(from = 1985,
+                                    to = 2020,
+                                    by = 5)) + #)scales::pretty_breaks(n = 10))
+    xlab("Time") +
+    ylab("")
+  print(phylotree.plot)
+  
+  
+  
+  sampling.dates <- read.csv(paste0(sub.dir.rename,"/samplingtimes.all.csv"))
   
   ## 
   # Node age with picante package
@@ -864,7 +919,7 @@ if(length(mCAr.IDs)>5){
   
   
   mrca.t <- mrca(mCAr.IDs.tree.calib, full = TRUE)
-
+  
   
   tree.cal.cov.35.IDs <- read.tree(paste0(sub.dir.rename, paste0("/calibrated.tree.cov.",seq.cov, ".mCAr.IDs.C.Epidemic.Fasta.tree")))
   
@@ -889,10 +944,18 @@ if(length(mCAr.IDs)>5){
   
   library(phangorn)
   
-  tree <- rtree(10)
+  tree <- mCAr.IDs.tree.calib # rtree(10)
   plot(tree, show.tip.label = FALSE)
   nodelabels()
   tiplabels()
+  
+  Ancestors(tree)
+  Children(tree)
+  Descendants(tree)
+  Siblings(tree)
+  
+  
+  
   Ancestors(tree, 1:3, "all")
   Children(tree, 11)
   Descendants(tree, 11, "tips")
@@ -914,13 +977,241 @@ if(length(mCAr.IDs)>5){
     k <- ansestor[[i]]
     
     ansestor.v <- c(ansestor.v, unique(k))
+    
+  }
   
+  sort.int.ansestor <- unique(sort(ansestor.v))
+  sort.int.node.age <- sort(int.node.age)
+  
+  tip.names <- names(mrca.v[1,])
+  
+  dates.tree.df <- dplyr::filter(sampling.dates, sampling.dates$V1%in%tip.names)
+  
+  # rearrange dates in tips order
+  tip.names.f <- vector()
+  dates.tree.dat <- vector()
+  for(i in 1:nrow(dates.tree.df)){
+    for(j in 1:length(tip.names)){
+      if(tip.names[i] == dates.tree.df$V1[[j]]){
+        tip.names.f <- c(tip.names.f, tip.names[i])
+        dates.tree.dat <- c(dates.tree.dat, 1977+40-dates.tree.df$V2[[j]])
       }
+    }
+  }
   
-  int.ansestor <- unique(ansestor.v)
+  
+  dates.tree.named <- dates.tree.dat
+  names(dates.tree.named) <- tip.names.f
   
   
-  sort(int.node.age)
+  # make mrca matrix diagonal 0 and other elements age of mrca
+  
+  sort.int.ansestor <- unique(sort(ansestor.v))
+  sort.int.node.age <- sort(int.node.age)
+  
+  
+  mrca.v.age <- mrca.v
+  
+  for(i in 1:nrow(mrca.v.age)){
+    for(j in 1:nrow(mrca.v.age)){
+      
+      if(i==j){
+        mrca.v.age[i,j] <- 0
+      }else{
+        
+        if(mrca.v[i,j] %in% sort.int.ansestor){
+          
+          p.index <- which(sort.int.ansestor == mrca.v[i,j])
+          
+          mrca.v.age[i,j] <-  sort.int.node.age[p.index]
+        }
+        
+      }
+      
+    }
+  }
+  
+  
+  
+  # make mrca matrix elements: sampling date - age of mrca
+  
+  # Fist contingency matrix
+  
+  mrca.v.age.samp <- mrca.v.age
+  
+  mrca.v.age.samp.cont1 <- mrca.v.age.samp
+  
+  for(i in 1:nrow(mrca.v.age)){
+    
+    for(j in 1:nrow(mrca.v.age)){
+      
+      if(i!=j){
+        
+        i.dat <- tip.names.f[i]
+        
+        v.index <- which(tip.names.f == i.dat)
+        
+        samp.date.tip <- dates.tree.dat[v.index]
+        
+        mrca.v.age.samp.cont1[i,] <- samp.date.tip - mrca.v.age.samp[i,]
+        
+      }
+      
+    }
+  }
+  
+  
+  
+  # Second contingency matrix
+  
+  mrca.v.age.samp <- mrca.v.age
+  
+  mrca.v.age.samp.cont2 <- mrca.v.age.samp
+  
+  for(i in 1:nrow(mrca.v.age)){
+    
+    for(j in 1:nrow(mrca.v.age)){
+      
+      if(i!=j){
+        
+        i.dat <- tip.names.f[i]
+        
+        v.index <- which(tip.names.f == i.dat)
+        
+        samp.date.tip <- dates.tree.dat[v.index]
+        
+        mrca.v.age.samp.cont2[,i] <- samp.date.tip - mrca.v.age.samp[,i]
+        
+      }
+      
+    }
+  }
+  
+  
+  # Diagonal zero
+  
+  for(i in 1:nrow(mrca.v.age.samp.cont1)){
+    for(j in 1:nrow(mrca.v.age.samp.cont1)){
+      
+      if(i==j){
+        mrca.v.age.samp.cont1[i,j] <- 0
+      }
+    }
+  }
+  
+  
+  for(i in 1:nrow(mrca.v.age.samp.cont2)){
+    for(j in 1:nrow(mrca.v.age.samp.cont2)){
+      
+      if(i==j){
+        mrca.v.age.samp.cont2[i,j] <- 0
+      }
+    }
+  }
+  
+  
+  
+  attributes.table.simpact.trans.net.adv <- dplyr::filter(table.simpact.trans.net.adv, table.simpact.trans.net.adv$id.lab%in%tip.names)
+  
+  V.gender <- vector()
+  V.cd4 <- vector()
+  V.vl <- vector()
+  V.x <- vector()
+  V.y <- vector()
+  iD <- vector()
+  
+  for(i in 1:length(tip.names)){
+    for(j in 1:nrow(attributes.table.simpact.trans.net.adv)){
+      if(tip.names[i] == attributes.table.simpact.trans.net.adv$id.lab[j]){
+        
+        V.gender <- c(V.gender, attributes.table.simpact.trans.net.adv$GenderRec[j])
+        V.cd4 <- c(V.cd4, attributes.table.simpact.trans.net.adv$cd4[j])
+        V.vl <- c(V.vl, attributes.table.simpact.trans.net.adv$vl[j])
+        V.x <- c(V.x, attributes.table.simpact.trans.net.adv$location.x[j])
+        V.y <- c(V.y, attributes.table.simpact.trans.net.adv$location.y[j])
+        iD <- c(iD, tip.names[i])
+        
+      }
+      
+    }
+  }
+  
+  
+  Node.gender.cd4.vl.x.y <- data.frame(V.gender,V.cd4, V.vl, V.x, V.y, iD)
+  
+  mrca.times.final <- as.matrix(abs(mrca.v.age.samp.cont2))
+  
+  library(igraph)
+  
+  net=graph.adjacency(as.matrix(mrca.times.final),mode="undirected",weighted=T,diag=FALSE)
+  
+  E(net)       # The edges of the "net" object
+  
+  V(net)       # The vertices of the "net" object
+  
+  V(net)$gender <- Node.gender.cd4.vl.x.y$V.gender
+  V(net)$cd4 <- Node.gender.cd4.vl.x.y$V.cd4
+  V(net)$vl <- Node.gender.cd4.vl.x.y$V.vl
+  V(net)$loc.x <- Node.gender.cd4.vl.x.y$V.x
+  V(net)$loc.y <- Node.gender.cd4.vl.x.y$V.y
+  
+  # each tips is connected to another one
+  plot(net)
+  
+  
+  cut.off <- 20
+  
+  
+  E(net)$weight
+  
+  net.sp <- delete_edges(net, E(net)[weight>=cut.off]) # remove link greater to the cuttoff
+  
+  E(net.sp)$weight
+  
+  plot(net.sp, layout=layout_with_kk) 
+  
+  
+  
+
+  # Incompatible matrix
+  
+  names.attributes.ngaha <- Node.gender.cd4.vl.x.y
+  
+  names.matrix.contigency <- names(mrca.times.final[1,])
+  
+  gender.l <- names.attributes.ngaha$V.gender
+  
+  mrca.times.filter <- mrca.times.final
+  
+  for (i in 1:length(names(mrca.times.final[1,]))) {
+    
+    name.col.i <- names.matrix.contigency[i]
+
+    index.i <- which(names(mrca.times.final[1,]) == name.col.i)
+    
+    gender.i <- gender.l[index.i]
+    
+    for(j in 1:length(names(mrca.times.final[1,]))){
+
+      if(i != j){
+        
+        name.col.j <- names.matrix.contigency[j]
+        
+        index.j <- which(names(mrca.times.final[1,]) == name.col.j)
+        
+        gender.j <- gender.l[index.j]
+        
+        if(gender.i == gender.j){
+          
+          mrca.times.filter[i,j] <- 0
+          
+        }
+        
+      }
+      
+    }
+    
+  }
   
   # run ClusterPicker
   
