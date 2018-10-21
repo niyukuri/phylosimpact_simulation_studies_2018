@@ -936,6 +936,58 @@ mrca.t <- mrca(mCAr.IDs.tree.calib, full = TRUE)
 tree.cal.cov.35.IDs <- read.tree(paste0(sub.dir.rename, paste0("/calibrated.tree.cov.",seq.cov, ".mCAr.IDs.C.Epidemic.Fasta.tree")))
 
 
+
+#### CLusters BEGIN
+
+
+
+# run ClusterPicker
+
+system(paste("java -jar ", paste(paste0(work.dir,"/ClusterPicker_1.2.3.jar"), paste0(sub.dir.rename,"/", paste0("cov.",seq.cov, ".mCAr.IDs.C.Epidemic.Fasta")), paste0(sub.dir.rename,"/",paste0("cov.",seq.cov, ".mCAr.IDs.C.Epidemic.Fasta.nwk")),  paste0("0.9 0.9 0.045 2 gap"))))
+
+# Read clusters' files
+
+dd <- list.files(path = paste0(sub.dir.rename), pattern = paste0(paste0("cov.",seq.cov, ".mCAr.IDs.C.Epidemic.Fasta"),"_",paste0("cov.",seq.cov, ".mCAr.IDs.C.Epidemic.Fasta"),"_","clusterPicks_cluste"),
+                 all.files = FALSE,
+                 full.names = FALSE, recursive = FALSE)
+
+# Transmission clusters.
+
+d <- clust.names <- dd
+
+data.list.simpact.trans.net.adv <-  vector("list", length(d)) # list() # initialise gender and age-structured data table of pairings in each transission cluster
+
+
+# Binding all data tables of clusters (age, gender, number of cluster)
+
+clust.size <- vector() # size of each cluster # table.simpact.trans.net.adv
+
+transm.df <- table.simpact.trans.net.adv
+
+for (i in 1:length(d)) {
+  
+  transm.df.cl.dat <- NULL
+  
+  clus.read <- read.table(file = paste0(paste0(sub.dir.rename,"/"),d[i]), header = FALSE) # Ids of each cluster
+  
+  clust.size <- c(clust.size, nrow(clus.read))
+  
+  data.table.simpact.trans.net.i <- subset(transm.df, transm.df$id.lab%in%as.character(clus.read$V1)) # transmission data table of IDs of that cluster
+  
+  data.table.simpact.trans.net.i$clust.ID <- rep(i, nrow(data.table.simpact.trans.net.i))
+  
+  data.list.simpact.trans.net.adv[[i]] <- as.data.frame(data.table.simpact.trans.net.i)
+  
+}
+
+
+data.table.simpact.trans.net.adv <- as.data.frame(do.call(rbind, data.list.simpact.trans.net.adv)) # data.table & data.frame
+
+# data.table.simpact.trans.clusts.net.adv <- data.table.simpact.trans.net.adv
+
+
+##### Clusters END
+
 library(phylobase)
 
 m <- MRCA(mCAr.IDs.tree.calib)
@@ -1142,14 +1194,39 @@ for(i in 1:length(tip.names)){
       V.x <- c(V.x, attributes.table.simpact.trans.net.adv$location.x[j])
       V.y <- c(V.y, attributes.table.simpact.trans.net.adv$location.y[j])
       iD <- c(iD, tip.names[i])
-      
     }
     
   }
 }
 
 
-Node.gender.cd4.vl.x.y <- data.frame(V.gender,V.cd4, V.vl, V.x, V.y, iD)
+Node.gender.cd4.vl.x.y <- data.table(V.gender,V.cd4, V.vl, V.x, V.y, iD)
+
+
+# Adding clusters ID
+
+clust.ID <- vector()
+
+for(i in 1:nrow(Node.gender.cd4.vl.x.y)){
+  
+  id <- Node.gender.cd4.vl.x.y$iD[i]
+  
+  if(id%in%data.table.simpact.trans.net.adv$id.lab){    # ID of tree belongs to IDs of clusters
+    
+    id.index <- which(data.table.simpact.trans.net.adv$id.lab == id)
+    
+    clust.ID <- c(clust.ID, data.table.simpact.trans.net.adv$clust.ID[id.index])
+    
+  }else{
+    clust.ID <- c(clust.ID, 0)
+  }
+  
+}
+
+Node.gender.cd4.vl.x.y$clust.ID <- clust.ID
+
+Node.gender.cd4.vl.x.y.clusID <- Node.gender.cd4.vl.x.y
+
 
 mrca.times.final <- as.matrix(abs(mrca.v.age.samp.cont2))
 
@@ -1195,6 +1272,52 @@ gender.l <- names.attributes.ngaha$V.gender
 
 mrca.times.filter <- mrca.times.final
 
+clusters.zose <- Node.gender.cd4.vl.x.y$clust.ID
+
+for (i in 1:length(names(mrca.times.final[1,]))) {
+  
+  name.col.i <- names.matrix.contigency[i]
+  
+  index.i <- which(names(mrca.times.final[1,]) == name.col.i)
+  
+  gender.i <- gender.l[index.i]
+  
+  cluster.i <- clusters.zose[index.i]
+
+  
+  for(j in 1:length(names(mrca.times.final[1,]))){
+    
+    if(i != j){
+      
+      name.col.j <- names.matrix.contigency[j]
+      
+      index.j <- which(names(mrca.times.final[1,]) == name.col.j)
+      
+      gender.j <- gender.l[index.j]
+      
+      cluster.j <- clusters.zose[index.j]
+      
+      
+      if(gender.i == gender.j){ # if same gender break the link
+        
+        mrca.times.filter[i,j] <- 0
+        
+      }
+      
+      if(cluster.i != 0 & cluster.j != 0 & cluster.i != cluster.j){
+        
+        mrca.times.filter[i,j] <- 0
+        
+      }
+      
+      
+    }
+    
+  }
+  
+}
+
+# Gender only
 for (i in 1:length(names(mrca.times.final[1,]))) {
   
   name.col.i <- names.matrix.contigency[i]
@@ -1212,8 +1335,8 @@ for (i in 1:length(names(mrca.times.final[1,]))) {
       index.j <- which(names(mrca.times.final[1,]) == name.col.j)
       
       gender.j <- gender.l[index.j]
-      
-      if(gender.i == gender.j){
+
+      if(gender.i == gender.j){ # if same gender break the link
         
         mrca.times.filter[i,j] <- 0
         
@@ -1227,12 +1350,19 @@ for (i in 1:length(names(mrca.times.final[1,]))) {
 
 
 
-
 net=graph.adjacency(as.matrix(mrca.times.filter),mode="undirected",weighted=T,diag=FALSE)
 
 E(net)       # The edges of the "net" object
 
 V(net)       # The vertices of the "net" object
+
+
+# Delete tips which are not part of transmission clusters
+
+Non.ids.dat <- dplyr::filter(Node.gender.cd4.vl.x.y, Node.gender.cd4.vl.x.y$clust.ID==0)
+Non.ids <- Non.ids.dat$iD
+
+net.cleaned <- delete_vertices(net, Non.ids)
 
 
 cut.off <- 20
@@ -1248,7 +1378,7 @@ plot(net.sp, layout=layout_with_kk)
 
 
 # Age groups filtering
-
+net.sp <- net.cleaned
 transm.matrix <- as.data.table(get.edgelist(net.sp))
 
 # table.simpact.trans.net.adv
@@ -1540,6 +1670,42 @@ age.groups.filtering.network.fun <- function(table.simpact.trans.net.igraph,
   dd <- list.files(path = paste0(sub.dir.rename), pattern = paste0(paste0("cov.",seq.cov, ".mCAr.IDs.C.Epidemic.Fasta"),"_",paste0("cov.",seq.cov, ".mCAr.IDs.C.Epidemic.Fasta"),"_","clusterPicks_cluste"),
                    all.files = FALSE,
                    full.names = FALSE, recursive = FALSE)
+  
+  # Transmission clusters.
+  
+  d <- clust.names <- dd
+  
+  data.list.simpact.trans.net.adv <-  vector("list", length(d)) # list() # initialise gender and age-structured data table of pairings in each transission cluster
+  
+  
+  # Binding all data tables of clusters (age, gender, number of cluster)
+  
+  clust.size <- vector() # size of each cluster # table.simpact.trans.net.adv
+  
+  transm.df <- table.simpact.trans.net.adv
+  
+  for (i in 1:length(d)) {
+    
+    transm.df.cl.dat <- NULL
+    
+    clus.read <- read.table(file = paste0(paste0(sub.dir.rename,"/"),d[i]), header = FALSE) # Ids of each cluster
+    
+    clust.size <- c(clust.size, nrow(clus.read))
+    
+    data.table.simpact.trans.net.i <- subset(transm.df, transm.df$id.lab%in%as.character(clus.read$V1)) # transmission data table of IDs of that cluster
+    
+    data.table.simpact.trans.net.i$clust.ID <- rep(i, nrow(data.table.simpact.trans.net.i))
+
+    data.list.simpact.trans.net.adv[[i]] <- as.data.frame(data.table.simpact.trans.net.i)
+    
+  }
+  
+  
+  data.table.simpact.trans.net.adv <- as.data.frame(do.call(rbind, data.list.simpact.trans.net.adv)) # data.table & data.frame
+  
+  
+  
+  
   
   
   clust.fit.params <- mixed.effect.fit.transmission.clusters(clust.names=dd, 
