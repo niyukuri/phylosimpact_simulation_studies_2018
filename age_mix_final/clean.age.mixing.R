@@ -23,19 +23,6 @@ inputvector <- c(123, -0.52, -0.05, 5, 7, 3, 0.25, -0.3, -0.1,
 
 
 source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
-source("~/phylosimpact_simulation_studies_2018/age_mixing_uncertainty/LMEMphylo.AR.groups.fun.agemix.R")
-source("~/phylosimpact_simulation_studies_2018/age_mixing_uncertainty/CAR.groups.fun.agemixBIS.R")
-source("~/phylosimpact_simulation_studies_2018/age_mixing_uncertainty/AR.groups.fun.agemixBIS.R")
-source("~/phylosimpact_simulation_studies_2018/age_mixing_uncertainty/LMEMphylo.CAR.groups.fun.agemix.R") 
-
-
-# work.dir <- "/home/david/Desktop/mastermodeltest" # on laptop
-
-# work.dir <- "/home/niyukuri/Desktop/mastermodeltest" # on PC
-
-# destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
-
-# destDir <- "/home/niyukuri/Desktop/mastermodeltest/temp" # on PC
 
 
 library(RSimpactCyan)
@@ -56,11 +43,8 @@ library(picante)
 library(igraph)
 library(phyloTop)
 library(phytools)
-
 library(Rsamtools)
-
 library(robustbase)
-
 library(intergraph)
 library(ggtree)
 library(lubridate)
@@ -75,197 +59,6 @@ library(tidyr)
 # Step 1: Setup and running simpact      #
 ###########################################
 
-
-######################### Parameter space ###################
-
-# 1.1. Parameter space:
-
-#   1.1.1. Sexual behaviour parameters
-
-# [1] #' @param dissolution.alpha_0: Baseline parameter for relationship dissolution rate. (0.1)
-# [2] #' @param dissolution.alpha_4 : Effect of increasing mean age of the couple on relationship dissolution rate (-0.05)
-# [XX] #' @param formation.hazard.type: Type of hazard function for relationship formation. Choose between "simple", "agegap" and "agegapry".
-# [3] #' @param person.agegap.man.dist.normal.mu: Mean of preferred age differences distribution for men (-4)
-# [4] #' @param person.agegap.woman.dist.normal.mu: Mean of preferred age differences distribution for women (-4)
-# [5] #' @param person.agegap.man.dist.normal.sigma: Standard deviation of preferred age differences distribution for men (3)
-# [6] #' @param person.agegap.woman.dist.normal.sigma: Standard deviation of preferred age differences distribution for women (3)
-# [7] #' @param formation.hazard.agegapry.gap_agescale_man: Effect of male age on preferred age difference (~ 1 - slope in regression model FemaleAge ~ MaleAge) (0.3)
-# [8] #' @param formation.hazard.agegapry.gap_agescale_woman: Effect of male age on preferred age difference (~ 1 - slope in regression model FemaleAge ~ MaleAge) (0.3)
-# [9] #' @param formation.hazard.agegapry.numrel_man: Effect of number of ongoing relationships on the relationship formation rate for men (-0.2)
-# [10] #' @param formation.hazard.agegapry.numrel_woman: Effect of number of ongoing relationships on the relationship formation rate for women (-0.2)
-# [11] #' @param formation.hazard.agegapry.numrel_diff: Effect of absolute difference in number of ongoing relationships on the relationship formation rate (-0.1)
-# [12] #' @param population.eyecap.fraction: Allow for the indication of how many people can a person possible engage in a relation with. (0.2)
-# 
-# 1.1.2. HIV transmission and diasese progression
-
-# [13] #' @param hivtransmission.param.a: Baseline parameter for HIV transmission rate in serodiscordant couples (-1.0352239)
-# [14] #' @param hivtransmission.param.b: Parameter "b" for the linear component of the effect of viral load on the HIV transmission rate in serodiscordant couples (-89.339994)
-# [15] #' @param hivtransmission.param.c: Parameter "c" for the exponential component of the effect of viral load on the HIV transmission rate in serodiscordant couples (0.4948478)
-# [16] #' @param hivtransmission.param.f1: Effect of youngest age on HIV susceptibility (log(5) ~1.6 such that the hazard is x 5 in 15 year olds)
-# [17] #' @param hivtransmission.param.f2: Effect of female age on HIV susceptibility (log(log(2.5) / log(5)) / 5 ~-0.11 such that the hazard is x 2.5 in 20 year olds, compared to the reference (>>25 year olds)
-# [18] #' @param person.vsp.toacute.x: Effect of acute versus chronic HIV infection on infectiousness (5)  # See Bellan PLoS Medicine
-# [19] #' @param person.vsp.toaids.x: Effect of "initial" AIDS stage versus chronic HIV infection on infectiousness (7)
-# [20] #' @param person.vsp.tofinalaids.x: Effect of "final" AIDS stage versus chronic HIV infection on infectiousness (12)
-
-# 1.1.3. Demographic parameters
-
-# [21] #' @param conception.alpha_base: Baseline parameter for conception rate. (-3)
-
-# inputvector: vector of 22 parameters, 1st being seed
-
-
-# age.distr <- agedistr.creator(shape = 5, scale = 65)
-# 
-# cfg.list <- input.params.creator(population.eyecap.fraction = 0.2, #0.21,#1,
-#                                  population.simtime = 40, #20, #40,  #25 for validation. 20 for calibration
-#                                  population.nummen = 600, #3000, #600, # 3800, #2500,
-#                                  population.numwomen = 600, # 3000, #600, #4200, #2500,
-#                                  hivseed.time = 10, # 20,
-#                                  hivseed.type = "amount",
-#                                  hivseed.amount = 20, #30,
-#                                  hivseed.age.min = 20,
-#                                  hivseed.age.max = 50,
-#                                  hivtransmission.param.a = -1, # -1,
-#                                  hivtransmission.param.b = -90,
-#                                  hivtransmission.param.c = 0.5,
-#                                  hivtransmission.param.f1 = log(2), #log(inputvector[2]) , #log(2),
-#                                  hivtransmission.param.f2 = log(log(1.4) / log(2)) / 5, #log(log(sqrt(inputvector[2])) / log(inputvector[2])) / 5, #log(log(1.4) / log(2)) / 5,
-#                                  formation.hazard.agegapry.gap_factor_man_age = -0.01, #-0.01472653928518528523251061,
-#                                  formation.hazard.agegapry.gap_factor_woman_age = -0.01, #-0.0726539285185285232510561,
-#                                  formation.hazard.agegapry.meanage = -0.025,
-#                                  formation.hazard.agegapry.gap_factor_man_const = 0,
-#                                  formation.hazard.agegapry.gap_factor_woman_const = 0,
-#                                  formation.hazard.agegapry.gap_factor_man_exp = -1, #-6,#-1.5,
-#                                  formation.hazard.agegapry.gap_factor_woman_exp = -1, #-6,#-1.5,
-#                                  formation.hazard.agegapry.gap_agescale_man = 0.25, #inputvector[3], # 0.25,
-#                                  formation.hazard.agegapry.gap_agescale_woman = 0.25, #inputvector[3], # 0.25,#-0.30000007,#-0.03,
-#                                  debut.debutage = 15,
-#                                  conception.alpha_base = -2.5#inputvector[14]#-2.5#,
-#                                  #person.art.accept.threshold.dist.fixed.value = 0
-# )
-# 
-# # 
-# # inputvector <- c(123, 0.1, -0.05, -4, -4, 3, 3,
-# #                  0.3, 0.3, -0.2, -0.2, -0.1, 0.2,
-# #                  -1.0352239, -89.339994, 0.4948478,
-# #                  1.6, -0.11, 5, 7, 12, -3)
-# 
-# 
-# # Seed for reproducability
-# ##########################
-# 
-# seedid <- inputvector[1]
-# 
-# 
-# # Sexual behaviour
-# ###################
-# 
-# cfg.list["dissolution.alpha_0"] <- inputvector[2]
-# cfg.list["dissolution.alpha_4"] <- inputvector[3]
-# cfg.list["person.agegap.man.dist.normal.mu"] <- inputvector[4]
-# cfg.list["person.agegap.woman.dist.normal.mu"] <- inputvector[5]
-# cfg.list["person.agegap.man.dist.normal.sigma"] <- inputvector[6]
-# cfg.list["person.agegap.woman.dist.normal.sigma"] <- inputvector[7]
-# cfg.list["formation.hazard.agegapry.gap_agescale_man"] <- inputvector[8]
-# cfg.list["formation.hazard.agegapry.gap_agescale_woman"] <- inputvector[9]
-# cfg.list["formation.hazard.agegapry.numrel_man"] <- inputvector[10]
-# cfg.list["formation.hazard.agegapry.numrel_woman"] <- inputvector[11]
-# cfg.list["formation.hazard.agegapry.numrel_diff"] <- inputvector[12]
-# cfg.list["population.eyecap.fraction"] <- inputvector[13]
-# 
-# # HIV transmission
-# ###################
-# 
-# cfg.list["hivtransmission.param.a"] <- inputvector[14]
-# cfg.list["hivtransmission.param.b"] <- inputvector[15]
-# cfg.list["hivtransmission.param.c"] <- inputvector[16]
-# cfg.list["hivtransmission.param.f1"] <- inputvector[17]
-# cfg.list["hivtransmission.param.f2"] <- inputvector[18]
-# cfg.list["person.vsp.toacute.x"] <- inputvector[19]
-# cfg.list["person.vsp.toaids.x"] <- inputvector[20]
-# cfg.list["person.vsp.tofinalaids.x"] <- inputvector[21]
-# 
-# # Demographic
-# ##############
-# 
-# cfg.list["conception.alpha_base"] <- inputvector[22]
-# 
-# 
-# # Assumptions to avoid negative branch lengths
-# ###############################################
-# 
-# cfg.list["monitoring.fraction.log_viralload"] <- 0
-# # + sampling == start ART
-# # when someone start ART, he/she is sampled and becomes non-infectious
-# 
-# # Assumption of nature of sexual network
-# #########################################
-# 
-# cfg.list["population.msm"] = "no"
-# 
-# 
-# ## Add-ons
-# 
-# cfg.list["formation.hazard.agegapry.baseline"] <- 2
-# cfg.list["mortality.aids.survtime.C"] <- 65
-# cfg.list["mortality.aids.survtime.k"] <- -0.2
-# cfg.list["dropout.interval.dist.uniform.min"] <- 1000
-# cfg.list["dropout.interval.dist.uniform.max"] <- 2000
-# cfg.list["person.survtime.logoffset.dist.type"] <- "normal"
-# cfg.list["person.survtime.logoffset.dist.normal.mu"] <- 0
-# cfg.list["person.survtime.logoffset.dist.normal.sigma"] <- 0.1a
-# 
-# cfg.list["person.agegap.man.dist.type"] <- "normal" #fixed
-# #cfg.list["person.agegap.man.dist.fixed.value"] <- -6
-# cfg.list["person.agegap.woman.dist.type"] <- "normal" #"fixed"
-# #cfg.list["person.agegap.woman.dist.fixed.value"] <- -6
-# 
-# 
-# # ART intervention
-# ###################
-# 
-# # ART acceptability paramter and the ART  interventions
-# 
-# cfg.list["person.art.accept.threshold.dist.fixed.value"] <- 0.6 
-# 
-# 
-# # Let's introduce ART, 
-# art.intro <- list()
-# art.intro["time"] <- 25 #25
-# art.intro["diagnosis.baseline"] <- 100
-# art.intro["monitoring.cd4.threshold"] <- 100 
-# 
-# # Gradual increase in CD4 threshold. in 2007:200. in 2010:350. in 2013:500
-# 
-# art.intro2 <- list()
-# art.intro2["time"] <- 25 + 5 #25 + 5 = 30
-# art.intro2["monitoring.cd4.threshold"] <- 200a
-# 
-# art.intro3 <- list()
-# art.intro3["time"] <- 25 + 8 #25 + 8 = 33
-# art.intro3["monitoring.cd4.threshold"] <- 350
-# 
-# art.intro4 <- list()
-# art.intro4["time"] <- 25 + 11 #25 + 11 = 36
-# art.intro4["monitoring.cd4.threshold"] <- 500
-# 
-# art.intro5 <- list()
-# art.intro5["time"] <- 25 + 13 #25 + 13 = 38
-# art.intro5["monitoring.cd4.threshold"] <- 700 # This is equivalent to immediate access
-# 
-# interventionlist <- list(art.intro, art.intro2, art.intro3, art.intro4, art.intro5)
-# 
-# intervention <- interventionlist
-# 
-# 
-
-
-
-
-
-#######################
-# Step 1: Run Simpact #
-#######################
 
 ## Run Simpact for specific parameter combination
 
@@ -450,17 +243,11 @@ generate.filename <- function(how.long){
 
 sub.dir.rename <- paste0(work.dir,"/temp/",generate.filename(10))
 
-#######################
-# Step 1: Run Simpact #
-#######################
 
 
-# results <- tryCatch(simpact.run(configParams = cfg.list,
-#                                 destDir = sub.dir.rename,
-#                                 agedist = age.distr,
-#                                 seed = seedid,
-#                                 intervention = intervention),
-#                     error = simpact.errFunction)
+
+# Running Simpact 
+#################
 
 results <- simpact.run(configParams = cfg.list,
                        destDir = sub.dir.rename,
@@ -497,6 +284,8 @@ simpact.trans.net.adv <- advanced.transmission.network.builder(datalist = datali
 
 # simpact.trans.net.projection <- transmission.network.builder(datalist = datalist.agemix, endpoint = 45)
 
+
+
 ###############################
 # Step 3: Sequence simulation #
 ###############################
@@ -530,6 +319,7 @@ write.dna(sequ.dna, file = paste0(sub.dir.rename,"/C.Epidemic.fas") , format = "
 
 
 # (i) Age mixing in relationships
+##################################
 
 # 
 
@@ -585,7 +375,9 @@ if( nrow(data) > length(unique(data$ID)) & length(unique(data$ID)) > 1 ){
 
 # age.scatter.df <- agemix.model[[1]]
 
-#  (ii) Point 	prevalence of concurrency in the adult population:
+#  (ii) Point 	prevalence of concurrency in the adult population
+##################################################################
+
 
 # Concurrency point prevalence 6 months before a survey, among men
 
@@ -595,6 +387,7 @@ pp.cp.6months.male <- tryCatch(concurr.pointprev.calculator(datalist = datalist.
 
 
 # (iii) Prevalence
+##################
 
 hiv.prev.lt25.women <- prevalence.calculator(datalist = datalist.agemix,
                                              agegroup = c(15, 25),
@@ -619,6 +412,7 @@ hiv.prev.40.50.men <- prevalence.calculator(datalist = datalist.agemix,
 
 
 # (iv) Incidence
+#################
 
 incidence.df.15.24 <- incidence.calculator(datalist = datalist.agemix,
                                            agegroup = c(15, 25), timewindow = c(30, 40))
@@ -661,138 +455,10 @@ summary.epidemic.df <- c(hiv.prev.lt25.women, hiv.prev.lt25.men,
 
 
 
-##########################################################
-# Step 3: Data and age-mixing in transmissions #
-##########################################################
-
-
-# Make a data table from all transmissions networks with at least limitTransmEvents transmission events
-
-agemixing.df <- agemixing.trans.df(trans.network = simpact.trans.net.adv, # simpact.trans.net
-                                   limitTransmEvents = 7)
-
-
-# IDs of individuals infected in the time window of the study
-
-IDs.study <- new.transmissions.dat(datalist = datalist.agemix, 
-                                   time.window=c(30,40))
-
-agemixing.df.IDs <- dplyr::filter(agemixing.df, agemixing.df$RecId%in%IDs.study)
-
-
-# True age mixing in transmissions within differewnt age groups seen by MELM #
-##############################################################################
-
-
-if( nrow(agemixing.df.IDs) > length(unique(agemixing.df.IDs$parent)) & length(unique(agemixing.df.IDs$parent)) > 1 ){
-  
-  # Heteroscedasticity: model variance component of within-group errors
-  ######################################################################
-  
-  
-  het.fit.lme.agemixing <- lme(AgeInfecRec ~ GenderRec, data = agemixing.df.IDs, random = ~ 1|DonId,
-                               weights = varIdent( c("1" = 0.5), ~ 1 |GenderRec ))
-  
-  
-  het.a <- coef(summary(het.fit.lme.agemixing))[1] # average age in transmission clusters
-  
-  het.beta <- coef(summary(het.fit.lme.agemixing))[2] # average age difference in transmission clusters: 
-  # seen as bridge width which shows potential cross-generation transmission
-  
-  
-  het.b1 <- as.numeric(VarCorr(het.fit.lme.agemixing)[3]) # between cluster variation
-  
-  het.b2 <- as.numeric(VarCorr(het.fit.lme.agemixing)[4]) # within cluster variation
-  
-  
-  # SD for the two strata
-  
-  unique.val.strat <- unique(attributes(het.fit.lme.agemixing$modelStruct$varStruct)$weights)
-  
-  het.fit.lme.agemixing$modelStruct$varStruct
-  
-  # reference group: female == 1
-  delta.female <- 1
-  
-  female.val <- unique.val.strat[1]
-  male.val <- unique.val.strat[2]
-  
-  delta.male <- female.val/male.val # delta_ref_group / val
-  
-  SD.female <- as.numeric(VarCorr(het.fit.lme.agemixing)[4])
-  SD.male <- delta.male * SD.female 
-  
-  
-  het.lme.val <- c(het.a, het.beta, het.b1, het.b2, SD.female, SD.male)
-  
-  names(het.lme.val) <-  c("het.av.age.male", "het.gendEffect.clust", "het.between.transm.var", "het.within.transm.var", "SD.female", "SD.male")
-  
-  
-  flag.lme <- NA
-  
-  if(abs(het.lme.val[[2]]) > 5){ # If average age difference is greater than 5, there is a cross-generation transmission
-    flag.lme <- 1
-  }else{
-    flag.lme <- 0
-  }
-  
-}else{
-  
-  names.lme.val <-  c("het.av.age.male", "het.gendEffect.clust", "het.between.transm.var", "het.within.transm.var", "SD.female", "SD.male")
-  
-  # c("av.age.male", "gendEffect.clust", "between.transm.var", "within.transm.var")
-  
-  het.lme.val <- rep(NA, length(names.lme.val))
-  
-  names(het.lme.val) <- names.lme.val
-  
-  flag.lme <- NA
-}
-
-
-
-# val.names <- c("num.men.15.25", "num.women.15.25",
-#                "num.men.25.40", "num.women.25.40",
-#                "num.men.40.50", "num.women.40.50",
-#                
-#                "partners.men.15.25.w.15.25", "partners.men.15.25.w.25.40", "partners.men.15.25.w.40.50",
-#                "partners.men.25.40.w.15.25", "partners.men.25.40.w.25.40", "partners.men.25.40.w.40.50",
-#                "partners.men.40.50.w.15.25", "partners.men.40.50.w.25.40", "partners.men.40.50.w.40.50",
-#                
-#                "mean.AD", "median.AD", "sd.AD")
-
-CAR.100 <- CAR.groups.fun.agemixBIS(simpact.trans.net = simpact.trans.net.adv, # simpact.trans.net
-                                    datalist = datalist.agemix,
-                                    limitTransmEvents = 7,
-                                    timewindow = c(30,40),
-                                    seq.cov = 100,
-                                    age.group.15.25 = c(15,25),
-                                    age.group.25.40 = c(25,40),
-                                    age.group.40.50 = c(40,50))
-
-flag.women.val <- CAR.100[13] # partners.men.40.50.w.15.25
-
-flag.men.val <- CAR.100[9] # partners.men.15.25.w.40.50
-
-flag.women <- NA
-flag.men <- NA
-
-if(flag.women.val >=1){ # If we have at least one transmission from older men to younger women 
-  flag.women <- 1
-}else{
-  flag.women <- 0
-}
-
-if(flag.men.val >=1){  # If we have at least one transmission from older women to younger men 
-  flag.men <- 1
-}else{
-  flag.men <- 0
-}
-
-
-
-# Age difference statistics #
+# Age difference statistics 
 #############################
+
+
 AD <- abs(abs(agemixing.df.IDs$TOBDon) - abs(agemixing.df.IDs$TOBRec))
 mean.AD <- mean(AD)
 med.AD <- median(AD)
@@ -800,13 +466,18 @@ sd.AD <- sd(AD)
 
 
 
-# III. Transmission clusters with MCAR
+# Building phylogenetic tree
+############################
+
 
 dirfasttree <- work.dir
 
 age.group.40.50 = c(40, 50)
 timewindow = c(30, 40)
 seq.cov = 100
+
+
+# Select IDs in MCAR scenario
 
 mCAr.IDs <- IDs.Seq.Random(simpact.trans.net = simpact.trans.net.adv, # simpact.trans.net 
                            limitTransmEvents = 7,
@@ -815,7 +486,9 @@ mCAr.IDs <- IDs.Seq.Random(simpact.trans.net = simpact.trans.net.adv, # simpact.
                            age.limit = age.group.40.50[2])
 
 
-### Transmission network table
+# Transmission network table as from transmission networks
+##########################################################
+
 
 infectionTable <- vector("list", length(simpact.trans.net.adv))
 
@@ -848,10 +521,17 @@ table.simpact.trans.net.adv <- infecttable # rbindlist(simpact.trans.net.adv)
 # if(length(mCAr.IDs)>5){
 
 
+# Select sequences from the pool of alignment
+##############################################
+
+
 choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.fas"),
                     select.vec = mCAr.IDs,
                     name.file = paste0(sub.dir.rename,"/",paste0("cov.",seq.cov, ".mCAr.IDs.C.Epidemic.Fasta")))
 
+
+# Build and calibrate the phylogenetic tree
+############################################
 
 mCAr.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
                                                       sub.dir.rename = sub.dir.rename,
@@ -884,7 +564,8 @@ sampling.dates <- read.csv(paste0(sub.dir.rename,"/samplingtimes.all.csv")) # sa
 # 
 
 
-## Compute transmission clusters
+# Compute transmission clusters
+###############################
 
 # run ClusterPicker
 
@@ -901,6 +582,10 @@ dd <- list.files(path = paste0(sub.dir.rename), pattern = paste0(paste0("cov.",s
 d <- clust.names <- dd
 
 data.list.simpact.trans.net.adv <-  vector("list", length(d)) # list() # initialise gender and age-structured data table of pairings in each transission cluster
+
+
+# Transmission table of individuals in the transmission clusters
+#################################################################
 
 
 # Binding all data tables of clusters as these information are captured in transmission networks
@@ -970,6 +655,9 @@ for(i in 1:nrow(dates.tree.df)){
 dates.tree.named <- dates.tree.dat
 names(dates.tree.named) <- tip.names.f
 
+
+# MRCA matrix
+#############
 
 # make mrca matrix diagonal 0 and other elements (internal nodes IDs) assign them the age of mrca
 
@@ -1153,9 +841,11 @@ V(net)$loc.y <- Node.gender.cd4.vl.x.y$V.y
 
 
 ## Filtering the network by breaking some edges due to conditions from individuals attributes:
+##############################################################################################
 
 # 1. Gender, 2. cluster belonging, 3. geographical location, 4. CD4, and 5. Viral load
 
+# Now considering 1 and 2
 
 names.attributes.ngaha <- Node.gender.cd4.vl.x.y
 
@@ -1215,6 +905,7 @@ mrca.times.filter <- mrca.times.final
 # }
 
 # i. Gender 
+############
 
 for (i in 1:length(names(mrca.times.final[1,]))) {
   
@@ -1250,6 +941,7 @@ mrca.times.filter.gender <- mrca.times.filter
 
 
 # ii. Cluster
+#############
 
 mrca.times.filter.gender.clust <- mrca.times.filter.gender
 
@@ -1287,6 +979,9 @@ for (i in 1:length(names(mrca.times.final[1,]))) {
 }
 
 
+# Transmission network built from phylogenetic tree
+####################################################
+
 
 net.cont.1 <- graph.adjacency(as.matrix(mrca.times.filter.gender.clust),mode="undirected",weighted=T,diag=FALSE)
 
@@ -1305,7 +1000,10 @@ E(net.cont.1)$weight
 # plot(net.cont.1, layout=layout_with_kk) 
 
 
-# Delete tips which are not part of transmission clusters, they have clust.ID==0 >> deletes vertices 
+
+# Delete tips of the phylogenetic tree which are not part of transmission clusters:  they have clust.ID==0 >> deletes vertices 
+###################################################################################
+
 
 Non.ids.dat <- dplyr::filter(Node.gender.cd4.vl.x.y, Node.gender.cd4.vl.x.y$clust.ID==0)
 Non.ids <- Non.ids.dat$iD
@@ -1501,15 +1199,17 @@ net.cleaned <- delete_vertices(net.cont.1, Non.ids)
 
 
 
-# Age groups filtering
-#######################
 
+# Age structure in the transmission network built from phylogenetic tree
+#########################################################################
+
+
+# produce age table
 
 net.sp <- net.cleaned
 
 
-
-transm.matrix <- as.data.table(get.edgelist(net.sp)) # matrix of links
+transm.matrix <- as.data.table(get.edgelist(net.sp)) # matrix of links of the ransmission network built from phylogenetic tree
 
 # table.simpact.trans.net.adv
 
