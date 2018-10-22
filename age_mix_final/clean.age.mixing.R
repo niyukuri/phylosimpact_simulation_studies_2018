@@ -273,8 +273,8 @@ age.distr <- agedistr.creator(shape = 5, scale = 65)
 #
 cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
                                  population.simtime = 50, 
-                                 population.nummen = 4000, 
-                                 population.numwomen = 4000,
+                                 population.nummen = 7000, 
+                                 population.numwomen = 7000,
                                  hivseed.time = 10, 
                                  hivseed.type = "amount",
                                  hivseed.amount = 20, 
@@ -1622,7 +1622,7 @@ age.groups.filtered.trans.clust.network.fun <- function(table.transm.clust.net.i
       
       if(women.age.table.1$age2.dat[j] >= age.group.15.25[1] & women.age.table.1$age2.dat[j] < age.group.15.25[2]){
         
-        women.15.25.men.15.25.2 <- c(women.15.25.men.15.25.2, women.age.table.2$age2.dat[j])
+        women.15.25.men.15.25.2 <- c(women.15.25.men.15.25.2, women.age.table.1$age2.dat[j])
         
       }else if(women.age.table.1$age2.dat[j] >= age.group.25.40[1] & women.age.table.1$age2.dat[j] < age.group.25.40[2]){
         
@@ -1899,7 +1899,7 @@ age.groups.filtered.transmission.network.fun <- function(table.transm.clust.net.
       
       if(women.age.table.1$age2.dat[j] >= age.group.15.25[1] & women.age.table.1$age2.dat[j] < age.group.15.25[2]){
         
-        women.15.25.men.15.25.2 <- c(women.15.25.men.15.25.2, women.age.table.2$age2.dat[j])
+        women.15.25.men.15.25.2 <- c(women.15.25.men.15.25.2, women.age.table.1$age2.dat[j])
         
       }else if(women.age.table.1$age2.dat[j] >= age.group.25.40[1] & women.age.table.1$age2.dat[j] < age.group.25.40[2]){
         
