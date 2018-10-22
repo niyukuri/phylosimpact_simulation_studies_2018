@@ -14,17 +14,9 @@ setwd(paste0(work.dir))
 
 #work.dir <- "/user/data/gent/vsc400/vsc40070/phylo/" # on cluster
 
-
-pacman::p_load(snow, parallel, RSimpactCyan, RSimpactHelper, ape, Rsamtools)
-
-
-
-inputvector <- c(123, -0.52, -0.05, 5, 7, 3, 0.25, -0.3, -0.1, 
-                 -1, -90, 0.5, 0.05, -0.14, 5, 7, 12, -2.7) 
-
-
 source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
 
+source("~/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
 
 library(RSimpactCyan)
 library(RSimpactHelper)
@@ -59,6 +51,13 @@ library(tidyr)
 ###########################################
 # Step 1: Setup and running simpact      #
 ###########################################
+
+
+
+
+inputvector <- c(123, -0.52, -0.05, 5, 7, 3, 0.25, -0.3, -0.1, 
+                 -1, -90, 0.5, 0.05, -0.14, 5, 7, 12, -2.7) 
+
 
 
 ## Run Simpact for specific parameter combination
@@ -270,10 +269,6 @@ datalist.agemix <- DataListALL
 ###########################################
 # Step 2: Construct transmission networks #
 ###########################################
-
-
-source("~/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
-
 
 
 simpact.trans.net.adv <- advanced.transmission.network.builder(datalist = datalist.agemix, endpoint = 40)
