@@ -6,7 +6,7 @@
 # work.dir <- "/home/david/Desktop/mastermodeltest" # on laptop
 
 
-work.dir <- "/home/david/Desktop/mastermodeltest" # on PC
+work.dir <- "/home/niyukuri/Desktop/mastermodeltest" # on PC
 
 
 setwd(paste0(work.dir))
