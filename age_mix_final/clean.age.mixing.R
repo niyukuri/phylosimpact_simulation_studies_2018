@@ -1,5 +1,6 @@
 # Master model for simulation of age-mixing patterns
 
+# Make sure you have seq-gen, FastTree, and comandline ClusterPicker_1.2.3 in you working directory
 
 # Define directory
 
