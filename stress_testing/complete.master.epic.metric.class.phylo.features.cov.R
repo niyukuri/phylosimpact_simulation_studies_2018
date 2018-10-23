@@ -19,6 +19,12 @@ pacman::p_load(snow, parallel, RSimpactCyan, RSimpactHelper, ape, Rsamtools)
 # work.dir <- "~/Desktop/calibration/"
 
 
+
+inputvector <- c(123, -0.52, -0.05, 5, 7, 3, 0.25, -0.3, -0.1, 
+                 -1, -90, 0.5, 0.05, -0.14, 5, 7, 12, -2.7) 
+
+
+
 complete.master.epic.metric.class.phylo.features.cov <- function(inputvector){
   
   
@@ -72,12 +78,14 @@ complete.master.epic.metric.class.phylo.features.cov <- function(inputvector){
   
   
   
+  ## Run Simpact for specific parameter combination
+  
   age.distr <- agedistr.creator(shape = 5, scale = 65)
   #
   cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
                                    population.simtime = 50, 
-                                   population.nummen = 3000, 
-                                   population.numwomen = 3000,
+                                   population.nummen = 2000, 
+                                   population.numwomen = 2000,
                                    hivseed.time = 10, 
                                    hivseed.type = "amount",
                                    hivseed.amount = 20, 
@@ -86,6 +94,12 @@ complete.master.epic.metric.class.phylo.features.cov <- function(inputvector){
                                    formation.hazard.agegapry.meanage = -0.025,
                                    debut.debutage = 15
   )
+  
+  # # Assumption of nature of sexual network
+  # #########################################
+  #
+  cfg.list["population.msm"] = "no"
+  
   
   # # Sexual behaviour
   # ###################
@@ -105,12 +119,10 @@ complete.master.epic.metric.class.phylo.features.cov <- function(inputvector){
   cfg.list["formation.hazard.agegapry.numrel_woman"] <- inputvector[8] # [7] # -0.3
   cfg.list["formation.hazard.agegapry.numrel_diff"] <- inputvector[9] # [8] # -0.1 c("unif", -0.9, 0)
   
-  # cfg.list["population.eyecap.fraction"] <- inputvector[10] # [9] # 0.2 c("unif", 0, 0.5) # REMOVED in params 
-  #
+  
   # # HIV transmission
   # ###################
   #
-  
   
   cfg.list["hivtransmission.param.a"] <- inputvector[10] # [10] # -1 c("unif", -2, 0)
   cfg.list["hivtransmission.param.b"] <- inputvector[11] # [11] # -90 c("unif", -100, -80)
@@ -132,21 +144,14 @@ complete.master.epic.metric.class.phylo.features.cov <- function(inputvector){
   
   cfg.list["conception.alpha_base"] <- inputvector[18] # [18] # -2.7 c("unif", -3.5, -1.7)
   
-  #
-  #
+  
   # # Assumptions to avoid negative branch lengths
   # ###############################################
-  #
+  # # + sampling == start ART
+  # # when someone start ART, he/she is sampled and becomes non-infectious
   
   cfg.list["monitoring.fraction.log_viralload"] <- 0
   
-  # # + sampling == start ART
-  # # when someone start ART, he/she is sampled and becomes non-infectious
-  #
-  # # Assumption of nature of sexual network
-  # #########################################
-  #
-  cfg.list["population.msm"] = "no"
   
   #
   # ## Add-ons
@@ -156,6 +161,7 @@ complete.master.epic.metric.class.phylo.features.cov <- function(inputvector){
   cfg.list["mortality.aids.survtime.C"] <- 65
   cfg.list["mortality.aids.survtime.k"] <- -0.2
   cfg.list["monitoring.fraction.log_viralload"] <- 0 #0.3
+  cfg.list["dropout.interval.dist.type"] <- "uniform"
   cfg.list["dropout.interval.dist.uniform.min"] <- 1000
   cfg.list["dropout.interval.dist.uniform.max"] <- 2000
   
@@ -256,6 +262,7 @@ complete.master.epic.metric.class.phylo.features.cov <- function(inputvector){
   sub.dir.rename <- paste0(work.dir,"/temp/",generate.filename(10))
   
   
+
   #######################
   # Step 1: Run Simpact #
   #######################
@@ -1647,7 +1654,7 @@ inputvector <- c(-0.52, -0.05, 2, 0, 2, 0.25, -0.3, -0.1,
                  -1, -90, 0.5, 0.05, -0.14, 5, 7, 12, -2.7) # length(inputvector) = 18
 
 
-reps <- 8
+reps <- 4
 
 
 # Input parameters in matrix form reps times (rows).
