@@ -111,22 +111,22 @@ compute.summary.statistics.classic <- function(datalist = datalist.agemix,
   #                                                timepoint = datalist.agemix$itable$population.simtime[1])$pointprevalence[2]
   #   
   
-  hiv.prev.15.25.women <- prevalence.calculator(datalist = datalist.agemix,
+  hiv.prev.15.25.women <- prevalence.calculator(datalist = datalist, # datalist.agemix,
                                                 agegroup = age.group.15.25,
                                                 timepoint = endpoint)$pointprevalence[2]
-  hiv.prev.15.25.men <- prevalence.calculator(datalist = datalist.agemix,
+  hiv.prev.15.25.men <- prevalence.calculator(datalist = datalist, # datalist.agemix,
                                               agegroup = age.group.15.25,
                                               timepoint = endpoint)$pointprevalence[1]
-  hiv.prev.25.40.women <- prevalence.calculator(datalist = datalist.agemix,
+  hiv.prev.25.40.women <- prevalence.calculator(datalist = datalist, # datalist.agemix,
                                                 agegroup = age.group.25.40,
                                                 timepoint = endpoint)$pointprevalence[2]
-  hiv.prev.25.40.men <- prevalence.calculator(datalist = datalist.agemix,
+  hiv.prev.25.40.men <- prevalence.calculator(datalist = datalist, # datalist.agemix,
                                               agegroup = age.group.25.40,
                                               timepoint = endpoint)$pointprevalence[1]
-  hiv.prev.40.50.women <- prevalence.calculator(datalist = datalist.agemix,
+  hiv.prev.40.50.women <- prevalence.calculator(datalist = datalist, # datalist.agemix,
                                                 agegroup = age.group.40.50,
                                                 timepoint = endpoint)$pointprevalence[2]
-  hiv.prev.40.50.men <- prevalence.calculator(datalist = datalist.agemix,
+  hiv.prev.40.50.men <- prevalence.calculator(datalist = datalist, # datalist.agemix,
                                               agegroup = age.group.40.50,
                                               timepoint = endpoint)$pointprevalence[1]
   
