@@ -2217,11 +2217,22 @@ age.groups.filtered.transmission.net.fun <- function(table.transmission.net.cov 
 
 
 
+
+
+# Results
+###########
+
+
+# Age structure table obtained from transmission network built from transmission clusters
+
 age.structure.transm.clust <- age.groups.filtered.trans.clust.network.fun(table.transm.clust.net.igraph = table.transm.clust.net.igraph,
                                                                           transm.matrix = transm.matrix,
                                                                           age.group.15.25 = c(15,25),
                                                                           age.group.25.40 = c(25,40),
                                                                           age.group.40.50 = c(40,50))
+
+
+# True age structure table from transmission network of these individuals in transmission clusters
 
 age.structure.transm.clust.true <- age.groups.filtered.transmission.clust.fun(table.transm.clust.net.igraph = table.transm.clust.net.igraph,
                                                                               age.group.15.25 = c(15,25),
@@ -2230,8 +2241,20 @@ age.structure.transm.clust.true <- age.groups.filtered.transmission.clust.fun(ta
 
 
 
+# True age structure table from transmission network of all selected individuals (people in the phylogenetic tree)
+
 age.structure.transm.net.true <- age.groups.filtered.transmission.net.fun(table.transmission.net.cov = table.simpact.trans.net.cov,
                                                                           age.group.15.25 = c(15,25),
                                                                           age.group.25.40 = c(25,40),
                                                                           age.group.40.50 = c(40,50))
+
+# Age mixing metrics in the full data set of the entire epidemic
+
+age.mixing.rels <- mix.rels.dat
+
+
+# Age mixing metrics in the data sets of selected individuals
+
+age.mixing.transm <- mix.rels.transm.dat
+
 
