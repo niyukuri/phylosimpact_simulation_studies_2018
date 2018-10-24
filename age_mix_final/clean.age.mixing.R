@@ -313,6 +313,11 @@ write.dna(sequ.dna, file = paste0(sub.dir.rename,"/C.Epidemic.fas") , format = "
 
 
 
+###################################################################
+# Step 4: Epidemic statistics and sexual behaviour: full data set #
+###################################################################
+
+
 
 # (i) Age mixing in relationships
 ##################################
@@ -363,9 +368,13 @@ if( nrow(data) > length(unique(data$ID)) & length(unique(data$ID)) > 1 ){
   
   mix.rels.dat <- c(AAD.male, SDAD.male, slope.male, WSD.male, BSD.male, intercept.male)
   
+  names(mix.rels.dat) <-  c("R.AAD.male", "R.SDAD.male", "R.slope.male", "R.WSD.male", "R.BSD.male", "R.intercept.male")
+  
 }else{
   
   mix.rels.dat <- rep(NA, 6)
+  
+  names(mix.rels.dat) <-  c("R.AAD.male", "R.SDAD.male", "R.slope.male", "R.WSD.male", "R.BSD.male", "R.intercept.male")
   
 }
 
@@ -378,8 +387,8 @@ if( nrow(data) > length(unique(data$ID)) & length(unique(data$ID)) > 1 ){
 # Concurrency point prevalence 6 months before a survey, among men
 
 
-pp.cp.6months.male <- tryCatch(concurr.pointprev.calculator(datalist = datalist.agemix,
-                                                            timepoint = 40 - 0.5), error=function(e) return(NA))
+pp.cp.6months.male.rels <- tryCatch(concurr.pointprev.calculator(datalist = datalist.agemix,
+                                                                 timepoint = 40 - 0.5), error=function(e) return(NA))
 
 
 # (iii) Prevalence
@@ -413,60 +422,50 @@ hiv.prev.40.50.men <- prevalence.calculator(datalist = datalist.agemix,
 incidence.df.15.24 <- incidence.calculator(datalist = datalist.agemix,
                                            agegroup = c(15, 25), timewindow = c(30, 40))
 
-METRICS.incidence.df.15.24 <- incidence.df.15.24$incidence[3]
+epi.rels.incidence.df.15.24 <- incidence.df.15.24$incidence[3]
 
-METRICS.incidence.df.15.24.men <- incidence.df.15.24$incidence[1]
-METRICS.incidence.df.15.24.women <- incidence.df.15.24$incidence[2]
+epi.rels.incidence.df.15.24.men <- incidence.df.15.24$incidence[1]
+epi.rels.incidence.df.15.24.women <- incidence.df.15.24$incidence[2]
 
 
 incidence.df.25.39 <- incidence.calculator(datalist = datalist.agemix,
                                            agegroup = c(25, 40), timewindow = c(30, 40))
 
-METRICS.incidence.df.25.39 <- incidence.df.25.39$incidence[3]
+epi.rels.incidence.df.25.39 <- incidence.df.25.39$incidence[3]
 
-METRICS.incidence.df.25.39.men <- incidence.df.25.39$incidence[1]
-METRICS.incidence.df.25.39.women <- incidence.df.25.39$incidence[2]
+epi.rels.incidence.df.25.39.men <- incidence.df.25.39$incidence[1]
+epi.rels.incidence.df.25.39.women <- incidence.df.25.39$incidence[2]
 
 
 incidence.df.40.49 <- incidence.calculator(datalist = datalist.agemix,
                                            agegroup = c(25, 40), timewindow = c(30, 40))
 
-METRICS.incidence.df.40.49 <- incidence.df.40.49$incidence[3]
+epi.rels.incidence.df.40.49 <- incidence.df.40.49$incidence[3]
 
-METRICS.incidence.df.40.49.men <- incidence.df.40.49$incidence[1] # res
-METRICS.incidence.df.40.49.women <- incidence.df.40.49$incidence[2] # res
-
-
-
-summary.epidemic.df <- c(hiv.prev.lt25.women, hiv.prev.lt25.men, 
-                         hiv.prev.25.40.women, hiv.prev.25.40.men,
-                         hiv.prev.40.50.women, hiv.prev.40.50.men, 
-                         mix.rels.dat,
-                         pp.cp.6months.male,
-                         
-                         METRICS.incidence.df.15.24.men, METRICS.incidence.df.15.24.women, 
-                         METRICS.incidence.df.25.39.men, METRICS.incidence.df.25.39.women,
-                         METRICS.incidence.df.40.49.men, METRICS.incidence.df.40.49.women)
+epi.rels.incidence.df.40.49.men <- incidence.df.40.49$incidence[1] # res
+epi.rels.incidence.df.40.49.women <- incidence.df.40.49$incidence[2] # res
 
 
 
-
-# Age difference statistics 
-#############################
-
-
-AD <- abs(abs(agemixing.df.IDs$TOBDon) - abs(agemixing.df.IDs$TOBRec))
-mean.AD <- mean(AD)
-med.AD <- median(AD)
-sd.AD <- sd(AD)
-
-
-
-# Building phylogenetic tree
-############################
+summary.epidemic.rels.df <- c(hiv.prev.lt25.women, hiv.prev.lt25.men, 
+                              hiv.prev.25.40.women, hiv.prev.25.40.men,
+                              hiv.prev.40.50.women, hiv.prev.40.50.men, 
+                              mix.rels.dat,
+                              pp.cp.6months.male.rels,
+                              
+                              epi.rels.incidence.df.15.24.men, epi.rels.incidence.df.15.24.women, 
+                              epi.rels.incidence.df.25.39.men, epi.rels.incidence.df.25.39.women,
+                              epi.rels.incidence.df.40.49.men, epi.rels.incidence.df.40.49.women)
 
 
-dirfasttree <- work.dir
+
+#################################################################################
+# Step 5: Epidemic statistics and sexual behaviour: data set of infected people #
+#################################################################################
+
+
+# Data list of infected individuals
+
 
 age.group.40.50 = c(40, 50)
 timewindow = c(30, 40)
@@ -482,8 +481,8 @@ mCAr.IDs <- IDs.Seq.Random(simpact.trans.net = simpact.trans.net.adv, # simpact.
                            age.limit = age.group.40.50[2])
 
 
-# Transmission network table as from transmission networks
-##########################################################
+# Transmission network table as from transmission networks for further steps
+############################################################################
 
 
 infectionTable <- vector("list", length(simpact.trans.net.adv))
@@ -511,6 +510,166 @@ infecttable <- rbindlist(infectionTable)
 
 
 table.simpact.trans.net.adv <- infecttable # rbindlist(simpact.trans.net.adv)
+
+
+Study.DataTable <- dplyr::filter(table.simpact.trans.net.adv, table.simpact.trans.net.adv$id.lab%in%mCAr.IDs) 
+
+
+IDs.study <- Study.DataTable$RecId
+
+
+transm.datalist.agemix <- datalist.agemix # assign full data set new age mix data set
+
+# Transmission table of selected individuals
+table.simpact.trans.net.cov <- dplyr::filter(table.simpact.trans.net.adv, table.simpact.trans.net.adv$id.lab%in%mCAr.IDs)
+
+# Person table of selected individuals
+transm.datalist.agemix$ptable <- dplyr::filter(transm.datalist.agemix$ptable, transm.datalist.agemix$ptable$ID%in%IDs.study)
+
+
+
+# (i) Age mixing in relationships
+
+# 
+
+agemix.rels.transm.df <- agemix.df.maker(transm.datalist.agemix)
+
+# 
+agemix.model <- pattern.modeller(dataframe = agemix.rels.transm.df,
+                                 agegroup = c(15, 50),
+                                 timepoint = 40, # transm.datalist.agemix$itable$population.simtime[1],
+                                 timewindow = 10)#1)#3)
+# 
+# # men.lme <- tryCatch(agemixing.lme.fitter(data = dplyr::filter(agemix.model[[1]], Gender =="male")),
+# #                     error = agemixing.lme.errFunction) # Returns an empty list if the lme model can't be fitted
+#
+# men.lmer <- ampmodel(data = dplyr::filter(agemix.model[[1]], Gender =="male"))
+
+data = dplyr::filter(agemix.model[[1]], Gender =="male")
+
+if( nrow(data) > length(unique(data$ID)) & length(unique(data$ID)) > 1 ){
+  
+  men.lmer <- lmer(pagerelform ~ agerelform0 + (1 | ID),
+                   data = dplyr::filter(agemix.model[[1]], Gender =="male"),
+                   REML = TRUE,
+                   control=lmerControl(check.nobs.vs.nlev = "ignore",
+                                       check.nobs.vs.rankZ = "ignore",
+                                       check.nobs.vs.nRE="ignore"))
+  
+  bignumber <- NA # let's try if NA works (instead of 9999 for example)
+  AAD.male <- ifelse(length(men.lmer) > 0, mean(dplyr::filter(agemix.model[[1]], Gender =="male")$AgeGap), bignumber)
+  SDAD.male <- ifelse(length(men.lmer) > 0, sd(dplyr::filter(agemix.model[[1]], Gender =="male")$AgeGap), bignumber)
+  #powerm <- ifelse(length(men.lme) > 0, as.numeric(attributes(men.lme$apVar)$Pars["varStruct.power"]), bignumber)
+  slope.male <- ifelse(length(men.lmer) > 0, summary(men.lmer)$coefficients[2, 1], bignumber) #summary(men.lmer)$tTable[2, 1], bignumber)
+  WSD.male <- ifelse(length(men.lmer) > 0, summary(men.lmer)$sigma, bignumber) #WVAD.base <- ifelse(length(men.lme) > 0, men.lme$sigma^2, bignumber)
+  
+  BSD.male <- ifelse(length(men.lmer) > 0, bvar(men.lmer), bignumber) # Bad name for the function because it actually extracts between subject standard deviation # BVAD <- ifelse(length(men.lmer) > 0, getVarCov(men.lme)[1,1], bignumber)
+  
+  intercept.male <- ifelse(length(men.lmer) > 0, summary(men.lmer)$coefficients[1,1] - 15, bignumber)
+  
+  # c(AAD.male, SDAD.male, slope.male, WSD.male, BSD.male, intercept.male)
+  
+  ## AAD: average age difference across all relationship
+  ## VAD: variance of these age differences
+  ## SDAD: standard deviation of age differences
+  ## BSD: between-subject standard deviation of age differences
+  
+  mix.rels.transm.dat <- c(AAD.male, SDAD.male, slope.male, WSD.male, BSD.male, intercept.male)
+  
+  names(mix.rels.transm.dat) <-  c("T.AAD.male", "T.SDAD.male", "T.slope.male", "T.WSD.male", "T.BSD.male", "T.intercept.male")
+  
+}else{
+  
+  mix.rels.transm.dat <- rep(NA, 6)
+  
+  names(mix.rels.transm.dat) <-  c("T.AAD.male", "T.SDAD.male", "T.slope.male", "T.WSD.male", "T.BSD.male", "T.intercept.male")
+  
+}
+
+# age.scatter.df <- agemix.model[[1]]
+
+#  (ii) Point 	prevalence of concurrency in the adult population:
+
+# Concurrency point prevalence 6 months before a survey, among men
+
+
+pp.cp.6months.male.transm <- tryCatch(concurr.pointprev.calculator(datalist = transm.datalist.agemix,
+                                                                   timepoint = 40 - 0.5), error=function(e) return(NA))
+
+
+# (iii) Prevalence
+
+hiv.prev.lt25.women <- prevalence.calculator(datalist = transm.datalist.agemix,
+                                             agegroup = c(15, 25),
+                                             timepoint = 40)$pointprevalence[2]
+hiv.prev.lt25.men <- prevalence.calculator(datalist = transm.datalist.agemix,
+                                           agegroup = c(15, 25),
+                                           timepoint = 40)$pointprevalence[1]
+
+hiv.prev.25.40.women <- prevalence.calculator(datalist = transm.datalist.agemix,
+                                              agegroup = c(25, 40),
+                                              timepoint = 40)$pointprevalence[2]
+hiv.prev.25.40.men <- prevalence.calculator(datalist = transm.datalist.agemix,
+                                            agegroup = c(25, 40),
+                                            timepoint = 40)$pointprevalence[1]
+
+hiv.prev.40.50.women <- prevalence.calculator(datalist = transm.datalist.agemix,
+                                              agegroup = c(40, 50),
+                                              timepoint = 40)$pointprevalence[2]
+hiv.prev.40.50.men <- prevalence.calculator(datalist = transm.datalist.agemix,
+                                            agegroup = c(40, 50),
+                                            timepoint = 40)$pointprevalence[1]
+
+
+# (iv) Incidence
+
+incidence.df.15.24 <- incidence.calculator(datalist = transm.datalist.agemix,
+                                           agegroup = c(15, 25), timewindow = c(30, 40))
+
+epi.transm.incidence.df.15.24 <- incidence.df.15.24$incidence[3]
+
+epi.transm.incidence.df.15.24.men <- incidence.df.15.24$incidence[1]
+epi.transm.incidence.df.15.24.women <- incidence.df.15.24$incidence[2]
+
+
+incidence.df.25.39 <- incidence.calculator(datalist = transm.datalist.agemix,
+                                           agegroup = c(25, 40), timewindow = c(30, 40))
+
+epi.transm.incidence.df.25.39 <- incidence.df.25.39$incidence[3]
+
+epi.transm.incidence.df.25.39.men <- incidence.df.25.39$incidence[1]
+epi.transm.incidence.df.25.39.women <- incidence.df.25.39$incidence[2]
+
+
+incidence.df.40.49 <- incidence.calculator(datalist = transm.datalist.agemix,
+                                           agegroup = c(25, 40), timewindow = c(30, 40))
+
+epi.transm.incidence.df.40.49 <- incidence.df.40.49$incidence[3]
+
+epi.transm.incidence.df.40.49.men <- incidence.df.40.49$incidence[1] # res
+epi.transm.incidence.df.40.49.women <- incidence.df.40.49$incidence[2] # res
+
+
+
+summary.epidemic.transm.df <- c(hiv.prev.lt25.women, hiv.prev.lt25.men, 
+                                hiv.prev.25.40.women, hiv.prev.25.40.men,
+                                hiv.prev.40.50.women, hiv.prev.40.50.men, 
+                                mix.rels.transm.dat,
+                                pp.cp.6months.male.transm,
+                                
+                                epi.transm.incidence.df.15.24.men, epi.transm.incidence.df.15.24.women, 
+                                epi.transm.incidence.df.25.39.men, epi.transm.incidence.df.25.39.women,
+                                epi.transm.incidence.df.40.49.men, epi.transm.incidence.df.40.49.women)
+
+
+
+######################################
+# Step 5: Building phylogenetic tree #
+######################################
+
+
+
+dirfasttree <- work.dir
 
 
 
@@ -823,9 +982,9 @@ mrca.times.final <- as.matrix(abs(mrca.v.age.samp.cont2))
 
 net <- graph.adjacency(as.matrix(mrca.times.final), mode="undirected",weighted=T,diag=FALSE)
 
-E(net)       # The edges of the "net" object
-
-V(net)       # The vertices of the "net" object
+# E(net)       # The edges of the "net" object
+# 
+# V(net)       # The vertices of the "net" object
 
 V(net)$gender <- Node.gender.cd4.vl.x.y$V.gender
 V(net)$cd4 <- Node.gender.cd4.vl.x.y$V.cd4
@@ -975,8 +1134,9 @@ for (i in 1:length(names(mrca.times.final[1,]))) {
 }
 
 
-# Transmission network built from phylogenetic tree
-####################################################
+# iii. tMRCA
+#############
+
 
 
 net.cont.1 <- graph.adjacency(as.matrix(mrca.times.filter.gender.clust),mode="undirected",weighted=T,diag=FALSE)
@@ -985,13 +1145,13 @@ net.cont.1 <- graph.adjacency(as.matrix(mrca.times.filter.gender.clust),mode="un
 # Consider plausible transmissions and difference between sampling time and tMRCA
 
 
-cut.off <- 7
+cut.off <- 7 # years
 
-E(net.cont.1)$weight
+# E(net.cont.1)$weight
 
 net.cont.1 <- delete_edges(net.cont.1, E(net.cont.1)[weight>=cut.off]) # remove link greater to the cuttoff
 
-E(net.cont.1)$weight
+# E(net.cont.1)$weight
 
 # plot(net.cont.1, layout=layout_with_kk) 
 
@@ -1218,6 +1378,7 @@ table.transm.clust.net.igraph <- dplyr::filter(data.table.simpact.trans.clusts.n
 
 
 
+# 1.
 
 # True age structure in transmission clusters as observed from phylogenetic tree #
 ##################################################################################
@@ -1496,14 +1657,15 @@ age.groups.filtered.trans.clust.network.fun <- function(table.transm.clust.net.i
 }
 
 
+# 2.
 
 # True age structure in transmission clusters as observed from transmission network #
 #####################################################################################
 
-age.groups.filtered.transmission.network.fun <- function(table.transm.clust.net.igraph = table.transm.clust.net.igraph,
-                                                         age.group.15.25 = c(15,25),
-                                                         age.group.25.40 = c(25,40),
-                                                         age.group.40.50 = c(40,50)){
+age.groups.filtered.transmission.clust.fun <- function(table.transm.clust.net.igraph = table.transm.clust.net.igraph,
+                                                       age.group.15.25 = c(15,25),
+                                                       age.group.25.40 = c(25,40),
+                                                       age.group.40.50 = c(40,50)){
   
   table.transm.clust.net.igraph$ageSampTimeDon <- table.transm.clust.net.igraph$SampTime - table.transm.clust.net.igraph$TOBDon
   
@@ -1774,15 +1936,302 @@ age.groups.filtered.transmission.network.fun <- function(table.transm.clust.net.
 
 
 
-phylo.age.structure.transm <- age.groups.filtered.trans.clust.network.fun(table.transm.clust.net.igraph = table.transm.clust.net.igraph,
+
+# 3.
+
+# True age structure in transmission transmission network for selected individuals #
+#####################################################################################
+
+age.groups.filtered.transmission.net.fun <- function(table.transmission.net.cov = table.simpact.trans.net.cov,
+                                                     age.group.15.25 = c(15,25),
+                                                     age.group.25.40 = c(25,40),
+                                                     age.group.40.50 = c(40,50)){
+  
+  table.transmission.net.cov$ageSampTimeDon <- table.transmission.net.cov$SampTime - table.transmission.net.cov$TOBDon
+  
+  Age.groups.table <- NULL
+  
+  v1.dat <- vector()
+  v2.dat <- vector()
+  age1.dat <- vector()
+  age2.dat <- vector()
+  gender1.dat <- vector()
+  gender2.dat <- vector()
+  
+  for(i in 1:nrow(table.transmission.net.cov)){
+    
+    v1 <- table.transmission.net.cov$RecId[i]
+    v2 <- table.transmission.net.cov$DonId[i]
+    
+    index.v1 <- which(table.transmission.net.cov$RecId == v1)
+    
+    age1 <- table.transmission.net.cov$ageSampTimeRec[index.v1]
+    age2 <- table.transmission.net.cov$ageSampTimeDon[index.v1]
+    
+    gender1 <- table.transmission.net.cov$GenderRec[index.v1]
+    gender2 <- table.transmission.net.cov$GenderDon[index.v1]
+    
+    v1.dat <- c(v1.dat, v1)
+    v2.dat <- c(v2.dat, v2)
+    age1.dat <- c(age1.dat, age1)
+    age2.dat <- c(age2.dat, age2)
+    gender1.dat <- c(gender1.dat, gender1)
+    gender2.dat <- c(gender2.dat, gender2)
+    
+  }
+  
+  age.table <- data.frame(v1.dat, gender1.dat, age1.dat, v2.dat, gender2.dat, age2.dat)
+  
+  
+  
+  age.group.15.25 = c(15,25)
+  age.group.25.40 = c(25,40)
+  age.group.40.50 = c(40,50)
+  
+  # men
+  men.age.table.1 <- dplyr::filter(age.table, age.table$gender1.dat==0)
+  
+  # women
+  women.age.table.1 <- dplyr::filter(age.table, age.table$gender1.dat==1)
+  
+  
+  # men 15.25 and women
+  
+  men.15.25.women.15.25.1 <- vector()
+  men.15.25.women.25.40.1 <- vector()
+  men.15.25.women.40.50.1 <- vector()
+  
+  for (j in 1:nrow(men.age.table.1)) {
+    
+    
+    if(men.age.table.1$age1.dat[j] >= age.group.15.25[1] & men.age.table.1$age1.dat[j] < age.group.15.25[2]){
+      
+      if(men.age.table.1$age2.dat[j] >= age.group.15.25[1] & men.age.table.1$age2.dat[j] < age.group.15.25[2]){
+        
+        men.15.25.women.15.25.1 <- c(men.15.25.women.15.25.1, men.age.table.1$age2.dat[j])
+        
+      }else if(men.age.table.1$age2.dat[j] >= age.group.25.40[1] & men.age.table.1$age2.dat[j] < age.group.25.40[2]){
+        
+        men.15.25.women.25.40.1 <- c(men.15.25.women.25.40.1, men.age.table.1$age2.dat[j])
+        
+      }else if (men.age.table.1$age2.dat[j] >= age.group.40.50[1] & men.age.table.1$age2.dat[j] < age.group.40.50[2]){
+        
+        men.15.25.women.40.50.1 <- c(men.15.25.women.40.50.1, men.age.table.1$age2.dat[j])
+      }
+      
+    }
+    
+    
+  }
+  
+  # women 15.25 and men
+  
+  women.15.25.men.15.25.2 <- vector()
+  women.15.25.men.25.40.2 <- vector()
+  women.15.25.men.40.50.2 <- vector()
+  
+  for (j in 1:nrow(women.age.table.1)) {
+    
+    
+    if(women.age.table.1$age1.dat[j] >= age.group.15.25[1] & women.age.table.1$age1.dat[j] < age.group.15.25[2]){
+      
+      if(women.age.table.1$age2.dat[j] >= age.group.15.25[1] & women.age.table.1$age2.dat[j] < age.group.15.25[2]){
+        
+        women.15.25.men.15.25.2 <- c(women.15.25.men.15.25.2, women.age.table.1$age2.dat[j])
+        
+      }else if(women.age.table.1$age2.dat[j] >= age.group.25.40[1] & women.age.table.1$age2.dat[j] < age.group.25.40[2]){
+        
+        women.15.25.men.25.40.2 <- c(women.15.25.men.25.40.2, women.age.table.1$age2.dat[j])
+        
+      }else if (women.age.table.1$age2.dat[j] >= age.group.40.50[1] & women.age.table.1$age2.dat[j] < age.group.40.50[2]){
+        
+        women.15.25.men.40.50.2 <- c(women.15.25.men.40.50.2, women.age.table.1$age2.dat[j])
+      }
+      
+    }
+    
+    
+  }
+  
+  
+  # men 25.40 and women
+  
+  men.25.40.women.15.25.1 <- vector()
+  men.25.40.women.25.40.1 <- vector()
+  men.25.40.women.40.50.1 <- vector()
+  
+  for (j in 1:nrow(men.age.table.1)) {
+    
+    
+    if(men.age.table.1$age1.dat[j] >= age.group.25.40[1] & men.age.table.1$age1.dat[j] < age.group.25.40[2]){
+      
+      if(men.age.table.1$age2.dat[j] >= age.group.15.25[1] & men.age.table.1$age2.dat[j] < age.group.15.25[2]){
+        
+        men.25.40.women.15.25.1 <- c(men.25.40.women.15.25.1, men.age.table.1$age2.dat[j])
+        
+      }else if(men.age.table.1$age2.dat[j] >= age.group.25.40[1] & men.age.table.1$age2.dat[j] < age.group.25.40[2]){
+        
+        men.25.40.women.25.40.1 <- c(men.25.40.women.25.40.1, men.age.table.1$age2.dat[j])
+        
+      }else if (men.age.table.1$age2.dat[j] >= age.group.40.50[1] & men.age.table.1$age2.dat[j] < age.group.40.50[2]){
+        
+        men.25.40.women.40.50.1 <- c(men.25.40.women.40.50.1, men.age.table.1$age2.dat[j])
+      }
+      
+    }
+    
+    
+  }
+  
+  
+  
+  
+  # women 25.40 and men
+  
+  women.25.40.men.15.25.2 <- vector()
+  women.25.40.men.25.40.2 <- vector()
+  women.25.40.men.40.50.2 <- vector()
+  
+  for (j in 1:nrow(women.age.table.1)) {
+    
+    
+    if(women.age.table.1$age1.dat[j] >= age.group.25.40[1] & women.age.table.1$age1.dat[j] < age.group.25.40[2]){
+      
+      if(women.age.table.1$age2.dat[j] >= age.group.15.25[1] & women.age.table.1$age2.dat[j] < age.group.15.25[2]){
+        
+        women.25.40.men.15.25.2 <- c(women.25.40.men.15.25.2, women.age.table.1$age2.dat[j])
+        
+      }else if(women.age.table.1$age2.dat[j] >= age.group.25.40[1] & women.age.table.1$age2.dat[j] < age.group.25.40[2]){
+        
+        women.25.40.men.25.40.2 <- c(women.25.40.men.25.40.2, women.age.table.1$age2.dat[j])
+        
+      }else if (women.age.table.1$age2.dat[j] >= age.group.40.50[1] & women.age.table.1$age2.dat[j] < age.group.40.50[2]){
+        
+        women.25.40.men.40.50.2 <- c(women.25.40.men.40.50.2, women.age.table.1$age2.dat[j])
+      }
+      
+    }
+    
+    
+  }
+  
+  
+  
+  # men 40.50 and women
+  
+  men.40.50.women.15.25.1 <- vector()
+  men.40.50.women.25.40.1 <- vector()
+  men.40.50.women.40.50.1 <- vector()
+  
+  for (j in 1:nrow(men.age.table.1)) {
+    
+    
+    if(men.age.table.1$age1.dat[j] >= age.group.40.50[1] & men.age.table.1$age1.dat[j] < age.group.40.50[2]){
+      
+      if(men.age.table.1$age2.dat[j] >= age.group.15.25[1] & men.age.table.1$age2.dat[j] < age.group.15.25[2]){
+        
+        men.40.50.women.15.25.1 <- c(men.40.50.women.15.25.1, men.age.table.1$age2.dat[j])
+        
+      }else if(men.age.table.1$age2.dat[j] >= age.group.25.40[1] & men.age.table.1$age2.dat[j] < age.group.25.40[2]){
+        
+        men.40.50.women.25.40.1 <- c(men.40.50.women.25.40.1, men.age.table.1$age2.dat[j])
+        
+      }else if (men.age.table.1$age2.dat[j] >= age.group.40.50[1] & men.age.table.1$age2.dat[j] < age.group.40.50[2]){
+        
+        men.40.50.women.40.50.1 <- c(men.40.50.women.40.50.1, men.age.table.1$age2.dat[j])
+      }
+      
+    }
+    
+    
+  }
+  
+  
+  
+  
+  # women 40.50 and men
+  
+  women.40.50.men.15.25.2 <- vector()
+  women.40.50.men.25.40.2 <- vector()
+  women.40.50.men.40.50.2 <- vector()
+  
+  for (j in 1:nrow(women.age.table.1)) {
+    
+    
+    if(women.age.table.1$age1.dat[j] >= age.group.40.50[1] & women.age.table.1$age1.dat[j] < age.group.40.50[2]){
+      
+      if(women.age.table.1$age2.dat[j] >= age.group.15.25[1] & women.age.table.1$age2.dat[j] < age.group.15.25[2]){
+        
+        women.40.50.men.15.25.2 <- c(women.40.50.men.15.25.2, women.age.table.1$age2.dat[j])
+        
+      }else if(women.age.table.1$age2.dat[j] >= age.group.25.40[1] & women.age.table.1$age2.dat[j] < age.group.25.40[2]){
+        
+        women.40.50.men.25.40.2 <- c(women.40.50.men.25.40.2, women.age.table.1$age2.dat[j])
+        
+      }else if (women.age.table.1$age2.dat[j] >= age.group.40.50[1] & women.age.table.1$age2.dat[j] < age.group.40.50[2]){
+        
+        women.40.50.men.40.50.2 <- c(women.40.50.men.40.50.2, women.age.table.1$age2.dat[j])
+      }
+      
+    }
+    
+    
+  }
+  
+  
+  
+  
+  men.15.25.women.15.25 <- c(men.15.25.women.15.25.1, women.15.25.men.15.25.2)
+  
+  men.15.25.women.25.40 <- c(men.15.25.women.25.40.1, women.25.40.men.15.25.2)
+  
+  men.15.25.women.40.50 <- c(men.15.25.women.40.50.1, women.40.50.men.15.25.2)
+  
+  men.25.40.women.15.25 <- c(men.25.40.women.15.25.1, women.15.25.men.25.40.2)
+  
+  men.25.40.women.25.40 <- c(men.25.40.women.25.40.1, women.25.40.men.25.40.2)
+  
+  men.25.40.women.40.50 <- c(men.25.40.women.40.50.1, women.40.50.men.25.40.2)
+  
+  men.40.50.women.15.25 <- c(men.40.50.women.15.25.1, women.15.25.men.40.50.2)
+  
+  men.40.50.women.25.40 <- c(men.40.50.women.25.40.1, women.25.40.men.40.50.2)
+  
+  men.40.50.women.40.50 <- c(men.40.50.women.40.50.1, women.40.50.men.40.50.2)
+  
+  Age.groups.table <- matrix(c(length(men.15.25.women.15.25), length(men.15.25.women.25.40), length(men.15.25.women.40.50),
+                               length(men.25.40.women.15.25), length(men.25.40.women.25.40), length(men.25.40.women.40.50),
+                               length(men.40.50.women.15.25), length(men.40.50.women.25.40), length(men.40.50.women.40.50)),
+                             ncol = 3,
+                             byrow = TRUE)
+  
+  colnames(Age.groups.table) <- c("Female.15.25", "Female.25.40", "Female.40.50")
+  rownames(Age.groups.table) <- c("Male.15.25", "Male.25.40", "Male.40.50")
+  
+  Age.groups.table <- as.table(Age.groups.table)
+  
+  return(Age.groups.table)
+  
+}
+
+
+
+
+age.structure.transm.clust <- age.groups.filtered.trans.clust.network.fun(table.transm.clust.net.igraph = table.transm.clust.net.igraph,
                                                                           transm.matrix = transm.matrix,
                                                                           age.group.15.25 = c(15,25),
                                                                           age.group.25.40 = c(25,40),
                                                                           age.group.40.50 = c(40,50))
 
-transmi.net.age.structure.transm <- age.groups.filtered.transmission.network.fun(table.transm.clust.net.igraph = table.transm.clust.net.igraph,
-                                                                                 age.group.15.25 = c(15,25),
-                                                                                 age.group.25.40 = c(25,40),
-                                                                                 age.group.40.50 = c(40,50))
+age.structure.transm.clust.true <- age.groups.filtered.transmission.clust.fun(table.transm.clust.net.igraph = table.transm.clust.net.igraph,
+                                                                              age.group.15.25 = c(15,25),
+                                                                              age.group.25.40 = c(25,40),
+                                                                              age.group.40.50 = c(40,50))
 
+
+
+age.structure.transm.net.true <- age.groups.filtered.transmission.net.fun(table.transmission.net.cov = table.simpact.trans.net.cov,
+                                                                          age.group.15.25 = c(15,25),
+                                                                          age.group.25.40 = c(25,40),
+                                                                          age.group.40.50 = c(40,50))
 
