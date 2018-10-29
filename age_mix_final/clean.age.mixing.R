@@ -66,8 +66,8 @@ age.distr <- agedistr.creator(shape = 5, scale = 65)
 #
 cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
                                  population.simtime = 50, 
-                                 population.nummen = 7000, 
-                                 population.numwomen = 7000,
+                                 population.nummen = 4000, 
+                                 population.numwomen = 4000,
                                  hivseed.time = 10, 
                                  hivseed.type = "amount",
                                  hivseed.amount = 20, 
@@ -457,6 +457,24 @@ summary.epidemic.rels.df <- c(hiv.prev.lt25.women, hiv.prev.lt25.men,
                               epi.rels.incidence.df.25.39.men, epi.rels.incidence.df.25.39.women,
                               epi.rels.incidence.df.40.49.men, epi.rels.incidence.df.40.49.women)
 
+names(summary.epidemic.rels.df) <- c("R.prev.15.25.w", "R.prev.15.25.m", "R.prev.25.40.w", "R.prev.25.40.m", "R.prev.40.50.w", "R.prev.40.50.m",
+                                     names(mix.rels.dat), 
+                                     "R.p.prev.6months.m",
+                                     "R.inc.15.25.w", "R.inc.15.25.m", "R.inc.25.40.w", "R.inc.25.40.m", "R.inc.40.50.w", "R.inc.40.50.m")
+
+# transm.clust.MCAR.cov.35 <- tryCatch(LMEMphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, 
+#                                                                      work.dir = work.dir,  
+#                                                                      dirfasttree = dirfasttree, 
+#                                                                      sub.dir.rename = sub.dir.rename,
+#                                                                      limitTransmEvents = 7,
+#                                                                      timewindow = c(30,40),
+#                                                                      seq.cov = 35,
+#                                                                      age.group.15.25 = c(15,25),
+#                                                                      age.group.25.40 = c(25,40),
+#                                                                      age.group.40.50 = c(40,50)),
+#                                      error=function(e) return(rep(NA, 8)))
+# transm.clust.MCAR.cov.35.val <- sapply(transm.clust.MCAR.cov.35, mean)
+
 
 
 #################################################################################
@@ -469,7 +487,7 @@ summary.epidemic.rels.df <- c(hiv.prev.lt25.women, hiv.prev.lt25.men,
 
 age.group.40.50 = c(40, 50)
 timewindow = c(30, 40)
-seq.cov = 100
+seq.cov = 80
 
 
 # Select IDs in MCAR scenario
@@ -662,6 +680,10 @@ summary.epidemic.transm.df <- c(hiv.prev.lt25.women, hiv.prev.lt25.men,
                                 epi.transm.incidence.df.40.49.men, epi.transm.incidence.df.40.49.women)
 
 
+names(summary.epidemic.transm.df) <- c("T.prev.15.25.w", "T.prev.15.25.m", "T.prev.25.40.w", "T.prev.25.40.m", "T.prev.40.50.w", "T.prev.40.50.m",
+                                                               names(mix.rels.transm.dat), 
+                                                               "T.p.prev.6months.m",
+                                                               "T.inc.15.25.w", "T.inc.15.25.m", "T.inc.25.40.w", "T.inc.25.40.m", "T.inc.40.50.w", "T.inc.40.50.m")
 
 ######################################
 # Step 5: Building phylogenetic tree #
@@ -2256,5 +2278,19 @@ age.mixing.rels <- mix.rels.dat
 # Age mixing metrics in the data sets of selected individuals
 
 age.mixing.transm <- mix.rels.transm.dat
+
+
+# Clusters statistics
+
+mean.clust.size <- mean(clust.size)
+median.clust.size <- median(clust.size)
+sd.clust.size <- sd(clust.size)
+
+clust.size.stat <- c(mean.clust.size, median.clust.size, sd.clust.size)
+
+names(clust.size.stat) <- c("mean.cl.size", "med.cl.size", "sd.cl.size")
+
+
+
 
 
