@@ -226,13 +226,13 @@ compute.summary.statistics.classic <- function(datalist = datalist.agemix,
     
     mix.rels.dat <- c(AAD.male, SDAD.male, slope.male, WSD.male, BSD.male, intercept.male)
     
-    names(mix.rels.dat) <- - c("R.AAD.male", "R.SDAD.male", "R.slope.male", "R.WSD.male", "R.BSD.male", "R.intercept.male")
+    names(mix.rels.dat) <- c("R.AAD.male", "R.SDAD.male", "R.slope.male", "R.WSD.male", "R.BSD.male", "R.intercept.male")
     
   }else{
     
     mix.rels.dat <- rep(NA, 6)
     
-    names(mix.rels.dat) <- - c("R.AAD.male", "R.SDAD.male", "R.slope.male", "R.WSD.male", "R.BSD.male", "R.intercept.male")
+    names(mix.rels.dat) <- c("R.AAD.male", "R.SDAD.male", "R.slope.male", "R.WSD.male", "R.BSD.male", "R.intercept.male")
     
   }
   
