@@ -523,7 +523,7 @@ test.MCAR.age.mix2 <- function(inputvector=inputvector){
                                                                age.group.25.40 = c(25,40),
                                                                age.group.40.50 = c(40,50),
                                                                cut.off = 7),
-                                          error=function(e) return(rep(NA, 36)))
+                                          error=function(e) return(rep(NA, 90)))
         
         res.clust.MCAR.cov.40 <- tryCatch(age.mixing.MCAR.fun(simpact.trans.net = simpact.trans.net.adv,  
                                                                datalist.agemix = datalist.agemix, 
@@ -537,7 +537,7 @@ test.MCAR.age.mix2 <- function(inputvector=inputvector){
                                                                age.group.25.40 = c(25,40),
                                                                age.group.40.50 = c(40,50),
                                                                cut.off = 7),
-                                          error=function(e) return(rep(NA, 36)))
+                                          error=function(e) return(rep(NA, 90)))
         
         res.clust.MCAR.cov.45 <- tryCatch(age.mixing.MCAR.fun(simpact.trans.net = simpact.trans.net.adv,  
                                                                datalist.agemix = datalist.agemix, 
@@ -551,7 +551,7 @@ test.MCAR.age.mix2 <- function(inputvector=inputvector){
                                                                age.group.25.40 = c(25,40),
                                                                age.group.40.50 = c(40,50),
                                                                cut.off = 7),
-                                          error=function(e) return(rep(NA, 36)))
+                                          error=function(e) return(rep(NA, 90)))
         
         res.clust.MCAR.cov.50 <- tryCatch(age.mixing.MCAR.fun(simpact.trans.net = simpact.trans.net.adv,  
                                                                datalist.agemix = datalist.agemix, 
@@ -565,7 +565,7 @@ test.MCAR.age.mix2 <- function(inputvector=inputvector){
                                                                age.group.25.40 = c(25,40),
                                                                age.group.40.50 = c(40,50),
                                                                cut.off = 7),
-                                          error=function(e) return(rep(NA, 36)))
+                                          error=function(e) return(rep(NA, 90)))
         
         res.clust.MCAR.cov.55 <- tryCatch(age.mixing.MCAR.fun(simpact.trans.net = simpact.trans.net.adv,  
                                                                datalist.agemix = datalist.agemix, 
@@ -579,7 +579,7 @@ test.MCAR.age.mix2 <- function(inputvector=inputvector){
                                                                age.group.25.40 = c(25,40),
                                                                age.group.40.50 = c(40,50),
                                                                cut.off = 7),
-                                          error=function(e) return(rep(NA, 36)))
+                                          error=function(e) return(rep(NA, 90)))
         
         
         res.clust.MCAR.cov.60 <- tryCatch(age.mixing.MCAR.fun(simpact.trans.net = simpact.trans.net.adv,  
@@ -594,7 +594,7 @@ test.MCAR.age.mix2 <- function(inputvector=inputvector){
                                                                age.group.25.40 = c(25,40),
                                                                age.group.40.50 = c(40,50),
                                                                cut.off = 7),
-                                          error=function(e) return(rep(NA, 36)))
+                                          error=function(e) return(rep(NA, 90)))
         
         
         res.clust.MCAR.cov.65 <- tryCatch(age.mixing.MCAR.fun(simpact.trans.net = simpact.trans.net.adv,  
@@ -609,7 +609,7 @@ test.MCAR.age.mix2 <- function(inputvector=inputvector){
                                                                age.group.25.40 = c(25,40),
                                                                age.group.40.50 = c(40,50),
                                                                cut.off = 7),
-                                          error=function(e) return(rep(NA, 36)))
+                                          error=function(e) return(rep(NA, 90)))
         
         
         
@@ -626,7 +626,7 @@ test.MCAR.age.mix2 <- function(inputvector=inputvector){
                                                                age.group.25.40 = c(25,40),
                                                                age.group.40.50 = c(40,50),
                                                                cut.off = 7),
-                                          error=function(e) return(rep(NA, 36)))
+                                          error=function(e) return(rep(NA, 90)))
         
         
         
@@ -642,7 +642,7 @@ test.MCAR.age.mix2 <- function(inputvector=inputvector){
                                                                age.group.25.40 = c(25,40),
                                                                age.group.40.50 = c(40,50),
                                                                cut.off = 7),
-                                          error=function(e) return(rep(NA, 36)))
+                                          error=function(e) return(rep(NA, 90)))
         
         
         
@@ -659,7 +659,7 @@ test.MCAR.age.mix2 <- function(inputvector=inputvector){
                                                                age.group.25.40 = c(25,40),
                                                                age.group.40.50 = c(40,50),
                                                                cut.off = 7),
-                                          error=function(e) return(rep(NA, 36)))
+                                          error=function(e) return(rep(NA, 90)))
         
         res.clust.MCAR.cov.85 <- tryCatch(age.mixing.MCAR.fun(simpact.trans.net = simpact.trans.net.adv,  
                                                                datalist.agemix = datalist.agemix, 
@@ -673,7 +673,7 @@ test.MCAR.age.mix2 <- function(inputvector=inputvector){
                                                                age.group.25.40 = c(25,40),
                                                                age.group.40.50 = c(40,50),
                                                                cut.off = 7),
-                                          error=function(e) return(rep(NA, 36)))
+                                          error=function(e) return(rep(NA, 90)))
         
         
         
@@ -690,7 +690,7 @@ test.MCAR.age.mix2 <- function(inputvector=inputvector){
                                                                age.group.25.40 = c(25,40),
                                                                age.group.40.50 = c(40,50),
                                                                cut.off = 7),
-                                          error=function(e) return(rep(NA, 36)))
+                                          error=function(e) return(rep(NA, 90)))
         
         res.clust.MCAR.cov.95 <- tryCatch(age.mixing.MCAR.fun(simpact.trans.net = simpact.trans.net.adv,  
                                                                datalist.agemix = datalist.agemix, 
@@ -704,7 +704,7 @@ test.MCAR.age.mix2 <- function(inputvector=inputvector){
                                                                age.group.25.40 = c(25,40),
                                                                age.group.40.50 = c(40,50),
                                                                cut.off = 7),
-                                          error=function(e) return(rep(NA, 36)))
+                                          error=function(e) return(rep(NA, 90)))
         
         
         results.mcar <- c(summary.epidemic.rels.df, res.clust.MCAR.cov.35, res.clust.MCAR.cov.40, res.clust.MCAR.cov.45,
@@ -723,7 +723,7 @@ test.MCAR.age.mix2 <- function(inputvector=inputvector){
         
       }else{
         
-        results.mcar <- rep(NA, 487)
+        results.mcar <- rep(NA, 1189)
         
       }
       
