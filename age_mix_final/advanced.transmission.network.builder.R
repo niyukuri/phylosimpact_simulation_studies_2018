@@ -34,6 +34,8 @@ advanced.transmission.network.builder <- function(datalist = datalist, endpoint 
   # HIV seed time
   hivseed.time <- datalist$etable[eventname=="HIV seeding"]$eventtime
   
+  CD4table <- datalist$ttable
+  
   
   # 1. Table of donors and recipients and time of infection
   
@@ -493,19 +495,28 @@ advanced.transmission.network.builder <- function(datalist = datalist, endpoint 
   
   ### CD4,  viral load, and geographical location
   
-  cd4.vl.loc.df.list <- vector("list", length(seeds.id))
+  cd4.vl.loc.df.list <- vector("list", length(seeds.id)) # CD4table
   
   cd4.vl.loc.i.list <- list()
   
   for(i in 1:length(seeds.id)){
     
- 
-    
     ids <- dat.recdontime[[i]][,2]
+    
+    sampling.types <- ord.flag.raw[[i]]$val.y # diagnosed individuals (0), died and non diagnosed (-1), and alive and non diagnosed (1)
     
     sampling.time <- ord.flag.raw[[i]]$val.x
     
-    cd4.dat <- dplyr::filter(datalist$ptable, datalist$ptable$ID%in%ids)
+    infection.time <- dat.recdontime[[i]][,5]
+    
+    cd4.dat <- dplyr::filter(datalist$ptable, datalist$ptable$ID%in%ids) # X
+    
+    cd4.at.infec <- dplyr::filter(datalist$ptable, datalist$ptable$ID%in%ids)
+    
+    cd4.at.ARTstart <- dplyr::filter(datalist$ttable, datalist$ttable$ID%in%ids)
+    
+    cd4.at.Death <- dplyr::filter(cd4.at.infec, cd4.at.infec$TOD!="Inf")
+    
     
     vl.dat <- dplyr::filter(datalist$vltable, datalist$vltable$ID%in%ids)
     
@@ -518,21 +529,34 @@ advanced.transmission.network.builder <- function(datalist = datalist, endpoint 
     
     for (j in 1:length(ids)) {
       
-      for(k in 1:length(ids)){
+      ids.j <- ids[j]
+      
+      if(sampling.types[j]==0){ # diagnosed individuals (0)
         
-        if(ids[j] == cd4.dat$ID[k]){
-          
-          cd4.val <- cd4.dat$CD4atInfection[k] # place holder >> CD4 at infection
-          
-          location.x.val <- cd4.dat$XCoord[k]
-          
-          location.y.val <- cd4.dat$YCoord[k]
-          
-          vl.i <- dplyr::filter(vl.dat, vl.dat$ID%in%ids[k])  
-          
-          vl.val <- median(vl.i$Log10VL) # place holder >> median of VL
-        }
+        cd4.val <- as.numeric(cd4.at.ARTstart[cd4.at.ARTstart$ID==ids.j,][6])
+        
+      }else if(sampling.types[j]==-1){ # died and non diagnosed (-1)
+        
+        cd4.val <- as.numeric(cd4.at.Death[cd4.at.Death$ID==ids.j, ][21])
+        
+      }else { # alive and non diagnosed (1): (sampling.types[j]==1)
+        
+        cd4.val <- as.numeric(cd4.at.infec[cd4.at.infec$ID==ids.j, ][20]) # to be adapted by taking into account time since infection (sampling.time - infection.time)
+        
       }
+      
+      
+      location.x.val <- as.numeric(cd4.at.infec[cd4.at.infec$ID==ids.j,][15])
+      
+      location.y.val <- as.numeric(cd4.at.infec[cd4.at.infec$ID==ids.j,][16])
+      
+      vl.table.j <- dplyr::filter(vl.dat, vl.dat$ID==ids.j) 
+      sampling.time.j <- sampling.time[j]
+      
+      vec.index <- which(vl.table.j$Time <= sampling.time.j) 
+      
+      vl.val <- vl.table.j$Log10VL[length(vec.index)]
+      
       
       
       cd4 <- c(cd4, cd4.val) # place holder >> CD4 at infection
@@ -549,14 +573,14 @@ advanced.transmission.network.builder <- function(datalist = datalist, endpoint 
     cd4.vl.loc.i.list$location.x <- location.x
     cd4.vl.loc.i.list$location.y <- location.y
     cd4.vl.loc.i.list$vl <- vl
-      
+    
     cd4.vl.loc.df.list[[i]] <- cd4.vl.loc.i.list
     
   }
   
   
-
-
+  
+  
   # initialize the list of of epi object (one per seed)
   
   transm.ls <- vector("list", length(seeds.id))
@@ -600,7 +624,7 @@ advanced.transmission.network.builder <- function(datalist = datalist, endpoint 
     transNet$vl <- cd4.vl.loc.tab$vl
     transNet$location.x <- cd4.vl.loc.tab$location.x
     transNet$location.y <- cd4.vl.loc.tab$location.y
-
+    
     transm.ls[[i]] <- transNet
   }
   
