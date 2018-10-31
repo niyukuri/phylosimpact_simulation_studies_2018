@@ -19,8 +19,10 @@ age.mixing.MCAR.fun <- function(simpact.trans.net = simpact.trans.net.adv,
   
   
   
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
   
+  
+  source("/home/dniyukuri/lustre/agemix.25.10.2018.2/needed.functions.RSimpactHelp.R")
   
   #################################################################################
   # Step 5: Epidemic statistics and sexual behaviour: data set of infected people #
@@ -36,6 +38,12 @@ age.mixing.MCAR.fun <- function(simpact.trans.net = simpact.trans.net.adv,
   timewindow <- timewindow
   seq.cov <- seq.cov
   age.group.40.50 <- age.group.40.50
+  
+  mCAr.IDs.100 <- IDs.Seq.Random(simpact.trans.net = simpact.trans.net, # simpact.trans.net 
+                                 limitTransmEvents = limitTransmEvents,
+                                 timewindow = timewindow, 
+                                 seq.cov = 100, 
+                                 age.limit = age.group.40.50[2])
   
   mCAr.IDs <- IDs.Seq.Random(simpact.trans.net = simpact.trans.net, # simpact.trans.net 
                              limitTransmEvents = limitTransmEvents,
@@ -91,6 +99,8 @@ age.mixing.MCAR.fun <- function(simpact.trans.net = simpact.trans.net.adv,
     
     # Transmission table of selected individuals
     table.simpact.trans.net.cov <- dplyr::filter(table.simpact.trans.net.adv, table.simpact.trans.net.adv$id.lab%in%mCAr.IDs)
+    
+    table.simpact.trans.net.cov.100 <- dplyr::filter(table.simpact.trans.net.adv, table.simpact.trans.net.adv$id.lab%in%mCAr.IDs.100)
     
     # Person table of selected individuals
     transm.datalist.agemix$ptable <- dplyr::filter(transm.datalist.agemix$ptable, transm.datalist.agemix$ptable$ID%in%IDs.study)
@@ -2283,9 +2293,107 @@ age.mixing.MCAR.fun <- function(simpact.trans.net = simpact.trans.net.adv,
     table.tree.trans.true.age.str.prop.women <- NA.handle.fun(input = table.tree.trans.true.age.str.prop.women)
     
     
+    
+    
+    # 4. True age structure table from transmission network of all (coverage 100%) selected individuals
+    
+    # table.simpact.trans.net.cov.100
+    
+    age.structure.transm.net.true.100.List <- age.groups.filtered.transmission.net.fun(table.transmission.net.cov = table.simpact.trans.net.cov.100,
+                                                                                       age.group.15.25 = c(15,25),
+                                                                                       age.group.25.40 = c(25,40),
+                                                                                       age.group.40.50 = c(40,50))
+    
+    
+    
+    age.struc.trans.net.true.cov.100 <- age.structure.transm.net.true.100.List$Age.groups.table
+    
+    cov.100.age.str.M.15.25.F.15.25 <- age.struc.trans.net.true.cov.100[1,][1]
+    cov.100.age.str.M.25.40.F.15.25 <- age.struc.trans.net.true.cov.100[2,][1]
+    cov.100.age.str.M.40.50.F.15.25 <- age.struc.trans.net.true.cov.100[3,][1]
+    
+    cov.100.age.str.M.15.25.F.25.40 <- age.struc.trans.net.true.cov.100[1,][2]
+    cov.100.age.str.M.25.40.F.25.40 <- age.struc.trans.net.true.cov.100[2,][2]
+    cov.100.age.str.M.40.50.F.25.40 <- age.struc.trans.net.true.cov.100[3,][2]
+    
+    cov.100.age.str.M.15.25.F.40.50 <- age.struc.trans.net.true.cov.100[1,][3]
+    cov.100.age.str.M.25.40.F.40.50 <- age.struc.trans.net.true.cov.100[2,][3]
+    cov.100.age.str.M.40.50.F.40.50 <- age.struc.trans.net.true.cov.100[3,][3]
+    
+    table.cov.100.age.str <- c(cov.100.age.str.M.15.25.F.15.25, cov.100.age.str.M.25.40.F.15.25, cov.100.age.str.M.40.50.F.15.25,
+                               cov.100.age.str.M.15.25.F.25.40, cov.100.age.str.M.25.40.F.25.40, cov.100.age.str.M.40.50.F.25.40,
+                               cov.100.age.str.M.15.25.F.40.50, cov.100.age.str.M.25.40.F.40.50, cov.100.age.str.M.40.50.F.40.50)
+    
+    
+    names(table.cov.100.age.str) <- c("cov.100.M.15.25.F.15.25", "cov.100.M.25.40.F.15.25", "cov.100.M.40.50.F.15.25",
+                                      "cov.100.M.15.25.F.25.40", "cov.100.M.25.40.F.25.40", "cov.100.M.40.50.F.25.40",
+                                      "cov.100.M.15.25.F.40.50", "cov.100.M.25.40.F.40.50", "cov.100.M.40.50.F.40.50")
+    
+    
+    # Men prop
+    
+    age.struc.trans.net.true.cov.100.prop.men <- age.structure.transm.net.true.100.List$prop.men.age.groups.table
+    
+    cov.100.true.age.str.prop.men.15.25.F.15.25 <- age.struc.trans.net.true.cov.100.prop.men[1,][1]
+    cov.100.true.age.str.prop.men.25.40.F.15.25 <- age.struc.trans.net.true.cov.100.prop.men[2,][1]
+    cov.100.true.age.str.prop.men.40.50.F.15.25 <- age.struc.trans.net.true.cov.100.prop.men[3,][1]
+    
+    cov.100.true.age.str.prop.men.15.25.F.25.40 <- age.struc.trans.net.true.cov.100.prop.men[1,][2]
+    cov.100.true.age.str.prop.men.25.40.F.25.40 <- age.struc.trans.net.true.cov.100.prop.men[2,][2]
+    cov.100.true.age.str.prop.men.40.50.F.25.40 <- age.struc.trans.net.true.cov.100.prop.men[3,][2]
+    
+    cov.100.true.age.str.prop.men.15.25.F.40.50 <- age.struc.trans.net.true.cov.100.prop.men[1,][3]
+    cov.100.true.age.str.prop.men.25.40.F.40.50 <- age.struc.trans.net.true.cov.100.prop.men[2,][3]
+    cov.100.true.age.str.prop.men.40.50.F.40.50 <- age.struc.trans.net.true.cov.100.prop.men[3,][3]
+    
+    table.cov.100.true.age.str.prop.men <- c(cov.100.true.age.str.prop.men.15.25.F.15.25, cov.100.true.age.str.prop.men.25.40.F.15.25, cov.100.true.age.str.prop.men.40.50.F.15.25,
+                                             cov.100.true.age.str.prop.men.15.25.F.25.40, cov.100.true.age.str.prop.men.25.40.F.25.40, cov.100.true.age.str.prop.men.40.50.F.25.40,
+                                             cov.100.true.age.str.prop.men.15.25.F.40.50, cov.100.true.age.str.prop.men.25.40.F.40.50, cov.100.true.age.str.prop.men.40.50.F.40.50)
+    
+    names(table.cov.100.true.age.str.prop.men) <- c("cov.100.true.prop.men15.25.F.15.25", "cov.100.true.prop.men25.40.F.15.25", "cov.100.true.prop.men40.50.F.15.25",
+                                                    "cov.100.true.prop.men15.25.F.25.40", "cov.100.true.prop.men25.40.F.25.40", "cov.100.true.prop.men40.50.F.25.40",
+                                                    "cov.100.true.prop.men15.25.F.40.50", "cov.100.true.prop.men25.40.F.40.50", "cov.100.true.prop.men40.50.F.40.50")
+    
+    
+    table.cov.100.true.age.str.prop.men <- NA.handle.fun(input = table.cov.100.true.age.str.prop.men)
+    
+    
+    
+    # Women prop
+    
+    age.structure.transm.clust.true.prop.women <- age.structure.transm.net.true.100.List$prop.women.age.groups.table
+    
+    cov.100.true.age.str.prop.women.15.25.M.15.25 <- age.structure.transm.clust.true.prop.women[1,][1]
+    cov.100.true.age.str.prop.women.25.40.M.15.25 <- age.structure.transm.clust.true.prop.women[2,][1]
+    cov.100.true.age.str.prop.women.40.50.M.15.25 <- age.structure.transm.clust.true.prop.women[3,][1]
+    
+    cov.100.true.age.str.prop.women.15.25.M.25.40 <- age.structure.transm.clust.true.prop.women[1,][2]
+    cov.100.true.age.str.prop.women.25.40.M.25.40 <- age.structure.transm.clust.true.prop.women[2,][2]
+    cov.100.true.age.str.prop.women.40.50.M.25.40 <- age.structure.transm.clust.true.prop.women[3,][2]
+    
+    cov.100.true.age.str.prop.women.15.25.M.40.50 <- age.structure.transm.clust.true.prop.women[1,][3]
+    cov.100.true.age.str.prop.women.25.40.M.40.50 <- age.structure.transm.clust.true.prop.women[2,][3]
+    cov.100.true.age.str.prop.women.40.50.M.40.50 <- age.structure.transm.clust.true.prop.women[3,][3]
+    
+    table.cov.100.true.age.str.prop.women <- c(cov.100.true.age.str.prop.women.15.25.M.15.25, cov.100.true.age.str.prop.women.25.40.M.15.25, cov.100.true.age.str.prop.women.40.50.M.15.25,
+                                               cov.100.true.age.str.prop.women.15.25.M.25.40, cov.100.true.age.str.prop.women.25.40.M.25.40, cov.100.true.age.str.prop.women.40.50.M.25.40,
+                                               cov.100.true.age.str.prop.women.15.25.M.40.50, cov.100.true.age.str.prop.women.25.40.M.40.50, cov.100.true.age.str.prop.women.40.50.M.40.50)
+    
+    names(table.cov.100.true.age.str.prop.women) <- c("cov.100.true.prop.women15.25.M.15.25", "cov.100.true.prop.women25.40.M.15.25", "cov.100.true.prop.women40.50.M.15.25",
+                                                      "cov.100.true.prop.women15.25.M.25.40", "cov.100.true.prop.women25.40.M.25.40", "cov.100.true.prop.women40.50.M.25.40",
+                                                      "cov.100.true.prop.women15.25.M.40.50", "cov.100.true.prop.women25.40.M.40.50", "cov.100.true.prop.women40.50.M.40.50")
+    
+    
+    
+    table.cov.100.true.age.str.prop.women <- NA.handle.fun(input = table.cov.100.true.age.str.prop.women)
+    
+    
+    
     table.statistics <- c(table.cl.age.str, table.cl.age.str.prop.men, table.cl.age.str.prop.women, 
                           table.cl.true.age.str, table.cl.true.age.str.prop.men, table.cl.true.age.str.prop.women, 
                           table.tree.tra.age.str, table.tree.trans.true.age.str.prop.men, table.tree.trans.true.age.str.prop.women)
+    
+    cov.100.stats <- c(table.cov.100.age.str, table.cov.100.true.age.str.prop.men, table.cov.100.true.age.str.prop.women)
     
     
     # Age mixing metrics in the data sets of selected individuals
@@ -2304,39 +2412,148 @@ age.mixing.MCAR.fun <- function(simpact.trans.net = simpact.trans.net.adv,
     names(clust.size.stat) <- c("mean.cl.size", "med.cl.size", "sd.cl.size")
     
     
-    output.results.vectot <- c(table.statistics, age.mixing.transm, clust.size.stat)
     
+    # table.statistics <- c(table.cl.age.str, table.cl.age.str.prop.men, table.cl.age.str.prop.women, 
+    #                       table.cl.true.age.str, table.cl.true.age.str.prop.men, table.cl.true.age.str.prop.women, 
+    #                       table.tree.tra.age.str, table.tree.trans.true.age.str.prop.men, table.tree.trans.true.age.str.prop.women)
+    
+    men.prop.clust <- table.statistics[10:18]
+    women.prop.clust <- table.statistics[19:27]
+    men.prop.true.clust <- table.statistics[37:45]
+    women.prop.true.clust <- table.statistics[46:54]
+    men.prop.tree.true <- table.statistics[64:72]
+    women.prop.tree.true <- table.statistics[73:81]
+    
+    men.prop.cov.100 <- cov.100.stats[10:18]
+    women.prop.cov.100 <- cov.100.stats[19:27]
+    
+    
+    
+    # Function for Root Mean Squared Error
+    RMSE <- function(error) {
+      rmse <- sqrt(mean(error^2)) 
+      return(rmse)}
+    
+    # Function for Mean Absolute Error
+    MAE <- function(error) { 
+      mae <- mean(abs(error)) 
+      return(mae)
+    }
+    
+    
+    # Difference between clusters' inference and true values in 100% coverage
+    error.infer.clust.cov.100.men <- as.numeric(men.prop.clust) - as.numeric(men.prop.cov.100)
+    RMSE.error.infer.clust.cov.100.men <- RMSE(error.infer.clust.cov.100.men)
+    MAE.error.infer.clust.cov.100.men <- MAE(error.infer.clust.cov.100.men)
+    
+    error.infer.clust.cov.100.women <- as.numeric(women.prop.clust) - as.numeric(women.prop.cov.100)
+    RMSE.infer.clust.cov.100.women <- RMSE(error.infer.clust.cov.100.women)
+    MAE.infer.clust.cov.100.women <- MAE(error.infer.clust.cov.100.women)
+    
+    
+    
+    # Difference between clusters' inference and true values in the transmission tree
+    error.infer.clust.tree.men <- as.numeric(men.prop.clust) - as.numeric(men.prop.tree.true)
+    RMSE.error.infer.clust.tree.men <- RMSE(error.infer.clust.tree.men)
+    MAE.error.infer.clust.tree.men <- MAE(error.infer.clust.tree.men)
+    
+    error.infer.clust.tree.women <- as.numeric(women.prop.clust) - as.numeric(women.prop.tree.true)
+    RMSE.error.infer.clust.tree.women <- RMSE(error.infer.clust.tree.women)
+    MAE.error.infer.clust.tree.women <- MAE(error.infer.clust.tree.women)
+    
+    
+    # Difference between clusters' inference and true values in the transmission clusters
+    error.infer.clust.true.clust.men <- as.numeric(men.prop.clust) - as.numeric(men.prop.true.clust)
+    RMSE.error.infer.clust.true.clust.men <- RMSE(error.infer.clust.true.clust.men)
+    MAE.error.infer.clust.true.clust.men <- MAE(error.infer.clust.true.clust.men)
+    
+    error.infer.clust.true.clust.women <- as.numeric(women.prop.clust) - as.numeric(women.prop.true.clust)
+    RMSE.error.infer.clust.true.clust.women <- RMSE(error.infer.clust.true.clust.women)
+    MAE.error.infer.clust.true.clust.women <- MAE(error.infer.clust.true.clust.women)
+    
+    
+    # Difference between truth in clusters and truth in the transmission tree
+    error.clust.true.tree.men <- as.numeric(men.prop.true.clust) - as.numeric(men.prop.tree.true)
+    RMSE.error.clust.true.tree.men <- RMSE(error.clust.true.tree.men)
+    MAE.error.clust.true.tree.men <- MAE(error.clust.true.tree.men)
+    
+    error.clust.true.tree.women <- as.numeric(women.prop.true.clust) - as.numeric(women.prop.tree.true)
+    RMSE.error.clust.true.tree.women <- RMSE(error.clust.true.tree.women)
+    MAE.error.clust.true.tree.women <- MAE(error.clust.true.tree.women)
+    
+    GoF.errors <- c(RMSE.error.infer.clust.cov.100.men, MAE.error.infer.clust.cov.100.men,
+                    RMSE.infer.clust.cov.100.women, MAE.infer.clust.cov.100.women,
+                    RMSE.error.infer.clust.tree.men, MAE.error.infer.clust.tree.men,
+                    RMSE.error.infer.clust.tree.women, MAE.error.infer.clust.tree.women,
+                    RMSE.error.infer.clust.true.clust.men, MAE.error.infer.clust.true.clust.men,
+                    RMSE.error.infer.clust.true.clust.women, MAE.error.infer.clust.true.clust.women,
+                    RMSE.error.clust.true.tree.men, MAE.error.clust.true.tree.men,
+                    RMSE.error.clust.true.tree.women, MAE.error.clust.true.tree.women)
+    
+    Names.GoF.errors <- c("RMSE.error.infer.clust.cov.100.men", "MAE.error.infer.clust.cov.100.men",
+                          "RMSE.infer.clust.cov.100.women", "MAE.infer.clust.cov.100.women",
+                          "RMSE.error.infer.clust.tree.men", "MAE.error.infer.clust.tree.men",
+                          "RMSE.error.infer.clust.tree.women", "MAE.error.infer.clust.tree.women",
+                          "RMSE.error.infer.clust.true.clust.men", "MAE.error.infer.clust.true.clust.men",
+                          "RMSE.error.infer.clust.true.clust.women", "MAE.error.infer.clust.true.clust.women",
+                          "RMSE.error.clust.true.tree.men", "MAE.error.clust.true.tree.men",
+                          "RMSE.error.clust.true.tree.women", "MAE.error.clust.true.tree.women")
+    
+    names(GoF.errors) <- Names.GoF.errors
+    
+    
+    output.results.vector.error <- c(table.statistics, age.mixing.transm, clust.size.stat,
+                                     cov.100.stats,
+                                     GoF.errors)
     
   }else{
     
-    output.results.vectot <- rep(NA, 90)
+    output.results.vectot <- rep(NA, 133)
     
-    names(output.results.vectot) <-  c("cl.M.15.25.F.15.25", "cl.M.25.40.F.15.25",  "cl.M.40.50.F.15.25", "cl.M.15.25.F.25.40",                     
-                                       "cl.M.25.40.F.25.40", "cl.M.40.50.F.25.40", "cl.M.15.25.F.40.50", "cl.M.25.40.F.40.50",                     
-                                       "cl.M.40.50.F.40.50", "cl.prop.men15.25.F.15.25", "cl.prop.men25.40.F.15.25", "cl.prop.men40.50.F.15.25",               
-                                       "cl.prop.men15.25.F.25.40", "cl.prop.men25.40.F.25.40", "cl.prop.men40.50.F.25.40", "cl.prop.men15.25.F.40.50",               
-                                       "cl.prop.men25.40.F.40.50", "cl.prop.men40.50.F.40.50", "cl.prop.women15.25.M.15.25", "cl.prop.women25.40.M.15.25",             
-                                       "cl.prop.women40.50.M.15.25", "cl.prop.women15.25.M.25.40", "cl.prop.women25.40.M.25.40" ,  "cl.prop.women40.50.M.25.40",             
-                                       "cl.prop.women15.25.M.40.50", "cl.prop.women25.40.M.40.50", "cl.prop.women40.50.M.40.50", "cl.true.M.15.25.F.15.25",                
-                                       "cl.true.M.25.40.F.15.25", "cl.true.M.40.50.F.15.25", "cl.true.M.15.25.F.25.40", "cl.true.M.25.40.F.25.40",                
-                                       "cl.str.M.40.50.F.25.40", "cl.true.M.15.25.F.40.50", "cl.true..M.25.40.F.40.50", "cl.M.40.50.F.40.50",                     
-                                       "cl.true.prop.men15.25.F.15.25", "cl.true.prop.men25.40.F.15.25", "cl.true.prop.men40.50.F.15.25", "cl.true.prop.men15.25.F.25.40",          
-                                       "cl.true.prop.men25.40.F.25.40", "cl.true.prop.men40.50.F.25.40", "cl.true.prop.men15.25.F.40.50", "cl.true.prop.men25.40.F.40.50",          
-                                       "cl.true.prop.men40.50.F.40.50", "cl.true.prop.women15.25.M.15.25", "cl.true.prop.women25.40.M.15.25", "cl.true.prop.women40.50.M.15.25",        
-                                       "cl.true.prop.women15.25.M.25.40", "cl.true.prop.women25.40.M.25.40", "cl.true.prop.women40.50.M.25.40", "cl.true.prop.women15.25.M.40.50",        
-                                       "cl.true.prop.women25.40.M.40.50", "cl.true.prop.women40.50.M.40.50", "tree.tra.M.15.25.F.15.25", "tree.tra.M.25.40.F.15.25",               
-                                       "tree.tra.M.40.50.F.15.25", "tree.tra.M.15.25.F.25.40", "tree.tra.M.25.40.F.25.40", "tree.tra.M.40.50.F.25.40",               
-                                       "tree.tra.M.15.25.F.40.50", "tree.tra.M.25.40.F.40.50", "tree.tra.M.40.50.F.40.50", "tree.trans.true.prop.men15.25.F.15.25",  
-                                       "tree.trans.true.prop.men25.40.F.15.25", "tree.trans.true.prop.men40.50.F.15.25", "tree.trans.true.prop.men15.25.F.25.40",   "tree.trans.true.prop.men25.40.F.25.40",  
-                                       "tree.trans.true.prop.men40.50.F.25.40", "tree.trans.true.prop.men15.25.F.40.50", "tree.trans.true.prop.men25.40.F.40.50",   "tree.trans.true.prop.men40.50.F.40.50",  
-                                       "tree.trans.true.prop.women15.25.M.15.25", "tree.trans.true.prop.women25.40.M.15.25", "tree.trans.true.prop.women40.50.M.15.25", "tree.trans.true.prop.women15.25.M.25.40",
-                                       "tree.trans.true.prop.women25.40.M.25.40", "tree.trans.true.prop.women40.50.M.25.40", "tree.trans.true.prop.women15.25.M.40.50", "tree.trans.true.prop.women25.40.M.40.50",
-                                       "tree.trans.true.prop.women40.50.M.40.50", "T.AAD.male", "T.SDAD.male",  "T.slope.male",                           
-                                       "T.WSD.male", "T.BSD.male",  "T.intercept.male", "mean.cl.size", "med.cl.size", "sd.cl.size")
+    names(output.results.vector.error) <-  c("cl.M.15.25.F.15.25", "cl.M.25.40.F.15.25",  "cl.M.40.50.F.15.25", "cl.M.15.25.F.25.40",                     
+                                             "cl.M.25.40.F.25.40", "cl.M.40.50.F.25.40", "cl.M.15.25.F.40.50", "cl.M.25.40.F.40.50",                     
+                                             "cl.M.40.50.F.40.50", "cl.prop.men15.25.F.15.25", "cl.prop.men25.40.F.15.25", "cl.prop.men40.50.F.15.25",               
+                                             "cl.prop.men15.25.F.25.40", "cl.prop.men25.40.F.25.40", "cl.prop.men40.50.F.25.40", "cl.prop.men15.25.F.40.50",               
+                                             "cl.prop.men25.40.F.40.50", "cl.prop.men40.50.F.40.50", "cl.prop.women15.25.M.15.25", "cl.prop.women25.40.M.15.25",             
+                                             "cl.prop.women40.50.M.15.25", "cl.prop.women15.25.M.25.40", "cl.prop.women25.40.M.25.40" ,  "cl.prop.women40.50.M.25.40",             
+                                             "cl.prop.women15.25.M.40.50", "cl.prop.women25.40.M.40.50", "cl.prop.women40.50.M.40.50", "cl.true.M.15.25.F.15.25",                
+                                             "cl.true.M.25.40.F.15.25", "cl.true.M.40.50.F.15.25", "cl.true.M.15.25.F.25.40", "cl.true.M.25.40.F.25.40",                
+                                             "cl.str.M.40.50.F.25.40", "cl.true.M.15.25.F.40.50", "cl.true..M.25.40.F.40.50", "cl.M.40.50.F.40.50",                     
+                                             "cl.true.prop.men15.25.F.15.25", "cl.true.prop.men25.40.F.15.25", "cl.true.prop.men40.50.F.15.25", "cl.true.prop.men15.25.F.25.40",          
+                                             "cl.true.prop.men25.40.F.25.40", "cl.true.prop.men40.50.F.25.40", "cl.true.prop.men15.25.F.40.50", "cl.true.prop.men25.40.F.40.50",          
+                                             "cl.true.prop.men40.50.F.40.50", "cl.true.prop.women15.25.M.15.25", "cl.true.prop.women25.40.M.15.25", "cl.true.prop.women40.50.M.15.25",        
+                                             "cl.true.prop.women15.25.M.25.40", "cl.true.prop.women25.40.M.25.40", "cl.true.prop.women40.50.M.25.40", "cl.true.prop.women15.25.M.40.50",        
+                                             "cl.true.prop.women25.40.M.40.50", "cl.true.prop.women40.50.M.40.50", "tree.tra.M.15.25.F.15.25", "tree.tra.M.25.40.F.15.25",               
+                                             "tree.tra.M.40.50.F.15.25", "tree.tra.M.15.25.F.25.40", "tree.tra.M.25.40.F.25.40", "tree.tra.M.40.50.F.25.40",               
+                                             "tree.tra.M.15.25.F.40.50", "tree.tra.M.25.40.F.40.50", "tree.tra.M.40.50.F.40.50", "tree.trans.true.prop.men15.25.F.15.25",  
+                                             "tree.trans.true.prop.men25.40.F.15.25", "tree.trans.true.prop.men40.50.F.15.25", "tree.trans.true.prop.men15.25.F.25.40",   "tree.trans.true.prop.men25.40.F.25.40",  
+                                             "tree.trans.true.prop.men40.50.F.25.40", "tree.trans.true.prop.men15.25.F.40.50", "tree.trans.true.prop.men25.40.F.40.50",   "tree.trans.true.prop.men40.50.F.40.50",  
+                                             "tree.trans.true.prop.women15.25.M.15.25", "tree.trans.true.prop.women25.40.M.15.25", "tree.trans.true.prop.women40.50.M.15.25", "tree.trans.true.prop.women15.25.M.25.40",
+                                             "tree.trans.true.prop.women25.40.M.25.40", "tree.trans.true.prop.women40.50.M.25.40", "tree.trans.true.prop.women15.25.M.40.50", "tree.trans.true.prop.women25.40.M.40.50",
+                                             "tree.trans.true.prop.women40.50.M.40.50", "T.AAD.male", "T.SDAD.male",  "T.slope.male",                           
+                                             "T.WSD.male", "T.BSD.male",  "T.intercept.male", "mean.cl.size", "med.cl.size", "sd.cl.size",
+                                             
+                                             "cov.100.M.15.25.F.15.25", "cov.100.M.25.40.F.15.25", "cov.100.M.40.50.F.15.25", "cov.100.M.15.25.F.25.40", "cov.100.M.25.40.F.25.40",             
+                                             "cov.100.M.40.50.F.25.40",  "cov.100.M.15.25.F.40.50", "cov.100.M.25.40.F.40.50", "cov.100.M.40.50.F.40.50", "cov.100.true.prop.men15.25.F.15.25",  
+                                             "cov.100.true.prop.men25.40.F.15.25", "cov.100.true.prop.men40.50.F.15.25", "cov.100.true.prop.men15.25.F.25.40", "cov.100.true.prop.men25.40.F.25.40",   
+                                             "cov.100.true.prop.men40.50.F.25.40" , "cov.100.true.prop.men15.25.F.40.50", "cov.100.true.prop.men25.40.F.40.50", "cov.100.true.prop.men40.50.F.40.50", 
+                                             "cov.100.true.prop.women15.25.M.15.25", "cov.100.true.prop.women25.40.M.15.25", "cov.100.true.prop.women40.50.M.15.25", "cov.100.true.prop.women15.25.M.25.40", 
+                                             "cov.100.true.prop.women25.40.M.25.40", "cov.100.true.prop.women40.50.M.25.40", "cov.100.true.prop.women15.25.M.40.50", "cov.100.true.prop.women25.40.M.40.50", 
+                                             "cov.100.true.prop.women40.50.M.40.50",
+                                             
+                                             "RMSE.error.infer.clust.cov.100.men", "MAE.error.infer.clust.cov.100.men",
+                                             "RMSE.infer.clust.cov.100.women", "MAE.infer.clust.cov.100.women",
+                                             "RMSE.error.infer.clust.tree.men", "MAE.error.infer.clust.tree.men",
+                                             "RMSE.error.infer.clust.tree.women", "MAE.error.infer.clust.tree.women",
+                                             "RMSE.error.infer.clust.true.clust.men", "MAE.error.infer.clust.true.clust.men",
+                                             "RMSE.error.infer.clust.true.clust.women", "MAE.error.infer.clust.true.clust.women",
+                                             "RMSE.error.clust.true.tree.men", "MAE.error.clust.true.tree.men",
+                                             "RMSE.error.clust.true.tree.women", "MAE.error.clust.true.tree.women")
+    
   }
   
   
-  return(output.results.vectot)
+  return(output.results.vector.error)
   
   
 }
