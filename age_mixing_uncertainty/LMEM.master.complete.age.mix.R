@@ -3,10 +3,10 @@
 
 # Define directory
 
-work.dir <- "/home/david/Desktop/mastermodeltest" # on laptop
+# work.dir <- "/home/david/Desktop/mastermodeltest" # on laptop
 
 
-# work.dir <- "/home/niyukuri/Desktop/mastermodeltest" # on PC
+work.dir <- "/home/niyukuri/Desktop/mastermodeltest" # on PC
 
 
 setwd(paste0(work.dir))
@@ -265,8 +265,8 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
   #
   cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
                                    population.simtime = 50, 
-                                   population.nummen = 3000, 
-                                   population.numwomen = 3000,
+                                   population.nummen = 1200, 
+                                   population.numwomen = 1200,
                                    hivseed.time = 10, 
                                    hivseed.type = "amount",
                                    hivseed.amount = 20, 
@@ -448,11 +448,12 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
   ##############
   
   
-  results <- simpact.run(configParams = cfg.list,
-                         destDir = sub.dir.rename,
-                         agedist = age.distr,
-                         seed = seedid,
-                         intervention = intervention)
+  results <- tryCatch(simpact.run(configParams = cfg.list,
+                                  destDir = sub.dir.rename,
+                                  agedist = age.distr,
+                                  seed = seedid,
+                                  intervention = intervention),
+                      error = simpact.errFunction)
   
   
   
@@ -693,7 +694,7 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
     
     het.fit.lme.agemixing <- lme(AgeInfecRec ~ GenderRec, data = agemixing.df.IDs, random = ~ 1|DonId,
                                  weights = varIdent( c("1" = 0.5), ~ 1 |GenderRec ))
-   
+    
     
     het.a <- coef(summary(het.fit.lme.agemixing))[1] # average age in transmission clusters
     
@@ -705,7 +706,7 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
     
     het.b2 <- as.numeric(VarCorr(het.fit.lme.agemixing)[4]) # within cluster variation
     
-
+    
     # SD for the two strata
     
     unique.val.strat <- unique(attributes(het.fit.lme.agemixing$modelStruct$varStruct)$weights)
@@ -822,7 +823,7 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
   
   
   
- 
+  
   
   transm.clust.MCAR.cov.40 <- tryCatch(LMEMphylo.CAR.groups.fun.agemix(simpact.trans.net = simpact.trans.net, 
                                                                        work.dir = work.dir,   
@@ -2346,7 +2347,7 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
   
   # MCAR
   
-
+  
   
   name.true.transm.MCAR.35 <- paste0("true.transm.MCAR.35.",c("num.men.15.25", "num.women.15.25", "num.men.25.40", "num.women.25.40", "num.men.40.50", 
                                                               "num.women.40.50", "partners.men.15.25.w.15.25", "partners.men.15.25.w.25.40", 
@@ -2993,6 +2994,8 @@ LMEM.master.model.age.mixing.toy1 <- function(inputvector = input.vector){
   
   names(outputvector) <- names.scenari
   
+  unlink(paste0(sub.dir.rename), recursive = TRUE)
+  
   return(outputvector)
   
   
@@ -3046,7 +3049,7 @@ inputvector <- c(-0.52, -0.05, 2, 0, 2, 0.25, -0.3, -0.1,
 # # replication number
 # 
 
-reps <- 4
+reps <- 2
 
 # 
 # 
