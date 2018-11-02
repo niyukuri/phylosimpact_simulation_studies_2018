@@ -337,6 +337,52 @@ simpact4ABC.classic <- function(inputvector){
 }
 
 
+
+
+
+wrapper.simpact4ABC.classic <- function(inputvector = inputvector){
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/simpact4ABC.classic.R")
+  
+  res.simpact4ABC.classic <- tryCatch(simpact4ABC.classic(inputvector = inputvector),
+                                      error=function(e) return(rep(NA, 28)))
+  
+  
+  return(res.simpact4ABC.classic)
+  
+}
+
+
+source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/calibration.ABC.R")
+
+
+cal.par <- calibration.ABC(model.sim = wrapper.simpact4ABC.classic,
+                           sum_stat_obs = sum_stat_obs,
+                           simpact_prior = simpact_prior, 
+                           design.points = 200,
+                           seed.val = 1,
+                           n_cores = 8)
+
+save(cal.par, file = "cal.par.RData")
+
+cal.par <- get(load("cal.par.RData"))
+
+sum.neuralnet.cal.par <- summary(cal.par, intvl = .9)
+
+par.run.models <- cal.par$adj.values
+
+source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+
+after.cal.res <- simpact.parallel(model = complete.master.epic.metrics,
+                                  actual.input.matrix = par.run.models,
+                                  seed_count = 124,
+                                  n_cluster = 8)
+
+
+par.run.models=as.matrix(par.run.models[1:8,])
+
+v = complete.master.epic.metrics(inputvector = inputvector)
+
 # Read results from the master model and compute values for observed summary statistics
 
 # These results were obtained by inputvector
@@ -367,7 +413,7 @@ sum_stat_obs <- c(-0.217246,  0.51472275,  0.08759751,  2.18014706,  0.7844332, 
 
 # (i)
 
-design.points <- 200 # number of simulations repeats
+design.points <- 100 # number of simulations repeats
 
 
 simpact_prior <- list(c("unif", -1, 0), c("unif", -0.5, 0), c("unif", 2, 7), c("unif", 5, 10), c("unif", 2, 4), c("unif", 0, 1),
