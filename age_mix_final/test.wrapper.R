@@ -27,7 +27,7 @@ test.wrapper <- function(inputvector=inputvector){
   
   
   results.f <- tryCatch(test.MCAR.age.mix(inputvector = inputvector),
-                        error=function(e) return(rep(NA, 6935)))
+                        error=function(e) return(rep(NA, 6936)))
   
   return(results.f)
   
@@ -36,11 +36,11 @@ test.wrapper <- function(inputvector=inputvector){
 
 
 
-inputvector <- c(-0.52, -0.05, 5, 7, 3, 0.25, -0.3, -0.1, 
-                 -1, -90, 0.5, 0.05, -0.14, 5, 7, 12, -2.7) 
+inputvector <- c(-0.52, -0.05, 2, 10, 5, 0.25, -0.3, -0.1,
+                 -1, -90, 0.5, 0.05, -0.14, 5, 7, 12, -1.7) 
 
 
-reps <- 200
+reps <- 1000
 
 
 inputmatrix <- matrix(rep(inputvector, reps), byrow = TRUE, nrow = reps)
@@ -48,7 +48,7 @@ inputmatrix <- matrix(rep(inputvector, reps), byrow = TRUE, nrow = reps)
 mcar.sim1 <- simpact.parallel(model = wrapper.test,
                               actual.input.matrix = inputmatrix,
                               seed_count = 100,
-                              n_cluster = 20)
+                              n_cluster = 24)
 
 write.csv(mcar.sim1, file = "Results.mcar.sim.complete.csv")
 

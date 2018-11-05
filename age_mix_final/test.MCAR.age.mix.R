@@ -6,8 +6,8 @@
 
 # work.dir <- "/home/david/Desktop/mastermodeltest" # on laptop
 # 
-inputvector <- c(13,-0.52, -0.05, 5, 7, 3, 0.25, -0.3, -0.1,
-                 -1, -90, 0.5, 0.05, -0.14, 5, 7, 12, -2.7)
+inputvector <- c(13,-0.52, -0.05, 2, 7, 3, 0.25, -0.3, -0.1,
+                 -1, -90, 0.5, 0.05, -0.14, 5, 7, 12, -1.7)
 
 work.dir <- "/home/niyukuri/Desktop/mastermodeltest" # on PC
 
@@ -21,7 +21,7 @@ setwd(paste0(work.dir))
 test.MCAR.age.mix2 <- function(inputvector=inputvector){
   
   #work.dir <- "/user/data/gent/vsc400/vsc40070/phylo/" # on cluster
-
+  
   
   source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
   
@@ -151,10 +151,10 @@ test.MCAR.age.mix2 <- function(inputvector=inputvector){
   # ## Add-ons
   #
   ### BEGIN Add-on
-  cfg.list["formation.hazard.agegapry.baseline"] <- 2
+  
   cfg.list["mortality.aids.survtime.C"] <- 65
   cfg.list["mortality.aids.survtime.k"] <- -0.2
-  cfg.list["monitoring.fraction.log_viralload"] <- 0 #0.3
+  
   cfg.list["dropout.interval.dist.type"] <- "uniform"
   cfg.list["dropout.interval.dist.uniform.min"] <- 1000
   cfg.list["dropout.interval.dist.uniform.max"] <- 2000
@@ -164,13 +164,11 @@ test.MCAR.age.mix2 <- function(inputvector=inputvector){
   cfg.list["person.survtime.logoffset.dist.normal.sigma"] <- 0.1
   
   cfg.list["person.agegap.man.dist.type"] <- "normal" #fixed
-  #cfg.list["person.agegap.man.dist.fixed.value"] <- -6
   cfg.list["person.agegap.woman.dist.type"] <- "normal" #"fixed"
-  #cfg.list["person.agegap.woman.dist.fixed.value"] <- -6
+  
   
   cfg.list["mortality.aids.survtime.C"] <- 65
   cfg.list["mortality.aids.survtime.k"] <- -0.2
-  cfg.list["monitoring.cd4.threshold"] <- 0 # 0 means nobody qualifies for ART
   cfg.list["diagnosis.baseline"] <- -2
   
   
@@ -426,63 +424,124 @@ test.MCAR.age.mix2 <- function(inputvector=inputvector){
         # Concurrency point prevalence 6 months before a survey, among men
         
         
-        pp.cp.6months.male.rels <- tryCatch(concurr.pointprev.calculator(datalist = datalist.agemix,
-                                                                         timepoint = 40 - 0.5), error=function(e) return(NA))
+        pp.cp.6months.male.rels <- concurr.pointprev.calculator(datalist = datalist.agemix,
+                                                                timepoint = 40 - 0.5) %>%
+          dplyr::select(concurr.pointprev) %>%
+          dplyr::slice(1) %>%
+          as.numeric()
+        
+        pp.cp.6months.female.rels <- concurr.pointprev.calculator(datalist = datalist.agemix,
+                                                                  timepoint = 40 - 0.5) %>%
+          dplyr::select(concurr.pointprev) %>%
+          dplyr::slice(2) %>%
+          as.numeric()
+        
+        
         
         
         # (iii) Prevalence
         ##################
         
+        
         hiv.prev.lt25.women <- prevalence.calculator(datalist = datalist.agemix,
                                                      agegroup = c(15, 25),
-                                                     timepoint = 40)$pointprevalence[2]
+                                                     timepoint = 40) %>%
+          dplyr::select(pointprevalence) %>%
+          dplyr::slice(2) %>%
+          as.numeric()
+        
         hiv.prev.lt25.men <- prevalence.calculator(datalist = datalist.agemix,
                                                    agegroup = c(15, 25),
-                                                   timepoint = 40)$pointprevalence[1]
+                                                   timepoint = 40) %>%
+          dplyr::select(pointprevalence) %>%
+          dplyr::slice(1) %>%
+          as.numeric()
         
         hiv.prev.25.40.women <- prevalence.calculator(datalist = datalist.agemix,
                                                       agegroup = c(25, 40),
-                                                      timepoint = 40)$pointprevalence[2]
+                                                      timepoint = 40) %>%
+          dplyr::select(pointprevalence) %>%
+          dplyr::slice(2) %>%
+          as.numeric()
+        
         hiv.prev.25.40.men <- prevalence.calculator(datalist = datalist.agemix,
                                                     agegroup = c(25, 40),
-                                                    timepoint = 40)$pointprevalence[1]
+                                                    timepoint = 40) %>%
+          dplyr::select(pointprevalence) %>%
+          dplyr::slice(1) %>%
+          as.numeric()
         
         hiv.prev.40.50.women <- prevalence.calculator(datalist = datalist.agemix,
                                                       agegroup = c(40, 50),
-                                                      timepoint = 40)$pointprevalence[2]
+                                                      timepoint = 40) %>%
+          dplyr::select(pointprevalence) %>%
+          dplyr::slice(2) %>%
+          as.numeric()
+        
         hiv.prev.40.50.men <- prevalence.calculator(datalist = datalist.agemix,
                                                     agegroup = c(40, 50),
-                                                    timepoint = 40)$pointprevalence[1]
+                                                    timepoint = 40) %>%
+          dplyr::select(pointprevalence) %>%
+          dplyr::slice(1) %>%
+          as.numeric()
         
         
         # (iv) Incidence
         #################
         
-        incidence.df.15.24 <- incidence.calculator(datalist = datalist.agemix,
-                                                   agegroup = c(15, 25), timewindow = c(30, 40))
-        
-        epi.rels.incidence.df.15.24 <- incidence.df.15.24$incidence[3]
-        
-        epi.rels.incidence.df.15.24.men <- incidence.df.15.24$incidence[1]
-        epi.rels.incidence.df.15.24.women <- incidence.df.15.24$incidence[2]
         
         
-        incidence.df.25.39 <- incidence.calculator(datalist = datalist.agemix,
-                                                   agegroup = c(25, 40), timewindow = c(30, 40))
+        epi.rels.incidence.df.15.24.men <- incidence.calculator(datalist = datalist.agemix,
+                                                                agegroup = c(15, 25),
+                                                                timewindow = c(39, 40),
+                                                                only.active = "No") %>%
+          dplyr::select(incidence) %>%
+          dplyr::slice(1) %>%
+          as.numeric()
         
-        epi.rels.incidence.df.25.39 <- incidence.df.25.39$incidence[3]
+        epi.rels.incidence.df.15.24.women <- incidence.calculator(datalist = datalist.agemix,
+                                                                  agegroup = c(15, 25),
+                                                                  timewindow = c(39, 40),
+                                                                  only.active = "No") %>%
+          dplyr::select(incidence) %>%
+          dplyr::slice(2) %>%
+          as.numeric()
         
-        epi.rels.incidence.df.25.39.men <- incidence.df.25.39$incidence[1]
-        epi.rels.incidence.df.25.39.women <- incidence.df.25.39$incidence[2]
         
         
-        incidence.df.40.49 <- incidence.calculator(datalist = datalist.agemix,
-                                                   agegroup = c(25, 40), timewindow = c(30, 40))
+        epi.rels.incidence.df.25.39.men <- incidence.calculator(datalist = datalist.agemix,
+                                                                agegroup = c(25, 40),
+                                                                timewindow = c(39, 40),
+                                                                only.active = "No") %>%
+          dplyr::select(incidence) %>%
+          dplyr::slice(1) %>%
+          as.numeric()
         
-        epi.rels.incidence.df.40.49 <- incidence.df.40.49$incidence[3]
+        epi.rels.incidence.df.25.39.women <- incidence.calculator(datalist = datalist.agemix,
+                                                                  agegroup = c(25, 40),
+                                                                  timewindow = c(39, 40),
+                                                                  only.active = "No") %>%
+          dplyr::select(incidence) %>%
+          dplyr::slice(2) %>%
+          as.numeric()
         
-        epi.rels.incidence.df.40.49.men <- incidence.df.40.49$incidence[1] # res
-        epi.rels.incidence.df.40.49.women <- incidence.df.40.49$incidence[2] # res
+        
+        
+        epi.rels.incidence.df.40.49.men <- incidence.calculator(datalist = datalist.agemix,
+                                                                agegroup = c(40, 50),
+                                                                timewindow = c(39, 40),
+                                                                only.active = "No") %>%
+          dplyr::select(incidence) %>%
+          dplyr::slice(1) %>%
+          as.numeric()
+        
+        epi.rels.incidence.df.40.49.women <- incidence.calculator(datalist = datalist.agemix,
+                                                                  agegroup = c(40, 50),
+                                                                  timewindow = c(39, 40),
+                                                                  only.active = "No") %>%
+          dplyr::select(incidence) %>%
+          dplyr::slice(2) %>%
+          as.numeric()
         
         
         
@@ -490,7 +549,7 @@ test.MCAR.age.mix2 <- function(inputvector=inputvector){
                                       hiv.prev.25.40.women, hiv.prev.25.40.men,
                                       hiv.prev.40.50.women, hiv.prev.40.50.men, 
                                       mix.rels.dat,
-                                      pp.cp.6months.male.rels,
+                                      pp.cp.6months.male.rels, pp.cp.6months.female.rels, 
                                       
                                       epi.rels.incidence.df.15.24.men, epi.rels.incidence.df.15.24.women, 
                                       epi.rels.incidence.df.25.39.men, epi.rels.incidence.df.25.39.women,
@@ -498,7 +557,7 @@ test.MCAR.age.mix2 <- function(inputvector=inputvector){
         
         names(summary.epidemic.rels.df) <- c("R.prev.15.25.w", "R.prev.15.25.m", "R.prev.25.40.w", "R.prev.25.40.m", "R.prev.40.50.w", "R.prev.40.50.m",
                                              names(mix.rels.dat), 
-                                             "R.p.prev.6months.m",
+                                             "R.p.prev.6months.m","R.p.prev.6months.f",
                                              "R.inc.15.25.w", "R.inc.15.25.m", "R.inc.25.40.w", "R.inc.25.40.m", "R.inc.40.50.w", "R.inc.40.50.m")
         
         
@@ -512,198 +571,198 @@ test.MCAR.age.mix2 <- function(inputvector=inputvector){
         
         
         res.clust.MCAR.cov.35 <- tryCatch(age.mixing.MCAR.fun(simpact.trans.net = simpact.trans.net.adv,  
-                                                               datalist.agemix = datalist.agemix, 
-                                                               work.dir = work.dir,  
-                                                               dirfasttree = work.dir, 
-                                                               sub.dir.rename = sub.dir.rename,
-                                                               limitTransmEvents = 7,
-                                                               timewindow = c(30,40),
-                                                               seq.cov = 35,
-                                                               age.group.15.25 = c(15,25),
-                                                               age.group.25.40 = c(25,40),
-                                                               age.group.40.50 = c(40,50),
-                                                               cut.off = 7),
+                                                              datalist.agemix = datalist.agemix, 
+                                                              work.dir = work.dir,  
+                                                              dirfasttree = work.dir, 
+                                                              sub.dir.rename = sub.dir.rename,
+                                                              limitTransmEvents = 7,
+                                                              timewindow = c(30,40),
+                                                              seq.cov = 35,
+                                                              age.group.15.25 = c(15,25),
+                                                              age.group.25.40 = c(25,40),
+                                                              age.group.40.50 = c(40,50),
+                                                              cut.off = 7),
                                           error=function(e) return(rep(NA, 90)))
         
         res.clust.MCAR.cov.40 <- tryCatch(age.mixing.MCAR.fun(simpact.trans.net = simpact.trans.net.adv,  
-                                                               datalist.agemix = datalist.agemix, 
-                                                               work.dir = work.dir,  
-                                                               dirfasttree = work.dir, 
-                                                               sub.dir.rename = sub.dir.rename,
-                                                               limitTransmEvents = 7,
-                                                               timewindow = c(30,40),
-                                                               seq.cov = 40,
-                                                               age.group.15.25 = c(15,25),
-                                                               age.group.25.40 = c(25,40),
-                                                               age.group.40.50 = c(40,50),
-                                                               cut.off = 7),
+                                                              datalist.agemix = datalist.agemix, 
+                                                              work.dir = work.dir,  
+                                                              dirfasttree = work.dir, 
+                                                              sub.dir.rename = sub.dir.rename,
+                                                              limitTransmEvents = 7,
+                                                              timewindow = c(30,40),
+                                                              seq.cov = 40,
+                                                              age.group.15.25 = c(15,25),
+                                                              age.group.25.40 = c(25,40),
+                                                              age.group.40.50 = c(40,50),
+                                                              cut.off = 7),
                                           error=function(e) return(rep(NA, 90)))
         
         res.clust.MCAR.cov.45 <- tryCatch(age.mixing.MCAR.fun(simpact.trans.net = simpact.trans.net.adv,  
-                                                               datalist.agemix = datalist.agemix, 
-                                                               work.dir = work.dir,  
-                                                               dirfasttree = work.dir, 
-                                                               sub.dir.rename = sub.dir.rename,
-                                                               limitTransmEvents = 7,
-                                                               timewindow = c(30,40),
-                                                               seq.cov = 45,
-                                                               age.group.15.25 = c(15,25),
-                                                               age.group.25.40 = c(25,40),
-                                                               age.group.40.50 = c(40,50),
-                                                               cut.off = 7),
+                                                              datalist.agemix = datalist.agemix, 
+                                                              work.dir = work.dir,  
+                                                              dirfasttree = work.dir, 
+                                                              sub.dir.rename = sub.dir.rename,
+                                                              limitTransmEvents = 7,
+                                                              timewindow = c(30,40),
+                                                              seq.cov = 45,
+                                                              age.group.15.25 = c(15,25),
+                                                              age.group.25.40 = c(25,40),
+                                                              age.group.40.50 = c(40,50),
+                                                              cut.off = 7),
                                           error=function(e) return(rep(NA, 90)))
         
         res.clust.MCAR.cov.50 <- tryCatch(age.mixing.MCAR.fun(simpact.trans.net = simpact.trans.net.adv,  
-                                                               datalist.agemix = datalist.agemix, 
-                                                               work.dir = work.dir,  
-                                                               dirfasttree = work.dir, 
-                                                               sub.dir.rename = sub.dir.rename,
-                                                               limitTransmEvents = 7,
-                                                               timewindow = c(30,40),
-                                                               seq.cov = 50,
-                                                               age.group.15.25 = c(15,25),
-                                                               age.group.25.40 = c(25,40),
-                                                               age.group.40.50 = c(40,50),
-                                                               cut.off = 7),
+                                                              datalist.agemix = datalist.agemix, 
+                                                              work.dir = work.dir,  
+                                                              dirfasttree = work.dir, 
+                                                              sub.dir.rename = sub.dir.rename,
+                                                              limitTransmEvents = 7,
+                                                              timewindow = c(30,40),
+                                                              seq.cov = 50,
+                                                              age.group.15.25 = c(15,25),
+                                                              age.group.25.40 = c(25,40),
+                                                              age.group.40.50 = c(40,50),
+                                                              cut.off = 7),
                                           error=function(e) return(rep(NA, 90)))
         
         res.clust.MCAR.cov.55 <- tryCatch(age.mixing.MCAR.fun(simpact.trans.net = simpact.trans.net.adv,  
-                                                               datalist.agemix = datalist.agemix, 
-                                                               work.dir = work.dir,  
-                                                               dirfasttree = work.dir, 
-                                                               sub.dir.rename = sub.dir.rename,
-                                                               limitTransmEvents = 7,
-                                                               timewindow = c(30,40),
-                                                               seq.cov = 55,
-                                                               age.group.15.25 = c(15,25),
-                                                               age.group.25.40 = c(25,40),
-                                                               age.group.40.50 = c(40,50),
-                                                               cut.off = 7),
+                                                              datalist.agemix = datalist.agemix, 
+                                                              work.dir = work.dir,  
+                                                              dirfasttree = work.dir, 
+                                                              sub.dir.rename = sub.dir.rename,
+                                                              limitTransmEvents = 7,
+                                                              timewindow = c(30,40),
+                                                              seq.cov = 55,
+                                                              age.group.15.25 = c(15,25),
+                                                              age.group.25.40 = c(25,40),
+                                                              age.group.40.50 = c(40,50),
+                                                              cut.off = 7),
                                           error=function(e) return(rep(NA, 90)))
         
         
         res.clust.MCAR.cov.60 <- tryCatch(age.mixing.MCAR.fun(simpact.trans.net = simpact.trans.net.adv,  
-                                                               datalist.agemix = datalist.agemix, 
-                                                               work.dir = work.dir,  
-                                                               dirfasttree = work.dir, 
-                                                               sub.dir.rename = sub.dir.rename,
-                                                               limitTransmEvents = 7,
-                                                               timewindow = c(30,40),
-                                                               seq.cov = 60,
-                                                               age.group.15.25 = c(15,25),
-                                                               age.group.25.40 = c(25,40),
-                                                               age.group.40.50 = c(40,50),
-                                                               cut.off = 7),
+                                                              datalist.agemix = datalist.agemix, 
+                                                              work.dir = work.dir,  
+                                                              dirfasttree = work.dir, 
+                                                              sub.dir.rename = sub.dir.rename,
+                                                              limitTransmEvents = 7,
+                                                              timewindow = c(30,40),
+                                                              seq.cov = 60,
+                                                              age.group.15.25 = c(15,25),
+                                                              age.group.25.40 = c(25,40),
+                                                              age.group.40.50 = c(40,50),
+                                                              cut.off = 7),
                                           error=function(e) return(rep(NA, 90)))
         
         
         res.clust.MCAR.cov.65 <- tryCatch(age.mixing.MCAR.fun(simpact.trans.net = simpact.trans.net.adv,  
-                                                               datalist.agemix = datalist.agemix, 
-                                                               work.dir = work.dir,  
-                                                               dirfasttree = work.dir, 
-                                                               sub.dir.rename = sub.dir.rename,
-                                                               limitTransmEvents = 7,
-                                                               timewindow = c(30,40),
-                                                               seq.cov = 65,
-                                                               age.group.15.25 = c(15,25),
-                                                               age.group.25.40 = c(25,40),
-                                                               age.group.40.50 = c(40,50),
-                                                               cut.off = 7),
+                                                              datalist.agemix = datalist.agemix, 
+                                                              work.dir = work.dir,  
+                                                              dirfasttree = work.dir, 
+                                                              sub.dir.rename = sub.dir.rename,
+                                                              limitTransmEvents = 7,
+                                                              timewindow = c(30,40),
+                                                              seq.cov = 65,
+                                                              age.group.15.25 = c(15,25),
+                                                              age.group.25.40 = c(25,40),
+                                                              age.group.40.50 = c(40,50),
+                                                              cut.off = 7),
                                           error=function(e) return(rep(NA, 90)))
         
         
         
         
         res.clust.MCAR.cov.70 <- tryCatch(age.mixing.MCAR.fun(simpact.trans.net = simpact.trans.net.adv,  
-                                                               datalist.agemix = datalist.agemix, 
-                                                               work.dir = work.dir,  
-                                                               dirfasttree = work.dir, 
-                                                               sub.dir.rename = sub.dir.rename,
-                                                               limitTransmEvents = 7,
-                                                               timewindow = c(30,40),
-                                                               seq.cov = 70,
-                                                               age.group.15.25 = c(15,25),
-                                                               age.group.25.40 = c(25,40),
-                                                               age.group.40.50 = c(40,50),
-                                                               cut.off = 7),
+                                                              datalist.agemix = datalist.agemix, 
+                                                              work.dir = work.dir,  
+                                                              dirfasttree = work.dir, 
+                                                              sub.dir.rename = sub.dir.rename,
+                                                              limitTransmEvents = 7,
+                                                              timewindow = c(30,40),
+                                                              seq.cov = 70,
+                                                              age.group.15.25 = c(15,25),
+                                                              age.group.25.40 = c(25,40),
+                                                              age.group.40.50 = c(40,50),
+                                                              cut.off = 7),
                                           error=function(e) return(rep(NA, 90)))
         
         
         
         res.clust.MCAR.cov.75 <- tryCatch(age.mixing.MCAR.fun(simpact.trans.net = simpact.trans.net.adv,  
-                                                               datalist.agemix = datalist.agemix, 
-                                                               work.dir = work.dir,  
-                                                               dirfasttree = work.dir, 
-                                                               sub.dir.rename = sub.dir.rename,
-                                                               limitTransmEvents = 7,
-                                                               timewindow = c(30,40),
-                                                               seq.cov = 75,
-                                                               age.group.15.25 = c(15,25),
-                                                               age.group.25.40 = c(25,40),
-                                                               age.group.40.50 = c(40,50),
-                                                               cut.off = 7),
+                                                              datalist.agemix = datalist.agemix, 
+                                                              work.dir = work.dir,  
+                                                              dirfasttree = work.dir, 
+                                                              sub.dir.rename = sub.dir.rename,
+                                                              limitTransmEvents = 7,
+                                                              timewindow = c(30,40),
+                                                              seq.cov = 75,
+                                                              age.group.15.25 = c(15,25),
+                                                              age.group.25.40 = c(25,40),
+                                                              age.group.40.50 = c(40,50),
+                                                              cut.off = 7),
                                           error=function(e) return(rep(NA, 90)))
         
         
         
         
         res.clust.MCAR.cov.80 <- tryCatch(age.mixing.MCAR.fun(simpact.trans.net = simpact.trans.net.adv,  
-                                                               datalist.agemix = datalist.agemix, 
-                                                               work.dir = work.dir,  
-                                                               dirfasttree = work.dir, 
-                                                               sub.dir.rename = sub.dir.rename,
-                                                               limitTransmEvents = 7,
-                                                               timewindow = c(30,40),
-                                                               seq.cov = 80,
-                                                               age.group.15.25 = c(15,25),
-                                                               age.group.25.40 = c(25,40),
-                                                               age.group.40.50 = c(40,50),
-                                                               cut.off = 7),
+                                                              datalist.agemix = datalist.agemix, 
+                                                              work.dir = work.dir,  
+                                                              dirfasttree = work.dir, 
+                                                              sub.dir.rename = sub.dir.rename,
+                                                              limitTransmEvents = 7,
+                                                              timewindow = c(30,40),
+                                                              seq.cov = 80,
+                                                              age.group.15.25 = c(15,25),
+                                                              age.group.25.40 = c(25,40),
+                                                              age.group.40.50 = c(40,50),
+                                                              cut.off = 7),
                                           error=function(e) return(rep(NA, 90)))
         
         res.clust.MCAR.cov.85 <- tryCatch(age.mixing.MCAR.fun(simpact.trans.net = simpact.trans.net.adv,  
-                                                               datalist.agemix = datalist.agemix, 
-                                                               work.dir = work.dir,  
-                                                               dirfasttree = work.dir, 
-                                                               sub.dir.rename = sub.dir.rename,
-                                                               limitTransmEvents = 7,
-                                                               timewindow = c(30,40),
-                                                               seq.cov = 85,
-                                                               age.group.15.25 = c(15,25),
-                                                               age.group.25.40 = c(25,40),
-                                                               age.group.40.50 = c(40,50),
-                                                               cut.off = 7),
+                                                              datalist.agemix = datalist.agemix, 
+                                                              work.dir = work.dir,  
+                                                              dirfasttree = work.dir, 
+                                                              sub.dir.rename = sub.dir.rename,
+                                                              limitTransmEvents = 7,
+                                                              timewindow = c(30,40),
+                                                              seq.cov = 85,
+                                                              age.group.15.25 = c(15,25),
+                                                              age.group.25.40 = c(25,40),
+                                                              age.group.40.50 = c(40,50),
+                                                              cut.off = 7),
                                           error=function(e) return(rep(NA, 90)))
         
         
         
         
         res.clust.MCAR.cov.90 <- tryCatch(age.mixing.MCAR.fun(simpact.trans.net = simpact.trans.net.adv,  
-                                                               datalist.agemix = datalist.agemix, 
-                                                               work.dir = work.dir,  
-                                                               dirfasttree = work.dir, 
-                                                               sub.dir.rename = sub.dir.rename,
-                                                               limitTransmEvents = 7,
-                                                               timewindow = c(30,40),
-                                                               seq.cov = 90,
-                                                               age.group.15.25 = c(15,25),
-                                                               age.group.25.40 = c(25,40),
-                                                               age.group.40.50 = c(40,50),
-                                                               cut.off = 7),
+                                                              datalist.agemix = datalist.agemix, 
+                                                              work.dir = work.dir,  
+                                                              dirfasttree = work.dir, 
+                                                              sub.dir.rename = sub.dir.rename,
+                                                              limitTransmEvents = 7,
+                                                              timewindow = c(30,40),
+                                                              seq.cov = 90,
+                                                              age.group.15.25 = c(15,25),
+                                                              age.group.25.40 = c(25,40),
+                                                              age.group.40.50 = c(40,50),
+                                                              cut.off = 7),
                                           error=function(e) return(rep(NA, 90)))
         
         res.clust.MCAR.cov.95 <- tryCatch(age.mixing.MCAR.fun(simpact.trans.net = simpact.trans.net.adv,  
-                                                               datalist.agemix = datalist.agemix, 
-                                                               work.dir = work.dir,  
-                                                               dirfasttree = work.dir, 
-                                                               sub.dir.rename = sub.dir.rename,
-                                                               limitTransmEvents = 7,
-                                                               timewindow = c(30,40),
-                                                               seq.cov = 95,
-                                                               age.group.15.25 = c(15,25),
-                                                               age.group.25.40 = c(25,40),
-                                                               age.group.40.50 = c(40,50),
-                                                               cut.off = 7),
+                                                              datalist.agemix = datalist.agemix, 
+                                                              work.dir = work.dir,  
+                                                              dirfasttree = work.dir, 
+                                                              sub.dir.rename = sub.dir.rename,
+                                                              limitTransmEvents = 7,
+                                                              timewindow = c(30,40),
+                                                              seq.cov = 95,
+                                                              age.group.15.25 = c(15,25),
+                                                              age.group.25.40 = c(25,40),
+                                                              age.group.40.50 = c(40,50),
+                                                              cut.off = 7),
                                           error=function(e) return(rep(NA, 90)))
         
         

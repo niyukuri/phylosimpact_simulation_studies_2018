@@ -172,61 +172,119 @@ age.mixing.MCAR.fun <- function(simpact.trans.net = simpact.trans.net.adv,
     # Concurrency point prevalence 6 months before a survey, among men
     
     
-    pp.cp.6months.male.transm <- tryCatch(concurr.pointprev.calculator(datalist = transm.datalist.agemix,
-                                                                       timepoint = 40 - 0.5), error=function(e) return(NA))
+    pp.cp.6months.male.transm <-  concurr.pointprev.calculator(datalist = transm.datalist.agemix,
+                                                               timepoint = 40 - 0.5) %>%
+      dplyr::select(concurr.pointprev) %>%
+      dplyr::slice(1) %>%
+      as.numeric()
+    
+    pp.cp.6months.female.transm <- concurr.pointprev.calculator(datalist = transm.datalist.agemix,
+                                                                timepoint = 40 - 0.5) %>%
+      dplyr::select(concurr.pointprev) %>%
+      dplyr::slice(2) %>%
+      as.numeric()
+    
     
     
     # (iii) Prevalence
     
-    hiv.prev.lt25.women <- prevalence.calculator(datalist = transm.datalist.agemix,
-                                                 agegroup = c(15, 25),
-                                                 timepoint = 40)$pointprevalence[2]
-    hiv.prev.lt25.men <- prevalence.calculator(datalist = transm.datalist.agemix,
+    
+    hiv.prev.lt25.women <-prevalence.calculator(datalist = datalist.agemix,
+                                                agegroup = c(15, 25),
+                                                timepoint = 40) %>%
+      dplyr::select(pointprevalence) %>%
+      dplyr::slice(2) %>%
+      as.numeric()
+    
+    hiv.prev.lt25.men <- prevalence.calculator(datalist = datalist.agemix,
                                                agegroup = c(15, 25),
-                                               timepoint = 40)$pointprevalence[1]
+                                               timepoint = 40) %>%
+      dplyr::select(pointprevalence) %>%
+      dplyr::slice(1) %>%
+      as.numeric()
     
-    hiv.prev.25.40.women <- prevalence.calculator(datalist = transm.datalist.agemix,
+    hiv.prev.25.40.women <- prevalence.calculator(datalist = datalist.agemix,
                                                   agegroup = c(25, 40),
-                                                  timepoint = 40)$pointprevalence[2]
-    hiv.prev.25.40.men <- prevalence.calculator(datalist = transm.datalist.agemix,
-                                                agegroup = c(25, 40),
-                                                timepoint = 40)$pointprevalence[1]
+                                                  timepoint = 40) %>%
+      dplyr::select(pointprevalence) %>%
+      dplyr::slice(2) %>%
+      as.numeric()
     
-    hiv.prev.40.50.women <- prevalence.calculator(datalist = transm.datalist.agemix,
+    hiv.prev.25.40.men <- prevalence.calculator(datalist = datalist.agemix,
+                                                agegroup = c(25, 40),
+                                                timepoint = 40) %>%
+      dplyr::select(pointprevalence) %>%
+      dplyr::slice(1) %>%
+      as.numeric()
+    
+    hiv.prev.40.50.women <- prevalence.calculator(datalist = datalist.agemix,
                                                   agegroup = c(40, 50),
-                                                  timepoint = 40)$pointprevalence[2]
-    hiv.prev.40.50.men <- prevalence.calculator(datalist = transm.datalist.agemix,
+                                                  timepoint = 40) %>%
+      dplyr::select(pointprevalence) %>%
+      dplyr::slice(2) %>%
+      as.numeric()
+    
+    hiv.prev.40.50.men <- prevalence.calculator(datalist = datalist.agemix,
                                                 agegroup = c(40, 50),
-                                                timepoint = 40)$pointprevalence[1]
+                                                timepoint = 40) %>%
+      dplyr::select(pointprevalence) %>%
+      dplyr::slice(1) %>%
+      as.numeric()
     
     
     # (iv) Incidence
+
     
-    incidence.df.15.24 <- incidence.calculator(datalist = transm.datalist.agemix,
-                                               agegroup = c(15, 25), timewindow = c(30, 40))
+    epi.transm.incidence.df.15.24.men <- incidence.calculator(datalist = datalist.agemix,
+                                                              agegroup = c(15, 25),
+                                                              timewindow = c(39, 40),
+                                                              only.active = "No") %>%
+      dplyr::select(incidence) %>%
+      dplyr::slice(1) %>%
+      as.numeric()
     
-    epi.transm.incidence.df.15.24 <- incidence.df.15.24$incidence[3]
+    epi.transm.incidence.df.15.24.women <- incidence.calculator(datalist = datalist.agemix,
+                                                                agegroup = c(15, 25),
+                                                                timewindow = c(39, 40),
+                                                                only.active = "No") %>%
+      dplyr::select(incidence) %>%
+      dplyr::slice(2) %>%
+      as.numeric()
     
-    epi.transm.incidence.df.15.24.men <- incidence.df.15.24$incidence[1]
-    epi.transm.incidence.df.15.24.women <- incidence.df.15.24$incidence[2]
+
     
+    epi.transm.incidence.df.25.39.men <- incidence.calculator(datalist = datalist.agemix,
+                                                              agegroup = c(25, 40),
+                                                              timewindow = c(39, 40),
+                                                              only.active = "No") %>%
+      dplyr::select(incidence) %>%
+      dplyr::slice(1) %>%
+      as.numeric()
     
-    incidence.df.25.39 <- incidence.calculator(datalist = transm.datalist.agemix,
-                                               agegroup = c(25, 40), timewindow = c(30, 40))
+    epi.transm.incidence.df.25.39.women <- incidence.calculator(datalist = datalist.agemix,
+                                                                agegroup = c(25, 40),
+                                                                timewindow = c(39, 40),
+                                                                only.active = "No") %>%
+      dplyr::select(incidence) %>%
+      dplyr::slice(2) %>%
+      as.numeric()
+
     
-    epi.transm.incidence.df.25.39 <- incidence.df.25.39$incidence[3]
+    epi.transm.incidence.df.40.49.men <- incidence.calculator(datalist = datalist.agemix,
+                                                              agegroup = c(40, 50),
+                                                              timewindow = c(39, 40),
+                                                              only.active = "No") %>%
+      dplyr::select(incidence) %>%
+      dplyr::slice(1) %>%
+      as.numeric()
     
-    epi.transm.incidence.df.25.39.men <- incidence.df.25.39$incidence[1]
-    epi.transm.incidence.df.25.39.women <- incidence.df.25.39$incidence[2]
-    
-    
-    incidence.df.40.49 <- incidence.calculator(datalist = transm.datalist.agemix,
-                                               agegroup = c(25, 40), timewindow = c(30, 40))
-    
-    epi.transm.incidence.df.40.49 <- incidence.df.40.49$incidence[3]
-    
-    epi.transm.incidence.df.40.49.men <- incidence.df.40.49$incidence[1] # res
-    epi.transm.incidence.df.40.49.women <- incidence.df.40.49$incidence[2] # res
+    epi.transm.incidence.df.40.49.women <- incidence.calculator(datalist = datalist.agemix,
+                                                                agegroup = c(40, 50),
+                                                                timewindow = c(39, 40),
+                                                                only.active = "No") %>%
+      dplyr::select(incidence) %>%
+      dplyr::slice(2) %>%
+      as.numeric()
     
     
     
@@ -234,7 +292,7 @@ age.mixing.MCAR.fun <- function(simpact.trans.net = simpact.trans.net.adv,
                                     hiv.prev.25.40.women, hiv.prev.25.40.men,
                                     hiv.prev.40.50.women, hiv.prev.40.50.men, 
                                     mix.rels.transm.dat,
-                                    pp.cp.6months.male.transm,
+                                    pp.cp.6months.male.transm, pp.cp.6months.female.transm, 
                                     
                                     epi.transm.incidence.df.15.24.men, epi.transm.incidence.df.15.24.women, 
                                     epi.transm.incidence.df.25.39.men, epi.transm.incidence.df.25.39.women,
@@ -243,7 +301,7 @@ age.mixing.MCAR.fun <- function(simpact.trans.net = simpact.trans.net.adv,
     
     names(summary.epidemic.transm.df) <- c("T.prev.15.25.w", "T.prev.15.25.m", "T.prev.25.40.w", "T.prev.25.40.m", "T.prev.40.50.w", "T.prev.40.50.m",
                                            names(mix.rels.transm.dat), 
-                                           "T.p.prev.6months.m",
+                                           "T.p.prev.6months.m", "T.p.prev.6months.f",
                                            "T.inc.15.25.w", "T.inc.15.25.m", "T.inc.25.40.w", "T.inc.25.40.m", "T.inc.40.50.w", "T.inc.40.50.m")
     
     

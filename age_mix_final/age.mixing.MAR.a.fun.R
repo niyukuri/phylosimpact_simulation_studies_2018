@@ -4,24 +4,26 @@
 # seq.gender.ratio = 0.7
 
 age.mixing.MAR.a.fun <- function(simpact.trans.net = simpact.trans.net.adv, 
-                               datalist.agemix = datalist.agemix,
-                               work.dir = work.dir,  
-                               dirfasttree = dirfasttree, 
-                               sub.dir.rename = sub.dir.rename,
-                               limitTransmEvents = 7,
-                               timewindow = c(30,40),
-                               seq.cov = 35,
-                               age.group.15.25 = c(15,25),
-                               age.group.25.40 = c(25,40),
-                               age.group.40.50 = c(40,50),
-                               cut.off = 7){
+                                 datalist.agemix = datalist.agemix,
+                                 work.dir = work.dir,  
+                                 dirfasttree = dirfasttree, 
+                                 sub.dir.rename = sub.dir.rename,
+                                 limitTransmEvents = 7,
+                                 timewindow = c(30,40),
+                                 seq.cov = 35,
+                                 age.group.15.25 = c(15,25),
+                                 age.group.25.40 = c(25,40),
+                                 age.group.40.50 = c(40,50),
+                                 cut.off = 7){
   
   
   
   
   # source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
   
-  source("/home/dniyukuri/lustre/agemix.25.10.2018.2/needed.functions.RSimpactHelp.R")
+  
+  source("/home/dniyukuri/lustre/age.mixing.large.AD/needed.functions.RSimpactHelp.R")
+  
   
   #################################################################################
   # Step 5: Epidemic statistics and sexual behaviour: data set of infected people #
@@ -44,17 +46,17 @@ age.mixing.MAR.a.fun <- function(simpact.trans.net = simpact.trans.net.adv,
                                  seq.cov = 100, 
                                  age.limit = age.group.40.50[2])
   
-  mCAr.IDs <- IDs.Seq.Age.Groups(simpact.trans.net = simpact.trans.net,
-                                 limitTransmEvents = limitTransmEvents, 
-                                 timewindow = timewindow, 
-                                 seq.cov = seq.cov,
-                                 seq.gender.ratio = 0.7, 
-                                 age.group.15.25 = age.group.15.25,
-                                 age.group.25.40 = age.group.25.40, 
-                                 age.group.40.50 = age.group.40.50)
+  mAr.IDs <- IDs.Seq.Age.Groups(simpact.trans.net = simpact.trans.net,
+                                limitTransmEvents = limitTransmEvents, 
+                                timewindow = timewindow, 
+                                seq.cov = seq.cov,
+                                seq.gender.ratio = 0.7, 
+                                age.group.15.25 = age.group.15.25,
+                                age.group.25.40 = age.group.25.40, 
+                                age.group.40.50 = age.group.40.50)
   
   
-  if(length(mCAr.IDs) >= 20){
+  if(length(mAr.IDs) >= 20){
     
     
     simpact.trans.net.adv <- simpact.trans.net
@@ -91,7 +93,7 @@ age.mixing.MAR.a.fun <- function(simpact.trans.net = simpact.trans.net.adv,
     table.simpact.trans.net.adv <- infecttable # rbindlist(simpact.trans.net.adv)
     
     
-    Study.DataTable <- dplyr::filter(table.simpact.trans.net.adv, table.simpact.trans.net.adv$id.lab%in%mCAr.IDs) 
+    Study.DataTable <- dplyr::filter(table.simpact.trans.net.adv, table.simpact.trans.net.adv$id.lab%in%mAr.IDs) 
     
     
     IDs.study <- Study.DataTable$RecId
@@ -100,7 +102,7 @@ age.mixing.MAR.a.fun <- function(simpact.trans.net = simpact.trans.net.adv,
     transm.datalist.agemix <- datalist.agemix # assign full data set new age mix data set
     
     # Transmission table of selected individuals
-    table.simpact.trans.net.cov <- dplyr::filter(table.simpact.trans.net.adv, table.simpact.trans.net.adv$id.lab%in%mCAr.IDs)
+    table.simpact.trans.net.cov <- dplyr::filter(table.simpact.trans.net.adv, table.simpact.trans.net.adv$id.lab%in%mAr.IDs)
     
     table.simpact.trans.net.cov.100 <- dplyr::filter(table.simpact.trans.net.adv, table.simpact.trans.net.adv$id.lab%in%mCAr.IDs.100)
     
@@ -119,7 +121,7 @@ age.mixing.MAR.a.fun <- function(simpact.trans.net = simpact.trans.net.adv,
     agemix.model <- pattern.modeller(dataframe = agemix.rels.transm.df,
                                      agegroup = c(15, 50),
                                      timepoint = 40, # transm.datalist.agemix$itable$population.simtime[1],
-                                     timewindow = 10)#1)#3)
+                                     timewindow = 1)#1)#3)
     # 
     # # men.lme <- tryCatch(agemixing.lme.fitter(data = dplyr::filter(agemix.model[[1]], Gender =="male")),
     # #                     error = agemixing.lme.errFunction) # Returns an empty list if the lme model can't be fitted
@@ -174,61 +176,119 @@ age.mixing.MAR.a.fun <- function(simpact.trans.net = simpact.trans.net.adv,
     # Concurrency point prevalence 6 months before a survey, among men
     
     
-    pp.cp.6months.male.transm <- tryCatch(concurr.pointprev.calculator(datalist = transm.datalist.agemix,
-                                                                       timepoint = 40 - 0.5), error=function(e) return(NA))
+    pp.cp.6months.male.transm <-  concurr.pointprev.calculator(datalist = transm.datalist.agemix,
+                                                               timepoint = 40 - 0.5) %>%
+      dplyr::select(concurr.pointprev) %>%
+      dplyr::slice(1) %>%
+      as.numeric()
+    
+    pp.cp.6months.female.transm <- concurr.pointprev.calculator(datalist = transm.datalist.agemix,
+                                                                timepoint = 40 - 0.5) %>%
+      dplyr::select(concurr.pointprev) %>%
+      dplyr::slice(2) %>%
+      as.numeric()
+    
     
     
     # (iii) Prevalence
     
-    hiv.prev.lt25.women <- prevalence.calculator(datalist = transm.datalist.agemix,
-                                                 agegroup = c(15, 25),
-                                                 timepoint = 40)$pointprevalence[2]
-    hiv.prev.lt25.men <- prevalence.calculator(datalist = transm.datalist.agemix,
+    
+    hiv.prev.lt25.women <-prevalence.calculator(datalist = datalist.agemix,
+                                                agegroup = c(15, 25),
+                                                timepoint = 40) %>%
+      dplyr::select(pointprevalence) %>%
+      dplyr::slice(2) %>%
+      as.numeric()
+    
+    hiv.prev.lt25.men <- prevalence.calculator(datalist = datalist.agemix,
                                                agegroup = c(15, 25),
-                                               timepoint = 40)$pointprevalence[1]
+                                               timepoint = 40) %>%
+      dplyr::select(pointprevalence) %>%
+      dplyr::slice(1) %>%
+      as.numeric()
     
-    hiv.prev.25.40.women <- prevalence.calculator(datalist = transm.datalist.agemix,
+    hiv.prev.25.40.women <- prevalence.calculator(datalist = datalist.agemix,
                                                   agegroup = c(25, 40),
-                                                  timepoint = 40)$pointprevalence[2]
-    hiv.prev.25.40.men <- prevalence.calculator(datalist = transm.datalist.agemix,
-                                                agegroup = c(25, 40),
-                                                timepoint = 40)$pointprevalence[1]
+                                                  timepoint = 40) %>%
+      dplyr::select(pointprevalence) %>%
+      dplyr::slice(2) %>%
+      as.numeric()
     
-    hiv.prev.40.50.women <- prevalence.calculator(datalist = transm.datalist.agemix,
+    hiv.prev.25.40.men <- prevalence.calculator(datalist = datalist.agemix,
+                                                agegroup = c(25, 40),
+                                                timepoint = 40) %>%
+      dplyr::select(pointprevalence) %>%
+      dplyr::slice(1) %>%
+      as.numeric()
+    
+    hiv.prev.40.50.women <- prevalence.calculator(datalist = datalist.agemix,
                                                   agegroup = c(40, 50),
-                                                  timepoint = 40)$pointprevalence[2]
-    hiv.prev.40.50.men <- prevalence.calculator(datalist = transm.datalist.agemix,
+                                                  timepoint = 40) %>%
+      dplyr::select(pointprevalence) %>%
+      dplyr::slice(2) %>%
+      as.numeric()
+    
+    hiv.prev.40.50.men <- prevalence.calculator(datalist = datalist.agemix,
                                                 agegroup = c(40, 50),
-                                                timepoint = 40)$pointprevalence[1]
+                                                timepoint = 40) %>%
+      dplyr::select(pointprevalence) %>%
+      dplyr::slice(1) %>%
+      as.numeric()
     
     
     # (iv) Incidence
     
-    incidence.df.15.24 <- incidence.calculator(datalist = transm.datalist.agemix,
-                                               agegroup = c(15, 25), timewindow = c(30, 40))
     
-    epi.transm.incidence.df.15.24 <- incidence.df.15.24$incidence[3]
+    epi.transm.incidence.df.15.24.men <- incidence.calculator(datalist = datalist.agemix,
+                                                              agegroup = c(15, 25),
+                                                              timewindow = c(39, 40),
+                                                              only.active = "No") %>%
+      dplyr::select(incidence) %>%
+      dplyr::slice(1) %>%
+      as.numeric()
     
-    epi.transm.incidence.df.15.24.men <- incidence.df.15.24$incidence[1]
-    epi.transm.incidence.df.15.24.women <- incidence.df.15.24$incidence[2]
+    epi.transm.incidence.df.15.24.women <- incidence.calculator(datalist = datalist.agemix,
+                                                                agegroup = c(15, 25),
+                                                                timewindow = c(39, 40),
+                                                                only.active = "No") %>%
+      dplyr::select(incidence) %>%
+      dplyr::slice(2) %>%
+      as.numeric()
     
     
-    incidence.df.25.39 <- incidence.calculator(datalist = transm.datalist.agemix,
-                                               agegroup = c(25, 40), timewindow = c(30, 40))
     
-    epi.transm.incidence.df.25.39 <- incidence.df.25.39$incidence[3]
+    epi.transm.incidence.df.25.39.men <- incidence.calculator(datalist = datalist.agemix,
+                                                              agegroup = c(25, 40),
+                                                              timewindow = c(39, 40),
+                                                              only.active = "No") %>%
+      dplyr::select(incidence) %>%
+      dplyr::slice(1) %>%
+      as.numeric()
     
-    epi.transm.incidence.df.25.39.men <- incidence.df.25.39$incidence[1]
-    epi.transm.incidence.df.25.39.women <- incidence.df.25.39$incidence[2]
+    epi.transm.incidence.df.25.39.women <- incidence.calculator(datalist = datalist.agemix,
+                                                                agegroup = c(25, 40),
+                                                                timewindow = c(39, 40),
+                                                                only.active = "No") %>%
+      dplyr::select(incidence) %>%
+      dplyr::slice(2) %>%
+      as.numeric()
     
     
-    incidence.df.40.49 <- incidence.calculator(datalist = transm.datalist.agemix,
-                                               agegroup = c(25, 40), timewindow = c(30, 40))
+    epi.transm.incidence.df.40.49.men <- incidence.calculator(datalist = datalist.agemix,
+                                                              agegroup = c(40, 50),
+                                                              timewindow = c(39, 40),
+                                                              only.active = "No") %>%
+      dplyr::select(incidence) %>%
+      dplyr::slice(1) %>%
+      as.numeric()
     
-    epi.transm.incidence.df.40.49 <- incidence.df.40.49$incidence[3]
-    
-    epi.transm.incidence.df.40.49.men <- incidence.df.40.49$incidence[1] # res
-    epi.transm.incidence.df.40.49.women <- incidence.df.40.49$incidence[2] # res
+    epi.transm.incidence.df.40.49.women <- incidence.calculator(datalist = datalist.agemix,
+                                                                agegroup = c(40, 50),
+                                                                timewindow = c(39, 40),
+                                                                only.active = "No") %>%
+      dplyr::select(incidence) %>%
+      dplyr::slice(2) %>%
+      as.numeric()
     
     
     
@@ -236,7 +296,7 @@ age.mixing.MAR.a.fun <- function(simpact.trans.net = simpact.trans.net.adv,
                                     hiv.prev.25.40.women, hiv.prev.25.40.men,
                                     hiv.prev.40.50.women, hiv.prev.40.50.men, 
                                     mix.rels.transm.dat,
-                                    pp.cp.6months.male.transm,
+                                    pp.cp.6months.male.transm, pp.cp.6months.female.transm, 
                                     
                                     epi.transm.incidence.df.15.24.men, epi.transm.incidence.df.15.24.women, 
                                     epi.transm.incidence.df.25.39.men, epi.transm.incidence.df.25.39.women,
@@ -245,7 +305,7 @@ age.mixing.MAR.a.fun <- function(simpact.trans.net = simpact.trans.net.adv,
     
     names(summary.epidemic.transm.df) <- c("T.prev.15.25.w", "T.prev.15.25.m", "T.prev.25.40.w", "T.prev.25.40.m", "T.prev.40.50.w", "T.prev.40.50.m",
                                            names(mix.rels.transm.dat), 
-                                           "T.p.prev.6months.m",
+                                           "T.p.prev.6months.m", "T.p.prev.6months.f",
                                            "T.inc.15.25.w", "T.inc.15.25.m", "T.inc.25.40.w", "T.inc.25.40.m", "T.inc.40.50.w", "T.inc.40.50.m")
     
     
@@ -264,25 +324,25 @@ age.mixing.MAR.a.fun <- function(simpact.trans.net = simpact.trans.net.adv,
     
     
     choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.fas"),
-                        select.vec = mCAr.IDs,
-                        name.file = paste0(sub.dir.rename,"/",paste0("cov.",seq.cov, ".mCAr.IDs.C.Epidemic.Fasta")))
+                        select.vec = mAr.IDs,
+                        name.file = paste0(sub.dir.rename,"/",paste0("cov.",seq.cov, ".mAr.IDs.C.Epidemic.Fasta")))
     
     
     # Build and calibrate the phylogenetic tree
     ############################################
     
-    mCAr.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
-                                                          sub.dir.rename = sub.dir.rename,
-                                                          fasttree.tool = "FastTree",
-                                                          calendar.dates = "samplingtimes.all.csv",
-                                                          simseqfile = paste0("cov.",seq.cov, ".mCAr.IDs.C.Epidemic.Fasta"),
-                                                          count.start = 1977,
-                                                          endsim = 40,
-                                                          clust = FALSE)
+    mAr.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
+                                                         sub.dir.rename = sub.dir.rename,
+                                                         fasttree.tool = "FastTreeMP",
+                                                         calendar.dates = "samplingtimes.all.csv",
+                                                         simseqfile = paste0("cov.",seq.cov, ".mAr.IDs.C.Epidemic.Fasta"),
+                                                         count.start = 1977,
+                                                         endsim = 40,
+                                                         clust = TRUE)
     
     
     
-    N <- node.age(mCAr.IDs.tree.calib)
+    N <- node.age(mAr.IDs.tree.calib)
     
     # Time to MRCA: internal nodes ages
     
@@ -292,13 +352,13 @@ age.mixing.MAR.a.fun <- function(simpact.trans.net = simpact.trans.net.adv,
     latest.samp <- N$timeToMRCA+N$timeOfMRCA # latest sampling date
     
     
-    mrca.v <- mrca(mCAr.IDs.tree.calib, full = FALSE) # MRCA ids
+    mrca.v <- mrca(mAr.IDs.tree.calib, full = FALSE) # MRCA ids
     
     
     sampling.dates <- read.csv(paste0(sub.dir.rename,"/samplingtimes.all.csv")) # sampling times
     
     # 
-    # tree.cal.cov.35.IDs <- read.tree(paste0(sub.dir.rename, paste0("/calibrated.tree.cov.",seq.cov, ".mCAr.IDs.C.Epidemic.Fasta.tree")))
+    # tree.cal.cov.35.IDs <- read.tree(paste0(sub.dir.rename, paste0("/calibrated.tree.cov.",seq.cov, ".mAr.IDs.C.Epidemic.Fasta.tree")))
     # 
     
     
@@ -307,11 +367,11 @@ age.mixing.MAR.a.fun <- function(simpact.trans.net = simpact.trans.net.adv,
     
     # run ClusterPicker
     
-    system(paste("java -jar ", paste(paste0(work.dir,"/ClusterPicker_1.2.3.jar"), paste0(sub.dir.rename,"/", paste0("cov.",seq.cov, ".mCAr.IDs.C.Epidemic.Fasta")), paste0(sub.dir.rename,"/",paste0("cov.",seq.cov, ".mCAr.IDs.C.Epidemic.Fasta.nwk")),  paste0("0.9 0.9 0.045 2 gap"))))
+    system(paste("java -jar ", paste(paste0(work.dir,"/ClusterPicker_1.2.3.jar"), paste0(sub.dir.rename,"/", paste0("cov.",seq.cov, ".mAr.IDs.C.Epidemic.Fasta")), paste0(sub.dir.rename,"/",paste0("cov.",seq.cov, ".mAr.IDs.C.Epidemic.Fasta.nwk")),  paste0("0.9 0.9 0.045 2 gap"))))
     
     # Read clusters' files
     
-    dd <- list.files(path = paste0(sub.dir.rename), pattern = paste0(paste0("cov.",seq.cov, ".mCAr.IDs.C.Epidemic.Fasta"),"_",paste0("cov.",seq.cov, ".mCAr.IDs.C.Epidemic.Fasta"),"_","clusterPicks_cluste"),
+    dd <- list.files(path = paste0(sub.dir.rename), pattern = paste0(paste0("cov.",seq.cov, ".mAr.IDs.C.Epidemic.Fasta"),"_",paste0("cov.",seq.cov, ".mAr.IDs.C.Epidemic.Fasta"),"_","clusterPicks_cluste"),
                      all.files = FALSE,
                      full.names = FALSE, recursive = FALSE)
     
@@ -359,7 +419,7 @@ age.mixing.MAR.a.fun <- function(simpact.trans.net = simpact.trans.net.adv,
     
     ## Aligning internal nodes IDs and their age: !they must get same length
     
-    ancestor <- Ancestors(mCAr.IDs.tree.calib) # ancestors of each tips and internal node
+    ancestor <- Ancestors(mAr.IDs.tree.calib) # ancestors of each tips and internal node
     # All ancestors output are internal nodes
     
     ancestor.v <- vector()
