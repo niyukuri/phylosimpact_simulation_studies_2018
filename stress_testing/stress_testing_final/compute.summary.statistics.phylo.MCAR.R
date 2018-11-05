@@ -1,48 +1,27 @@
 
 
-
-
 compute.summary.statistics.phylo.MCAR <- function(simpact.trans.net = simpact.trans.net,
-                                             work.dir = work.dir,
-                                             sub.dir.rename = sub.dir.rename,
-                                             dirfasttree = work.dir,
-                                             limitTransmEvents = 7,
-                                             seq.cov = 100,
-                                             age.group.15.25 = c(15,25),
-                                             age.group.25.40 = c(25,40),
-                                             age.group.40.50 = c(40,50),
-                                             endpoint = 40,
-                                             timewindow = c(30,40)){
+                                                 work.dir = work.dir,
+                                                 sub.dir.rename = sub.dir.rename,
+                                                 dirfasttree = work.dir,
+                                                 limitTransmEvents = 7,
+                                                 seq.cov = 100,
+                                                 age.group.15.25 = c(15,25),
+                                                 age.group.25.40 = c(25,40),
+                                                 age.group.40.50 = c(40,50),
+                                                 endpoint = 40,
+                                                 timewindow = c(30,40)){
   
   
   
   source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
   
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/age.groups.filtered.trans.clust.network.fun.R")
+  
   
   work.dir <- paste0(work.dir)
   
   dirseqgen <- work.dir
-  
-  seeds.num <- floor(runif(1, min=0, max=1000))
-  
-  # Sequence simulation is done for at least a transmission network with 6 individuals
-  # This means that limitTransmEvents equal at least 7
-  
-  sequence.simulation.seqgen.par(dir.seq = dirseqgen,
-                                 sub.dir.rename = sub.dir.rename,
-                                 simpact.trans.net = simpact.trans.net,
-                                 seq.gen.tool = "seq-gen",
-                                 seeds.num = seeds.num,
-                                 endpoint = 40,
-                                 limitTransmEvents = 7, # no less than 7
-                                 hiv.seq.file = "hiv.seq.C.pol.j.fasta",
-                                 clust = FALSE) # hiv.seq.file lodged in work.dir
-  
-  # Transform the sequence format to be handled by ClusterPicker
-  sequ.dna <- read.dna(file = paste0(sub.dir.rename,"/C.Epidemic_seed.seq.bis.sim.nwk.fasta"), format = "interleaved")
-  write.dna(sequ.dna, file = paste0(sub.dir.rename,"/C.Epidemic.fas") , format = "fasta")
-  
-  
   
   
   # Function for linear mixed effect models in transmission clusters
@@ -156,52 +135,52 @@ compute.summary.statistics.phylo.MCAR <- function(simpact.trans.net = simpact.tr
     clust.table.df <- as.data.frame(do.call(rbind, transmission.clust.list)) # data.table & data.frame
     
     if(nrow(clust.table.df) >= length(d)){
-    
-    het.fit.lme.agemixing <- lme(age ~ gender, data = clust.table.df, random = ~ 1|clust.id,
-                                 weights = varIdent( c("1" = 0.5), ~ 1 |gender))
-    
-    
-    het.a <- coef(summary(het.fit.lme.agemixing))[1] # average age in transmission clusters
-    
-    het.beta <- coef(summary(het.fit.lme.agemixing))[2] # average age difference in transmission clusters: 
-    # seen as bridge width which shows potential cross-generation transmission
-    
-    
-    het.b1 <- as.numeric(VarCorr(het.fit.lme.agemixing)[3]) # between cluster variation
-    
-    het.b2 <- as.numeric(VarCorr(het.fit.lme.agemixing)[4]) # within cluster variation
-    
-    
-    # SD for the two strata
-    
-    unique.val.strat <- unique(attributes(het.fit.lme.agemixing$modelStruct$varStruct)$weights)
-    
-    het.fit.lme.agemixing$modelStruct$varStruct
-    
-    # reference group: female == 1
-    delta.female <- 1
-    
-    female.val <- unique.val.strat[1]
-    male.val <- unique.val.strat[2]
-    
-    delta.male <- female.val/male.val # delta_ref_group / val
-    
-    SD.female <- as.numeric(VarCorr(het.fit.lme.agemixing)[4])
-    SD.male <- delta.male * SD.female 
-    
-    
-    clust.lme.val <- c(het.a, het.beta, het.b1, het.b2, SD.female, SD.male)
-    
-    
-    Num.Clus <- length(d)
-    
-    av.Clust.size <- sum(clust.size)/length(d)
-    
-    ouptuvector.clust <- c(clust.lme.val, Num.Clus, av.Clust.size)
-    
-    names(ouptuvector.clust) <- c("clust.av.age.male", "clust.gendEffect", "clust.between.transm.var", "clust.within.transm.var", "clust.SD.female", "clust.SD.male", "Num.Clusters", "av.Clust.Size")
-    
-    
+      
+      het.fit.lme.agemixing <- lme(age ~ gender, data = clust.table.df, random = ~ 1|clust.id,
+                                   weights = varIdent( c("1" = 0.5), ~ 1 |gender))
+      
+      
+      het.a <- coef(summary(het.fit.lme.agemixing))[1] # average age in transmission clusters
+      
+      het.beta <- coef(summary(het.fit.lme.agemixing))[2] # average age difference in transmission clusters: 
+      # seen as bridge width which shows potential cross-generation transmission
+      
+      
+      het.b1 <- as.numeric(VarCorr(het.fit.lme.agemixing)[3]) # between cluster variation
+      
+      het.b2 <- as.numeric(VarCorr(het.fit.lme.agemixing)[4]) # within cluster variation
+      
+      
+      # SD for the two strata
+      
+      unique.val.strat <- unique(attributes(het.fit.lme.agemixing$modelStruct$varStruct)$weights)
+      
+      het.fit.lme.agemixing$modelStruct$varStruct
+      
+      # reference group: female == 1
+      delta.female <- 1
+      
+      female.val <- unique.val.strat[1]
+      male.val <- unique.val.strat[2]
+      
+      delta.male <- female.val/male.val # delta_ref_group / val
+      
+      SD.female <- as.numeric(VarCorr(het.fit.lme.agemixing)[4])
+      SD.male <- delta.male * SD.female 
+      
+      
+      clust.lme.val <- c(het.a, het.beta, het.b1, het.b2, SD.female, SD.male)
+      
+      
+      Num.Clus <- length(d)
+      
+      av.Clust.size <- sum(clust.size)/length(d)
+      
+      ouptuvector.clust <- c(clust.lme.val, Num.Clus, av.Clust.size)
+      
+      names(ouptuvector.clust) <- c("clust.av.age.male", "clust.gendEffect", "clust.between.transm.var", "clust.within.transm.var", "clust.SD.female", "clust.SD.male", "Num.Clusters", "av.Clust.Size")
+      
+      
     }else{
       
       ouptuvector.clust <- c(clust.lme.val, Num.Clus, av.Clust.size)
@@ -222,7 +201,8 @@ compute.summary.statistics.phylo.MCAR <- function(simpact.trans.net = simpact.tr
   
   
   
-  mCAr.IDs <- IDs.Seq.Random(simpact.trans.net = simpact.trans.net,
+
+  mAr.IDs <- IDs.Seq.Random(simpact.trans.net = simpact.trans.net,
                              limitTransmEvents = limitTransmEvents,
                              timewindow = timewindow,
                              seq.cov = seq.cov,
@@ -234,35 +214,35 @@ compute.summary.statistics.phylo.MCAR <- function(simpact.trans.net = simpact.tr
   
   
   
-  if(length(mCAr.IDs)>5){
+  if(length(mAr.IDs)>5){
     
     
     choose.sequence.ind(pool.seq.file = paste0(sub.dir.rename,"/C.Epidemic.fas"),
-                        select.vec = mCAr.IDs,
-                        name.file = paste0(sub.dir.rename,"/",paste0("cov.",seq.cov, ".mCAr.IDs.C.Epidemic.Fasta")))
+                        select.vec = mAr.IDs,
+                        name.file = paste0(sub.dir.rename,"/",paste0("cov.",seq.cov, ".mAr.IDs.C.Epidemic.Fasta")))
     
     
-    mCAr.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
+    mAr.IDs.tree.calib <- phylogenetic.tree.fasttree.par(dir.tree = dirfasttree,
                                                           sub.dir.rename = sub.dir.rename,
                                                           fasttree.tool = "FastTree",
                                                           calendar.dates = "samplingtimes.all.csv",
-                                                          simseqfile = paste0("cov.",seq.cov, ".mCAr.IDs.C.Epidemic.Fasta"),
+                                                          simseqfile = paste0("cov.",seq.cov, ".mAr.IDs.C.Epidemic.Fasta"),
                                                           count.start = 1977,
                                                           endsim = endpoint,
                                                           clust = FALSE)
     
     
-    tree.cal.cov.35.IDs <- read.tree(paste0(sub.dir.rename, paste0("/calibrated.tree.cov.",seq.cov, ".mCAr.IDs.C.Epidemic.Fasta.tree")))
+    tree.cal.cov.35.IDs <- read.tree(paste0(sub.dir.rename, paste0("/calibrated.tree.cov.",seq.cov, ".mAr.IDs.C.Epidemic.Fasta.tree")))
     
     
     
     # run ClusterPicker
     
-    system(paste("java -jar ", paste(paste0(work.dir,"/ClusterPicker_1.2.3.jar"), paste0(sub.dir.rename,"/", paste0("cov.",seq.cov, ".mCAr.IDs.C.Epidemic.Fasta")), paste0(sub.dir.rename,"/",paste0("cov.",seq.cov, ".mCAr.IDs.C.Epidemic.Fasta.nwk")),  paste0("0.9 0.9 0.045 2 gap"))))
+    system(paste("java -jar ", paste(paste0(work.dir,"/ClusterPicker_1.2.3.jar"), paste0(sub.dir.rename,"/", paste0("cov.",seq.cov, ".mAr.IDs.C.Epidemic.Fasta")), paste0(sub.dir.rename,"/",paste0("cov.",seq.cov, ".mAr.IDs.C.Epidemic.Fasta.nwk")),  paste0("0.9 0.9 0.045 2 gap"))))
     
     # Read clusters' files
     
-    dd <- list.files(path = paste0(sub.dir.rename), pattern = paste0(paste0("cov.",seq.cov, ".mCAr.IDs.C.Epidemic.Fasta"),"_",paste0("cov.",seq.cov, ".mCAr.IDs.C.Epidemic.Fasta"),"_","clusterPicks_cluste"),
+    dd <- list.files(path = paste0(sub.dir.rename), pattern = paste0(paste0("cov.",seq.cov, ".mAr.IDs.C.Epidemic.Fasta"),"_",paste0("cov.",seq.cov, ".mAr.IDs.C.Epidemic.Fasta"),"_","clusterPicks_cluste"),
                      all.files = FALSE,
                      full.names = FALSE, recursive = FALSE)
     
@@ -270,6 +250,123 @@ compute.summary.statistics.phylo.MCAR <- function(simpact.trans.net = simpact.tr
     clust.fit.params <- mixed.effect.fit.transmission.clusters(clust.names=dd, 
                                                                simpact.trans.net = simpact.trans.net,
                                                                limitTransmEvents = limitTransmEvents)
+    
+    
+    # From age mix study BEGIN
+    
+    # Function to handle NAs
+    
+    
+    NA.handle.fun <- function(input=input){
+      
+      v.names <- names(input)
+      
+      v <- as.numeric(input)
+      
+      v.vec <- vector()
+      
+      for(i in 1:length(v)){
+        
+        v.i <- v[i]
+        
+        if(is.na(v.i)==TRUE){
+          v.j <- 0
+        }else{
+          v.j <- v.i
+        }
+        v.vec <- c(v.vec, v.j)
+      }
+      
+      names(v.vec) <- v.names
+      return(v.vec)
+    }
+    
+    # 1. Age structure table obtained from transmission network built from transmission clusters
+    
+    age.structure.transm.clust.List <- age.groups.filtered.trans.clust.network.fun(table.transm.clust.net.igraph = table.transm.clust.net.igraph,
+                                                                                   transm.matrix = transm.matrix,
+                                                                                   age.group.15.25 = c(15,25),
+                                                                                   age.group.25.40 = c(25,40),
+                                                                                   age.group.40.50 = c(40,50))
+    age.structure.transm.clust <- age.structure.transm.clust.List$Age.groups.table
+    
+    cl.age.str.M.15.25.F.15.25 <- age.structure.transm.clust[1,][1]
+    cl.age.str.M.25.40.F.15.25 <- age.structure.transm.clust[2,][1]
+    cl.age.str.M.40.50.F.15.25 <- age.structure.transm.clust[3,][1]
+    
+    cl.age.str.M.15.25.F.25.40 <- age.structure.transm.clust[1,][2]
+    cl.age.str.M.25.40.F.25.40 <- age.structure.transm.clust[2,][2]
+    cl.age.str.M.40.50.F.25.40 <- age.structure.transm.clust[3,][2]
+    
+    cl.age.str.M.15.25.F.40.50 <- age.structure.transm.clust[1,][3]
+    cl.age.str.M.25.40.F.40.50 <- age.structure.transm.clust[2,][3]
+    cl.age.str.M.40.50.F.40.50 <- age.structure.transm.clust[3,][3]
+    
+    table.cl.age.str <- c(cl.age.str.M.15.25.F.15.25, cl.age.str.M.25.40.F.15.25, cl.age.str.M.40.50.F.15.25,
+                          cl.age.str.M.15.25.F.25.40, cl.age.str.M.25.40.F.25.40, cl.age.str.M.40.50.F.25.40,
+                          cl.age.str.M.15.25.F.40.50, cl.age.str.M.25.40.F.40.50, cl.age.str.M.40.50.F.40.50)
+    
+    names(table.cl.age.str) <- c("cl.M.15.25.F.15.25", "cl.M.25.40.F.15.25", "cl.M.40.50.F.15.25",
+                                 "cl.M.15.25.F.25.40", "cl.M.25.40.F.25.40", "cl.M.40.50.F.25.40",
+                                 "cl.M.15.25.F.40.50", "cl.M.25.40.F.40.50", "cl.M.40.50.F.40.50")
+    
+    
+    # Men prop
+    
+    age.structure.transm.clust.prop.men <- age.structure.transm.clust.List$prop.men.age.groups.table
+    
+    cl.age.str.prop.men.15.25.F.15.25 <- age.structure.transm.clust.prop.men[1,][1]
+    cl.age.str.prop.men.25.40.F.15.25 <- age.structure.transm.clust.prop.men[2,][1]
+    cl.age.str.prop.men.40.50.F.15.25 <- age.structure.transm.clust.prop.men[3,][1]
+    
+    cl.age.str.prop.men.15.25.F.25.40 <- age.structure.transm.clust.prop.men[1,][2]
+    cl.age.str.prop.men.25.40.F.25.40 <- age.structure.transm.clust.prop.men[2,][2]
+    cl.age.str.prop.men.40.50.F.25.40 <- age.structure.transm.clust.prop.men[3,][2]
+    
+    cl.age.str.prop.men.15.25.F.40.50 <- age.structure.transm.clust.prop.men[1,][3]
+    cl.age.str.prop.men.25.40.F.40.50 <- age.structure.transm.clust.prop.men[2,][3]
+    cl.age.str.prop.men.40.50.F.40.50 <- age.structure.transm.clust.prop.men[3,][3]
+    
+    table.cl.age.str.prop.men <- c(cl.age.str.prop.men.15.25.F.15.25, cl.age.str.prop.men.25.40.F.15.25, cl.age.str.prop.men.40.50.F.15.25,
+                                   cl.age.str.prop.men.15.25.F.25.40, cl.age.str.prop.men.25.40.F.25.40, cl.age.str.prop.men.40.50.F.25.40,
+                                   cl.age.str.prop.men.15.25.F.40.50, cl.age.str.prop.men.25.40.F.40.50, cl.age.str.prop.men.40.50.F.40.50)
+    
+    names(table.cl.age.str.prop.men) <- c("cl.prop.men15.25.F.15.25", "cl.prop.men25.40.F.15.25", "cl.prop.men40.50.F.15.25",
+                                          "cl.prop.men15.25.F.25.40", "cl.prop.men25.40.F.25.40", "cl.prop.men40.50.F.25.40",
+                                          "cl.prop.men15.25.F.40.50", "cl.prop.men25.40.F.40.50", "cl.prop.men40.50.F.40.50")
+    
+    table.cl.age.str.prop.men <- NA.handle.fun(input = table.cl.age.str.prop.men)
+    
+    
+    # Women prop
+    
+    age.structure.transm.clust.prop.women <- age.structure.transm.clust.List$prop.women.age.groups.table
+    
+    cl.age.str.prop.women.15.25.M.15.25 <- age.structure.transm.clust.prop.women[1,][1]
+    cl.age.str.prop.women.25.40.M.15.25 <- age.structure.transm.clust.prop.women[2,][1]
+    cl.age.str.prop.women.40.50.M.15.25 <- age.structure.transm.clust.prop.women[3,][1]
+    
+    cl.age.str.prop.women.15.25.M.25.40 <- age.structure.transm.clust.prop.women[1,][2]
+    cl.age.str.prop.women.25.40.M.25.40 <- age.structure.transm.clust.prop.women[2,][2]
+    cl.age.str.prop.women.40.50.M.25.40 <- age.structure.transm.clust.prop.women[3,][2]
+    
+    cl.age.str.prop.women.15.25.M.40.50 <- age.structure.transm.clust.prop.women[1,][3]
+    cl.age.str.prop.women.25.40.M.40.50 <- age.structure.transm.clust.prop.women[2,][3]
+    cl.age.str.prop.women.40.50.M.40.50 <- age.structure.transm.clust.prop.women[3,][3]
+    
+    table.cl.age.str.prop.women <- c(cl.age.str.prop.women.15.25.M.15.25, cl.age.str.prop.women.25.40.M.15.25, cl.age.str.prop.women.40.50.M.15.25,
+                                     cl.age.str.prop.women.15.25.M.25.40, cl.age.str.prop.women.25.40.M.25.40, cl.age.str.prop.women.40.50.M.25.40,
+                                     cl.age.str.prop.women.15.25.M.40.50, cl.age.str.prop.women.25.40.M.40.50, cl.age.str.prop.women.40.50.M.40.50)
+    
+    names(table.cl.age.str.prop.women) <- c("cl.prop.women15.25.M.15.25", "cl.prop.women25.40.M.15.25", "cl.prop.women40.50.M.15.25",
+                                            "cl.prop.women15.25.M.25.40", "cl.prop.women25.40.M.25.40", "cl.prop.women40.50.M.25.40",
+                                            "cl.prop.women15.25.M.40.50", "cl.prop.women25.40.M.40.50", "cl.prop.women40.50.M.40.50")
+    
+    table.cl.age.str.prop.women <- NA.handle.fun(input = table.cl.age.str.prop.women)
+    
+    
+    
+    # From age mix study END
     
     
     # library(phytools)
@@ -324,23 +421,40 @@ compute.summary.statistics.phylo.MCAR <- function(simpact.trans.net = simpact.tr
     # lb.mean.feature, lb.median.feature, ub.mean.feature, ub.median.feature,
     # median.mean.feature, median.median.feature)
     
-    features.names <- c("meanHeight.feature", "colless.feature", "sackin.feature", "mean.tipsDepths.feature", "mean.nodesDepths.feature",
-                        "maxHeight.feature")
+    features.names <- c("meanHeight", "colless", "sackin", "mean.tipsDepths", "mean.nodesDepths",
+                        "maxHeight")
     # , "LTT.lb.mean.feature", "LTT.lb.median.feature", "LTT.ub.mean.feature", "LTT.ub.median.feature",
     #                     "LTT.median.mean.feature", "LTT.median.median.feature")
     
     names(phylo.features.summary) <- features.names
     
-    clust.phylo.fit.params <- c(clust.fit.params, phylo.features.summary)
+    
+    clust.phylo.fit.params <- c(clust.fit.params, phylo.features.summary,
+                                table.cl.age.str.prop.men, table.cl.age.str.prop.women)
+    
     
   }else{
     
-    clust.phylo.fit.params <- rep(NA, 14)
+    clust.phylo.fit.params <- rep(NA, 32)
     
-    names(clust.phylo.fit.params) <- c("clust.av.age.male", "clust.gendEffect", "clust.between.transm.var", "clust.within.transm.var", 
-                                       "clust.SD.female", "clust.SD.male", "Num.Clusters", "av.Clust.Size",
-                                       "meanHeight.feature", "colless.feature", "sackin.feature", "mean.tipsDepths.feature", 
-                                       "mean.nodesDepths.feature", "maxHeight.feature")
+    names(clust.phylo.fit.params) <- c("clust.av.age.male", "clust.gendEffect", "clust.between.transm.var", 
+                                       "clust.within.transm.var", "clust.SD.female", "clust.SD.male", 
+                                       "Num.Clusters", "av.Clust.Size",
+                                       
+                                       "meanHeight", "colless", "sackin", "mean.tipsDepths", 
+                                       "mean.nodesDepths", "maxHeight",
+                                       
+                                       "cl.prop.men15.25.F.15.25", "cl.prop.men25.40.F.15.25", "cl.prop.men40.50.F.15.25",
+                                       "cl.prop.men15.25.F.25.40", "cl.prop.men25.40.F.25.40", "cl.prop.men40.50.F.25.40",
+                                       "cl.prop.men15.25.F.40.50", "cl.prop.men25.40.F.40.50", "cl.prop.men40.50.F.40.50",
+                                       
+                                       "cl.prop.women15.25.M.15.25", "cl.prop.women25.40.M.15.25", "cl.prop.women40.50.M.15.25",
+                                       "cl.prop.women15.25.M.25.40", "cl.prop.women25.40.M.25.40", "cl.prop.women40.50.M.25.40",
+                                       "cl.prop.women15.25.M.40.50", "cl.prop.women25.40.M.40.50", "cl.prop.women40.50.M.40.50")
+    
+    
+    
+    
   }
   
   return(clust.phylo.fit.params)

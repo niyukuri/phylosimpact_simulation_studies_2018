@@ -1,7 +1,5 @@
 
 
-
-
 compute.summary.statistics.phylo.MAR <- function(simpact.trans.net = simpact.trans.net,
                                                  work.dir = work.dir,
                                                  sub.dir.rename = sub.dir.rename,
@@ -21,30 +19,11 @@ compute.summary.statistics.phylo.MAR <- function(simpact.trans.net = simpact.tra
   
   source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/age.groups.filtered.trans.clust.network.fun.R")
   
+  
   work.dir <- paste0(work.dir)
   
   dirseqgen <- work.dir
-  
-  seeds.num <- floor(runif(1, min=0, max=1000))
-  
-  # Sequence simulation is done for at least a transmission network with 6 individuals
-  # This means that limitTransmEvents equal at least 7
-  
-  sequence.simulation.seqgen.par(dir.seq = dirseqgen,
-                                 sub.dir.rename = sub.dir.rename,
-                                 simpact.trans.net = simpact.trans.net,
-                                 seq.gen.tool = "seq-gen",
-                                 seeds.num = seeds.num,
-                                 endpoint = 40,
-                                 limitTransmEvents = 7, # no less than 7
-                                 hiv.seq.file = "hiv.seq.C.pol.j.fasta",
-                                 clust = FALSE) # hiv.seq.file lodged in work.dir
-  
-  # Transform the sequence format to be handled by ClusterPicker
-  sequ.dna <- read.dna(file = paste0(sub.dir.rename,"/C.Epidemic_seed.seq.bis.sim.nwk.fasta"), format = "interleaved")
-  write.dna(sequ.dna, file = paste0(sub.dir.rename,"/C.Epidemic.fas") , format = "fasta")
-  
-  
+
   
   
   # Function for linear mixed effect models in transmission clusters
@@ -277,70 +256,35 @@ compute.summary.statistics.phylo.MAR <- function(simpact.trans.net = simpact.tra
                                                                limitTransmEvents = limitTransmEvents)
     
     
-    # library(phytools)
+    # From age mix study BEGIN
     
-    # tree.cal <- read.tree(paste0(sub.dir.rename, "/calibrated.tree.nwk"))
-    
-    tree.cal <- tree.cal.cov.35.IDs # read.tree(paste0(tree.topo))
+    # Function to handle NAs
     
     
-    # Mean height of internal nodes
+    NA.handle.fun <- function(input=input){
+      
+      v.names <- names(input)
+      
+      v <- as.numeric(input)
+      
+      v.vec <- vector()
+      
+      for(i in 1:length(v)){
+        
+        v.i <- v[i]
+        
+        if(is.na(v.i)==TRUE){
+          v.j <- 0
+        }else{
+          v.j <- v.i
+        }
+        v.vec <- c(v.vec, v.j)
+      }
+      
+      names(v.vec) <- v.names
+      return(v.vec)
+    }
     
-    H <- nodeHeights(tree.cal) # similar to node.depth.edgelength(tree)
-    
-    # It's clear from a casual inspection of the matrix that each parent node height (in the right column) 
-    # is represented twice and only twice. Thus, if we exclude the root node (zero height), 
-    # we can just take the mean of H[,1].
-    
-    mean.feature <- mean(sort(H[,1])[3:nrow(H)]) # important
-    
-    # library(phyloTop)
-    
-    colless.feature <- colless.phylo(tree.cal, normalise = TRUE)
-    
-    sackin.feature <- sackin.phylo(tree.cal, normalise = TRUE)
-    
-    
-    Depths <- getDepths(tree.cal) # depth of tips and nodes
-    
-    mean.tipsDepths.feature <- mean(Depths$tipDepths)
-    
-    mean.nodesDepths.feature <- mean(Depths$nodeDepths)
-    
-    maxHeight.feature <- maxHeight(tree.cal, normalise = TRUE)
-    
-    # # Estimating confidence intervals for rates and dates using a parametric bootstrap
-    # pb <- parboot.treedater(tree.calib.LTT) # Lineage Through Time
-    # 
-    # # Lineages through time
-    # LTT <- plot.parboot.ltt.dat(pb)
-    # 
-    # lb.mean.feature <- mean(LTT$lb) # mean of low values of LTT
-    # lb.median.feature <- median(LTT$lb) # median of low values of LTT
-    # 
-    # ub.mean.feature <- mean(LTT$ub) # mean of upper values of LTT
-    # ub.median.feature <- median(LTT$ub) # median of upper values of LTT
-    # 
-    # median.mean.feature <- mean(LTT$median) # mean of medians of values of LTT
-    # median.median.feature <- median(LTT$median) # median of medians of values of LTT
-    
-    phylo.features.summary <- c(mean.feature, colless.feature, sackin.feature, mean.tipsDepths.feature, mean.nodesDepths.feature,
-                                maxHeight.feature)
-    # lb.mean.feature, lb.median.feature, ub.mean.feature, ub.median.feature,
-    # median.mean.feature, median.median.feature)
-    
-    features.names <- c("meanHeight.feature", "colless.feature", "sackin.feature", "mean.tipsDepths.feature", "mean.nodesDepths.feature",
-                        "maxHeight.feature")
-    # , "LTT.lb.mean.feature", "LTT.lb.median.feature", "LTT.ub.mean.feature", "LTT.ub.median.feature",
-    #                     "LTT.median.mean.feature", "LTT.median.median.feature")
-    
-    names(phylo.features.summary) <- features.names
-    
-    clust.phylo.fit.params <- c(clust.fit.params, phylo.features.summary)
-    
-    
-    
-    ### Transmission clusters statistics
     # 1. Age structure table obtained from transmission network built from transmission clusters
     
     age.structure.transm.clust.List <- age.groups.filtered.trans.clust.network.fun(table.transm.clust.net.igraph = table.transm.clust.net.igraph,
@@ -426,17 +370,95 @@ compute.summary.statistics.phylo.MAR <- function(simpact.trans.net = simpact.tra
     
     
     
+    # From age mix study END
     
+    
+    # library(phytools)
+    
+    # tree.cal <- read.tree(paste0(sub.dir.rename, "/calibrated.tree.nwk"))
+    
+    tree.cal <- tree.cal.cov.35.IDs # read.tree(paste0(tree.topo))
+    
+    
+    # Mean height of internal nodes
+    
+    H <- nodeHeights(tree.cal) # similar to node.depth.edgelength(tree)
+    
+    # It's clear from a casual inspection of the matrix that each parent node height (in the right column) 
+    # is represented twice and only twice. Thus, if we exclude the root node (zero height), 
+    # we can just take the mean of H[,1].
+    
+    mean.feature <- mean(sort(H[,1])[3:nrow(H)]) # important
+    
+    # library(phyloTop)
+    
+    colless.feature <- colless.phylo(tree.cal, normalise = TRUE)
+    
+    sackin.feature <- sackin.phylo(tree.cal, normalise = TRUE)
+    
+    
+    Depths <- getDepths(tree.cal) # depth of tips and nodes
+    
+    mean.tipsDepths.feature <- mean(Depths$tipDepths)
+    
+    mean.nodesDepths.feature <- mean(Depths$nodeDepths)
+    
+    maxHeight.feature <- maxHeight(tree.cal, normalise = TRUE)
+    
+    # # Estimating confidence intervals for rates and dates using a parametric bootstrap
+    # pb <- parboot.treedater(tree.calib.LTT) # Lineage Through Time
+    # 
+    # # Lineages through time
+    # LTT <- plot.parboot.ltt.dat(pb)
+    # 
+    # lb.mean.feature <- mean(LTT$lb) # mean of low values of LTT
+    # lb.median.feature <- median(LTT$lb) # median of low values of LTT
+    # 
+    # ub.mean.feature <- mean(LTT$ub) # mean of upper values of LTT
+    # ub.median.feature <- median(LTT$ub) # median of upper values of LTT
+    # 
+    # median.mean.feature <- mean(LTT$median) # mean of medians of values of LTT
+    # median.median.feature <- median(LTT$median) # median of medians of values of LTT
+    
+    phylo.features.summary <- c(mean.feature, colless.feature, sackin.feature, mean.tipsDepths.feature, mean.nodesDepths.feature,
+                                maxHeight.feature)
+    # lb.mean.feature, lb.median.feature, ub.mean.feature, ub.median.feature,
+    # median.mean.feature, median.median.feature)
+    
+    features.names <- c("meanHeight", "colless", "sackin", "mean.tipsDepths", "mean.nodesDepths",
+                        "maxHeight")
+    # , "LTT.lb.mean.feature", "LTT.lb.median.feature", "LTT.ub.mean.feature", "LTT.ub.median.feature",
+    #                     "LTT.median.mean.feature", "LTT.median.median.feature")
+    
+    names(phylo.features.summary) <- features.names
+    
+    
+    clust.phylo.fit.params <- c(clust.fit.params, phylo.features.summary,
+                                table.cl.age.str.prop.men, table.cl.age.str.prop.women)
     
     
   }else{
     
-    clust.phylo.fit.params <- rep(NA, 14)
+    clust.phylo.fit.params <- rep(NA, 32)
     
-    names(clust.phylo.fit.params) <- c("clust.av.age.male", "clust.gendEffect", "clust.between.transm.var", "clust.within.transm.var", 
-                                       "clust.SD.female", "clust.SD.male", "Num.Clusters", "av.Clust.Size",
-                                       "meanHeight.feature", "colless.feature", "sackin.feature", "mean.tipsDepths.feature", 
-                                       "mean.nodesDepths.feature", "maxHeight.feature")
+    names(clust.phylo.fit.params) <- c("clust.av.age.male", "clust.gendEffect", "clust.between.transm.var", 
+                                       "clust.within.transm.var", "clust.SD.female", "clust.SD.male", 
+                                       "Num.Clusters", "av.Clust.Size",
+                                       
+                                       "meanHeight", "colless", "sackin", "mean.tipsDepths", 
+                                       "mean.nodesDepths", "maxHeight",
+                                       
+                                       "cl.prop.men15.25.F.15.25", "cl.prop.men25.40.F.15.25", "cl.prop.men40.50.F.15.25",
+                                       "cl.prop.men15.25.F.25.40", "cl.prop.men25.40.F.25.40", "cl.prop.men40.50.F.25.40",
+                                       "cl.prop.men15.25.F.40.50", "cl.prop.men25.40.F.40.50", "cl.prop.men40.50.F.40.50",
+                                       
+                                       "cl.prop.women15.25.M.15.25", "cl.prop.women25.40.M.15.25", "cl.prop.women40.50.M.15.25",
+                                       "cl.prop.women15.25.M.25.40", "cl.prop.women25.40.M.25.40", "cl.prop.women40.50.M.25.40",
+                                       "cl.prop.women15.25.M.40.50", "cl.prop.women25.40.M.40.50", "cl.prop.women40.50.M.40.50")
+    
+    
+    
+    
   }
   
   return(clust.phylo.fit.params)

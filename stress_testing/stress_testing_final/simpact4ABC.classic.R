@@ -264,27 +264,7 @@ simpact4ABC.classic <- function(inputvector){
                                                                           endpoint = 40,
                                                                           timewindow = c(30,40)),
                                        error=function(e) return(rep(NA, 28)))
-      #                                   error = err.functionGEN)
-      
-      #  error=function(e) return(rep(NA, 36))
-      
-      # 
-      # summary.stat.phylo <- compute.summary.statistics.phylo(simpact.trans.net = simpact.trans.net,
-      #                                                        work.dir = work.dir,
-      #                                                        sub.dir.rename = ABC_DestDir.classic,
-      #                                                        dirfasttree = work.dir,
-      #                                                        limitTransmEvents = 7,
-      #                                                        seq.cov = 100,
-      #                                                        age.group.15.25 = c(15,25),
-      #                                                        age.group.25.40 = c(25,40),
-      #                                                        age.group.40.50 = c(40,50),
-      #                                                        endpoint = 40,
-      #                                                        timewindow = c(30,40))
-      
-      
-      # relsperpersonperyear <- nrow(datalist$rtable) / (nrow(datalist$ptable)/2) / cfg$population.simtime
-      # agegapsd <- sd(datalist$rtable$AgeGap)
-      # outputvector <- c(relsperpersonperyear, agegapsd)
+
       
       
       outputvector <- summary.stat.classic
