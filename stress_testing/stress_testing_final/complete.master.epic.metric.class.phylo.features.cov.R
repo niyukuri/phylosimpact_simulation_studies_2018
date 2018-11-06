@@ -20,7 +20,7 @@ pacman::p_load(snow, parallel, RSimpactCyan, RSimpactHelper, ape, Rsamtools)
 
 
 
-inputvector <- c(123, -0.52, -0.05, 2, 10, 5, 0.25, -0.3, -0.1,
+inputvector <- c(1000, -0.52, -0.05, 2, 10, 5, 0.25, -0.3, -0.1,
                  -1, -90, 0.5, 0.05, -0.14, 5, 7, 12, -1.7) 
 
 
@@ -30,9 +30,9 @@ complete.master.epic.metric.class.phylo.features.cov <- function(inputvector){
   
   source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
   
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/MCAR.compute.classic.phylo.features.cov.R")
-  
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/MAR.compute.classic.phylo.features.cov.R")
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/MCAR.compute.classic.phylo.features.cov.R")
+  # 
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/MAR.compute.classic.phylo.features.cov.R")
   
   source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
   
@@ -47,34 +47,41 @@ complete.master.epic.metric.class.phylo.features.cov <- function(inputvector){
   
   
   
+  setwd(paste0(work.dir))
   
-  # library(EasyABC)
+  
   library(RSimpactCyan)
   library(RSimpactHelper)
   library(Rcpp)
-  # library(ape)
-  # library(expoTree)
+  library(ape)
+  library(expoTree)
   library(data.table)
   library(readr)
-  # library(phangorn)
+  library(phangorn)
   library(lme4)
   library(nlme)
-  library(minque) # with lmer
   library(dplyr)
-  # library(adephylo)
-  # library(treedater)
-  # library(geiger)
-  # library(picante)
+  library(adephylo)
+  library(treedater)
+  library(geiger)
+  library(picante)
   library(igraph)
-  # library(phyloTop)
-  # library(phytools)
-  # library(Rsamtools) # select IDs sequences in a file
-  library(robustbase) # colMedians
-  
-  
-  library(mgcv)
-  library(phytools)
   library(phyloTop)
+  library(phytools)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
   
   
   
@@ -85,12 +92,12 @@ complete.master.epic.metric.class.phylo.features.cov <- function(inputvector){
   age.distr <- agedistr.creator(shape = 5, scale = 65)
   #
   cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
-                                   population.simtime = 50, 
-                                   population.nummen = 2000, 
-                                   population.numwomen = 2000,
+                                   population.simtime = 40, 
+                                   population.nummen = 5000, 
+                                   population.numwomen = 5000,
                                    hivseed.time = 10, 
                                    hivseed.type = "amount",
-                                   hivseed.amount = 20, 
+                                   hivseed.amount = 40, 
                                    hivseed.age.min = 20,
                                    hivseed.age.max = 50,
                                    formation.hazard.agegapry.meanage = -0.025,
@@ -261,14 +268,15 @@ complete.master.epic.metric.class.phylo.features.cov <- function(inputvector){
     return(sub.dir.sim.id)
   }
   
+  
+  
   sub.dir.rename <- paste0(work.dir,"/temp/",generate.filename(10))
   
   
   
-  #######################
-  # Step 1: Run Simpact #
-  #######################
   
+  # Running Simpact 
+  #################
   
   results <- tryCatch(simpact.run(configParams = cfg.list,
                                   destDir = sub.dir.rename,
@@ -276,6 +284,7 @@ complete.master.epic.metric.class.phylo.features.cov <- function(inputvector){
                                   seed = seedid,
                                   intervention = intervention),
                       error = simpact.errFunction)
+  
   
   
   
@@ -289,8 +298,10 @@ complete.master.epic.metric.class.phylo.features.cov <- function(inputvector){
   ###########################################
   
   
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
   
-  simpact.trans.net <- transmission.network.builder(datalist = datalist.agemix, endpoint = 40)
+  
+  simpact.trans.net <- advanced.transmission.network.builder(datalist = datalist.agemix, endpoint = 40)
   
   # simpact.trans.net.projection <- transmission.network.builder(datalist = datalist.agemix, endpoint = 45)
   
@@ -325,6 +336,8 @@ complete.master.epic.metric.class.phylo.features.cov <- function(inputvector){
   ### I. Compute transmission network characteristics #
   #####################################################
   
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
   
   epidemic.metrics <- complete.master.epic.metrics(datalist = datalist.agemix)
   
@@ -333,18 +346,10 @@ complete.master.epic.metric.class.phylo.features.cov <- function(inputvector){
   ### II. Compute classic features #
   ################################## ??? change arguments
   
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
   epi.behav.stats <- compute.summary.statistics.classic(datalist = datalist.agemix,
-                                                        simpact.trans.net = simpact.trans.net,
-                                                        work.dir = work.dir,
-                                                        sub.dir.rename = sub.dir.rename,
-                                                        dirfasttree = work.dir,
-                                                        limitTransmEvents = 7,
-                                                        seq.cov = 100,
-                                                        age.group.15.25 = c(15,25),
-                                                        age.group.25.40 = c(25,40),
-                                                        age.group.40.50 = c(40,50),
-                                                        endpoint = 40,
-                                                        timewindow = c(30,40))
+                                                        timewindow = c(10, 40))
   
   
   #########################################################################
@@ -353,64 +358,852 @@ complete.master.epic.metric.class.phylo.features.cov <- function(inputvector){
   
   
   # MCAR
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+
   
-  MCAR.cov.35 <- compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
-                                                       work.dir = work.dir,
-                                                       sub.dir.rename = sub.dir.rename,
-                                                       dirfasttree = work.dir,
-                                                       limitTransmEvents = 7,
-                                                       seq.cov = 100,
-                                                       seq.gender.ratio = 0.7,
-                                                       age.group.15.25 = c(15,25),
-                                                       age.group.25.40 = c(25,40),
-                                                       age.group.40.50 = c(40,50),
-                                                       endpoint = 40,
-                                                       timewindow = c(30,40))
+  MCAR.cov.35 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 35,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                          error=function(e) return(rep(NA, 37)))
+  
+  MCAR.cov.40 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 40,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                          error=function(e) return(rep(NA, 37)))
+  
+  MCAR.cov.45 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 45,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                          error=function(e) return(rep(NA, 37)))
+  
+  MCAR.cov.50 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 50,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                          error=function(e) return(rep(NA, 37)))
+  
+  MCAR.cov.55 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 55,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                          error=function(e) return(rep(NA, 37)))
+  
+  MCAR.cov.60 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 60,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                          error=function(e) return(rep(NA, 37)))
+  
+  MCAR.cov.65 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 65,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                          error=function(e) return(rep(NA, 37)))
+  
+  MCAR.cov.70 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 70,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                          error=function(e) return(rep(NA, 37)))
+  
+  MCAR.cov.75 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 75,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                          error=function(e) return(rep(NA, 37)))
+  
+  MCAR.cov.80 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 80,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                          error=function(e) return(rep(NA, 37)))
+  
+  MCAR.cov.85 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 85,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                          error=function(e) return(rep(NA, 37)))
+  
+  MCAR.cov.90 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 90,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                          error=function(e) return(rep(NA, 37)))
+  
+  
+  MCAR.cov.95 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 95,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                          error=function(e) return(rep(NA, 37)))
+  
+  
+  
   
   
   # MAR
-  # a. 
-  MAR.a.cov.35 <- compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
-                                                       work.dir = work.dir,
-                                                       sub.dir.rename = sub.dir.rename,
-                                                       dirfasttree = work.dir,
-                                                       limitTransmEvents = 7,
-                                                       seq.cov = 100,
-                                                       seq.gender.ratio = 0.7,
-                                                       age.group.15.25 = c(15,25),
-                                                       age.group.25.40 = c(25,40),
-                                                       age.group.40.50 = c(40,50),
-                                                       endpoint = 40,
-                                                       timewindow = c(30,40))
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
+  
+  # a. 0.7
+  MAR.a.cov.35 <- tryCatch(compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 35,
+                                                                seq.gender.ratio = 0.7,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                           error=function(e) return(rep(NA, 37)))
   
   
-  # b. 
-  MAR.b.cov.35 <- compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
-                                                       work.dir = work.dir,
-                                                       sub.dir.rename = sub.dir.rename,
-                                                       dirfasttree = work.dir,
-                                                       limitTransmEvents = 7,
-                                                       seq.cov = 100,
-                                                       seq.gender.ratio = 0.3,
-                                                       age.group.15.25 = c(15,25),
-                                                       age.group.25.40 = c(25,40),
-                                                       age.group.40.50 = c(40,50),
-                                                       endpoint = 40,
-                                                       timewindow = c(30,40))
+  MAR.a.cov.40 <- tryCatch(compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 40,
+                                                                seq.gender.ratio = 0.7,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                           error=function(e) return(rep(NA, 37)))
   
-  # c. 
-  MAR.c.cov.35 <- compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
-                                                       work.dir = work.dir,
-                                                       sub.dir.rename = sub.dir.rename,
-                                                       dirfasttree = work.dir,
-                                                       limitTransmEvents = 7,
-                                                       seq.cov = 100,
-                                                       seq.gender.ratio = 0.5,
-                                                       age.group.15.25 = c(15,25),
-                                                       age.group.25.40 = c(25,40),
-                                                       age.group.40.50 = c(40,50),
-                                                       endpoint = 40,
-                                                       timewindow = c(30,40))
+  MAR.a.cov.45 <- tryCatch(compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 45,
+                                                                seq.gender.ratio = 0.7,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                           error=function(e) return(rep(NA, 37)))
+  
+  MAR.a.cov.50 <- tryCatch(compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 50,
+                                                                seq.gender.ratio = 0.7,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                           error=function(e) return(rep(NA, 37)))
+  
+  MAR.a.cov.55 <- tryCatch(compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 55,
+                                                                seq.gender.ratio = 0.7,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                           error=function(e) return(rep(NA, 37)))
+  
+  
+  MAR.a.cov.60 <- tryCatch(compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 60,
+                                                                seq.gender.ratio = 0.7,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                           error=function(e) return(rep(NA, 37)))
+  
+  
+  MAR.a.cov.65 <- tryCatch(compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 65,
+                                                                seq.gender.ratio = 0.7,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                           error=function(e) return(rep(NA, 37)))
+  
+  
+  
+  MAR.a.cov.70 <- tryCatch(compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 70,
+                                                                seq.gender.ratio = 0.7,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                           error=function(e) return(rep(NA, 37)))
+  
+  MAR.a.cov.75 <- tryCatch(compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 75,
+                                                                seq.gender.ratio = 0.7,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                           error=function(e) return(rep(NA, 37)))
+  
+  
+  MAR.a.cov.80 <- tryCatch(compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 80,
+                                                                seq.gender.ratio = 0.7,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                           error=function(e) return(rep(NA, 37)))
+  
+  MAR.a.cov.85 <- tryCatch(compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 85,
+                                                                seq.gender.ratio = 0.7,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                           error=function(e) return(rep(NA, 37)))
+  
+  
+  MAR.a.cov.90 <- tryCatch(compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 90,
+                                                                seq.gender.ratio = 0.7,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                           error=function(e) return(rep(NA, 37)))
+  
+  
+  MAR.a.cov.95 <- tryCatch(compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 95,
+                                                                seq.gender.ratio = 0.7,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                           error=function(e) return(rep(NA, 37)))
+  
+  
+  
+  # b.  0.3
+  MAR.b.cov.35 <- tryCatch(compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 35,
+                                                                seq.gender.ratio = 0.3,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                           error=function(e) return(rep(NA, 37)))
+  
+  
+  MAR.b.cov.40 <- tryCatch(compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 40,
+                                                                seq.gender.ratio = 0.3,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                           error=function(e) return(rep(NA, 37)))
+  
+  MAR.b.cov.45 <- tryCatch(compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 45,
+                                                                seq.gender.ratio = 0.3,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                           error=function(e) return(rep(NA, 37)))
+  
+  MAR.b.cov.50 <- tryCatch(compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 50,
+                                                                seq.gender.ratio = 0.3,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                           error=function(e) return(rep(NA, 37)))
+  
+  MAR.b.cov.55 <- tryCatch(compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 55,
+                                                                seq.gender.ratio = 0.3,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                           error=function(e) return(rep(NA, 37)))
+  
+  MAR.b.cov.60 <- tryCatch(compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 60,
+                                                                seq.gender.ratio = 0.3,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                           error=function(e) return(rep(NA, 37)))
+  
+  MAR.b.cov.65 <- tryCatch(compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 65,
+                                                                seq.gender.ratio = 0.3,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                           error=function(e) return(rep(NA, 37)))
+  MAR.b.cov.70 <- tryCatch(compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 70,
+                                                                seq.gender.ratio = 0.3,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                           error=function(e) return(rep(NA, 37)))
+  
+  MAR.b.cov.75 <- tryCatch(compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 75,
+                                                                seq.gender.ratio = 0.3,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                           error=function(e) return(rep(NA, 37)))
+  
+  MAR.b.cov.80 <- tryCatch(compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 80,
+                                                                seq.gender.ratio = 0.3,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                           error=function(e) return(rep(NA, 37)))
+  
+  MAR.b.cov.85 <- tryCatch(compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 85,
+                                                                seq.gender.ratio = 0.3,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                           error=function(e) return(rep(NA, 37)))
+  
+  MAR.b.cov.90 <- tryCatch(compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 90,
+                                                                seq.gender.ratio = 0.3,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                           error=function(e) return(rep(NA, 37)))
+  
+  MAR.b.cov.95 <- tryCatch(compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 95,
+                                                                seq.gender.ratio = 0.3,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                           error=function(e) return(rep(NA, 37)))
+  
+  
+  # c. 0.5
+
+  MAR.c.cov.35 <- tryCatch(compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 35,
+                                                                seq.gender.ratio = 0.5,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                           error=function(e) return(rep(NA, 37)))
+  
+  
+  MAR.c.cov.40 <- tryCatch(compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 40,
+                                                                seq.gender.ratio = 0.5,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                           error=function(e) return(rep(NA, 37)))
+  
+  MAR.c.cov.45 <- tryCatch(compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 45,
+                                                                seq.gender.ratio = 0.5,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                           error=function(e) return(rep(NA, 37)))
+  
+  MAR.c.cov.50 <- tryCatch(compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 50,
+                                                                seq.gender.ratio = 0.5,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                           error=function(e) return(rep(NA, 37)))
+  
+  MAR.c.cov.55 <- tryCatch(compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 55,
+                                                                seq.gender.ratio = 0.5,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                           error=function(e) return(rep(NA, 37)))
+  
+  MAR.c.cov.60 <- tryCatch(compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 60,
+                                                                seq.gender.ratio = 0.5,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                           error=function(e) return(rep(NA, 37)))
+  
+  MAR.c.cov.65 <- tryCatch(compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 65,
+                                                                seq.gender.ratio = 0.5,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                           error=function(e) return(rep(NA, 37)))
+  
+  MAR.c.cov.70 <- tryCatch(compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 70,
+                                                                seq.gender.ratio = 0.5,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                           error=function(e) return(rep(NA, 37)))
+  
+  MAR.c.cov.75 <- tryCatch(compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 75,
+                                                                seq.gender.ratio = 0.5,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                           error=function(e) return(rep(NA, 37)))
+  
+  MAR.c.cov.80 <- tryCatch(compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 80,
+                                                                seq.gender.ratio = 0.5,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                           error=function(e) return(rep(NA, 37)))
+  
+  MAR.c.cov.85 <- tryCatch(compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 85,
+                                                                seq.gender.ratio = 0.5,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                           error=function(e) return(rep(NA, 37)))
+  
+  MAR.c.cov.90 <- tryCatch(compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 90,
+                                                                seq.gender.ratio = 0.5,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                           error=function(e) return(rep(NA, 37)))
+  
+  MAR.c.cov.95 <- tryCatch(compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
+                                                                datalist.agemix = datalist.agemix,
+                                                                work.dir = work.dir,
+                                                                sub.dir.rename = sub.dir.rename,
+                                                                dirfasttree = work.dir,
+                                                                limitTransmEvents = 7,
+                                                                seq.cov = 95,
+                                                                seq.gender.ratio = 0.5,
+                                                                age.group.15.25 = c(15,25),
+                                                                age.group.25.40 = c(25,40),
+                                                                age.group.40.50 = c(40,50),
+                                                                endpoint = 40,
+                                                                timewindow = c(30,40),
+                                                                cut.off = 7),
+                           error=function(e) return(rep(NA, 37)))
+  
   
   
   MCAR.All <- c(MCAR.cov.35, MCAR.cov.40, MCAR.cov.45, MCAR.cov.50, MCAR.cov.55, MCAR.cov.60, MCAR.cov.65, MCAR.cov.70, 
@@ -428,15 +1221,15 @@ complete.master.epic.metric.class.phylo.features.cov <- function(inputvector){
   
   # Values
   
-  outputvector <- c(epi.Metrics, MCAR.All, MAR.a.All, MAR.b.All, MAR.c.All)
+  outputvector <- c(epidemic.metrics, epi.behav.stats, MCAR.All, MAR.a.All, MAR.b.All, MAR.c.All)
   
   outputvector.values <- as.numeric(outputvector)
   
   
   # Names
   
-  name.epi.Metrics <- names(epi.Metrics)
-  
+  name.epi.metrics <- names(epidemic.metrics)
+  name.epi.behav.stats <- names(epi.behav.stats)
   
   name.MCAR.35 <- paste0("MCAR.35.", names(MCAR.cov.35))
   name.MCAR.40 <- paste0("MCAR.40.", names(MCAR.cov.40))
@@ -519,22 +1312,29 @@ complete.master.epic.metric.class.phylo.features.cov <- function(inputvector){
                           name.MAR.c.75, name.MAR.c.80, name.MAR.c.85,
                           name.MAR.c.90, name.MAR.c.95)
   
-  outputvector.names <- c(name.epi.Metrics, name.MCAR.scenari, name.MAR.a.scenari, name.MAR.b.scenari, name.MAR.c.scenari)
+  outputvector.names <- c(name.epi.metrics, name.epi.behav.stats, name.MCAR.scenari, name.MAR.a.scenari, name.MAR.b.scenari, name.MAR.c.scenari)
+  
+  
   
   
   names(outputvector.values) <- outputvector.names
-  
-  
-  outputvector.full <- outputvector.values
+
   
   unlink(paste0(sub.dir.rename), recursive = TRUE)
   
-  return(outputvector.full)
+  
+  
+  return(outputvector.values)
   
 }
 
+
+
+
 # 
-# x <- complete.master.epic.metric.class.phylo.features.cov(inputvector = inputvector)
+# 
+
+x <- complete.master.epic.metric.class.phylo.features.cov(inputvector = inputvector)
 
 
 inputvector <- c(-0.52, -0.05, 2, 0, 2, 0.25, -0.3, -0.1,
