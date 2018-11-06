@@ -3,88 +3,14 @@
 
 
 compute.summary.statistics.classic <- function(datalist = datalist.agemix,
-                                               simpact.trans.net = simpact.trans.net,
-                                               work.dir = work.dir,
-                                               sub.dir.rename = sub.dir.rename,
-                                               dirfasttree = work.dir,
-                                               limitTransmEvents = 7,
-                                               seq.cov = 100,
-                                               age.group.15.25 = c(15,25),
-                                               age.group.25.40 = c(25,40),
-                                               age.group.40.50 = c(40,50),
-                                               endpoint = 40,
-                                               timewindow = c(30,40)){
+                                               timewindow = c(30, 40)){
+  
+  
   
   source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
   
   
-  work.dir <- paste0(work.dir)
-  
-  
   datalist.agemix <- datalist
-  
-  
-  # New datalist for relationships
-  
-  
-  age.limit = age.group.40.50[2]
-  
-  
-  datalist.new <- datalist
-  
-  
-  person.datalist.new <- datalist.new$ptable
-  
-  perc.100 <- nrow(person.datalist.new)
-  
-  person.TOB.datalist.new <- person.datalist.new
-  
-  person.TOB.datalist.new$AgeDeath <- abs(person.TOB.datalist.new$TOB) + person.TOB.datalist.new$TOD
-  
-  person.TOB.datalist.new$AgEndpoint <- abs(person.TOB.datalist.new$TOB) + endpoint
-  
-  person.TOB.datalist.new$AgeLowWindow <- abs(person.TOB.datalist.new$TOB) + timewindow[1]
-  
-  person.TOB.datalist.new$AgeUppWindow <- abs(person.TOB.datalist.new$TOB) + timewindow[2]
-  
-  
-  men.women.datalist.new.df.alive <- dplyr::filter(person.TOB.datalist.new, 
-                                                   person.TOB.datalist.new$AgeDeath=="Inf" & person.TOB.datalist.new$AgeLowWindow >= age.group.15.25[1] & person.TOB.datalist.new$AgeUppWindow < age.group.40.50[2])
-  
-  men.women.datalist.new.df.died <- dplyr::filter(person.TOB.datalist.new, 
-                                                  person.TOB.datalist.new$AgeDeath!="Inf" & person.TOB.datalist.new$AgeDeath >= age.group.15.25[1] & person.TOB.datalist.new$AgeDeath < age.group.40.50[2])
-  
-  
-  men.women.datalist.new.df <- rbind(men.women.datalist.new.df.alive, men.women.datalist.new.df.died)
-  
-  
-  perc.100.limit.window <- nrow(men.women.datalist.new.df)
-  
-  
-  perc.seq.coverage <- round(perc.100.limit.window*seq.cov/100) # total number of wanted individuals at seq.cov sequence coverage
-  
-  
-  samp.IDs <- sample(men.women.datalist.new.df$ID, perc.seq.coverage)
-  
-  
-  
-  
-  
-  # Persons' table of selected individuals within the time winedow
-  
-  pers.datalist.selected <- dplyr::filter(person.datalist.new, person.datalist.new$ID%in%samp.IDs)
-  
-  
-  # Data list of infected individuals within the time window
-  
-  datalist.selec <- datalist
-  
-  datalist.selec$ptable <- pers.datalist.selected
-  
-  
-  # Using new datalist for next steps
-  
-  datalist.agemix <- datalist.selec
   
   
   ########################################
@@ -103,7 +29,7 @@ compute.summary.statistics.classic <- function(datalist = datalist.agemix,
                                       timewindow = timewindow) # c(0, datalist.agemix$itable$population.simtime[1])
   
   
-  # 1.2.2. Transmission features:	
+  # 1.2.2. Prevalence
   
   hiv.prev.lt25.women <- prevalence.calculator(datalist = datalist.agemix,
                                                agegroup = c(15, 25),
@@ -150,6 +76,64 @@ compute.summary.statistics.classic <- function(datalist = datalist.agemix,
   
   
   
+  
+  
+  # Incidence
+  
+  incid.15.24.men <-  incidence.calculator(datalist = datalist.agemix,
+                                           agegroup = c(15, 25),
+                                           timewindow = c(39, 40),
+                                           only.active = "No") %>%
+    dplyr::select(incidence) %>%
+    dplyr::slice(1) %>%
+    as.numeric()
+  
+  incid.15.24.women <-  incidence.calculator(datalist = datalist.agemix,
+                                             agegroup = c(15, 25),
+                                             timewindow = c(39, 40),
+                                             only.active = "No") %>%
+    dplyr::select(incidence) %>%
+    dplyr::slice(2) %>%
+    as.numeric()
+  
+  
+  incid.25.39.men <-  incidence.calculator(datalist = datalist.agemix,
+                                           agegroup = c(25, 40),
+                                           timewindow = c(39, 40),
+                                           only.active = "No") %>%
+    dplyr::select(incidence) %>%
+    dplyr::slice(1) %>%
+    as.numeric()
+  
+  incid.25.39.women <-  incidence.calculator(datalist = datalist.agemix,
+                                             agegroup = c(25, 40),
+                                             timewindow = c(39, 40),
+                                             only.active = "No") %>%
+    dplyr::select(incidence) %>%
+    dplyr::slice(2) %>%
+    as.numeric()
+  
+  
+  incid.40.49.men <-  incidence.calculator(datalist = datalist.agemix,
+                                           agegroup = c(40, 50),
+                                           timewindow = c(39, 40),
+                                           only.active = "No") %>%
+    dplyr::select(incidence) %>%
+    dplyr::slice(1) %>%
+    as.numeric()
+  
+  incid.40.49.women <-  incidence.calculator(datalist = datalist.agemix,
+                                             agegroup = c(40, 50),
+                                             timewindow = c(39, 40),
+                                             only.active = "No") %>%
+    dplyr::select(incidence) %>%
+    dplyr::slice(2) %>%
+    as.numeric()
+  
+  # 
+  
+  
+  
   # Sexual behaviour
   
   
@@ -157,19 +141,23 @@ compute.summary.statistics.classic <- function(datalist = datalist.agemix,
   
   # Concurrency point prevalence 6 months before a survey, among men
   
-  
   pp.cp.6months.male.rels <- concurr.pointprev.calculator(datalist = datalist.agemix,
-                                                          timepoint = 40 - 0.5) %>%
-    dplyr::select(concurr.pointprev) %>%
-    dplyr::slice(1) %>%
-    as.numeric()
+                                                          timepoint = timewindow[2] - 0.5) 
   
-  pp.cp.6months.female.rels <- concurr.pointprev.calculator(datalist = datalist.agemix,
-                                                            timepoint = 40 - 0.5) %>%
-    dplyr::select(concurr.pointprev) %>%
-    dplyr::slice(2) %>%
-    as.numeric()
   
+  
+  # pp.cp.6months.male.rels <- concurr.pointprev.calculator(datalist = datalist.agemix,
+  #                                                         timepoint = 40 - 0.5) %>%
+  #   dplyr::select(concurr.pointprev) %>%
+  #   dplyr::slice(1) %>%
+  #   as.numeric()
+  # 
+  # pp.cp.6months.female.rels <- concurr.pointprev.calculator(datalist = datalist.agemix,
+  #                                                           timepoint = 40 - 0.5) %>%
+  #   dplyr::select(concurr.pointprev) %>%
+  #   dplyr::slice(2) %>%
+  #   as.numeric()
+  # 
   
   
   # (ii) Relationship per person per year ??
@@ -185,26 +173,77 @@ compute.summary.statistics.classic <- function(datalist = datalist.agemix,
   agegap.sd <- sd(datalist.agemix$rtable$AgeGap)
   
   
-  classic.features <-   c(growthrate, 
+  
+  ####
+  # ART coverage among adults 15+ years old from UNAIDS (2010 - 2017 estimates)
+  ####
+  ART.cov.eval.timepoints <- seq(from = 33,
+                                 to = 40)
+  
+  ART.cov.vector <- rep(NA, length(ART.cov.eval.timepoints))
+  
+  for (art.cov.index in 1:length(ART.cov.vector)){
+    ART.cov.vector[art.cov.index] <- sum(ART.coverage.calculator(datalist = datalist.agemix,
+                                                                 agegroup = c(15, 50),
+                                                                 timepoint = ART.cov.eval.timepoints[art.cov.index])$sum.onART) /
+      sum(ART.coverage.calculator(datalist = datalist.agemix,
+                                  agegroup = c(15, 50),
+                                  timepoint = ART.cov.eval.timepoints[art.cov.index])$sum.cases)
+  }
+  
+  names(ART.cov.vector) <- paste0("ART.", ART.cov.eval.timepoints)
+  
+  ####
+  # VL suppression fraction (all ages in 2017 ~ >= 15 yo) 0.74
+  ####
+  VL.suppression.fraction <- VL.suppression.calculator(datalist = datalist.agemix,
+                                                       agegroup = c(15, 50),
+                                                       timepoint = 40,
+                                                       vl.cutoff = 1000,
+                                                       site="All") %>%
+    dplyr::select(vl.suppr.frac) %>%
+    dplyr::slice(3) %>%
+    as.numeric()
+  
+  names(VL.suppression.fraction) <- "VL.suppr." 
+  
+  
+  classic.features <-   c(exp(growthrate), 
                           
-                          hiv.prev.lt25.women, hiv.prev.lt25.men, 
-                          hiv.prev.25.40.women, hiv.prev.25.40.men,
-                          hiv.prev.40.50.women, hiv.prev.40.50.men,
+                          hiv.prev.lt25.men, hiv.prev.lt25.women, 
+                          hiv.prev.25.40.men, hiv.prev.25.40.women,
+                          hiv.prev.40.50.men, hiv.prev.40.50.women, 
                           
-                          pp.cp.6months.male.rels, pp.cp.6months.female.rels,
+                          exp(incid.15.24.men), exp(incid.15.24.women), 
+                          exp(incid.25.39.men), exp(incid.25.39.women), 
+                          exp(incid.40.49.men), exp(incid.40.49.women),
+                          
+                          pp.cp.6months.male.rels, # pp.cp.6months.female.rels,
                           
                           relsperpersonperyear, 
-                          agegap.mean, agegap.med, agegap.sd)
+                          agegap.mean, agegap.med, agegap.sd,
+                          
+                          ART.cov.vector, VL.suppression.fraction)
+  
+  
   
   
   classic.features.names <- c("Pop.growthrate", 
                               
-                              "hiv.prev.15.25.women", "hiv.prev.15.25.men", 
-                              "hiv.prev.25.40.women", "hiv.prev.25.40.men",
-                              "hiv.prev.40.50.women", "hiv.prev.40.50.men",
+                              "prev.15.25.men", "prev.15.25.women", 
+                              "prev.25.40.men", "prev.25.40.women", 
+                              "prev.40.50.men", "prev.40.50.women", 
+                              
+                              "incid.15.24.men", "incid.15.24.women", 
+                              "incid.25.39.men", "incid.25.39.women", 
+                              "incid.40.49.men", "incid.40.49.women",
+                              
+                              "pp.cp.6months.male.rels",
                               
                               "relsperpersonperyear", 
-                              "agegap.mean", "agegap.med", "agegap.sd")
+                              "agegap.mean", "agegap.med", "agegap.sd", 
+                              
+                              paste0(names(ART.cov.vector)), paste0(names(VL.suppression.fraction)))
   
   names(classic.features) <- classic.features.names 
   
