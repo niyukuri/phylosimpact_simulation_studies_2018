@@ -304,7 +304,7 @@ complete.master.epic.metrics <- function(datalist = datalist.agemix){
   agemix.model <- pattern.modeller(dataframe = agemix.rels.df,
                                    agegroup = c(15, 50),
                                    timepoint = 40, # datalist.agemix$itable$population.simtime[1],
-                                   timewindow = 1)#1)#3)
+                                   timewindow = 10)#1)#3)
   # 
   # # men.lme <- tryCatch(agemixing.lme.fitter(data = dplyr::filter(agemix.model[[1]], Gender =="male")),
   # #                     error = agemixing.lme.errFunction) # Returns an empty list if the lme model can't be fitted
@@ -416,8 +416,8 @@ complete.master.epic.metrics <- function(datalist = datalist.agemix){
                     
                     paste0("metr.",names(METRICS.LMEM.rels.age.mix)), 
                     
-                    "metr.tran.av",
-                    "metr.tran.med", "metr.transm.sd")
+                    "metr.transm.av",
+                    "metr.transm.med", "metr.transm.sd")
   
   
   names(epi.Metrics) <- metric.names
