@@ -1,53 +1,49 @@
 
 
-# Define directory
-
-work.dir <- "/home/niyukuri/Desktop/mastermodeltest" # on laptop
-
-
-# work.dir <- "/home/niyukuri/Desktop/mastermodeltest" on PC
-
-
-setwd(paste0(work.dir))
-
-#work.dir <- "/user/data/gent/vsc400/vsc40070/phylo/" # on cluster
-
-
-pacman::p_load(snow, parallel, RSimpactCyan, RSimpactHelper, ape, Rsamtools)
-
-
-# work.dir <- "~/Desktop/calibration/"
-
-
-
-inputvector <- c(1000, -0.52, -0.05, 2, 10, 5, 0.25, -0.3, -0.1,
-                 -1, -90, 0.5, 0.05, -0.14, 5, 7, 12, -1.7) 
-
-
-
 complete.master.epic.metric.class.phylo.features.cov <- function(inputvector){
   
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
   
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
   
-  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/MCAR.compute.classic.phylo.features.cov.R")
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
   # 
-  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/MAR.compute.classic.phylo.features.cov.R")
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
   
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
   
   
-  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
   
-  # work.dir <- "/home/niyukuri/Desktop/mastermodeltest" # on PC
+  # work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
   
   # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
   
-  # destDir <- "/home/niyukuri/Desktop/mastermodeltest/temp" # on PC
-  
-  
   
   setwd(paste0(work.dir))
+  
+  
+  
+  source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  
+  source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  
+  source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  
+  source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  
+  source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
   
   
   library(RSimpactCyan)
@@ -92,9 +88,9 @@ complete.master.epic.metric.class.phylo.features.cov <- function(inputvector){
   age.distr <- agedistr.creator(shape = 5, scale = 65)
   #
   cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
-                                   population.simtime = 40, 
-                                   population.nummen = 5000, 
-                                   population.numwomen = 5000,
+                                   population.simtime = 50, 
+                                   population.nummen = 10000, 
+                                   population.numwomen = 10000,
                                    hivseed.time = 10, 
                                    hivseed.type = "amount",
                                    hivseed.amount = 40, 
@@ -298,12 +294,26 @@ complete.master.epic.metric.class.phylo.features.cov <- function(inputvector){
   ###########################################
   
   
-  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
-  
-  
   simpact.trans.net <- advanced.transmission.network.builder(datalist = datalist.agemix, endpoint = 40)
   
   # simpact.trans.net.projection <- transmission.network.builder(datalist = datalist.agemix, endpoint = 45)
+  
+  
+  
+  net.size.vector <- vector() # i_th seed in the list of seeds
+  
+  for(i in 1:length(simpact.trans.net)){
+    
+    tree.n <- simpact.trans.net[[i]] # transmission network for i^th seed
+    
+    net.size.vector <- c(net.size.vector, nrow(as.data.frame(tree.n)))
+    
+  }
+  
+  big.index <- which(net.size.vector>=100)
+  
+  if(length(big.index) >= 1){ 
+  
   
   ###############################
   # Step 3: Sequence simulation #
@@ -325,7 +335,7 @@ complete.master.epic.metric.class.phylo.features.cov <- function(inputvector){
                                  endpoint = 40,
                                  limitTransmEvents = 7, # no less than 7
                                  hiv.seq.file = "hiv.seq.C.pol.j.fasta",
-                                 clust = FALSE) # hiv.seq.file lodged in work.dir
+                                 clust = TRUE) # hiv.seq.file lodged in work.dir
   
   # Transform the sequence format to be handled by ClusterPicker
   sequ.dna <- read.dna(file = paste0(sub.dir.rename,"/C.Epidemic_seed.seq.bis.sim.nwk.fasta"), format = "interleaved")
@@ -336,7 +346,7 @@ complete.master.epic.metric.class.phylo.features.cov <- function(inputvector){
   ### I. Compute transmission network characteristics #
   #####################################################
   
-  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
   
   
   epidemic.metrics <- complete.master.epic.metrics(datalist = datalist.agemix)
@@ -346,7 +356,7 @@ complete.master.epic.metric.class.phylo.features.cov <- function(inputvector){
   ### II. Compute classic features #
   ################################## ??? change arguments
   
-  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
   
   epi.behav.stats <- compute.summary.statistics.classic(datalist = datalist.agemix,
                                                         timewindow = c(10, 40))
@@ -356,10 +366,9 @@ complete.master.epic.metric.class.phylo.features.cov <- function(inputvector){
   ## III. Compute phylogenetic features considering missingness scenarios #
   #########################################################################
   
+ 
   
   # MCAR
-  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
-
   
   MCAR.cov.35 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
                                                                 datalist.agemix = datalist.agemix,
@@ -372,7 +381,7 @@ complete.master.epic.metric.class.phylo.features.cov <- function(inputvector){
                                                                 age.group.25.40 = c(25,40),
                                                                 age.group.40.50 = c(40,50),
                                                                 endpoint = 40,
-                                                                timewindow = c(30,40),
+                                                                timewindow = c(37,40),
                                                                 cut.off = 7),
                           error=function(e) return(rep(NA, 37)))
   
@@ -557,12 +566,18 @@ complete.master.epic.metric.class.phylo.features.cov <- function(inputvector){
                                                                 cut.off = 7),
                           error=function(e) return(rep(NA, 37)))
   
+  MCAR.All <- c(MCAR.cov.35, MCAR.cov.40, MCAR.cov.45, MCAR.cov.50, MCAR.cov.55, MCAR.cov.60, MCAR.cov.65, MCAR.cov.70, 
+                MCAR.cov.75, MCAR.cov.80, MCAR.cov.85, MCAR.cov.90, MCAR.cov.95)
   
+  
+  
+
   
   
   
   # MAR
-  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
+  
+  
   
   # a. 0.7
   MAR.a.cov.35 <- tryCatch(compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
@@ -782,6 +797,9 @@ complete.master.epic.metric.class.phylo.features.cov <- function(inputvector){
                            error=function(e) return(rep(NA, 37)))
   
   
+  MAR.a.All <- c(MAR.a.cov.35, MAR.a.cov.40, MAR.a.cov.45, MAR.a.cov.50, MAR.a.cov.55, MAR.a.cov.60, MAR.a.cov.65, MAR.a.cov.70, 
+                 MAR.a.cov.75, MAR.a.cov.80, MAR.a.cov.85, MAR.a.cov.90, MAR.a.cov.95)
+  
   
   # b.  0.3
   MAR.b.cov.35 <- tryCatch(compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
@@ -993,8 +1011,11 @@ complete.master.epic.metric.class.phylo.features.cov <- function(inputvector){
                            error=function(e) return(rep(NA, 37)))
   
   
+  MAR.b.All <- c(MAR.b.cov.35, MAR.b.cov.40, MAR.b.cov.45, MAR.b.cov.50, MAR.b.cov.55, MAR.b.cov.60, MAR.b.cov.65, MAR.b.cov.70, 
+                 MAR.b.cov.75, MAR.b.cov.80, MAR.b.cov.85, MAR.b.cov.90, MAR.b.cov.95)
+  
   # c. 0.5
-
+  
   MAR.c.cov.35 <- tryCatch(compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
                                                                 datalist.agemix = datalist.agemix,
                                                                 work.dir = work.dir,
@@ -1205,16 +1226,6 @@ complete.master.epic.metric.class.phylo.features.cov <- function(inputvector){
                            error=function(e) return(rep(NA, 37)))
   
   
-  
-  MCAR.All <- c(MCAR.cov.35, MCAR.cov.40, MCAR.cov.45, MCAR.cov.50, MCAR.cov.55, MCAR.cov.60, MCAR.cov.65, MCAR.cov.70, 
-                MCAR.cov.75, MCAR.cov.80, MCAR.cov.85, MCAR.cov.90, MCAR.cov.95)
-  
-  MAR.a.All <- c(MAR.a.cov.35, MAR.a.cov.40, MAR.a.cov.45, MAR.a.cov.50, MAR.a.cov.55, MAR.a.cov.60, MAR.a.cov.65, MAR.a.cov.70, 
-                 MAR.a.cov.75, MAR.a.cov.80, MAR.a.cov.85, MAR.a.cov.90, MAR.a.cov.95)
-  
-  MAR.b.All <- c(MAR.b.cov.35, MAR.b.cov.40, MAR.b.cov.45, MAR.b.cov.50, MAR.b.cov.55, MAR.b.cov.60, MAR.b.cov.65, MAR.b.cov.70, 
-                 MAR.b.cov.75, MAR.b.cov.80, MAR.b.cov.85, MAR.b.cov.90, MAR.b.cov.95)
-  
   MAR.c.All <- c(MAR.c.cov.35, MAR.c.cov.40, MAR.c.cov.45, MAR.c.cov.50, MAR.c.cov.55, MAR.c.cov.60, MAR.c.cov.65, MAR.c.cov.70, 
                  MAR.c.cov.75, MAR.c.cov.80, MAR.c.cov.85, MAR.c.cov.90, MAR.c.cov.95)
   
@@ -1223,7 +1234,7 @@ complete.master.epic.metric.class.phylo.features.cov <- function(inputvector){
   
   outputvector <- c(epidemic.metrics, epi.behav.stats, MCAR.All, MAR.a.All, MAR.b.All, MAR.c.All)
   
-  outputvector.values <- as.numeric(outputvector)
+  outputvector.values <- outputvector
   
   
   # Names
@@ -1316,9 +1327,14 @@ complete.master.epic.metric.class.phylo.features.cov <- function(inputvector){
   
   
   
-  
   names(outputvector.values) <- outputvector.names
-
+  
+  
+  }else{
+    
+    outputvector.values <- rep(NA, 1990)
+    
+  }
   
   unlink(paste0(sub.dir.rename), recursive = TRUE)
   
@@ -1326,40 +1342,41 @@ complete.master.epic.metric.class.phylo.features.cov <- function(inputvector){
   
   return(outputvector.values)
   
+  
 }
 
 
-
-
 # 
 # 
 
-x <- complete.master.epic.metric.class.phylo.features.cov(inputvector = inputvector)
+# x <- complete.master.epic.metric.class.phylo.features.cov(inputvector = inputvector)
 
-
-inputvector <- c(-0.52, -0.05, 2, 0, 2, 0.25, -0.3, -0.1,
-                 # 0.2,
-                 -1, -90, 0.5, 0.05, -0.14, 5, 7, 12, -2.7) # length(inputvector) = 18
-
-
-reps <- 4
-
-
-# Input parameters in matrix form reps times (rows).
-inputmatrix <- matrix(rep(inputvector, reps), byrow = TRUE, nrow = reps)
-
-sim.start.time <- proc.time()[3] 
-
-epi.Metrics.Save <- simpact.parallel(model = complete.master.epic.metric.class.phylo.features.cov,
-                                     actual.input.matrix = inputmatrix,
-                                     seed_count = 124,
-                                     n_cluster = 8)
-
-sim.end.time <- proc.time()[3] - sim.start.time
-
-print(paste0("Simulation time: ", round(sim.end.time/60,2), " minutes"))
-
-write.csv(epi.Metrics.Save, file = "epi.Metrics.features.Save.csv")
-
-
-df <- read.csv(file = "epi.Metrics.features.Save.csv")
+# 
+# save(x, file="x.RData")
+# 
+# inputvector <- c(-0.52, -0.05, 2, 0, 2, 0.25, -0.3, -0.1,
+#                  # 0.2,
+#                  -1, -90, 0.5, 0.05, -0.14, 5, 7, 12, -2.7) # length(inputvector) = 18
+# 
+# 
+# reps <- 4
+# 
+# 
+# # Input parameters in matrix form reps times (rows).
+# inputmatrix <- matrix(rep(inputvector, reps), byrow = TRUE, nrow = reps)
+# 
+# sim.start.time <- proc.time()[3] 
+# 
+# epi.Metrics.Save <- simpact.parallel(model = complete.master.epic.metric.class.phylo.features.cov,
+#                                      actual.input.matrix = inputmatrix,
+#                                      seed_count = 124,
+#                                      n_cluster = 8)
+# 
+# sim.end.time <- proc.time()[3] - sim.start.time
+# 
+# print(paste0("Simulation time: ", round(sim.end.time/60,2), " minutes"))
+# 
+# write.csv(epi.Metrics.Save, file = "epi.Metrics.features.Save.csv")
+# 
+# 
+# df <- read.csv(file = "epi.Metrics.features.Save.csv")
