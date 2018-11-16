@@ -21,7 +21,7 @@ pacman::p_load(snow, parallel, RSimpactCyan, RSimpactHelper, ape, Rsamtools)
 
 
 
-wrapper.stress.testing <- function(inputvector = inputvector){
+wrapper.stress.testing <- function(inputvector){
   
   
   
@@ -97,7 +97,7 @@ wrapper.stress.testing <- function(inputvector = inputvector){
 }
 
 
-reps <- 24
+reps <- 4
 
 inputvector <- c(-0.52, -0.05, 2, 10, 5, 0.25, -0.3, -0.1,
                  -1, -90, 0.5, 0.05, -0.14, 5, 7, 12, -1.7) 
@@ -111,9 +111,39 @@ inputmatrix <- matrix(rep(inputvector, reps), byrow = TRUE, nrow = reps)
 epi.mm.stats <- simpact.parallel(model = wrapper.stress.testing,
                                  actual.input.matrix = inputmatrix,
                                  seed_count = 124,
-                                 n_cluster = 24)
+                                 n_cluster = 8)
 
 
 write.csv(epi.mm.stats, file = "Results.epi.mm.stats.csv")
+
+
+
+inputvector <- c(1000, -0.52, -0.05, 2, 10, 5, 0.25, -0.3, -0.1,
+                 -1, -90, 0.5, 0.05, -0.14, 5, 7, 12, -1.7) 
+
+source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+
+source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+
+source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
+
+source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/calibration.ABC.R")
+
+epi.metric.behav.stats.stat.missingness
+
+
+median.epi.metric.behav.stats.stat.missingness <- median(epi.metric.behav.stats.stat.missingness)
+
+
+epidemic.metrics # len = 39
+epi.behav.stats  # len = 27
+missingness # len = 37 * 13 * 4 [MCAR, MAR.a.0.7, MAR.b.0.3, MAR.c.0.5]
+
+
+epidemic.metrics <- median.epi.metric.behav.stats.stat.missingness[1:39]
+
+epi.behav.stats <- median.epi.metric.behav.stats.stat.missingness[40:66]
+
+missingness.cov
 
 

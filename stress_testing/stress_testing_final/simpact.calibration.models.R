@@ -5,21 +5,52 @@
 
 
 
-simpact4ABC.classic <- function(inputvector){
+simpact4ABC.classic <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
   
   
-  work.dir <- "/home/niyukuri/Desktop/calibration" # on laptop
   
-  # work.dir <- "/home/niyukuri/Desktop/calibration" # on PC
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
   
   
   setwd(paste0(work.dir))
   
   
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
   
   
-  library(EasyABC)
   library(RSimpactCyan)
   library(RSimpactHelper)
   library(Rcpp)
@@ -27,10 +58,9 @@ simpact4ABC.classic <- function(inputvector){
   library(expoTree)
   library(data.table)
   library(readr)
-  # library(phangorn)
-  # library(lme4)
-  # library(nlme)
-  library(minque) # with lmer
+  library(phangorn)
+  library(lme4)
+  library(nlme)
   library(dplyr)
   library(adephylo)
   library(treedater)
@@ -39,9 +69,22 @@ simpact4ABC.classic <- function(inputvector){
   library(igraph)
   library(phyloTop)
   library(phytools)
-  library(Rsamtools) # select IDs sequences in a file
-  library(robustbase) # colMedians
-  library(lme4)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
   
   
   
@@ -50,12 +93,12 @@ simpact4ABC.classic <- function(inputvector){
   age.distr <- agedistr.creator(shape = 5, scale = 65)
   #
   cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
-                                   population.simtime = 40, 
+                                   population.simtime = 50, 
                                    population.nummen = 4000, 
                                    population.numwomen = 4000,
                                    hivseed.time = 10, 
                                    hivseed.type = "amount",
-                                   hivseed.amount = 20, 
+                                   hivseed.amount = 40, 
                                    hivseed.age.min = 20,
                                    hivseed.age.max = 50,
                                    formation.hazard.agegapry.meanage = -0.025,
@@ -232,7 +275,7 @@ simpact4ABC.classic <- function(inputvector){
   # Error function when computing summary statistics
   
   err.functionGEN <- function(e){
-    return(chunk.summary.stats = rep(NA,28))
+    return(chunk.summary.stats = rep(NA,27))
     stop(e)
   }
   
@@ -246,10 +289,10 @@ simpact4ABC.classic <- function(inputvector){
   
   
   if (length(results) == 0){
-    outputvector <- rep(NA, 28) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+    outputvector <- rep(NA, 27) # 37 + 82 + 33 + 1 + 1 + 53 = 207
   }else{
     if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
-      outputvector <- rep(NA, 28)
+      outputvector <- rep(NA, 27)
     }else{
       
       
@@ -258,19 +301,9 @@ simpact4ABC.classic <- function(inputvector){
       simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
       
       
-      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist,
-                                                                          simpact.trans.net = simpact.trans.net,
-                                                                          work.dir = work.dir,
-                                                                          sub.dir.rename = ABC_DestDir.classic,
-                                                                          dirfasttree = work.dir,
-                                                                          limitTransmEvents = 7,
-                                                                          seq.cov = 100,
-                                                                          age.group.15.25 = c(15,25),
-                                                                          age.group.25.40 = c(25,40),
-                                                                          age.group.40.50 = c(40,50),
-                                                                          endpoint = 40,
-                                                                          timewindow = c(30,40)),
-                                       error=function(e) return(rep(NA, 28)))
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
       
       
       
@@ -290,21 +323,52 @@ simpact4ABC.classic <- function(inputvector){
 # II. one simpact model calibrated to classic and phylogenetic summary statistics (full)
 ########################################################################################
 
-simpact4ABC.classic.phylo <- function(inputvector){
+simpact4ABC.classic.phylo <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
   
   
-  work.dir <- "/home/niyukuri/Desktop/calibration" # on laptop
   
-  # work.dir <- "/home/niyukuri/Desktop/calibration" # on PC
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
   
   
   setwd(paste0(work.dir))
   
   
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")  
   
-  library(EasyABC)
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
   library(RSimpactCyan)
   library(RSimpactHelper)
   library(Rcpp)
@@ -312,10 +376,9 @@ simpact4ABC.classic.phylo <- function(inputvector){
   library(expoTree)
   library(data.table)
   library(readr)
-  # library(phangorn)
-  # library(lme4)
-  # library(nlme)
-  library(minque) # with lmer
+  library(phangorn)
+  library(lme4)
+  library(nlme)
   library(dplyr)
   library(adephylo)
   library(treedater)
@@ -324,9 +387,22 @@ simpact4ABC.classic.phylo <- function(inputvector){
   library(igraph)
   library(phyloTop)
   library(phytools)
-  library(Rsamtools) # select IDs sequences in a file
-  library(robustbase) # colMedians
-  library(lme4)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
   
   
   
@@ -335,12 +411,12 @@ simpact4ABC.classic.phylo <- function(inputvector){
   age.distr <- agedistr.creator(shape = 5, scale = 65)
   #
   cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
-                                   population.simtime = 40, 
+                                   population.simtime = 50, 
                                    population.nummen = 4000, 
                                    population.numwomen = 4000,
                                    hivseed.time = 10, 
                                    hivseed.type = "amount",
-                                   hivseed.amount = 20, 
+                                   hivseed.amount = 40, 
                                    hivseed.age.min = 20,
                                    hivseed.age.max = 50,
                                    formation.hazard.agegapry.meanage = -0.025,
@@ -491,6 +567,7 @@ simpact4ABC.classic.phylo <- function(inputvector){
   cfg.list["population.maxevents"] <- as.numeric(cfg.list["population.simtime"][1]) * as.numeric(cfg.list["population.nummen"][1]) * 3
   
   # Avoid overlaping in same directory
+  
   
   #creating subfolder with unique name for each simulation
   generate.filename <- function(how.long){
@@ -517,7 +594,7 @@ simpact4ABC.classic.phylo <- function(inputvector){
   # Error function when computing summary statistics
   
   err.functionGEN <- function(e){
-    return(chunk.summary.stats = rep(NA,28))
+    return(chunk.summary.stats = rep(NA,64))
     stop(e)
   }
   
@@ -531,43 +608,39 @@ simpact4ABC.classic.phylo <- function(inputvector){
   
   
   if (length(results) == 0){
-    outputvector <- rep(NA, 28) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
   }else{
     if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
-      outputvector <- rep(NA, 28)
+      outputvector <- rep(NA, 64)
     }else{
       
       
       datalist <- readthedata(results)
       
-      simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
+      
+      simpact.trans.net <- advanced.transmission.network.builder(datalist = datalist, endpoint = 40)
       
       
-      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist,
-                                                                          simpact.trans.net = simpact.trans.net,
-                                                                          work.dir = work.dir,
-                                                                          sub.dir.rename = ABC_DestDir.classic.phylo,
-                                                                          dirfasttree = work.dir,
-                                                                          limitTransmEvents = 7,
-                                                                          seq.cov = 100,
-                                                                          age.group.15.25 = c(15,25),
-                                                                          age.group.25.40 = c(25,40),
-                                                                          age.group.40.50 = c(40,50),
-                                                                          endpoint = 40,
-                                                                          timewindow = c(30,40)),
-                                       error=function(e) return(rep(NA, 28)))
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
       
-      summary.stat.phylo.MCAR.100 <- compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
-                                                                           work.dir = work.dir,
-                                                                           sub.dir.rename = ABC_DestDir.classic.phylo,
-                                                                           dirfasttree = work.dir,
-                                                                           limitTransmEvents = 7,
-                                                                           seq.cov = 100,
-                                                                           age.group.15.25 = c(15,25),
-                                                                           age.group.25.40 = c(25,40),
-                                                                           age.group.40.50 = c(40,50),
-                                                                           endpoint = 40,
-                                                                           timewindow = c(30,40))
+      
+      
+      summary.stat.phylo.MCAR.100 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                    datalist.agemix = datalist,
+                                                                                    work.dir = work.dir,
+                                                                                    sub.dir.rename = ABC_DestDir.classic.phylo,
+                                                                                    dirfasttree = work.dir,
+                                                                                    limitTransmEvents = 7,
+                                                                                    seq.cov = 100,
+                                                                                    age.group.15.25 = c(15,25),
+                                                                                    age.group.25.40 = c(25,40),
+                                                                                    age.group.40.50 = c(40,50),
+                                                                                    endpoint = 40,
+                                                                                    timewindow = c(37,40),
+                                                                                    cut.off = 7),
+                                              error=function(e) return(rep(NA, 37)))
       
       
       
@@ -590,21 +663,52 @@ simpact4ABC.classic.phylo <- function(inputvector){
 ###################################################################################
 
 # Coverage of 35%
-simpact4ABC.classic.phylo.MCAR.35 <- function(inputvector){
+simpact4ABC.classic.phylo.MCAR.35 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
   
   
-  work.dir <- "/home/niyukuri/Desktop/calibration" # on laptop
   
-  # work.dir <- "/home/niyukuri/Desktop/calibration" # on PC
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
   
   
   setwd(paste0(work.dir))
   
   
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")  
   
-  library(EasyABC)
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
   library(RSimpactCyan)
   library(RSimpactHelper)
   library(Rcpp)
@@ -612,10 +716,9 @@ simpact4ABC.classic.phylo.MCAR.35 <- function(inputvector){
   library(expoTree)
   library(data.table)
   library(readr)
-  # library(phangorn)
-  # library(lme4)
-  # library(nlme)
-  library(minque) # with lmer
+  library(phangorn)
+  library(lme4)
+  library(nlme)
   library(dplyr)
   library(adephylo)
   library(treedater)
@@ -624,9 +727,22 @@ simpact4ABC.classic.phylo.MCAR.35 <- function(inputvector){
   library(igraph)
   library(phyloTop)
   library(phytools)
-  library(Rsamtools) # select IDs sequences in a file
-  library(robustbase) # colMedians
-  library(lme4)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
   
   
   
@@ -635,12 +751,12 @@ simpact4ABC.classic.phylo.MCAR.35 <- function(inputvector){
   age.distr <- agedistr.creator(shape = 5, scale = 65)
   #
   cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
-                                   population.simtime = 40, 
+                                   population.simtime = 50, 
                                    population.nummen = 4000, 
                                    population.numwomen = 4000,
                                    hivseed.time = 10, 
                                    hivseed.type = "amount",
-                                   hivseed.amount = 20, 
+                                   hivseed.amount = 40, 
                                    hivseed.age.min = 20,
                                    hivseed.age.max = 50,
                                    formation.hazard.agegapry.meanage = -0.025,
@@ -791,6 +907,7 @@ simpact4ABC.classic.phylo.MCAR.35 <- function(inputvector){
   cfg.list["population.maxevents"] <- as.numeric(cfg.list["population.simtime"][1]) * as.numeric(cfg.list["population.nummen"][1]) * 3
   
   # Avoid overlaping in same directory
+  
   
   #creating subfolder with unique name for each simulation
   generate.filename <- function(how.long){
@@ -817,7 +934,7 @@ simpact4ABC.classic.phylo.MCAR.35 <- function(inputvector){
   # Error function when computing summary statistics
   
   err.functionGEN <- function(e){
-    return(chunk.summary.stats = rep(NA,28))
+    return(chunk.summary.stats = rep(NA,64))
     stop(e)
   }
   
@@ -831,10 +948,10 @@ simpact4ABC.classic.phylo.MCAR.35 <- function(inputvector){
   
   
   if (length(results) == 0){
-    outputvector <- rep(NA, 28) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
   }else{
     if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
-      outputvector <- rep(NA, 28)
+      outputvector <- rep(NA, 64)
     }else{
       
       
@@ -842,38 +959,33 @@ simpact4ABC.classic.phylo.MCAR.35 <- function(inputvector){
       
       simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
       
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
       
-      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist,
-                                                                          simpact.trans.net = simpact.trans.net,
-                                                                          work.dir = work.dir,
-                                                                          sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.35,
-                                                                          dirfasttree = work.dir,
-                                                                          limitTransmEvents = 7,
-                                                                          seq.cov = 100,
-                                                                          age.group.15.25 = c(15,25),
-                                                                          age.group.25.40 = c(25,40),
-                                                                          age.group.40.50 = c(40,50),
-                                                                          endpoint = 40,
-                                                                          timewindow = c(30,40)),
-                                       error=function(e) return(rep(NA, 28)))
       
-      summary.stat.phylo.MCAR.35 <- compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
-                                                                          work.dir = work.dir,
-                                                                          sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.35,
-                                                                          dirfasttree = work.dir,
-                                                                          limitTransmEvents = 7,
-                                                                          seq.cov = 35,
-                                                                          age.group.15.25 = c(15,25),
-                                                                          age.group.25.40 = c(25,40),
-                                                                          age.group.40.50 = c(40,50),
-                                                                          endpoint = 40,
-                                                                          timewindow = c(30,40))
+      
+      summary.stat.phylo.MCAR.35 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                   datalist.agemix = datalist,
+                                                                                   work.dir = work.dir,
+                                                                                   sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.35,
+                                                                                   dirfasttree = work.dir,
+                                                                                   limitTransmEvents = 7,
+                                                                                   seq.cov = 35,
+                                                                                   age.group.15.25 = c(15,25),
+                                                                                   age.group.25.40 = c(25,40),
+                                                                                   age.group.40.50 = c(40,50),
+                                                                                   endpoint = 40,
+                                                                                   timewindow = c(37,40),
+                                                                                   cut.off = 7),
+                                             error=function(e) return(rep(NA, 37)))
       
       
       
       
       
-      outputvector <- c(summary.stat.classic, summary.stat.phylo.MCAR.100)
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MCAR.35)
       
     }
     
@@ -886,22 +998,52 @@ simpact4ABC.classic.phylo.MCAR.35 <- function(inputvector){
 
 
 # Coverage of 40%
-
-simpact4ABC.classic.phylo.MCAR.40 <- function(inputvector){
+simpact4ABC.classic.phylo.MCAR.40 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
   
   
-  work.dir <- "/home/niyukuri/Desktop/calibration" # on laptop
   
-  # work.dir <- "/home/niyukuri/Desktop/calibration" # on PC
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
   
   
   setwd(paste0(work.dir))
   
   
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")  
   
-  library(EasyABC)
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
   library(RSimpactCyan)
   library(RSimpactHelper)
   library(Rcpp)
@@ -909,10 +1051,9 @@ simpact4ABC.classic.phylo.MCAR.40 <- function(inputvector){
   library(expoTree)
   library(data.table)
   library(readr)
-  # library(phangorn)
-  # library(lme4)
-  # library(nlme)
-  library(minque) # with lmer
+  library(phangorn)
+  library(lme4)
+  library(nlme)
   library(dplyr)
   library(adephylo)
   library(treedater)
@@ -921,9 +1062,22 @@ simpact4ABC.classic.phylo.MCAR.40 <- function(inputvector){
   library(igraph)
   library(phyloTop)
   library(phytools)
-  library(Rsamtools) # select IDs sequences in a file
-  library(robustbase) # colMedians
-  library(lme4)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
   
   
   
@@ -932,12 +1086,12 @@ simpact4ABC.classic.phylo.MCAR.40 <- function(inputvector){
   age.distr <- agedistr.creator(shape = 5, scale = 65)
   #
   cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
-                                   population.simtime = 40, 
+                                   population.simtime = 50, 
                                    population.nummen = 4000, 
                                    population.numwomen = 4000,
                                    hivseed.time = 10, 
                                    hivseed.type = "amount",
-                                   hivseed.amount = 20, 
+                                   hivseed.amount = 40, 
                                    hivseed.age.min = 20,
                                    hivseed.age.max = 50,
                                    formation.hazard.agegapry.meanage = -0.025,
@@ -1088,6 +1242,7 @@ simpact4ABC.classic.phylo.MCAR.40 <- function(inputvector){
   cfg.list["population.maxevents"] <- as.numeric(cfg.list["population.simtime"][1]) * as.numeric(cfg.list["population.nummen"][1]) * 3
   
   # Avoid overlaping in same directory
+  
   
   #creating subfolder with unique name for each simulation
   generate.filename <- function(how.long){
@@ -1114,7 +1269,7 @@ simpact4ABC.classic.phylo.MCAR.40 <- function(inputvector){
   # Error function when computing summary statistics
   
   err.functionGEN <- function(e){
-    return(chunk.summary.stats = rep(NA,28))
+    return(chunk.summary.stats = rep(NA,64))
     stop(e)
   }
   
@@ -1128,10 +1283,10 @@ simpact4ABC.classic.phylo.MCAR.40 <- function(inputvector){
   
   
   if (length(results) == 0){
-    outputvector <- rep(NA, 28) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
   }else{
     if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
-      outputvector <- rep(NA, 28)
+      outputvector <- rep(NA, 64)
     }else{
       
       
@@ -1139,38 +1294,33 @@ simpact4ABC.classic.phylo.MCAR.40 <- function(inputvector){
       
       simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
       
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
       
-      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist,
-                                                                          simpact.trans.net = simpact.trans.net,
-                                                                          work.dir = work.dir,
-                                                                          sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.40,
-                                                                          dirfasttree = work.dir,
-                                                                          limitTransmEvents = 7,
-                                                                          seq.cov = 100,
-                                                                          age.group.15.25 = c(15,25),
-                                                                          age.group.25.40 = c(25,40),
-                                                                          age.group.40.50 = c(40,50),
-                                                                          endpoint = 40,
-                                                                          timewindow = c(30,40)),
-                                       error=function(e) return(rep(NA, 28)))
       
-      summary.stat.phylo.MCAR.40 <- compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
-                                                                          work.dir = work.dir,
-                                                                          sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.40,
-                                                                          dirfasttree = work.dir,
-                                                                          limitTransmEvents = 7,
-                                                                          seq.cov = 40,
-                                                                          age.group.15.25 = c(15,25),
-                                                                          age.group.25.40 = c(25,40),
-                                                                          age.group.40.50 = c(40,50),
-                                                                          endpoint = 40,
-                                                                          timewindow = c(30,40))
+      
+      summary.stat.phylo.MCAR.40 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                   datalist.agemix = datalist,
+                                                                                   work.dir = work.dir,
+                                                                                   sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.40,
+                                                                                   dirfasttree = work.dir,
+                                                                                   limitTransmEvents = 7,
+                                                                                   seq.cov = 40,
+                                                                                   age.group.15.25 = c(15,25),
+                                                                                   age.group.25.40 = c(25,40),
+                                                                                   age.group.40.50 = c(40,50),
+                                                                                   endpoint = 40,
+                                                                                   timewindow = c(37,40),
+                                                                                   cut.off = 7),
+                                             error=function(e) return(rep(NA, 37)))
       
       
       
       
       
-      outputvector <- c(summary.stat.classic, summary.stat.phylo.MCAR.100)
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MCAR.40)
       
     }
     
@@ -1181,23 +1331,54 @@ simpact4ABC.classic.phylo.MCAR.40 <- function(inputvector){
   return(outputvector)
 }
 
-# Coverage of 45%
 
-simpact4ABC.classic.phylo.MCAR.45 <- function(inputvector){
+# Coverage of 45%
+simpact4ABC.classic.phylo.MCAR.45 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
   
   
-  work.dir <- "/home/niyukuri/Desktop/calibration" # on laptop
   
-  # work.dir <- "/home/niyukuri/Desktop/calibration" # on PC
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
   
   
   setwd(paste0(work.dir))
   
   
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")  
   
-  library(EasyABC)
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
   library(RSimpactCyan)
   library(RSimpactHelper)
   library(Rcpp)
@@ -1205,10 +1386,9 @@ simpact4ABC.classic.phylo.MCAR.45 <- function(inputvector){
   library(expoTree)
   library(data.table)
   library(readr)
-  # library(phangorn)
-  # library(lme4)
-  # library(nlme)
-  library(minque) # with lmer
+  library(phangorn)
+  library(lme4)
+  library(nlme)
   library(dplyr)
   library(adephylo)
   library(treedater)
@@ -1217,9 +1397,22 @@ simpact4ABC.classic.phylo.MCAR.45 <- function(inputvector){
   library(igraph)
   library(phyloTop)
   library(phytools)
-  library(Rsamtools) # select IDs sequences in a file
-  library(robustbase) # colMedians
-  library(lme4)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
   
   
   
@@ -1228,12 +1421,12 @@ simpact4ABC.classic.phylo.MCAR.45 <- function(inputvector){
   age.distr <- agedistr.creator(shape = 5, scale = 65)
   #
   cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
-                                   population.simtime = 40, 
+                                   population.simtime = 50, 
                                    population.nummen = 4000, 
                                    population.numwomen = 4000,
                                    hivseed.time = 10, 
                                    hivseed.type = "amount",
-                                   hivseed.amount = 20, 
+                                   hivseed.amount = 40, 
                                    hivseed.age.min = 20,
                                    hivseed.age.max = 50,
                                    formation.hazard.agegapry.meanage = -0.025,
@@ -1384,6 +1577,7 @@ simpact4ABC.classic.phylo.MCAR.45 <- function(inputvector){
   cfg.list["population.maxevents"] <- as.numeric(cfg.list["population.simtime"][1]) * as.numeric(cfg.list["population.nummen"][1]) * 3
   
   # Avoid overlaping in same directory
+  
   
   #creating subfolder with unique name for each simulation
   generate.filename <- function(how.long){
@@ -1410,7 +1604,7 @@ simpact4ABC.classic.phylo.MCAR.45 <- function(inputvector){
   # Error function when computing summary statistics
   
   err.functionGEN <- function(e){
-    return(chunk.summary.stats = rep(NA,28))
+    return(chunk.summary.stats = rep(NA,64))
     stop(e)
   }
   
@@ -1424,10 +1618,10 @@ simpact4ABC.classic.phylo.MCAR.45 <- function(inputvector){
   
   
   if (length(results) == 0){
-    outputvector <- rep(NA, 28) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
   }else{
     if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
-      outputvector <- rep(NA, 28)
+      outputvector <- rep(NA, 64)
     }else{
       
       
@@ -1435,38 +1629,33 @@ simpact4ABC.classic.phylo.MCAR.45 <- function(inputvector){
       
       simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
       
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
       
-      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist,
-                                                                          simpact.trans.net = simpact.trans.net,
-                                                                          work.dir = work.dir,
-                                                                          sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.45,
-                                                                          dirfasttree = work.dir,
-                                                                          limitTransmEvents = 7,
-                                                                          seq.cov = 100,
-                                                                          age.group.15.25 = c(15,25),
-                                                                          age.group.25.40 = c(25,40),
-                                                                          age.group.40.50 = c(40,50),
-                                                                          endpoint = 40,
-                                                                          timewindow = c(30,40)),
-                                       error=function(e) return(rep(NA, 28)))
       
-      summary.stat.phylo.MCAR.45 <- compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
-                                                                          work.dir = work.dir,
-                                                                          sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.45,
-                                                                          dirfasttree = work.dir,
-                                                                          limitTransmEvents = 7,
-                                                                          seq.cov = 45,
-                                                                          age.group.15.25 = c(15,25),
-                                                                          age.group.25.40 = c(25,40),
-                                                                          age.group.40.50 = c(40,50),
-                                                                          endpoint = 40,
-                                                                          timewindow = c(30,40))
+      
+      summary.stat.phylo.MCAR.45 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                   datalist.agemix = datalist,
+                                                                                   work.dir = work.dir,
+                                                                                   sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.45,
+                                                                                   dirfasttree = work.dir,
+                                                                                   limitTransmEvents = 7,
+                                                                                   seq.cov = 45,
+                                                                                   age.group.15.25 = c(15,25),
+                                                                                   age.group.25.40 = c(25,40),
+                                                                                   age.group.40.50 = c(40,50),
+                                                                                   endpoint = 40,
+                                                                                   timewindow = c(37,40),
+                                                                                   cut.off = 7),
+                                             error=function(e) return(rep(NA, 37)))
       
       
       
       
       
-      outputvector <- c(summary.stat.classic, summary.stat.phylo.MCAR.100)
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MCAR.45)
       
     }
     
@@ -1478,24 +1667,54 @@ simpact4ABC.classic.phylo.MCAR.45 <- function(inputvector){
 }
 
 
+
 # Coverage of 50%
-
-
-simpact4ABC.classic.phylo.MCAR.50 <- function(inputvector){
+simpact4ABC.classic.phylo.MCAR.50 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
   
   
-  work.dir <- "/home/niyukuri/Desktop/calibration" # on laptop
   
-  # work.dir <- "/home/niyukuri/Desktop/calibration" # on PC
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
   
   
   setwd(paste0(work.dir))
   
   
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")  
   
-  library(EasyABC)
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
   library(RSimpactCyan)
   library(RSimpactHelper)
   library(Rcpp)
@@ -1503,10 +1722,9 @@ simpact4ABC.classic.phylo.MCAR.50 <- function(inputvector){
   library(expoTree)
   library(data.table)
   library(readr)
-  # library(phangorn)
-  # library(lme4)
-  # library(nlme)
-  library(minque) # with lmer
+  library(phangorn)
+  library(lme4)
+  library(nlme)
   library(dplyr)
   library(adephylo)
   library(treedater)
@@ -1515,9 +1733,22 @@ simpact4ABC.classic.phylo.MCAR.50 <- function(inputvector){
   library(igraph)
   library(phyloTop)
   library(phytools)
-  library(Rsamtools) # select IDs sequences in a file
-  library(robustbase) # colMedians
-  library(lme4)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
   
   
   
@@ -1526,12 +1757,12 @@ simpact4ABC.classic.phylo.MCAR.50 <- function(inputvector){
   age.distr <- agedistr.creator(shape = 5, scale = 65)
   #
   cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
-                                   population.simtime = 40, 
+                                   population.simtime = 50, 
                                    population.nummen = 4000, 
                                    population.numwomen = 4000,
                                    hivseed.time = 10, 
                                    hivseed.type = "amount",
-                                   hivseed.amount = 20, 
+                                   hivseed.amount = 40, 
                                    hivseed.age.min = 20,
                                    hivseed.age.max = 50,
                                    formation.hazard.agegapry.meanage = -0.025,
@@ -1682,6 +1913,7 @@ simpact4ABC.classic.phylo.MCAR.50 <- function(inputvector){
   cfg.list["population.maxevents"] <- as.numeric(cfg.list["population.simtime"][1]) * as.numeric(cfg.list["population.nummen"][1]) * 3
   
   # Avoid overlaping in same directory
+  
   
   #creating subfolder with unique name for each simulation
   generate.filename <- function(how.long){
@@ -1708,7 +1940,7 @@ simpact4ABC.classic.phylo.MCAR.50 <- function(inputvector){
   # Error function when computing summary statistics
   
   err.functionGEN <- function(e){
-    return(chunk.summary.stats = rep(NA,28))
+    return(chunk.summary.stats = rep(NA,64))
     stop(e)
   }
   
@@ -1722,10 +1954,10 @@ simpact4ABC.classic.phylo.MCAR.50 <- function(inputvector){
   
   
   if (length(results) == 0){
-    outputvector <- rep(NA, 28) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
   }else{
     if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
-      outputvector <- rep(NA, 28)
+      outputvector <- rep(NA, 64)
     }else{
       
       
@@ -1733,38 +1965,33 @@ simpact4ABC.classic.phylo.MCAR.50 <- function(inputvector){
       
       simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
       
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
       
-      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist,
-                                                                          simpact.trans.net = simpact.trans.net,
-                                                                          work.dir = work.dir,
-                                                                          sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.50,
-                                                                          dirfasttree = work.dir,
-                                                                          limitTransmEvents = 7,
-                                                                          seq.cov = 100,
-                                                                          age.group.15.25 = c(15,25),
-                                                                          age.group.25.40 = c(25,40),
-                                                                          age.group.40.50 = c(40,50),
-                                                                          endpoint = 40,
-                                                                          timewindow = c(30,40)),
-                                       error=function(e) return(rep(NA, 28)))
       
-      summary.stat.phylo.MCAR.50 <- compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
-                                                                          work.dir = work.dir,
-                                                                          sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.50,
-                                                                          dirfasttree = work.dir,
-                                                                          limitTransmEvents = 7,
-                                                                          seq.cov = 50,
-                                                                          age.group.15.25 = c(15,25),
-                                                                          age.group.25.40 = c(25,40),
-                                                                          age.group.40.50 = c(40,50),
-                                                                          endpoint = 40,
-                                                                          timewindow = c(30,40))
+      
+      summary.stat.phylo.MCAR.50 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                   datalist.agemix = datalist,
+                                                                                   work.dir = work.dir,
+                                                                                   sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.50,
+                                                                                   dirfasttree = work.dir,
+                                                                                   limitTransmEvents = 7,
+                                                                                   seq.cov = 50,
+                                                                                   age.group.15.25 = c(15,25),
+                                                                                   age.group.25.40 = c(25,40),
+                                                                                   age.group.40.50 = c(40,50),
+                                                                                   endpoint = 40,
+                                                                                   timewindow = c(37,40),
+                                                                                   cut.off = 7),
+                                             error=function(e) return(rep(NA, 37)))
       
       
       
       
       
-      outputvector <- c(summary.stat.classic, summary.stat.phylo.MCAR.100)
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MCAR.50)
       
     }
     
@@ -1776,24 +2003,54 @@ simpact4ABC.classic.phylo.MCAR.50 <- function(inputvector){
 }
 
 
+
 # Coverage of 55%
-
-
-simpact4ABC.classic.phylo.MCAR.55 <- function(inputvector){
+simpact4ABC.classic.phylo.MCAR.55 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
   
   
-  work.dir <- "/home/niyukuri/Desktop/calibration" # on laptop
   
-  # work.dir <- "/home/niyukuri/Desktop/calibration" # on PC
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
   
   
   setwd(paste0(work.dir))
   
   
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")  
   
-  library(EasyABC)
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
   library(RSimpactCyan)
   library(RSimpactHelper)
   library(Rcpp)
@@ -1801,10 +2058,9 @@ simpact4ABC.classic.phylo.MCAR.55 <- function(inputvector){
   library(expoTree)
   library(data.table)
   library(readr)
-  # library(phangorn)
-  # library(lme4)
-  # library(nlme)
-  library(minque) # with lmer
+  library(phangorn)
+  library(lme4)
+  library(nlme)
   library(dplyr)
   library(adephylo)
   library(treedater)
@@ -1813,9 +2069,22 @@ simpact4ABC.classic.phylo.MCAR.55 <- function(inputvector){
   library(igraph)
   library(phyloTop)
   library(phytools)
-  library(Rsamtools) # select IDs sequences in a file
-  library(robustbase) # colMedians
-  library(lme4)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
   
   
   
@@ -1824,12 +2093,12 @@ simpact4ABC.classic.phylo.MCAR.55 <- function(inputvector){
   age.distr <- agedistr.creator(shape = 5, scale = 65)
   #
   cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
-                                   population.simtime = 40, 
+                                   population.simtime = 50, 
                                    population.nummen = 4000, 
                                    population.numwomen = 4000,
                                    hivseed.time = 10, 
                                    hivseed.type = "amount",
-                                   hivseed.amount = 20, 
+                                   hivseed.amount = 40, 
                                    hivseed.age.min = 20,
                                    hivseed.age.max = 50,
                                    formation.hazard.agegapry.meanage = -0.025,
@@ -1980,6 +2249,7 @@ simpact4ABC.classic.phylo.MCAR.55 <- function(inputvector){
   cfg.list["population.maxevents"] <- as.numeric(cfg.list["population.simtime"][1]) * as.numeric(cfg.list["population.nummen"][1]) * 3
   
   # Avoid overlaping in same directory
+  
   
   #creating subfolder with unique name for each simulation
   generate.filename <- function(how.long){
@@ -2006,7 +2276,7 @@ simpact4ABC.classic.phylo.MCAR.55 <- function(inputvector){
   # Error function when computing summary statistics
   
   err.functionGEN <- function(e){
-    return(chunk.summary.stats = rep(NA,28))
+    return(chunk.summary.stats = rep(NA,64))
     stop(e)
   }
   
@@ -2020,10 +2290,10 @@ simpact4ABC.classic.phylo.MCAR.55 <- function(inputvector){
   
   
   if (length(results) == 0){
-    outputvector <- rep(NA, 28) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
   }else{
     if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
-      outputvector <- rep(NA, 28)
+      outputvector <- rep(NA, 64)
     }else{
       
       
@@ -2031,38 +2301,33 @@ simpact4ABC.classic.phylo.MCAR.55 <- function(inputvector){
       
       simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
       
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
       
-      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist,
-                                                                          simpact.trans.net = simpact.trans.net,
-                                                                          work.dir = work.dir,
-                                                                          sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.55,
-                                                                          dirfasttree = work.dir,
-                                                                          limitTransmEvents = 7,
-                                                                          seq.cov = 100,
-                                                                          age.group.15.25 = c(15,25),
-                                                                          age.group.25.40 = c(25,40),
-                                                                          age.group.40.50 = c(40,50),
-                                                                          endpoint = 40,
-                                                                          timewindow = c(30,40)),
-                                       error=function(e) return(rep(NA, 28)))
       
-      summary.stat.phylo.MCAR.55 <- compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
-                                                                          work.dir = work.dir,
-                                                                          sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.55,
-                                                                          dirfasttree = work.dir,
-                                                                          limitTransmEvents = 7,
-                                                                          seq.cov = 55,
-                                                                          age.group.15.25 = c(15,25),
-                                                                          age.group.25.40 = c(25,40),
-                                                                          age.group.40.50 = c(40,50),
-                                                                          endpoint = 40,
-                                                                          timewindow = c(30,40))
+      
+      summary.stat.phylo.MCAR.55 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                   datalist.agemix = datalist,
+                                                                                   work.dir = work.dir,
+                                                                                   sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.55,
+                                                                                   dirfasttree = work.dir,
+                                                                                   limitTransmEvents = 7,
+                                                                                   seq.cov = 55,
+                                                                                   age.group.15.25 = c(15,25),
+                                                                                   age.group.25.40 = c(25,40),
+                                                                                   age.group.40.50 = c(40,50),
+                                                                                   endpoint = 40,
+                                                                                   timewindow = c(37,40),
+                                                                                   cut.off = 7),
+                                             error=function(e) return(rep(NA, 37)))
       
       
       
       
       
-      outputvector <- c(summary.stat.classic, summary.stat.phylo.MCAR.100)
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MCAR.55)
       
     }
     
@@ -2074,24 +2339,54 @@ simpact4ABC.classic.phylo.MCAR.55 <- function(inputvector){
 }
 
 
+
 # Coverage of 60%
-
-
-simpact4ABC.classic.phylo.MCAR.60 <- function(inputvector){
+simpact4ABC.classic.phylo.MCAR.60 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
   
   
-  work.dir <- "/home/niyukuri/Desktop/calibration" # on laptop
   
-  # work.dir <- "/home/niyukuri/Desktop/calibration" # on PC
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
   
   
   setwd(paste0(work.dir))
   
   
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")  
   
-  library(EasyABC)
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
   library(RSimpactCyan)
   library(RSimpactHelper)
   library(Rcpp)
@@ -2099,10 +2394,9 @@ simpact4ABC.classic.phylo.MCAR.60 <- function(inputvector){
   library(expoTree)
   library(data.table)
   library(readr)
-  # library(phangorn)
-  # library(lme4)
-  # library(nlme)
-  library(minque) # with lmer
+  library(phangorn)
+  library(lme4)
+  library(nlme)
   library(dplyr)
   library(adephylo)
   library(treedater)
@@ -2111,9 +2405,22 @@ simpact4ABC.classic.phylo.MCAR.60 <- function(inputvector){
   library(igraph)
   library(phyloTop)
   library(phytools)
-  library(Rsamtools) # select IDs sequences in a file
-  library(robustbase) # colMedians
-  library(lme4)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
   
   
   
@@ -2122,12 +2429,12 @@ simpact4ABC.classic.phylo.MCAR.60 <- function(inputvector){
   age.distr <- agedistr.creator(shape = 5, scale = 65)
   #
   cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
-                                   population.simtime = 40, 
+                                   population.simtime = 50, 
                                    population.nummen = 4000, 
                                    population.numwomen = 4000,
                                    hivseed.time = 10, 
                                    hivseed.type = "amount",
-                                   hivseed.amount = 20, 
+                                   hivseed.amount = 40, 
                                    hivseed.age.min = 20,
                                    hivseed.age.max = 50,
                                    formation.hazard.agegapry.meanage = -0.025,
@@ -2278,6 +2585,7 @@ simpact4ABC.classic.phylo.MCAR.60 <- function(inputvector){
   cfg.list["population.maxevents"] <- as.numeric(cfg.list["population.simtime"][1]) * as.numeric(cfg.list["population.nummen"][1]) * 3
   
   # Avoid overlaping in same directory
+  
   
   #creating subfolder with unique name for each simulation
   generate.filename <- function(how.long){
@@ -2304,7 +2612,7 @@ simpact4ABC.classic.phylo.MCAR.60 <- function(inputvector){
   # Error function when computing summary statistics
   
   err.functionGEN <- function(e){
-    return(chunk.summary.stats = rep(NA,28))
+    return(chunk.summary.stats = rep(NA,64))
     stop(e)
   }
   
@@ -2318,10 +2626,10 @@ simpact4ABC.classic.phylo.MCAR.60 <- function(inputvector){
   
   
   if (length(results) == 0){
-    outputvector <- rep(NA, 28) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
   }else{
     if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
-      outputvector <- rep(NA, 28)
+      outputvector <- rep(NA, 64)
     }else{
       
       
@@ -2329,38 +2637,33 @@ simpact4ABC.classic.phylo.MCAR.60 <- function(inputvector){
       
       simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
       
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
       
-      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist,
-                                                                          simpact.trans.net = simpact.trans.net,
-                                                                          work.dir = work.dir,
-                                                                          sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.60,
-                                                                          dirfasttree = work.dir,
-                                                                          limitTransmEvents = 7,
-                                                                          seq.cov = 100,
-                                                                          age.group.15.25 = c(15,25),
-                                                                          age.group.25.40 = c(25,40),
-                                                                          age.group.40.50 = c(40,50),
-                                                                          endpoint = 40,
-                                                                          timewindow = c(30,40)),
-                                       error=function(e) return(rep(NA, 28)))
       
-      summary.stat.phylo.MCAR.60 <- compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
-                                                                          work.dir = work.dir,
-                                                                          sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.60,
-                                                                          dirfasttree = work.dir,
-                                                                          limitTransmEvents = 7,
-                                                                          seq.cov = 60,
-                                                                          age.group.15.25 = c(15,25),
-                                                                          age.group.25.40 = c(25,40),
-                                                                          age.group.40.50 = c(40,50),
-                                                                          endpoint = 40,
-                                                                          timewindow = c(30,40))
+      
+      summary.stat.phylo.MCAR.60 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                   datalist.agemix = datalist,
+                                                                                   work.dir = work.dir,
+                                                                                   sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.60,
+                                                                                   dirfasttree = work.dir,
+                                                                                   limitTransmEvents = 7,
+                                                                                   seq.cov = 60,
+                                                                                   age.group.15.25 = c(15,25),
+                                                                                   age.group.25.40 = c(25,40),
+                                                                                   age.group.40.50 = c(40,50),
+                                                                                   endpoint = 40,
+                                                                                   timewindow = c(37,40),
+                                                                                   cut.off = 7),
+                                             error=function(e) return(rep(NA, 37)))
       
       
       
       
       
-      outputvector <- c(summary.stat.classic, summary.stat.phylo.MCAR.100)
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MCAR.60)
       
     }
     
@@ -2372,24 +2675,54 @@ simpact4ABC.classic.phylo.MCAR.60 <- function(inputvector){
 }
 
 
+
 # Coverage of 65%
-
-
-simpact4ABC.classic.phylo.MCAR.65 <- function(inputvector){
+simpact4ABC.classic.phylo.MCAR.65 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
   
   
-  work.dir <- "/home/niyukuri/Desktop/calibration" # on laptop
   
-  # work.dir <- "/home/niyukuri/Desktop/calibration" # on PC
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
   
   
   setwd(paste0(work.dir))
   
   
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")  
   
-  library(EasyABC)
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
   library(RSimpactCyan)
   library(RSimpactHelper)
   library(Rcpp)
@@ -2397,10 +2730,9 @@ simpact4ABC.classic.phylo.MCAR.65 <- function(inputvector){
   library(expoTree)
   library(data.table)
   library(readr)
-  # library(phangorn)
-  # library(lme4)
-  # library(nlme)
-  library(minque) # with lmer
+  library(phangorn)
+  library(lme4)
+  library(nlme)
   library(dplyr)
   library(adephylo)
   library(treedater)
@@ -2409,9 +2741,22 @@ simpact4ABC.classic.phylo.MCAR.65 <- function(inputvector){
   library(igraph)
   library(phyloTop)
   library(phytools)
-  library(Rsamtools) # select IDs sequences in a file
-  library(robustbase) # colMedians
-  library(lme4)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
   
   
   
@@ -2420,12 +2765,12 @@ simpact4ABC.classic.phylo.MCAR.65 <- function(inputvector){
   age.distr <- agedistr.creator(shape = 5, scale = 65)
   #
   cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
-                                   population.simtime = 40, 
+                                   population.simtime = 50, 
                                    population.nummen = 4000, 
                                    population.numwomen = 4000,
                                    hivseed.time = 10, 
                                    hivseed.type = "amount",
-                                   hivseed.amount = 20, 
+                                   hivseed.amount = 40, 
                                    hivseed.age.min = 20,
                                    hivseed.age.max = 50,
                                    formation.hazard.agegapry.meanage = -0.025,
@@ -2576,6 +2921,7 @@ simpact4ABC.classic.phylo.MCAR.65 <- function(inputvector){
   cfg.list["population.maxevents"] <- as.numeric(cfg.list["population.simtime"][1]) * as.numeric(cfg.list["population.nummen"][1]) * 3
   
   # Avoid overlaping in same directory
+  
   
   #creating subfolder with unique name for each simulation
   generate.filename <- function(how.long){
@@ -2602,7 +2948,7 @@ simpact4ABC.classic.phylo.MCAR.65 <- function(inputvector){
   # Error function when computing summary statistics
   
   err.functionGEN <- function(e){
-    return(chunk.summary.stats = rep(NA,28))
+    return(chunk.summary.stats = rep(NA,64))
     stop(e)
   }
   
@@ -2616,10 +2962,10 @@ simpact4ABC.classic.phylo.MCAR.65 <- function(inputvector){
   
   
   if (length(results) == 0){
-    outputvector <- rep(NA, 28) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
   }else{
     if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
-      outputvector <- rep(NA, 28)
+      outputvector <- rep(NA, 64)
     }else{
       
       
@@ -2627,38 +2973,33 @@ simpact4ABC.classic.phylo.MCAR.65 <- function(inputvector){
       
       simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
       
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
       
-      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist,
-                                                                          simpact.trans.net = simpact.trans.net,
-                                                                          work.dir = work.dir,
-                                                                          sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.65,
-                                                                          dirfasttree = work.dir,
-                                                                          limitTransmEvents = 7,
-                                                                          seq.cov = 100,
-                                                                          age.group.15.25 = c(15,25),
-                                                                          age.group.25.40 = c(25,40),
-                                                                          age.group.40.50 = c(40,50),
-                                                                          endpoint = 40,
-                                                                          timewindow = c(30,40)),
-                                       error=function(e) return(rep(NA, 28)))
       
-      summary.stat.phylo.MCAR.65 <- compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
-                                                                          work.dir = work.dir,
-                                                                          sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.65,
-                                                                          dirfasttree = work.dir,
-                                                                          limitTransmEvents = 7,
-                                                                          seq.cov = 65,
-                                                                          age.group.15.25 = c(15,25),
-                                                                          age.group.25.40 = c(25,40),
-                                                                          age.group.40.50 = c(40,50),
-                                                                          endpoint = 40,
-                                                                          timewindow = c(30,40))
+      
+      summary.stat.phylo.MCAR.65 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                   datalist.agemix = datalist,
+                                                                                   work.dir = work.dir,
+                                                                                   sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.65,
+                                                                                   dirfasttree = work.dir,
+                                                                                   limitTransmEvents = 7,
+                                                                                   seq.cov = 65,
+                                                                                   age.group.15.25 = c(15,25),
+                                                                                   age.group.25.40 = c(25,40),
+                                                                                   age.group.40.50 = c(40,50),
+                                                                                   endpoint = 40,
+                                                                                   timewindow = c(37,40),
+                                                                                   cut.off = 7),
+                                             error=function(e) return(rep(NA, 37)))
       
       
       
       
       
-      outputvector <- c(summary.stat.classic, summary.stat.phylo.MCAR.100)
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MCAR.65)
       
     }
     
@@ -2670,24 +3011,54 @@ simpact4ABC.classic.phylo.MCAR.65 <- function(inputvector){
 }
 
 
+
 # Coverage of 70%
-
-
-simpact4ABC.classic.phylo.MCAR.70 <- function(inputvector){
+simpact4ABC.classic.phylo.MCAR.70 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
   
   
-  work.dir <- "/home/niyukuri/Desktop/calibration" # on laptop
   
-  # work.dir <- "/home/niyukuri/Desktop/calibration" # on PC
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
   
   
   setwd(paste0(work.dir))
   
   
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")  
   
-  library(EasyABC)
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
   library(RSimpactCyan)
   library(RSimpactHelper)
   library(Rcpp)
@@ -2695,10 +3066,9 @@ simpact4ABC.classic.phylo.MCAR.70 <- function(inputvector){
   library(expoTree)
   library(data.table)
   library(readr)
-  # library(phangorn)
-  # library(lme4)
-  # library(nlme)
-  library(minque) # with lmer
+  library(phangorn)
+  library(lme4)
+  library(nlme)
   library(dplyr)
   library(adephylo)
   library(treedater)
@@ -2707,9 +3077,22 @@ simpact4ABC.classic.phylo.MCAR.70 <- function(inputvector){
   library(igraph)
   library(phyloTop)
   library(phytools)
-  library(Rsamtools) # select IDs sequences in a file
-  library(robustbase) # colMedians
-  library(lme4)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
   
   
   
@@ -2718,12 +3101,12 @@ simpact4ABC.classic.phylo.MCAR.70 <- function(inputvector){
   age.distr <- agedistr.creator(shape = 5, scale = 65)
   #
   cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
-                                   population.simtime = 40, 
+                                   population.simtime = 50, 
                                    population.nummen = 4000, 
                                    population.numwomen = 4000,
                                    hivseed.time = 10, 
                                    hivseed.type = "amount",
-                                   hivseed.amount = 20, 
+                                   hivseed.amount = 40, 
                                    hivseed.age.min = 20,
                                    hivseed.age.max = 50,
                                    formation.hazard.agegapry.meanage = -0.025,
@@ -2874,6 +3257,7 @@ simpact4ABC.classic.phylo.MCAR.70 <- function(inputvector){
   cfg.list["population.maxevents"] <- as.numeric(cfg.list["population.simtime"][1]) * as.numeric(cfg.list["population.nummen"][1]) * 3
   
   # Avoid overlaping in same directory
+  
   
   #creating subfolder with unique name for each simulation
   generate.filename <- function(how.long){
@@ -2900,7 +3284,7 @@ simpact4ABC.classic.phylo.MCAR.70 <- function(inputvector){
   # Error function when computing summary statistics
   
   err.functionGEN <- function(e){
-    return(chunk.summary.stats = rep(NA,28))
+    return(chunk.summary.stats = rep(NA,64))
     stop(e)
   }
   
@@ -2914,10 +3298,10 @@ simpact4ABC.classic.phylo.MCAR.70 <- function(inputvector){
   
   
   if (length(results) == 0){
-    outputvector <- rep(NA, 28) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
   }else{
     if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
-      outputvector <- rep(NA, 28)
+      outputvector <- rep(NA, 64)
     }else{
       
       
@@ -2925,38 +3309,33 @@ simpact4ABC.classic.phylo.MCAR.70 <- function(inputvector){
       
       simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
       
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
       
-      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist,
-                                                                          simpact.trans.net = simpact.trans.net,
-                                                                          work.dir = work.dir,
-                                                                          sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.70,
-                                                                          dirfasttree = work.dir,
-                                                                          limitTransmEvents = 7,
-                                                                          seq.cov = 100,
-                                                                          age.group.15.25 = c(15,25),
-                                                                          age.group.25.40 = c(25,40),
-                                                                          age.group.40.50 = c(40,50),
-                                                                          endpoint = 40,
-                                                                          timewindow = c(30,40)),
-                                       error=function(e) return(rep(NA, 28)))
       
-      summary.stat.phylo.MCAR.70 <- compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
-                                                                          work.dir = work.dir,
-                                                                          sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.70,
-                                                                          dirfasttree = work.dir,
-                                                                          limitTransmEvents = 7,
-                                                                          seq.cov = 70,
-                                                                          age.group.15.25 = c(15,25),
-                                                                          age.group.25.40 = c(25,40),
-                                                                          age.group.40.50 = c(40,50),
-                                                                          endpoint = 40,
-                                                                          timewindow = c(30,40))
+      
+      summary.stat.phylo.MCAR.70 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                   datalist.agemix = datalist,
+                                                                                   work.dir = work.dir,
+                                                                                   sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.70,
+                                                                                   dirfasttree = work.dir,
+                                                                                   limitTransmEvents = 7,
+                                                                                   seq.cov = 70,
+                                                                                   age.group.15.25 = c(15,25),
+                                                                                   age.group.25.40 = c(25,40),
+                                                                                   age.group.40.50 = c(40,50),
+                                                                                   endpoint = 40,
+                                                                                   timewindow = c(37,40),
+                                                                                   cut.off = 7),
+                                             error=function(e) return(rep(NA, 37)))
       
       
       
       
       
-      outputvector <- c(summary.stat.classic, summary.stat.phylo.MCAR.100)
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MCAR.70)
       
     }
     
@@ -2968,24 +3347,55 @@ simpact4ABC.classic.phylo.MCAR.70 <- function(inputvector){
 }
 
 
+
+
 # Coverage of 75%
-
-
-simpact4ABC.classic.phylo.MCAR.75 <- function(inputvector){
+simpact4ABC.classic.phylo.MCAR.75 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
   
   
-  work.dir <- "/home/niyukuri/Desktop/calibration" # on laptop
   
-  # work.dir <- "/home/niyukuri/Desktop/calibration" # on PC
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
   
   
   setwd(paste0(work.dir))
   
   
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")  
   
-  library(EasyABC)
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
   library(RSimpactCyan)
   library(RSimpactHelper)
   library(Rcpp)
@@ -2993,10 +3403,9 @@ simpact4ABC.classic.phylo.MCAR.75 <- function(inputvector){
   library(expoTree)
   library(data.table)
   library(readr)
-  # library(phangorn)
-  # library(lme4)
-  # library(nlme)
-  library(minque) # with lmer
+  library(phangorn)
+  library(lme4)
+  library(nlme)
   library(dplyr)
   library(adephylo)
   library(treedater)
@@ -3005,9 +3414,22 @@ simpact4ABC.classic.phylo.MCAR.75 <- function(inputvector){
   library(igraph)
   library(phyloTop)
   library(phytools)
-  library(Rsamtools) # select IDs sequences in a file
-  library(robustbase) # colMedians
-  library(lme4)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
   
   
   
@@ -3016,12 +3438,12 @@ simpact4ABC.classic.phylo.MCAR.75 <- function(inputvector){
   age.distr <- agedistr.creator(shape = 5, scale = 65)
   #
   cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
-                                   population.simtime = 40, 
+                                   population.simtime = 50, 
                                    population.nummen = 4000, 
                                    population.numwomen = 4000,
                                    hivseed.time = 10, 
                                    hivseed.type = "amount",
-                                   hivseed.amount = 20, 
+                                   hivseed.amount = 40, 
                                    hivseed.age.min = 20,
                                    hivseed.age.max = 50,
                                    formation.hazard.agegapry.meanage = -0.025,
@@ -3172,6 +3594,7 @@ simpact4ABC.classic.phylo.MCAR.75 <- function(inputvector){
   cfg.list["population.maxevents"] <- as.numeric(cfg.list["population.simtime"][1]) * as.numeric(cfg.list["population.nummen"][1]) * 3
   
   # Avoid overlaping in same directory
+  
   
   #creating subfolder with unique name for each simulation
   generate.filename <- function(how.long){
@@ -3198,7 +3621,7 @@ simpact4ABC.classic.phylo.MCAR.75 <- function(inputvector){
   # Error function when computing summary statistics
   
   err.functionGEN <- function(e){
-    return(chunk.summary.stats = rep(NA,28))
+    return(chunk.summary.stats = rep(NA,64))
     stop(e)
   }
   
@@ -3212,10 +3635,10 @@ simpact4ABC.classic.phylo.MCAR.75 <- function(inputvector){
   
   
   if (length(results) == 0){
-    outputvector <- rep(NA, 28) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
   }else{
     if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
-      outputvector <- rep(NA, 28)
+      outputvector <- rep(NA, 64)
     }else{
       
       
@@ -3223,38 +3646,33 @@ simpact4ABC.classic.phylo.MCAR.75 <- function(inputvector){
       
       simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
       
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
       
-      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist,
-                                                                          simpact.trans.net = simpact.trans.net,
-                                                                          work.dir = work.dir,
-                                                                          sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.75,
-                                                                          dirfasttree = work.dir,
-                                                                          limitTransmEvents = 7,
-                                                                          seq.cov = 100,
-                                                                          age.group.15.25 = c(15,25),
-                                                                          age.group.25.40 = c(25,40),
-                                                                          age.group.40.50 = c(40,50),
-                                                                          endpoint = 40,
-                                                                          timewindow = c(30,40)),
-                                       error=function(e) return(rep(NA, 28)))
       
-      summary.stat.phylo.MCAR.75 <- compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
-                                                                          work.dir = work.dir,
-                                                                          sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.75,
-                                                                          dirfasttree = work.dir,
-                                                                          limitTransmEvents = 7,
-                                                                          seq.cov = 75,
-                                                                          age.group.15.25 = c(15,25),
-                                                                          age.group.25.40 = c(25,40),
-                                                                          age.group.40.50 = c(40,50),
-                                                                          endpoint = 40,
-                                                                          timewindow = c(30,40))
+      
+      summary.stat.phylo.MCAR.75 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                   datalist.agemix = datalist,
+                                                                                   work.dir = work.dir,
+                                                                                   sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.75,
+                                                                                   dirfasttree = work.dir,
+                                                                                   limitTransmEvents = 7,
+                                                                                   seq.cov = 75,
+                                                                                   age.group.15.25 = c(15,25),
+                                                                                   age.group.25.40 = c(25,40),
+                                                                                   age.group.40.50 = c(40,50),
+                                                                                   endpoint = 40,
+                                                                                   timewindow = c(37,40),
+                                                                                   cut.off = 7),
+                                             error=function(e) return(rep(NA, 37)))
       
       
       
       
       
-      outputvector <- c(summary.stat.classic, summary.stat.phylo.MCAR.100)
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MCAR.75)
       
     }
     
@@ -3266,24 +3684,54 @@ simpact4ABC.classic.phylo.MCAR.75 <- function(inputvector){
 }
 
 
+
 # Coverage of 80%
-
-
-simpact4ABC.classic.phylo.MCAR.80 <- function(inputvector){
+simpact4ABC.classic.phylo.MCAR.80 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
   
   
-  work.dir <- "/home/niyukuri/Desktop/calibration" # on laptop
   
-  # work.dir <- "/home/niyukuri/Desktop/calibration" # on PC
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
   
   
   setwd(paste0(work.dir))
   
   
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")  
   
-  library(EasyABC)
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
   library(RSimpactCyan)
   library(RSimpactHelper)
   library(Rcpp)
@@ -3291,10 +3739,9 @@ simpact4ABC.classic.phylo.MCAR.80 <- function(inputvector){
   library(expoTree)
   library(data.table)
   library(readr)
-  # library(phangorn)
-  # library(lme4)
-  # library(nlme)
-  library(minque) # with lmer
+  library(phangorn)
+  library(lme4)
+  library(nlme)
   library(dplyr)
   library(adephylo)
   library(treedater)
@@ -3303,9 +3750,22 @@ simpact4ABC.classic.phylo.MCAR.80 <- function(inputvector){
   library(igraph)
   library(phyloTop)
   library(phytools)
-  library(Rsamtools) # select IDs sequences in a file
-  library(robustbase) # colMedians
-  library(lme4)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
   
   
   
@@ -3314,12 +3774,12 @@ simpact4ABC.classic.phylo.MCAR.80 <- function(inputvector){
   age.distr <- agedistr.creator(shape = 5, scale = 65)
   #
   cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
-                                   population.simtime = 40, 
+                                   population.simtime = 50, 
                                    population.nummen = 4000, 
                                    population.numwomen = 4000,
                                    hivseed.time = 10, 
                                    hivseed.type = "amount",
-                                   hivseed.amount = 20, 
+                                   hivseed.amount = 40, 
                                    hivseed.age.min = 20,
                                    hivseed.age.max = 50,
                                    formation.hazard.agegapry.meanage = -0.025,
@@ -3470,6 +3930,7 @@ simpact4ABC.classic.phylo.MCAR.80 <- function(inputvector){
   cfg.list["population.maxevents"] <- as.numeric(cfg.list["population.simtime"][1]) * as.numeric(cfg.list["population.nummen"][1]) * 3
   
   # Avoid overlaping in same directory
+  
   
   #creating subfolder with unique name for each simulation
   generate.filename <- function(how.long){
@@ -3496,7 +3957,7 @@ simpact4ABC.classic.phylo.MCAR.80 <- function(inputvector){
   # Error function when computing summary statistics
   
   err.functionGEN <- function(e){
-    return(chunk.summary.stats = rep(NA,28))
+    return(chunk.summary.stats = rep(NA,64))
     stop(e)
   }
   
@@ -3510,10 +3971,10 @@ simpact4ABC.classic.phylo.MCAR.80 <- function(inputvector){
   
   
   if (length(results) == 0){
-    outputvector <- rep(NA, 28) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
   }else{
     if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
-      outputvector <- rep(NA, 28)
+      outputvector <- rep(NA, 64)
     }else{
       
       
@@ -3521,38 +3982,33 @@ simpact4ABC.classic.phylo.MCAR.80 <- function(inputvector){
       
       simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
       
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
       
-      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist,
-                                                                          simpact.trans.net = simpact.trans.net,
-                                                                          work.dir = work.dir,
-                                                                          sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.80,
-                                                                          dirfasttree = work.dir,
-                                                                          limitTransmEvents = 7,
-                                                                          seq.cov = 100,
-                                                                          age.group.15.25 = c(15,25),
-                                                                          age.group.25.40 = c(25,40),
-                                                                          age.group.40.50 = c(40,50),
-                                                                          endpoint = 40,
-                                                                          timewindow = c(30,40)),
-                                       error=function(e) return(rep(NA, 28)))
       
-      summary.stat.phylo.MCAR.80 <- compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
-                                                                          work.dir = work.dir,
-                                                                          sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.80,
-                                                                          dirfasttree = work.dir,
-                                                                          limitTransmEvents = 7,
-                                                                          seq.cov = 80,
-                                                                          age.group.15.25 = c(15,25),
-                                                                          age.group.25.40 = c(25,40),
-                                                                          age.group.40.50 = c(40,50),
-                                                                          endpoint = 40,
-                                                                          timewindow = c(30,40))
+      
+      summary.stat.phylo.MCAR.80 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                   datalist.agemix = datalist,
+                                                                                   work.dir = work.dir,
+                                                                                   sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.80,
+                                                                                   dirfasttree = work.dir,
+                                                                                   limitTransmEvents = 7,
+                                                                                   seq.cov = 80,
+                                                                                   age.group.15.25 = c(15,25),
+                                                                                   age.group.25.40 = c(25,40),
+                                                                                   age.group.40.50 = c(40,50),
+                                                                                   endpoint = 40,
+                                                                                   timewindow = c(37,40),
+                                                                                   cut.off = 7),
+                                             error=function(e) return(rep(NA, 37)))
       
       
       
       
       
-      outputvector <- c(summary.stat.classic, summary.stat.phylo.MCAR.100)
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MCAR.80)
       
     }
     
@@ -3564,24 +4020,55 @@ simpact4ABC.classic.phylo.MCAR.80 <- function(inputvector){
 }
 
 
+
+
 # Coverage of 85%
-
-
-simpact4ABC.classic.phylo.MCAR.85 <- function(inputvector){
+simpact4ABC.classic.phylo.MCAR.85 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
   
   
-  work.dir <- "/home/niyukuri/Desktop/calibration" # on laptop
   
-  # work.dir <- "/home/niyukuri/Desktop/calibration" # on PC
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
   
   
   setwd(paste0(work.dir))
   
   
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")  
   
-  library(EasyABC)
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
   library(RSimpactCyan)
   library(RSimpactHelper)
   library(Rcpp)
@@ -3589,10 +4076,9 @@ simpact4ABC.classic.phylo.MCAR.85 <- function(inputvector){
   library(expoTree)
   library(data.table)
   library(readr)
-  # library(phangorn)
-  # library(lme4)
-  # library(nlme)
-  library(minque) # with lmer
+  library(phangorn)
+  library(lme4)
+  library(nlme)
   library(dplyr)
   library(adephylo)
   library(treedater)
@@ -3601,9 +4087,22 @@ simpact4ABC.classic.phylo.MCAR.85 <- function(inputvector){
   library(igraph)
   library(phyloTop)
   library(phytools)
-  library(Rsamtools) # select IDs sequences in a file
-  library(robustbase) # colMedians
-  library(lme4)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
   
   
   
@@ -3612,12 +4111,12 @@ simpact4ABC.classic.phylo.MCAR.85 <- function(inputvector){
   age.distr <- agedistr.creator(shape = 5, scale = 65)
   #
   cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
-                                   population.simtime = 40, 
+                                   population.simtime = 50, 
                                    population.nummen = 4000, 
                                    population.numwomen = 4000,
                                    hivseed.time = 10, 
                                    hivseed.type = "amount",
-                                   hivseed.amount = 20, 
+                                   hivseed.amount = 40, 
                                    hivseed.age.min = 20,
                                    hivseed.age.max = 50,
                                    formation.hazard.agegapry.meanage = -0.025,
@@ -3768,6 +4267,7 @@ simpact4ABC.classic.phylo.MCAR.85 <- function(inputvector){
   cfg.list["population.maxevents"] <- as.numeric(cfg.list["population.simtime"][1]) * as.numeric(cfg.list["population.nummen"][1]) * 3
   
   # Avoid overlaping in same directory
+  
   
   #creating subfolder with unique name for each simulation
   generate.filename <- function(how.long){
@@ -3794,7 +4294,7 @@ simpact4ABC.classic.phylo.MCAR.85 <- function(inputvector){
   # Error function when computing summary statistics
   
   err.functionGEN <- function(e){
-    return(chunk.summary.stats = rep(NA,28))
+    return(chunk.summary.stats = rep(NA,64))
     stop(e)
   }
   
@@ -3808,10 +4308,10 @@ simpact4ABC.classic.phylo.MCAR.85 <- function(inputvector){
   
   
   if (length(results) == 0){
-    outputvector <- rep(NA, 28) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
   }else{
     if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
-      outputvector <- rep(NA, 28)
+      outputvector <- rep(NA, 64)
     }else{
       
       
@@ -3819,38 +4319,33 @@ simpact4ABC.classic.phylo.MCAR.85 <- function(inputvector){
       
       simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
       
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
       
-      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist,
-                                                                          simpact.trans.net = simpact.trans.net,
-                                                                          work.dir = work.dir,
-                                                                          sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.85,
-                                                                          dirfasttree = work.dir,
-                                                                          limitTransmEvents = 7,
-                                                                          seq.cov = 100,
-                                                                          age.group.15.25 = c(15,25),
-                                                                          age.group.25.40 = c(25,40),
-                                                                          age.group.40.50 = c(40,50),
-                                                                          endpoint = 40,
-                                                                          timewindow = c(30,40)),
-                                       error=function(e) return(rep(NA, 28)))
       
-      summary.stat.phylo.MCAR.85 <- compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
-                                                                          work.dir = work.dir,
-                                                                          sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.85,
-                                                                          dirfasttree = work.dir,
-                                                                          limitTransmEvents = 7,
-                                                                          seq.cov = 85,
-                                                                          age.group.15.25 = c(15,25),
-                                                                          age.group.25.40 = c(25,40),
-                                                                          age.group.40.50 = c(40,50),
-                                                                          endpoint = 40,
-                                                                          timewindow = c(30,40))
+      
+      summary.stat.phylo.MCAR.85 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                   datalist.agemix = datalist,
+                                                                                   work.dir = work.dir,
+                                                                                   sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.85,
+                                                                                   dirfasttree = work.dir,
+                                                                                   limitTransmEvents = 7,
+                                                                                   seq.cov = 85,
+                                                                                   age.group.15.25 = c(15,25),
+                                                                                   age.group.25.40 = c(25,40),
+                                                                                   age.group.40.50 = c(40,50),
+                                                                                   endpoint = 40,
+                                                                                   timewindow = c(37,40),
+                                                                                   cut.off = 7),
+                                             error=function(e) return(rep(NA, 37)))
       
       
       
       
       
-      outputvector <- c(summary.stat.classic, summary.stat.phylo.MCAR.100)
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MCAR.85)
       
     }
     
@@ -3862,24 +4357,55 @@ simpact4ABC.classic.phylo.MCAR.85 <- function(inputvector){
 }
 
 
+
+
 # Coverage of 90%
-
-
-simpact4ABC.classic.phylo.MCAR.90 <- function(inputvector){
+simpact4ABC.classic.phylo.MCAR.90 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
   
   
-  work.dir <- "/home/niyukuri/Desktop/calibration" # on laptop
   
-  # work.dir <- "/home/niyukuri/Desktop/calibration" # on PC
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
   
   
   setwd(paste0(work.dir))
   
   
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")  
   
-  library(EasyABC)
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
   library(RSimpactCyan)
   library(RSimpactHelper)
   library(Rcpp)
@@ -3887,10 +4413,9 @@ simpact4ABC.classic.phylo.MCAR.90 <- function(inputvector){
   library(expoTree)
   library(data.table)
   library(readr)
-  # library(phangorn)
-  # library(lme4)
-  # library(nlme)
-  library(minque) # with lmer
+  library(phangorn)
+  library(lme4)
+  library(nlme)
   library(dplyr)
   library(adephylo)
   library(treedater)
@@ -3899,9 +4424,22 @@ simpact4ABC.classic.phylo.MCAR.90 <- function(inputvector){
   library(igraph)
   library(phyloTop)
   library(phytools)
-  library(Rsamtools) # select IDs sequences in a file
-  library(robustbase) # colMedians
-  library(lme4)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
   
   
   
@@ -3910,12 +4448,12 @@ simpact4ABC.classic.phylo.MCAR.90 <- function(inputvector){
   age.distr <- agedistr.creator(shape = 5, scale = 65)
   #
   cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
-                                   population.simtime = 40, 
+                                   population.simtime = 50, 
                                    population.nummen = 4000, 
                                    population.numwomen = 4000,
                                    hivseed.time = 10, 
                                    hivseed.type = "amount",
-                                   hivseed.amount = 20, 
+                                   hivseed.amount = 40, 
                                    hivseed.age.min = 20,
                                    hivseed.age.max = 50,
                                    formation.hazard.agegapry.meanage = -0.025,
@@ -4066,6 +4604,7 @@ simpact4ABC.classic.phylo.MCAR.90 <- function(inputvector){
   cfg.list["population.maxevents"] <- as.numeric(cfg.list["population.simtime"][1]) * as.numeric(cfg.list["population.nummen"][1]) * 3
   
   # Avoid overlaping in same directory
+  
   
   #creating subfolder with unique name for each simulation
   generate.filename <- function(how.long){
@@ -4092,7 +4631,7 @@ simpact4ABC.classic.phylo.MCAR.90 <- function(inputvector){
   # Error function when computing summary statistics
   
   err.functionGEN <- function(e){
-    return(chunk.summary.stats = rep(NA,28))
+    return(chunk.summary.stats = rep(NA,64))
     stop(e)
   }
   
@@ -4106,10 +4645,10 @@ simpact4ABC.classic.phylo.MCAR.90 <- function(inputvector){
   
   
   if (length(results) == 0){
-    outputvector <- rep(NA, 28) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
   }else{
     if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
-      outputvector <- rep(NA, 28)
+      outputvector <- rep(NA, 64)
     }else{
       
       
@@ -4117,38 +4656,33 @@ simpact4ABC.classic.phylo.MCAR.90 <- function(inputvector){
       
       simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
       
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
       
-      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist,
-                                                                          simpact.trans.net = simpact.trans.net,
-                                                                          work.dir = work.dir,
-                                                                          sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.90,
-                                                                          dirfasttree = work.dir,
-                                                                          limitTransmEvents = 7,
-                                                                          seq.cov = 100,
-                                                                          age.group.15.25 = c(15,25),
-                                                                          age.group.25.40 = c(25,40),
-                                                                          age.group.40.50 = c(40,50),
-                                                                          endpoint = 40,
-                                                                          timewindow = c(30,40)),
-                                       error=function(e) return(rep(NA, 28)))
       
-      summary.stat.phylo.MCAR.90 <- compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
-                                                                          work.dir = work.dir,
-                                                                          sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.90,
-                                                                          dirfasttree = work.dir,
-                                                                          limitTransmEvents = 7,
-                                                                          seq.cov = 90,
-                                                                          age.group.15.25 = c(15,25),
-                                                                          age.group.25.40 = c(25,40),
-                                                                          age.group.40.50 = c(40,50),
-                                                                          endpoint = 40,
-                                                                          timewindow = c(30,40))
+      
+      summary.stat.phylo.MCAR.90 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                   datalist.agemix = datalist,
+                                                                                   work.dir = work.dir,
+                                                                                   sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.90,
+                                                                                   dirfasttree = work.dir,
+                                                                                   limitTransmEvents = 7,
+                                                                                   seq.cov = 90,
+                                                                                   age.group.15.25 = c(15,25),
+                                                                                   age.group.25.40 = c(25,40),
+                                                                                   age.group.40.50 = c(40,50),
+                                                                                   endpoint = 40,
+                                                                                   timewindow = c(37,40),
+                                                                                   cut.off = 7),
+                                             error=function(e) return(rep(NA, 37)))
       
       
       
       
       
-      outputvector <- c(summary.stat.classic, summary.stat.phylo.MCAR.100)
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MCAR.90)
       
     }
     
@@ -4160,24 +4694,54 @@ simpact4ABC.classic.phylo.MCAR.90 <- function(inputvector){
 }
 
 
+
 # Coverage of 95%
-
-
-simpact4ABC.classic.phylo.MCAR.95 <- function(inputvector){
+simpact4ABC.classic.phylo.MCAR.95 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
   
   
-  work.dir <- "/home/niyukuri/Desktop/calibration" # on laptop
   
-  # work.dir <- "/home/niyukuri/Desktop/calibration" # on PC
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
   
   
   setwd(paste0(work.dir))
   
   
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")  
   
-  library(EasyABC)
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
   library(RSimpactCyan)
   library(RSimpactHelper)
   library(Rcpp)
@@ -4185,10 +4749,9 @@ simpact4ABC.classic.phylo.MCAR.95 <- function(inputvector){
   library(expoTree)
   library(data.table)
   library(readr)
-  # library(phangorn)
-  # library(lme4)
-  # library(nlme)
-  library(minque) # with lmer
+  library(phangorn)
+  library(lme4)
+  library(nlme)
   library(dplyr)
   library(adephylo)
   library(treedater)
@@ -4197,9 +4760,22 @@ simpact4ABC.classic.phylo.MCAR.95 <- function(inputvector){
   library(igraph)
   library(phyloTop)
   library(phytools)
-  library(Rsamtools) # select IDs sequences in a file
-  library(robustbase) # colMedians
-  library(lme4)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
   
   
   
@@ -4208,12 +4784,12 @@ simpact4ABC.classic.phylo.MCAR.95 <- function(inputvector){
   age.distr <- agedistr.creator(shape = 5, scale = 65)
   #
   cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
-                                   population.simtime = 40, 
+                                   population.simtime = 50, 
                                    population.nummen = 4000, 
                                    population.numwomen = 4000,
                                    hivseed.time = 10, 
                                    hivseed.type = "amount",
-                                   hivseed.amount = 20, 
+                                   hivseed.amount = 40, 
                                    hivseed.age.min = 20,
                                    hivseed.age.max = 50,
                                    formation.hazard.agegapry.meanage = -0.025,
@@ -4364,6 +4940,7 @@ simpact4ABC.classic.phylo.MCAR.95 <- function(inputvector){
   cfg.list["population.maxevents"] <- as.numeric(cfg.list["population.simtime"][1]) * as.numeric(cfg.list["population.nummen"][1]) * 3
   
   # Avoid overlaping in same directory
+  
   
   #creating subfolder with unique name for each simulation
   generate.filename <- function(how.long){
@@ -4390,7 +4967,7 @@ simpact4ABC.classic.phylo.MCAR.95 <- function(inputvector){
   # Error function when computing summary statistics
   
   err.functionGEN <- function(e){
-    return(chunk.summary.stats = rep(NA,28))
+    return(chunk.summary.stats = rep(NA,64))
     stop(e)
   }
   
@@ -4404,10 +4981,10 @@ simpact4ABC.classic.phylo.MCAR.95 <- function(inputvector){
   
   
   if (length(results) == 0){
-    outputvector <- rep(NA, 28) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
   }else{
     if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
-      outputvector <- rep(NA, 28)
+      outputvector <- rep(NA, 64)
     }else{
       
       
@@ -4415,38 +4992,33 @@ simpact4ABC.classic.phylo.MCAR.95 <- function(inputvector){
       
       simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
       
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
       
-      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist,
-                                                                          simpact.trans.net = simpact.trans.net,
-                                                                          work.dir = work.dir,
-                                                                          sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.95,
-                                                                          dirfasttree = work.dir,
-                                                                          limitTransmEvents = 7,
-                                                                          seq.cov = 100,
-                                                                          age.group.15.25 = c(15,25),
-                                                                          age.group.25.40 = c(25,40),
-                                                                          age.group.40.50 = c(40,50),
-                                                                          endpoint = 40,
-                                                                          timewindow = c(30,40)),
-                                       error=function(e) return(rep(NA, 28)))
       
-      summary.stat.phylo.MCAR.95 <- compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
-                                                                          work.dir = work.dir,
-                                                                          sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.95,
-                                                                          dirfasttree = work.dir,
-                                                                          limitTransmEvents = 7,
-                                                                          seq.cov = 95,
-                                                                          age.group.15.25 = c(15,25),
-                                                                          age.group.25.40 = c(25,40),
-                                                                          age.group.40.50 = c(40,50),
-                                                                          endpoint = 40,
-                                                                          timewindow = c(30,40))
+      
+      summary.stat.phylo.MCAR.95 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                   datalist.agemix = datalist,
+                                                                                   work.dir = work.dir,
+                                                                                   sub.dir.rename = ABC_DestDir.classic.phylo.MCAR.95,
+                                                                                   dirfasttree = work.dir,
+                                                                                   limitTransmEvents = 7,
+                                                                                   seq.cov = 95,
+                                                                                   age.group.15.25 = c(15,25),
+                                                                                   age.group.25.40 = c(25,40),
+                                                                                   age.group.40.50 = c(40,50),
+                                                                                   endpoint = 40,
+                                                                                   timewindow = c(37,40),
+                                                                                   cut.off = 7),
+                                             error=function(e) return(rep(NA, 37)))
       
       
       
       
       
-      outputvector <- c(summary.stat.classic, summary.stat.phylo.MCAR.100)
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MCAR.95)
       
     }
     
@@ -4459,26 +5031,59 @@ simpact4ABC.classic.phylo.MCAR.95 <- function(inputvector){
 
 
 
+
+
 ## IV. thirteen simpact models calibrated to classic summary statistics (full) 
 #    and phylogenetic summary statistics in MAR scenarios (35:95%, by=5%; women proportion = 0.7)
 ####################################################################################################
 
 # Coverage of 35%
-simpact4ABC.classic.phylo.MAR.35 <- function(inputvector){
+simpact4ABC.classic.phylo.MAR.a.35 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
   
   
-  work.dir <- "/home/niyukuri/Desktop/calibration" # on laptop
   
-  # work.dir <- "/home/niyukuri/Desktop/calibration" # on PC
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
   
   
   setwd(paste0(work.dir))
   
   
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")  
   
-  library(EasyABC)
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
   library(RSimpactCyan)
   library(RSimpactHelper)
   library(Rcpp)
@@ -4486,10 +5091,9 @@ simpact4ABC.classic.phylo.MAR.35 <- function(inputvector){
   library(expoTree)
   library(data.table)
   library(readr)
-  # library(phangorn)
-  # library(lme4)
-  # library(nlme)
-  library(minque) # with lmer
+  library(phangorn)
+  library(lme4)
+  library(nlme)
   library(dplyr)
   library(adephylo)
   library(treedater)
@@ -4498,9 +5102,22 @@ simpact4ABC.classic.phylo.MAR.35 <- function(inputvector){
   library(igraph)
   library(phyloTop)
   library(phytools)
-  library(Rsamtools) # select IDs sequences in a file
-  library(robustbase) # colMedians
-  library(lme4)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
   
   
   
@@ -4509,12 +5126,12 @@ simpact4ABC.classic.phylo.MAR.35 <- function(inputvector){
   age.distr <- agedistr.creator(shape = 5, scale = 65)
   #
   cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
-                                   population.simtime = 40, 
+                                   population.simtime = 50, 
                                    population.nummen = 4000, 
                                    population.numwomen = 4000,
                                    hivseed.time = 10, 
                                    hivseed.type = "amount",
-                                   hivseed.amount = 20, 
+                                   hivseed.amount = 40, 
                                    hivseed.age.min = 20,
                                    hivseed.age.max = 50,
                                    formation.hazard.agegapry.meanage = -0.025,
@@ -4666,6 +5283,7 @@ simpact4ABC.classic.phylo.MAR.35 <- function(inputvector){
   
   # Avoid overlaping in same directory
   
+  
   #creating subfolder with unique name for each simulation
   generate.filename <- function(how.long){
     
@@ -4685,30 +5303,30 @@ simpact4ABC.classic.phylo.MAR.35 <- function(inputvector){
     return(sub.dir.sim.id)
   }
   
-  ABC_DestDir.classic.phylo.MAR.35 <- paste0(work.dir,"/temp/",generate.filename(10))
+  ABC_DestDir.classic.phylo.MAR.a.35 <- paste0(work.dir,"/temp/",generate.filename(10))
   
   
   # Error function when computing summary statistics
   
   err.functionGEN <- function(e){
-    return(chunk.summary.stats = rep(NA,28))
+    return(chunk.summary.stats = rep(NA,64))
     stop(e)
   }
   
   
   
   results <- tryCatch(simpact.run(configParams = cfg.list,
-                                  destDir = ABC_DestDir.classic.phylo.MAR.35,
+                                  destDir = ABC_DestDir.classic.phylo.MAR.a.35,
                                   agedist = age.distr,
                                   intervention = intervention),
                       error = simpact.errFunction)
   
   
   if (length(results) == 0){
-    outputvector <- rep(NA, 28) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
   }else{
     if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
-      outputvector <- rep(NA, 28)
+      outputvector <- rep(NA, 64)
     }else{
       
       
@@ -4716,66 +5334,92 @@ simpact4ABC.classic.phylo.MAR.35 <- function(inputvector){
       
       simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
       
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
       
-      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist,
-                                                                          simpact.trans.net = simpact.trans.net,
-                                                                          work.dir = work.dir,
-                                                                          sub.dir.rename = ABC_DestDir.classic.phylo.MAR.35,
-                                                                          dirfasttree = work.dir,
-                                                                          limitTransmEvents = 7,
-                                                                          seq.cov = 100,
-                                                                          age.group.15.25 = c(15,25),
-                                                                          age.group.25.40 = c(25,40),
-                                                                          age.group.40.50 = c(40,50),
-                                                                          endpoint = 40,
-                                                                          timewindow = c(30,40)),
-                                       error=function(e) return(rep(NA, 28)))
       
-      summary.stat.phylo.MAR.35 <- compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
-                                                                        work.dir = work.dir,
-                                                                        sub.dir.rename = ABC_DestDir.classic.phylo.MAR.35,
-                                                                        dirfasttree = work.dir,
-                                                                        limitTransmEvents = 7,
-                                                                        seq.cov = 35,
-                                                                        age.group.15.25 = c(15,25),
-                                                                        age.group.25.40 = c(25,40),
-                                                                        age.group.40.50 = c(40,50),
-                                                                        endpoint = 40,
-                                                                        timewindow = c(30,40))
+      
+      summary.stat.phylo.MAR.a.35 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                    datalist.agemix = datalist,
+                                                                                    work.dir = work.dir,
+                                                                                    sub.dir.rename = ABC_DestDir.classic.phylo.MAR.a.35,
+                                                                                    dirfasttree = work.dir,
+                                                                                    limitTransmEvents = 7,
+                                                                                    seq.cov = 35,
+                                                                                    seq.gender.ratio = 0.7,
+                                                                                    age.group.15.25 = c(15,25),
+                                                                                    age.group.25.40 = c(25,40),
+                                                                                    age.group.40.50 = c(40,50),
+                                                                                    endpoint = 40,
+                                                                                    timewindow = c(37,40),
+                                                                                    cut.off = 7),
+                                              error=function(e) return(rep(NA, 37)))
       
       
       
       
       
-      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.100)
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.a.35)
       
     }
     
   }
   
-  unlink(paste0(ABC_DestDir.classic.phylo.MAR.35), recursive = TRUE)
+  unlink(paste0(ABC_DestDir.classic.phylo.MAR.a.35), recursive = TRUE)
   
   return(outputvector)
 }
 
 
 # Coverage of 40%
-
-simpact4ABC.classic.phylo.MAR.40 <- function(inputvector){
+simpact4ABC.classic.phylo.MAR.a.40 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
   
   
-  work.dir <- "/home/niyukuri/Desktop/calibration" # on laptop
   
-  # work.dir <- "/home/niyukuri/Desktop/calibration" # on PC
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
   
   
   setwd(paste0(work.dir))
   
   
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")  
   
-  library(EasyABC)
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
   library(RSimpactCyan)
   library(RSimpactHelper)
   library(Rcpp)
@@ -4783,10 +5427,9 @@ simpact4ABC.classic.phylo.MAR.40 <- function(inputvector){
   library(expoTree)
   library(data.table)
   library(readr)
-  # library(phangorn)
-  # library(lme4)
-  # library(nlme)
-  library(minque) # with lmer
+  library(phangorn)
+  library(lme4)
+  library(nlme)
   library(dplyr)
   library(adephylo)
   library(treedater)
@@ -4795,9 +5438,22 @@ simpact4ABC.classic.phylo.MAR.40 <- function(inputvector){
   library(igraph)
   library(phyloTop)
   library(phytools)
-  library(Rsamtools) # select IDs sequences in a file
-  library(robustbase) # colMedians
-  library(lme4)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
   
   
   
@@ -4806,12 +5462,12 @@ simpact4ABC.classic.phylo.MAR.40 <- function(inputvector){
   age.distr <- agedistr.creator(shape = 5, scale = 65)
   #
   cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
-                                   population.simtime = 40, 
+                                   population.simtime = 50, 
                                    population.nummen = 4000, 
                                    population.numwomen = 4000,
                                    hivseed.time = 10, 
                                    hivseed.type = "amount",
-                                   hivseed.amount = 20, 
+                                   hivseed.amount = 40, 
                                    hivseed.age.min = 20,
                                    hivseed.age.max = 50,
                                    formation.hazard.agegapry.meanage = -0.025,
@@ -4963,6 +5619,7 @@ simpact4ABC.classic.phylo.MAR.40 <- function(inputvector){
   
   # Avoid overlaping in same directory
   
+  
   #creating subfolder with unique name for each simulation
   generate.filename <- function(how.long){
     
@@ -4982,30 +5639,30 @@ simpact4ABC.classic.phylo.MAR.40 <- function(inputvector){
     return(sub.dir.sim.id)
   }
   
-  ABC_DestDir.classic.phylo.MAR.40 <- paste0(work.dir,"/temp/",generate.filename(10))
+  ABC_DestDir.classic.phylo.MAR.a.40 <- paste0(work.dir,"/temp/",generate.filename(10))
   
   
   # Error function when computing summary statistics
   
   err.functionGEN <- function(e){
-    return(chunk.summary.stats = rep(NA,28))
+    return(chunk.summary.stats = rep(NA,64))
     stop(e)
   }
   
   
   
   results <- tryCatch(simpact.run(configParams = cfg.list,
-                                  destDir = ABC_DestDir.classic.phylo.MAR.40,
+                                  destDir = ABC_DestDir.classic.phylo.MAR.a.40,
                                   agedist = age.distr,
                                   intervention = intervention),
                       error = simpact.errFunction)
   
   
   if (length(results) == 0){
-    outputvector <- rep(NA, 28) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
   }else{
     if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
-      outputvector <- rep(NA, 28)
+      outputvector <- rep(NA, 64)
     }else{
       
       
@@ -5013,65 +5670,93 @@ simpact4ABC.classic.phylo.MAR.40 <- function(inputvector){
       
       simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
       
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
       
-      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist,
-                                                                          simpact.trans.net = simpact.trans.net,
-                                                                          work.dir = work.dir,
-                                                                          sub.dir.rename = ABC_DestDir.classic.phylo.MAR.40,
-                                                                          dirfasttree = work.dir,
-                                                                          limitTransmEvents = 7,
-                                                                          seq.cov = 100,
-                                                                          age.group.15.25 = c(15,25),
-                                                                          age.group.25.40 = c(25,40),
-                                                                          age.group.40.50 = c(40,50),
-                                                                          endpoint = 40,
-                                                                          timewindow = c(30,40)),
-                                       error=function(e) return(rep(NA, 28)))
       
-      summary.stat.phylo.MAR.40 <- compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
-                                                                        work.dir = work.dir,
-                                                                        sub.dir.rename = ABC_DestDir.classic.phylo.MAR.40,
-                                                                        dirfasttree = work.dir,
-                                                                        limitTransmEvents = 7,
-                                                                        seq.cov = 40,
-                                                                        age.group.15.25 = c(15,25),
-                                                                        age.group.25.40 = c(25,40),
-                                                                        age.group.40.50 = c(40,50),
-                                                                        endpoint = 40,
-                                                                        timewindow = c(30,40))
+      
+      summary.stat.phylo.MAR.a.40 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                    datalist.agemix = datalist,
+                                                                                    work.dir = work.dir,
+                                                                                    sub.dir.rename = ABC_DestDir.classic.phylo.MAR.a.40,
+                                                                                    dirfasttree = work.dir,
+                                                                                    limitTransmEvents = 7,
+                                                                                    seq.cov = 40,
+                                                                                    seq.gender.ratio = 0.7,
+                                                                                    age.group.15.25 = c(15,25),
+                                                                                    age.group.25.40 = c(25,40),
+                                                                                    age.group.40.50 = c(40,50),
+                                                                                    endpoint = 40,
+                                                                                    timewindow = c(37,40),
+                                                                                    cut.off = 7),
+                                              error=function(e) return(rep(NA, 37)))
       
       
       
       
       
-      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.100)
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.a.40)
       
     }
     
   }
   
-  unlink(paste0(ABC_DestDir.classic.phylo.MAR.40), recursive = TRUE)
+  unlink(paste0(ABC_DestDir.classic.phylo.MAR.a.40), recursive = TRUE)
   
   return(outputvector)
 }
+
+
 
 # Coverage of 45%
-
-simpact4ABC.classic.phylo.MAR.45 <- function(inputvector){
+simpact4ABC.classic.phylo.MAR.a.45 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
   
   
-  work.dir <- "/home/niyukuri/Desktop/calibration" # on laptop
   
-  # work.dir <- "/home/niyukuri/Desktop/calibration" # on PC
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
   
   
   setwd(paste0(work.dir))
   
   
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")  
   
-  library(EasyABC)
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
   library(RSimpactCyan)
   library(RSimpactHelper)
   library(Rcpp)
@@ -5079,10 +5764,9 @@ simpact4ABC.classic.phylo.MAR.45 <- function(inputvector){
   library(expoTree)
   library(data.table)
   library(readr)
-  # library(phangorn)
-  # library(lme4)
-  # library(nlme)
-  library(minque) # with lmer
+  library(phangorn)
+  library(lme4)
+  library(nlme)
   library(dplyr)
   library(adephylo)
   library(treedater)
@@ -5091,9 +5775,22 @@ simpact4ABC.classic.phylo.MAR.45 <- function(inputvector){
   library(igraph)
   library(phyloTop)
   library(phytools)
-  library(Rsamtools) # select IDs sequences in a file
-  library(robustbase) # colMedians
-  library(lme4)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
   
   
   
@@ -5102,12 +5799,12 @@ simpact4ABC.classic.phylo.MAR.45 <- function(inputvector){
   age.distr <- agedistr.creator(shape = 5, scale = 65)
   #
   cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
-                                   population.simtime = 40, 
+                                   population.simtime = 50, 
                                    population.nummen = 4000, 
                                    population.numwomen = 4000,
                                    hivseed.time = 10, 
                                    hivseed.type = "amount",
-                                   hivseed.amount = 20, 
+                                   hivseed.amount = 40, 
                                    hivseed.age.min = 20,
                                    hivseed.age.max = 50,
                                    formation.hazard.agegapry.meanage = -0.025,
@@ -5259,6 +5956,7 @@ simpact4ABC.classic.phylo.MAR.45 <- function(inputvector){
   
   # Avoid overlaping in same directory
   
+  
   #creating subfolder with unique name for each simulation
   generate.filename <- function(how.long){
     
@@ -5278,30 +5976,30 @@ simpact4ABC.classic.phylo.MAR.45 <- function(inputvector){
     return(sub.dir.sim.id)
   }
   
-  ABC_DestDir.classic.phylo.MAR.45 <- paste0(work.dir,"/temp/",generate.filename(10))
+  ABC_DestDir.classic.phylo.MAR.a.45 <- paste0(work.dir,"/temp/",generate.filename(10))
   
   
   # Error function when computing summary statistics
   
   err.functionGEN <- function(e){
-    return(chunk.summary.stats = rep(NA,28))
+    return(chunk.summary.stats = rep(NA,64))
     stop(e)
   }
   
   
   
   results <- tryCatch(simpact.run(configParams = cfg.list,
-                                  destDir = ABC_DestDir.classic.phylo.MAR.45,
+                                  destDir = ABC_DestDir.classic.phylo.MAR.a.45,
                                   agedist = age.distr,
                                   intervention = intervention),
                       error = simpact.errFunction)
   
   
   if (length(results) == 0){
-    outputvector <- rep(NA, 28) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
   }else{
     if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
-      outputvector <- rep(NA, 28)
+      outputvector <- rep(NA, 64)
     }else{
       
       
@@ -5309,67 +6007,93 @@ simpact4ABC.classic.phylo.MAR.45 <- function(inputvector){
       
       simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
       
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
       
-      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist,
-                                                                          simpact.trans.net = simpact.trans.net,
-                                                                          work.dir = work.dir,
-                                                                          sub.dir.rename = ABC_DestDir.classic.phylo.MAR.45,
-                                                                          dirfasttree = work.dir,
-                                                                          limitTransmEvents = 7,
-                                                                          seq.cov = 100,
-                                                                          age.group.15.25 = c(15,25),
-                                                                          age.group.25.40 = c(25,40),
-                                                                          age.group.40.50 = c(40,50),
-                                                                          endpoint = 40,
-                                                                          timewindow = c(30,40)),
-                                       error=function(e) return(rep(NA, 28)))
       
-      summary.stat.phylo.MAR.45 <- compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
-                                                                        work.dir = work.dir,
-                                                                        sub.dir.rename = ABC_DestDir.classic.phylo.MAR.45,
-                                                                        dirfasttree = work.dir,
-                                                                        limitTransmEvents = 7,
-                                                                        seq.cov = 45,
-                                                                        age.group.15.25 = c(15,25),
-                                                                        age.group.25.40 = c(25,40),
-                                                                        age.group.40.50 = c(40,50),
-                                                                        endpoint = 40,
-                                                                        timewindow = c(30,40))
+      
+      summary.stat.phylo.MAR.a.45 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                    datalist.agemix = datalist,
+                                                                                    work.dir = work.dir,
+                                                                                    sub.dir.rename = ABC_DestDir.classic.phylo.MAR.a.45,
+                                                                                    dirfasttree = work.dir,
+                                                                                    limitTransmEvents = 7,
+                                                                                    seq.cov = 45,
+                                                                                    seq.gender.ratio = 0.7,
+                                                                                    age.group.15.25 = c(15,25),
+                                                                                    age.group.25.40 = c(25,40),
+                                                                                    age.group.40.50 = c(40,50),
+                                                                                    endpoint = 40,
+                                                                                    timewindow = c(37,40),
+                                                                                    cut.off = 7),
+                                              error=function(e) return(rep(NA, 37)))
       
       
       
       
       
-      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.100)
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.a.45)
       
     }
     
   }
   
-  unlink(paste0(ABC_DestDir.classic.phylo.MAR.45), recursive = TRUE)
+  unlink(paste0(ABC_DestDir.classic.phylo.MAR.a.45), recursive = TRUE)
   
   return(outputvector)
 }
+
 
 
 # Coverage of 50%
-
-
-simpact4ABC.classic.phylo.MAR.50 <- function(inputvector){
+simpact4ABC.classic.phylo.MAR.a.50 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
   
   
-  work.dir <- "/home/niyukuri/Desktop/calibration" # on laptop
   
-  # work.dir <- "/home/niyukuri/Desktop/calibration" # on PC
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
   
   
   setwd(paste0(work.dir))
   
   
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")  
   
-  library(EasyABC)
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
   library(RSimpactCyan)
   library(RSimpactHelper)
   library(Rcpp)
@@ -5377,10 +6101,9 @@ simpact4ABC.classic.phylo.MAR.50 <- function(inputvector){
   library(expoTree)
   library(data.table)
   library(readr)
-  # library(phangorn)
-  # library(lme4)
-  # library(nlme)
-  library(minque) # with lmer
+  library(phangorn)
+  library(lme4)
+  library(nlme)
   library(dplyr)
   library(adephylo)
   library(treedater)
@@ -5389,9 +6112,22 @@ simpact4ABC.classic.phylo.MAR.50 <- function(inputvector){
   library(igraph)
   library(phyloTop)
   library(phytools)
-  library(Rsamtools) # select IDs sequences in a file
-  library(robustbase) # colMedians
-  library(lme4)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
   
   
   
@@ -5400,12 +6136,12 @@ simpact4ABC.classic.phylo.MAR.50 <- function(inputvector){
   age.distr <- agedistr.creator(shape = 5, scale = 65)
   #
   cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
-                                   population.simtime = 40, 
+                                   population.simtime = 50, 
                                    population.nummen = 4000, 
                                    population.numwomen = 4000,
                                    hivseed.time = 10, 
                                    hivseed.type = "amount",
-                                   hivseed.amount = 20, 
+                                   hivseed.amount = 40, 
                                    hivseed.age.min = 20,
                                    hivseed.age.max = 50,
                                    formation.hazard.agegapry.meanage = -0.025,
@@ -5557,6 +6293,7 @@ simpact4ABC.classic.phylo.MAR.50 <- function(inputvector){
   
   # Avoid overlaping in same directory
   
+  
   #creating subfolder with unique name for each simulation
   generate.filename <- function(how.long){
     
@@ -5576,30 +6313,30 @@ simpact4ABC.classic.phylo.MAR.50 <- function(inputvector){
     return(sub.dir.sim.id)
   }
   
-  ABC_DestDir.classic.phylo.MAR.50 <- paste0(work.dir,"/temp/",generate.filename(10))
+  ABC_DestDir.classic.phylo.MAR.a.50 <- paste0(work.dir,"/temp/",generate.filename(10))
   
   
   # Error function when computing summary statistics
   
   err.functionGEN <- function(e){
-    return(chunk.summary.stats = rep(NA,28))
+    return(chunk.summary.stats = rep(NA,64))
     stop(e)
   }
   
   
   
   results <- tryCatch(simpact.run(configParams = cfg.list,
-                                  destDir = ABC_DestDir.classic.phylo.MAR.50,
+                                  destDir = ABC_DestDir.classic.phylo.MAR.a.50,
                                   agedist = age.distr,
                                   intervention = intervention),
                       error = simpact.errFunction)
   
   
   if (length(results) == 0){
-    outputvector <- rep(NA, 28) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
   }else{
     if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
-      outputvector <- rep(NA, 28)
+      outputvector <- rep(NA, 64)
     }else{
       
       
@@ -5607,67 +6344,93 @@ simpact4ABC.classic.phylo.MAR.50 <- function(inputvector){
       
       simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
       
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
       
-      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist,
-                                                                          simpact.trans.net = simpact.trans.net,
-                                                                          work.dir = work.dir,
-                                                                          sub.dir.rename = ABC_DestDir.classic.phylo.MAR.50,
-                                                                          dirfasttree = work.dir,
-                                                                          limitTransmEvents = 7,
-                                                                          seq.cov = 100,
-                                                                          age.group.15.25 = c(15,25),
-                                                                          age.group.25.40 = c(25,40),
-                                                                          age.group.40.50 = c(40,50),
-                                                                          endpoint = 40,
-                                                                          timewindow = c(30,40)),
-                                       error=function(e) return(rep(NA, 28)))
       
-      summary.stat.phylo.MAR.50 <- compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
-                                                                        work.dir = work.dir,
-                                                                        sub.dir.rename = ABC_DestDir.classic.phylo.MAR.50,
-                                                                        dirfasttree = work.dir,
-                                                                        limitTransmEvents = 7,
-                                                                        seq.cov = 50,
-                                                                        age.group.15.25 = c(15,25),
-                                                                        age.group.25.40 = c(25,40),
-                                                                        age.group.40.50 = c(40,50),
-                                                                        endpoint = 40,
-                                                                        timewindow = c(30,40))
+      
+      summary.stat.phylo.MAR.a.50 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                    datalist.agemix = datalist,
+                                                                                    work.dir = work.dir,
+                                                                                    sub.dir.rename = ABC_DestDir.classic.phylo.MAR.a.50,
+                                                                                    dirfasttree = work.dir,
+                                                                                    limitTransmEvents = 7,
+                                                                                    seq.cov = 45,
+                                                                                    seq.gender.ratio = 0.7,
+                                                                                    age.group.15.25 = c(15,25),
+                                                                                    age.group.25.40 = c(25,40),
+                                                                                    age.group.40.50 = c(40,50),
+                                                                                    endpoint = 40,
+                                                                                    timewindow = c(37,40),
+                                                                                    cut.off = 7),
+                                              error=function(e) return(rep(NA, 37)))
       
       
       
       
       
-      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.100)
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.a.50)
       
     }
     
   }
   
-  unlink(paste0(ABC_DestDir.classic.phylo.MAR.50), recursive = TRUE)
+  unlink(paste0(ABC_DestDir.classic.phylo.MAR.a.50), recursive = TRUE)
   
   return(outputvector)
 }
+
 
 
 # Coverage of 55%
-
-
-simpact4ABC.classic.phylo.MAR.55 <- function(inputvector){
+simpact4ABC.classic.phylo.MAR.a.55 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
   
   
-  work.dir <- "/home/niyukuri/Desktop/calibration" # on laptop
   
-  # work.dir <- "/home/niyukuri/Desktop/calibration" # on PC
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
   
   
   setwd(paste0(work.dir))
   
   
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")  
   
-  library(EasyABC)
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
   library(RSimpactCyan)
   library(RSimpactHelper)
   library(Rcpp)
@@ -5675,10 +6438,9 @@ simpact4ABC.classic.phylo.MAR.55 <- function(inputvector){
   library(expoTree)
   library(data.table)
   library(readr)
-  # library(phangorn)
-  # library(lme4)
-  # library(nlme)
-  library(minque) # with lmer
+  library(phangorn)
+  library(lme4)
+  library(nlme)
   library(dplyr)
   library(adephylo)
   library(treedater)
@@ -5687,9 +6449,22 @@ simpact4ABC.classic.phylo.MAR.55 <- function(inputvector){
   library(igraph)
   library(phyloTop)
   library(phytools)
-  library(Rsamtools) # select IDs sequences in a file
-  library(robustbase) # colMedians
-  library(lme4)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
   
   
   
@@ -5698,12 +6473,12 @@ simpact4ABC.classic.phylo.MAR.55 <- function(inputvector){
   age.distr <- agedistr.creator(shape = 5, scale = 65)
   #
   cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
-                                   population.simtime = 40, 
+                                   population.simtime = 50, 
                                    population.nummen = 4000, 
                                    population.numwomen = 4000,
                                    hivseed.time = 10, 
                                    hivseed.type = "amount",
-                                   hivseed.amount = 20, 
+                                   hivseed.amount = 40, 
                                    hivseed.age.min = 20,
                                    hivseed.age.max = 50,
                                    formation.hazard.agegapry.meanage = -0.025,
@@ -5855,6 +6630,7 @@ simpact4ABC.classic.phylo.MAR.55 <- function(inputvector){
   
   # Avoid overlaping in same directory
   
+  
   #creating subfolder with unique name for each simulation
   generate.filename <- function(how.long){
     
@@ -5874,30 +6650,30 @@ simpact4ABC.classic.phylo.MAR.55 <- function(inputvector){
     return(sub.dir.sim.id)
   }
   
-  ABC_DestDir.classic.phylo.MAR.55 <- paste0(work.dir,"/temp/",generate.filename(10))
+  ABC_DestDir.classic.phylo.MAR.a.55 <- paste0(work.dir,"/temp/",generate.filename(10))
   
   
   # Error function when computing summary statistics
   
   err.functionGEN <- function(e){
-    return(chunk.summary.stats = rep(NA,28))
+    return(chunk.summary.stats = rep(NA,64))
     stop(e)
   }
   
   
   
   results <- tryCatch(simpact.run(configParams = cfg.list,
-                                  destDir = ABC_DestDir.classic.phylo.MAR.55,
+                                  destDir = ABC_DestDir.classic.phylo.MAR.a.55,
                                   agedist = age.distr,
                                   intervention = intervention),
                       error = simpact.errFunction)
   
   
   if (length(results) == 0){
-    outputvector <- rep(NA, 28) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
   }else{
     if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
-      outputvector <- rep(NA, 28)
+      outputvector <- rep(NA, 64)
     }else{
       
       
@@ -5905,67 +6681,93 @@ simpact4ABC.classic.phylo.MAR.55 <- function(inputvector){
       
       simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
       
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
       
-      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist,
-                                                                          simpact.trans.net = simpact.trans.net,
-                                                                          work.dir = work.dir,
-                                                                          sub.dir.rename = ABC_DestDir.classic.phylo.MAR.55,
-                                                                          dirfasttree = work.dir,
-                                                                          limitTransmEvents = 7,
-                                                                          seq.cov = 100,
-                                                                          age.group.15.25 = c(15,25),
-                                                                          age.group.25.40 = c(25,40),
-                                                                          age.group.40.50 = c(40,50),
-                                                                          endpoint = 40,
-                                                                          timewindow = c(30,40)),
-                                       error=function(e) return(rep(NA, 28)))
       
-      summary.stat.phylo.MAR.55 <- compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
-                                                                        work.dir = work.dir,
-                                                                        sub.dir.rename = ABC_DestDir.classic.phylo.MAR.55,
-                                                                        dirfasttree = work.dir,
-                                                                        limitTransmEvents = 7,
-                                                                        seq.cov = 55,
-                                                                        age.group.15.25 = c(15,25),
-                                                                        age.group.25.40 = c(25,40),
-                                                                        age.group.40.50 = c(40,50),
-                                                                        endpoint = 40,
-                                                                        timewindow = c(30,40))
+      
+      summary.stat.phylo.MAR.a.55 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                    datalist.agemix = datalist,
+                                                                                    work.dir = work.dir,
+                                                                                    sub.dir.rename = ABC_DestDir.classic.phylo.MAR.a.55,
+                                                                                    dirfasttree = work.dir,
+                                                                                    limitTransmEvents = 7,
+                                                                                    seq.cov = 45,
+                                                                                    seq.gender.ratio = 0.7,
+                                                                                    age.group.15.25 = c(15,25),
+                                                                                    age.group.25.40 = c(25,40),
+                                                                                    age.group.40.50 = c(40,50),
+                                                                                    endpoint = 40,
+                                                                                    timewindow = c(37,40),
+                                                                                    cut.off = 7),
+                                              error=function(e) return(rep(NA, 37)))
       
       
       
       
       
-      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.100)
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.a.55)
       
     }
     
   }
   
-  unlink(paste0(ABC_DestDir.classic.phylo.MAR.55), recursive = TRUE)
+  unlink(paste0(ABC_DestDir.classic.phylo.MAR.a.55), recursive = TRUE)
   
   return(outputvector)
 }
+
 
 
 # Coverage of 60%
-
-
-simpact4ABC.classic.phylo.MAR.60 <- function(inputvector){
+simpact4ABC.classic.phylo.MAR.a.60 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
   
   
-  work.dir <- "/home/niyukuri/Desktop/calibration" # on laptop
   
-  # work.dir <- "/home/niyukuri/Desktop/calibration" # on PC
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
   
   
   setwd(paste0(work.dir))
   
   
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")  
   
-  library(EasyABC)
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
   library(RSimpactCyan)
   library(RSimpactHelper)
   library(Rcpp)
@@ -5973,10 +6775,9 @@ simpact4ABC.classic.phylo.MAR.60 <- function(inputvector){
   library(expoTree)
   library(data.table)
   library(readr)
-  # library(phangorn)
-  # library(lme4)
-  # library(nlme)
-  library(minque) # with lmer
+  library(phangorn)
+  library(lme4)
+  library(nlme)
   library(dplyr)
   library(adephylo)
   library(treedater)
@@ -5985,9 +6786,22 @@ simpact4ABC.classic.phylo.MAR.60 <- function(inputvector){
   library(igraph)
   library(phyloTop)
   library(phytools)
-  library(Rsamtools) # select IDs sequences in a file
-  library(robustbase) # colMedians
-  library(lme4)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
   
   
   
@@ -5996,12 +6810,12 @@ simpact4ABC.classic.phylo.MAR.60 <- function(inputvector){
   age.distr <- agedistr.creator(shape = 5, scale = 65)
   #
   cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
-                                   population.simtime = 40, 
+                                   population.simtime = 50, 
                                    population.nummen = 4000, 
                                    population.numwomen = 4000,
                                    hivseed.time = 10, 
                                    hivseed.type = "amount",
-                                   hivseed.amount = 20, 
+                                   hivseed.amount = 40, 
                                    hivseed.age.min = 20,
                                    hivseed.age.max = 50,
                                    formation.hazard.agegapry.meanage = -0.025,
@@ -6153,6 +6967,7 @@ simpact4ABC.classic.phylo.MAR.60 <- function(inputvector){
   
   # Avoid overlaping in same directory
   
+  
   #creating subfolder with unique name for each simulation
   generate.filename <- function(how.long){
     
@@ -6172,30 +6987,30 @@ simpact4ABC.classic.phylo.MAR.60 <- function(inputvector){
     return(sub.dir.sim.id)
   }
   
-  ABC_DestDir.classic.phylo.MAR.60 <- paste0(work.dir,"/temp/",generate.filename(10))
+  ABC_DestDir.classic.phylo.MAR.a.60 <- paste0(work.dir,"/temp/",generate.filename(10))
   
   
   # Error function when computing summary statistics
   
   err.functionGEN <- function(e){
-    return(chunk.summary.stats = rep(NA,28))
+    return(chunk.summary.stats = rep(NA,64))
     stop(e)
   }
   
   
   
   results <- tryCatch(simpact.run(configParams = cfg.list,
-                                  destDir = ABC_DestDir.classic.phylo.MAR.60,
+                                  destDir = ABC_DestDir.classic.phylo.MAR.a.60,
                                   agedist = age.distr,
                                   intervention = intervention),
                       error = simpact.errFunction)
   
   
   if (length(results) == 0){
-    outputvector <- rep(NA, 28) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
   }else{
     if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
-      outputvector <- rep(NA, 28)
+      outputvector <- rep(NA, 64)
     }else{
       
       
@@ -6203,67 +7018,94 @@ simpact4ABC.classic.phylo.MAR.60 <- function(inputvector){
       
       simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
       
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
       
-      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist,
-                                                                          simpact.trans.net = simpact.trans.net,
-                                                                          work.dir = work.dir,
-                                                                          sub.dir.rename = ABC_DestDir.classic.phylo.MAR.60,
-                                                                          dirfasttree = work.dir,
-                                                                          limitTransmEvents = 7,
-                                                                          seq.cov = 100,
-                                                                          age.group.15.25 = c(15,25),
-                                                                          age.group.25.40 = c(25,40),
-                                                                          age.group.40.50 = c(40,50),
-                                                                          endpoint = 40,
-                                                                          timewindow = c(30,40)),
-                                       error=function(e) return(rep(NA, 28)))
       
-      summary.stat.phylo.MAR.60 <- compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
-                                                                        work.dir = work.dir,
-                                                                        sub.dir.rename = ABC_DestDir.classic.phylo.MAR.60,
-                                                                        dirfasttree = work.dir,
-                                                                        limitTransmEvents = 7,
-                                                                        seq.cov = 60,
-                                                                        age.group.15.25 = c(15,25),
-                                                                        age.group.25.40 = c(25,40),
-                                                                        age.group.40.50 = c(40,50),
-                                                                        endpoint = 40,
-                                                                        timewindow = c(30,40))
+      
+      summary.stat.phylo.MAR.a.60 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                    datalist.agemix = datalist,
+                                                                                    work.dir = work.dir,
+                                                                                    sub.dir.rename = ABC_DestDir.classic.phylo.MAR.a.60,
+                                                                                    dirfasttree = work.dir,
+                                                                                    limitTransmEvents = 7,
+                                                                                    seq.cov = 45,
+                                                                                    seq.gender.ratio = 0.7,
+                                                                                    age.group.15.25 = c(15,25),
+                                                                                    age.group.25.40 = c(25,40),
+                                                                                    age.group.40.50 = c(40,50),
+                                                                                    endpoint = 40,
+                                                                                    timewindow = c(37,40),
+                                                                                    cut.off = 7),
+                                              error=function(e) return(rep(NA, 37)))
       
       
       
       
       
-      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.100)
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.a.60)
       
     }
     
   }
   
-  unlink(paste0(ABC_DestDir.classic.phylo.MAR.60), recursive = TRUE)
+  unlink(paste0(ABC_DestDir.classic.phylo.MAR.a.60), recursive = TRUE)
   
   return(outputvector)
 }
+
+
 
 
 # Coverage of 65%
-
-
-simpact4ABC.classic.phylo.MAR.65 <- function(inputvector){
+simpact4ABC.classic.phylo.MAR.a.65 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
   
   
-  work.dir <- "/home/niyukuri/Desktop/calibration" # on laptop
   
-  # work.dir <- "/home/niyukuri/Desktop/calibration" # on PC
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
   
   
   setwd(paste0(work.dir))
   
   
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")  
   
-  library(EasyABC)
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
   library(RSimpactCyan)
   library(RSimpactHelper)
   library(Rcpp)
@@ -6271,10 +7113,9 @@ simpact4ABC.classic.phylo.MAR.65 <- function(inputvector){
   library(expoTree)
   library(data.table)
   library(readr)
-  # library(phangorn)
-  # library(lme4)
-  # library(nlme)
-  library(minque) # with lmer
+  library(phangorn)
+  library(lme4)
+  library(nlme)
   library(dplyr)
   library(adephylo)
   library(treedater)
@@ -6283,9 +7124,22 @@ simpact4ABC.classic.phylo.MAR.65 <- function(inputvector){
   library(igraph)
   library(phyloTop)
   library(phytools)
-  library(Rsamtools) # select IDs sequences in a file
-  library(robustbase) # colMedians
-  library(lme4)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
   
   
   
@@ -6294,12 +7148,12 @@ simpact4ABC.classic.phylo.MAR.65 <- function(inputvector){
   age.distr <- agedistr.creator(shape = 5, scale = 65)
   #
   cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
-                                   population.simtime = 40, 
+                                   population.simtime = 50, 
                                    population.nummen = 4000, 
                                    population.numwomen = 4000,
                                    hivseed.time = 10, 
                                    hivseed.type = "amount",
-                                   hivseed.amount = 20, 
+                                   hivseed.amount = 40, 
                                    hivseed.age.min = 20,
                                    hivseed.age.max = 50,
                                    formation.hazard.agegapry.meanage = -0.025,
@@ -6451,6 +7305,7 @@ simpact4ABC.classic.phylo.MAR.65 <- function(inputvector){
   
   # Avoid overlaping in same directory
   
+  
   #creating subfolder with unique name for each simulation
   generate.filename <- function(how.long){
     
@@ -6470,30 +7325,30 @@ simpact4ABC.classic.phylo.MAR.65 <- function(inputvector){
     return(sub.dir.sim.id)
   }
   
-  ABC_DestDir.classic.phylo.MAR.65 <- paste0(work.dir,"/temp/",generate.filename(10))
+  ABC_DestDir.classic.phylo.MAR.a.65 <- paste0(work.dir,"/temp/",generate.filename(10))
   
   
   # Error function when computing summary statistics
   
   err.functionGEN <- function(e){
-    return(chunk.summary.stats = rep(NA,28))
+    return(chunk.summary.stats = rep(NA,64))
     stop(e)
   }
   
   
   
   results <- tryCatch(simpact.run(configParams = cfg.list,
-                                  destDir = ABC_DestDir.classic.phylo.MAR.65,
+                                  destDir = ABC_DestDir.classic.phylo.MAR.a.65,
                                   agedist = age.distr,
                                   intervention = intervention),
                       error = simpact.errFunction)
   
   
   if (length(results) == 0){
-    outputvector <- rep(NA, 28) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
   }else{
     if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
-      outputvector <- rep(NA, 28)
+      outputvector <- rep(NA, 64)
     }else{
       
       
@@ -6501,67 +7356,93 @@ simpact4ABC.classic.phylo.MAR.65 <- function(inputvector){
       
       simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
       
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
       
-      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist,
-                                                                          simpact.trans.net = simpact.trans.net,
-                                                                          work.dir = work.dir,
-                                                                          sub.dir.rename = ABC_DestDir.classic.phylo.MAR.65,
-                                                                          dirfasttree = work.dir,
-                                                                          limitTransmEvents = 7,
-                                                                          seq.cov = 100,
-                                                                          age.group.15.25 = c(15,25),
-                                                                          age.group.25.40 = c(25,40),
-                                                                          age.group.40.50 = c(40,50),
-                                                                          endpoint = 40,
-                                                                          timewindow = c(30,40)),
-                                       error=function(e) return(rep(NA, 28)))
       
-      summary.stat.phylo.MAR.65 <- compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
-                                                                        work.dir = work.dir,
-                                                                        sub.dir.rename = ABC_DestDir.classic.phylo.MAR.65,
-                                                                        dirfasttree = work.dir,
-                                                                        limitTransmEvents = 7,
-                                                                        seq.cov = 65,
-                                                                        age.group.15.25 = c(15,25),
-                                                                        age.group.25.40 = c(25,40),
-                                                                        age.group.40.50 = c(40,50),
-                                                                        endpoint = 40,
-                                                                        timewindow = c(30,40))
+      
+      summary.stat.phylo.MAR.a.65 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                    datalist.agemix = datalist,
+                                                                                    work.dir = work.dir,
+                                                                                    sub.dir.rename = ABC_DestDir.classic.phylo.MAR.a.65,
+                                                                                    dirfasttree = work.dir,
+                                                                                    limitTransmEvents = 7,
+                                                                                    seq.cov = 45,
+                                                                                    seq.gender.ratio = 0.7,
+                                                                                    age.group.15.25 = c(15,25),
+                                                                                    age.group.25.40 = c(25,40),
+                                                                                    age.group.40.50 = c(40,50),
+                                                                                    endpoint = 40,
+                                                                                    timewindow = c(37,40),
+                                                                                    cut.off = 7),
+                                              error=function(e) return(rep(NA, 37)))
       
       
       
       
       
-      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.100)
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.a.65)
       
     }
     
   }
   
-  unlink(paste0(ABC_DestDir.classic.phylo.MAR.65), recursive = TRUE)
+  unlink(paste0(ABC_DestDir.classic.phylo.MAR.a.65), recursive = TRUE)
   
   return(outputvector)
 }
+
 
 
 # Coverage of 70%
-
-
-simpact4ABC.classic.phylo.MAR.70 <- function(inputvector){
+simpact4ABC.classic.phylo.MAR.a.70 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
   
   
-  work.dir <- "/home/niyukuri/Desktop/calibration" # on laptop
   
-  # work.dir <- "/home/niyukuri/Desktop/calibration" # on PC
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
   
   
   setwd(paste0(work.dir))
   
   
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")  
   
-  library(EasyABC)
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
   library(RSimpactCyan)
   library(RSimpactHelper)
   library(Rcpp)
@@ -6569,10 +7450,9 @@ simpact4ABC.classic.phylo.MAR.70 <- function(inputvector){
   library(expoTree)
   library(data.table)
   library(readr)
-  # library(phangorn)
-  # library(lme4)
-  # library(nlme)
-  library(minque) # with lmer
+  library(phangorn)
+  library(lme4)
+  library(nlme)
   library(dplyr)
   library(adephylo)
   library(treedater)
@@ -6581,9 +7461,22 @@ simpact4ABC.classic.phylo.MAR.70 <- function(inputvector){
   library(igraph)
   library(phyloTop)
   library(phytools)
-  library(Rsamtools) # select IDs sequences in a file
-  library(robustbase) # colMedians
-  library(lme4)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
   
   
   
@@ -6592,12 +7485,12 @@ simpact4ABC.classic.phylo.MAR.70 <- function(inputvector){
   age.distr <- agedistr.creator(shape = 5, scale = 65)
   #
   cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
-                                   population.simtime = 40, 
+                                   population.simtime = 50, 
                                    population.nummen = 4000, 
                                    population.numwomen = 4000,
                                    hivseed.time = 10, 
                                    hivseed.type = "amount",
-                                   hivseed.amount = 20, 
+                                   hivseed.amount = 40, 
                                    hivseed.age.min = 20,
                                    hivseed.age.max = 50,
                                    formation.hazard.agegapry.meanage = -0.025,
@@ -6749,6 +7642,7 @@ simpact4ABC.classic.phylo.MAR.70 <- function(inputvector){
   
   # Avoid overlaping in same directory
   
+  
   #creating subfolder with unique name for each simulation
   generate.filename <- function(how.long){
     
@@ -6768,30 +7662,30 @@ simpact4ABC.classic.phylo.MAR.70 <- function(inputvector){
     return(sub.dir.sim.id)
   }
   
-  ABC_DestDir.classic.phylo.MAR.70 <- paste0(work.dir,"/temp/",generate.filename(10))
+  ABC_DestDir.classic.phylo.MAR.a.70 <- paste0(work.dir,"/temp/",generate.filename(10))
   
   
   # Error function when computing summary statistics
   
   err.functionGEN <- function(e){
-    return(chunk.summary.stats = rep(NA,28))
+    return(chunk.summary.stats = rep(NA,64))
     stop(e)
   }
   
   
   
   results <- tryCatch(simpact.run(configParams = cfg.list,
-                                  destDir = ABC_DestDir.classic.phylo.MAR.70,
+                                  destDir = ABC_DestDir.classic.phylo.MAR.a.70,
                                   agedist = age.distr,
                                   intervention = intervention),
                       error = simpact.errFunction)
   
   
   if (length(results) == 0){
-    outputvector <- rep(NA, 28) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
   }else{
     if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
-      outputvector <- rep(NA, 28)
+      outputvector <- rep(NA, 64)
     }else{
       
       
@@ -6799,67 +7693,93 @@ simpact4ABC.classic.phylo.MAR.70 <- function(inputvector){
       
       simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
       
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
       
-      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist,
-                                                                          simpact.trans.net = simpact.trans.net,
-                                                                          work.dir = work.dir,
-                                                                          sub.dir.rename = ABC_DestDir.classic.phylo.MAR.70,
-                                                                          dirfasttree = work.dir,
-                                                                          limitTransmEvents = 7,
-                                                                          seq.cov = 100,
-                                                                          age.group.15.25 = c(15,25),
-                                                                          age.group.25.40 = c(25,40),
-                                                                          age.group.40.50 = c(40,50),
-                                                                          endpoint = 40,
-                                                                          timewindow = c(30,40)),
-                                       error=function(e) return(rep(NA, 28)))
       
-      summary.stat.phylo.MAR.70 <- compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
-                                                                        work.dir = work.dir,
-                                                                        sub.dir.rename = ABC_DestDir.classic.phylo.MAR.70,
-                                                                        dirfasttree = work.dir,
-                                                                        limitTransmEvents = 7,
-                                                                        seq.cov = 70,
-                                                                        age.group.15.25 = c(15,25),
-                                                                        age.group.25.40 = c(25,40),
-                                                                        age.group.40.50 = c(40,50),
-                                                                        endpoint = 40,
-                                                                        timewindow = c(30,40))
+      
+      summary.stat.phylo.MAR.a.70 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                    datalist.agemix = datalist,
+                                                                                    work.dir = work.dir,
+                                                                                    sub.dir.rename = ABC_DestDir.classic.phylo.MAR.a.70,
+                                                                                    dirfasttree = work.dir,
+                                                                                    limitTransmEvents = 7,
+                                                                                    seq.cov = 45,
+                                                                                    seq.gender.ratio = 0.7,
+                                                                                    age.group.15.25 = c(15,25),
+                                                                                    age.group.25.40 = c(25,40),
+                                                                                    age.group.40.50 = c(40,50),
+                                                                                    endpoint = 40,
+                                                                                    timewindow = c(37,40),
+                                                                                    cut.off = 7),
+                                              error=function(e) return(rep(NA, 37)))
       
       
       
       
       
-      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.100)
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.a.70)
       
     }
     
   }
   
-  unlink(paste0(ABC_DestDir.classic.phylo.MAR.70), recursive = TRUE)
+  unlink(paste0(ABC_DestDir.classic.phylo.MAR.a.70), recursive = TRUE)
   
   return(outputvector)
 }
+
 
 
 # Coverage of 75%
-
-
-simpact4ABC.classic.phylo.MAR.75 <- function(inputvector){
+simpact4ABC.classic.phylo.MAR.a.75 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
   
   
-  work.dir <- "/home/niyukuri/Desktop/calibration" # on laptop
   
-  # work.dir <- "/home/niyukuri/Desktop/calibration" # on PC
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
   
   
   setwd(paste0(work.dir))
   
   
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")  
   
-  library(EasyABC)
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
   library(RSimpactCyan)
   library(RSimpactHelper)
   library(Rcpp)
@@ -6867,10 +7787,9 @@ simpact4ABC.classic.phylo.MAR.75 <- function(inputvector){
   library(expoTree)
   library(data.table)
   library(readr)
-  # library(phangorn)
-  # library(lme4)
-  # library(nlme)
-  library(minque) # with lmer
+  library(phangorn)
+  library(lme4)
+  library(nlme)
   library(dplyr)
   library(adephylo)
   library(treedater)
@@ -6879,9 +7798,22 @@ simpact4ABC.classic.phylo.MAR.75 <- function(inputvector){
   library(igraph)
   library(phyloTop)
   library(phytools)
-  library(Rsamtools) # select IDs sequences in a file
-  library(robustbase) # colMedians
-  library(lme4)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
   
   
   
@@ -6890,12 +7822,12 @@ simpact4ABC.classic.phylo.MAR.75 <- function(inputvector){
   age.distr <- agedistr.creator(shape = 5, scale = 65)
   #
   cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
-                                   population.simtime = 40, 
+                                   population.simtime = 50, 
                                    population.nummen = 4000, 
                                    population.numwomen = 4000,
                                    hivseed.time = 10, 
                                    hivseed.type = "amount",
-                                   hivseed.amount = 20, 
+                                   hivseed.amount = 40, 
                                    hivseed.age.min = 20,
                                    hivseed.age.max = 50,
                                    formation.hazard.agegapry.meanage = -0.025,
@@ -7047,6 +7979,7 @@ simpact4ABC.classic.phylo.MAR.75 <- function(inputvector){
   
   # Avoid overlaping in same directory
   
+  
   #creating subfolder with unique name for each simulation
   generate.filename <- function(how.long){
     
@@ -7066,30 +7999,30 @@ simpact4ABC.classic.phylo.MAR.75 <- function(inputvector){
     return(sub.dir.sim.id)
   }
   
-  ABC_DestDir.classic.phylo.MAR.75 <- paste0(work.dir,"/temp/",generate.filename(10))
+  ABC_DestDir.classic.phylo.MAR.a.75 <- paste0(work.dir,"/temp/",generate.filename(10))
   
   
   # Error function when computing summary statistics
   
   err.functionGEN <- function(e){
-    return(chunk.summary.stats = rep(NA,28))
+    return(chunk.summary.stats = rep(NA,64))
     stop(e)
   }
   
   
   
   results <- tryCatch(simpact.run(configParams = cfg.list,
-                                  destDir = ABC_DestDir.classic.phylo.MAR.75,
+                                  destDir = ABC_DestDir.classic.phylo.MAR.a.75,
                                   agedist = age.distr,
                                   intervention = intervention),
                       error = simpact.errFunction)
   
   
   if (length(results) == 0){
-    outputvector <- rep(NA, 28) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
   }else{
     if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
-      outputvector <- rep(NA, 28)
+      outputvector <- rep(NA, 64)
     }else{
       
       
@@ -7097,67 +8030,94 @@ simpact4ABC.classic.phylo.MAR.75 <- function(inputvector){
       
       simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
       
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
       
-      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist,
-                                                                          simpact.trans.net = simpact.trans.net,
-                                                                          work.dir = work.dir,
-                                                                          sub.dir.rename = ABC_DestDir.classic.phylo.MAR.75,
-                                                                          dirfasttree = work.dir,
-                                                                          limitTransmEvents = 7,
-                                                                          seq.cov = 100,
-                                                                          age.group.15.25 = c(15,25),
-                                                                          age.group.25.40 = c(25,40),
-                                                                          age.group.40.50 = c(40,50),
-                                                                          endpoint = 40,
-                                                                          timewindow = c(30,40)),
-                                       error=function(e) return(rep(NA, 28)))
       
-      summary.stat.phylo.MAR.75 <- compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
-                                                                        work.dir = work.dir,
-                                                                        sub.dir.rename = ABC_DestDir.classic.phylo.MAR.75,
-                                                                        dirfasttree = work.dir,
-                                                                        limitTransmEvents = 7,
-                                                                        seq.cov = 75,
-                                                                        age.group.15.25 = c(15,25),
-                                                                        age.group.25.40 = c(25,40),
-                                                                        age.group.40.50 = c(40,50),
-                                                                        endpoint = 40,
-                                                                        timewindow = c(30,40))
+      
+      summary.stat.phylo.MAR.a.75 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                    datalist.agemix = datalist,
+                                                                                    work.dir = work.dir,
+                                                                                    sub.dir.rename = ABC_DestDir.classic.phylo.MAR.a.75,
+                                                                                    dirfasttree = work.dir,
+                                                                                    limitTransmEvents = 7,
+                                                                                    seq.cov = 45,
+                                                                                    seq.gender.ratio = 0.7,
+                                                                                    age.group.15.25 = c(15,25),
+                                                                                    age.group.25.40 = c(25,40),
+                                                                                    age.group.40.50 = c(40,50),
+                                                                                    endpoint = 40,
+                                                                                    timewindow = c(37,40),
+                                                                                    cut.off = 7),
+                                              error=function(e) return(rep(NA, 37)))
       
       
       
       
       
-      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.100)
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.a.75)
       
     }
     
   }
   
-  unlink(paste0(ABC_DestDir.classic.phylo.MAR.75), recursive = TRUE)
+  unlink(paste0(ABC_DestDir.classic.phylo.MAR.a.75), recursive = TRUE)
   
   return(outputvector)
 }
 
 
-# Coverage of 80%
 
 
-simpact4ABC.classic.phylo.MAR.80 <- function(inputvector){
+# Coverage of 80 %
+simpact4ABC.classic.phylo.MAR.a.80 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
   
   
-  work.dir <- "/home/niyukuri/Desktop/calibration" # on laptop
   
-  # work.dir <- "/home/niyukuri/Desktop/calibration" # on PC
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
   
   
   setwd(paste0(work.dir))
   
   
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")  
   
-  library(EasyABC)
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
   library(RSimpactCyan)
   library(RSimpactHelper)
   library(Rcpp)
@@ -7165,10 +8125,9 @@ simpact4ABC.classic.phylo.MAR.80 <- function(inputvector){
   library(expoTree)
   library(data.table)
   library(readr)
-  # library(phangorn)
-  # library(lme4)
-  # library(nlme)
-  library(minque) # with lmer
+  library(phangorn)
+  library(lme4)
+  library(nlme)
   library(dplyr)
   library(adephylo)
   library(treedater)
@@ -7177,9 +8136,22 @@ simpact4ABC.classic.phylo.MAR.80 <- function(inputvector){
   library(igraph)
   library(phyloTop)
   library(phytools)
-  library(Rsamtools) # select IDs sequences in a file
-  library(robustbase) # colMedians
-  library(lme4)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
   
   
   
@@ -7188,12 +8160,12 @@ simpact4ABC.classic.phylo.MAR.80 <- function(inputvector){
   age.distr <- agedistr.creator(shape = 5, scale = 65)
   #
   cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
-                                   population.simtime = 40, 
+                                   population.simtime = 50, 
                                    population.nummen = 4000, 
                                    population.numwomen = 4000,
                                    hivseed.time = 10, 
                                    hivseed.type = "amount",
-                                   hivseed.amount = 20, 
+                                   hivseed.amount = 40, 
                                    hivseed.age.min = 20,
                                    hivseed.age.max = 50,
                                    formation.hazard.agegapry.meanage = -0.025,
@@ -7345,6 +8317,7 @@ simpact4ABC.classic.phylo.MAR.80 <- function(inputvector){
   
   # Avoid overlaping in same directory
   
+  
   #creating subfolder with unique name for each simulation
   generate.filename <- function(how.long){
     
@@ -7364,30 +8337,30 @@ simpact4ABC.classic.phylo.MAR.80 <- function(inputvector){
     return(sub.dir.sim.id)
   }
   
-  ABC_DestDir.classic.phylo.MAR.80 <- paste0(work.dir,"/temp/",generate.filename(10))
+  ABC_DestDir.classic.phylo.MAR.a.80 <- paste0(work.dir,"/temp/",generate.filename(10))
   
   
   # Error function when computing summary statistics
   
   err.functionGEN <- function(e){
-    return(chunk.summary.stats = rep(NA,28))
+    return(chunk.summary.stats = rep(NA,64))
     stop(e)
   }
   
   
   
   results <- tryCatch(simpact.run(configParams = cfg.list,
-                                  destDir = ABC_DestDir.classic.phylo.MAR.80,
+                                  destDir = ABC_DestDir.classic.phylo.MAR.a.80,
                                   agedist = age.distr,
                                   intervention = intervention),
                       error = simpact.errFunction)
   
   
   if (length(results) == 0){
-    outputvector <- rep(NA, 28) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
   }else{
     if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
-      outputvector <- rep(NA, 28)
+      outputvector <- rep(NA, 64)
     }else{
       
       
@@ -7395,67 +8368,94 @@ simpact4ABC.classic.phylo.MAR.80 <- function(inputvector){
       
       simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
       
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
       
-      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist,
-                                                                          simpact.trans.net = simpact.trans.net,
-                                                                          work.dir = work.dir,
-                                                                          sub.dir.rename = ABC_DestDir.classic.phylo.MAR.80,
-                                                                          dirfasttree = work.dir,
-                                                                          limitTransmEvents = 7,
-                                                                          seq.cov = 100,
-                                                                          age.group.15.25 = c(15,25),
-                                                                          age.group.25.40 = c(25,40),
-                                                                          age.group.40.50 = c(40,50),
-                                                                          endpoint = 40,
-                                                                          timewindow = c(30,40)),
-                                       error=function(e) return(rep(NA, 28)))
       
-      summary.stat.phylo.MAR.80 <- compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
-                                                                        work.dir = work.dir,
-                                                                        sub.dir.rename = ABC_DestDir.classic.phylo.MAR.80,
-                                                                        dirfasttree = work.dir,
-                                                                        limitTransmEvents = 7,
-                                                                        seq.cov = 80,
-                                                                        age.group.15.25 = c(15,25),
-                                                                        age.group.25.40 = c(25,40),
-                                                                        age.group.40.50 = c(40,50),
-                                                                        endpoint = 40,
-                                                                        timewindow = c(30,40))
+      
+      summary.stat.phylo.MAR.a.80 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                    datalist.agemix = datalist,
+                                                                                    work.dir = work.dir,
+                                                                                    sub.dir.rename = ABC_DestDir.classic.phylo.MAR.a.80,
+                                                                                    dirfasttree = work.dir,
+                                                                                    limitTransmEvents = 7,
+                                                                                    seq.cov = 45,
+                                                                                    seq.gender.ratio = 0.7,
+                                                                                    age.group.15.25 = c(15,25),
+                                                                                    age.group.25.40 = c(25,40),
+                                                                                    age.group.40.50 = c(40,50),
+                                                                                    endpoint = 40,
+                                                                                    timewindow = c(37,40),
+                                                                                    cut.off = 7),
+                                              error=function(e) return(rep(NA, 37)))
       
       
       
       
       
-      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.100)
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.a.80)
       
     }
     
   }
   
-  unlink(paste0(ABC_DestDir.classic.phylo.MAR.80), recursive = TRUE)
+  unlink(paste0(ABC_DestDir.classic.phylo.MAR.a.80), recursive = TRUE)
   
   return(outputvector)
 }
 
 
-# Coverage of 85%
 
 
-simpact4ABC.classic.phylo.MAR.85 <- function(inputvector){
+# Coverage of 85 %
+simpact4ABC.classic.phylo.MAR.a.85 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
   
   
-  work.dir <- "/home/niyukuri/Desktop/calibration" # on laptop
   
-  # work.dir <- "/home/niyukuri/Desktop/calibration" # on PC
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
   
   
   setwd(paste0(work.dir))
   
   
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")  
   
-  library(EasyABC)
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
   library(RSimpactCyan)
   library(RSimpactHelper)
   library(Rcpp)
@@ -7463,10 +8463,9 @@ simpact4ABC.classic.phylo.MAR.85 <- function(inputvector){
   library(expoTree)
   library(data.table)
   library(readr)
-  # library(phangorn)
-  # library(lme4)
-  # library(nlme)
-  library(minque) # with lmer
+  library(phangorn)
+  library(lme4)
+  library(nlme)
   library(dplyr)
   library(adephylo)
   library(treedater)
@@ -7475,9 +8474,22 @@ simpact4ABC.classic.phylo.MAR.85 <- function(inputvector){
   library(igraph)
   library(phyloTop)
   library(phytools)
-  library(Rsamtools) # select IDs sequences in a file
-  library(robustbase) # colMedians
-  library(lme4)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
   
   
   
@@ -7486,12 +8498,12 @@ simpact4ABC.classic.phylo.MAR.85 <- function(inputvector){
   age.distr <- agedistr.creator(shape = 5, scale = 65)
   #
   cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
-                                   population.simtime = 40, 
+                                   population.simtime = 50, 
                                    population.nummen = 4000, 
                                    population.numwomen = 4000,
                                    hivseed.time = 10, 
                                    hivseed.type = "amount",
-                                   hivseed.amount = 20, 
+                                   hivseed.amount = 40, 
                                    hivseed.age.min = 20,
                                    hivseed.age.max = 50,
                                    formation.hazard.agegapry.meanage = -0.025,
@@ -7643,6 +8655,7 @@ simpact4ABC.classic.phylo.MAR.85 <- function(inputvector){
   
   # Avoid overlaping in same directory
   
+  
   #creating subfolder with unique name for each simulation
   generate.filename <- function(how.long){
     
@@ -7662,30 +8675,30 @@ simpact4ABC.classic.phylo.MAR.85 <- function(inputvector){
     return(sub.dir.sim.id)
   }
   
-  ABC_DestDir.classic.phylo.MAR.85 <- paste0(work.dir,"/temp/",generate.filename(10))
+  ABC_DestDir.classic.phylo.MAR.a.85 <- paste0(work.dir,"/temp/",generate.filename(10))
   
   
   # Error function when computing summary statistics
   
   err.functionGEN <- function(e){
-    return(chunk.summary.stats = rep(NA,28))
+    return(chunk.summary.stats = rep(NA,64))
     stop(e)
   }
   
   
   
   results <- tryCatch(simpact.run(configParams = cfg.list,
-                                  destDir = ABC_DestDir.classic.phylo.MAR.85,
+                                  destDir = ABC_DestDir.classic.phylo.MAR.a.85,
                                   agedist = age.distr,
                                   intervention = intervention),
                       error = simpact.errFunction)
   
   
   if (length(results) == 0){
-    outputvector <- rep(NA, 28) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
   }else{
     if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
-      outputvector <- rep(NA, 28)
+      outputvector <- rep(NA, 64)
     }else{
       
       
@@ -7693,67 +8706,94 @@ simpact4ABC.classic.phylo.MAR.85 <- function(inputvector){
       
       simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
       
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
       
-      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist,
-                                                                          simpact.trans.net = simpact.trans.net,
-                                                                          work.dir = work.dir,
-                                                                          sub.dir.rename = ABC_DestDir.classic.phylo.MAR.85,
-                                                                          dirfasttree = work.dir,
-                                                                          limitTransmEvents = 7,
-                                                                          seq.cov = 100,
-                                                                          age.group.15.25 = c(15,25),
-                                                                          age.group.25.40 = c(25,40),
-                                                                          age.group.40.50 = c(40,50),
-                                                                          endpoint = 40,
-                                                                          timewindow = c(30,40)),
-                                       error=function(e) return(rep(NA, 28)))
       
-      summary.stat.phylo.MAR.85 <- compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
-                                                                        work.dir = work.dir,
-                                                                        sub.dir.rename = ABC_DestDir.classic.phylo.MAR.85,
-                                                                        dirfasttree = work.dir,
-                                                                        limitTransmEvents = 7,
-                                                                        seq.cov = 85,
-                                                                        age.group.15.25 = c(15,25),
-                                                                        age.group.25.40 = c(25,40),
-                                                                        age.group.40.50 = c(40,50),
-                                                                        endpoint = 40,
-                                                                        timewindow = c(30,40))
+      
+      summary.stat.phylo.MAR.a.85 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                    datalist.agemix = datalist,
+                                                                                    work.dir = work.dir,
+                                                                                    sub.dir.rename = ABC_DestDir.classic.phylo.MAR.a.85,
+                                                                                    dirfasttree = work.dir,
+                                                                                    limitTransmEvents = 7,
+                                                                                    seq.cov = 45,
+                                                                                    seq.gender.ratio = 0.7,
+                                                                                    age.group.15.25 = c(15,25),
+                                                                                    age.group.25.40 = c(25,40),
+                                                                                    age.group.40.50 = c(40,50),
+                                                                                    endpoint = 40,
+                                                                                    timewindow = c(37,40),
+                                                                                    cut.off = 7),
+                                              error=function(e) return(rep(NA, 37)))
       
       
       
       
       
-      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.100)
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.a.85)
       
     }
     
   }
   
-  unlink(paste0(ABC_DestDir.classic.phylo.MAR.85), recursive = TRUE)
+  unlink(paste0(ABC_DestDir.classic.phylo.MAR.a.85), recursive = TRUE)
   
   return(outputvector)
 }
 
 
-# Coverage of 90%
 
 
-simpact4ABC.classic.phylo.MAR.90 <- function(inputvector){
+# Coverage of 90 %
+simpact4ABC.classic.phylo.MAR.a.90 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
   
   
-  work.dir <- "/home/niyukuri/Desktop/calibration" # on laptop
   
-  # work.dir <- "/home/niyukuri/Desktop/calibration" # on PC
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
   
   
   setwd(paste0(work.dir))
   
   
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")  
   
-  library(EasyABC)
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
   library(RSimpactCyan)
   library(RSimpactHelper)
   library(Rcpp)
@@ -7761,10 +8801,9 @@ simpact4ABC.classic.phylo.MAR.90 <- function(inputvector){
   library(expoTree)
   library(data.table)
   library(readr)
-  # library(phangorn)
-  # library(lme4)
-  # library(nlme)
-  library(minque) # with lmer
+  library(phangorn)
+  library(lme4)
+  library(nlme)
   library(dplyr)
   library(adephylo)
   library(treedater)
@@ -7773,9 +8812,22 @@ simpact4ABC.classic.phylo.MAR.90 <- function(inputvector){
   library(igraph)
   library(phyloTop)
   library(phytools)
-  library(Rsamtools) # select IDs sequences in a file
-  library(robustbase) # colMedians
-  library(lme4)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
   
   
   
@@ -7784,12 +8836,12 @@ simpact4ABC.classic.phylo.MAR.90 <- function(inputvector){
   age.distr <- agedistr.creator(shape = 5, scale = 65)
   #
   cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
-                                   population.simtime = 40, 
+                                   population.simtime = 50, 
                                    population.nummen = 4000, 
                                    population.numwomen = 4000,
                                    hivseed.time = 10, 
                                    hivseed.type = "amount",
-                                   hivseed.amount = 20, 
+                                   hivseed.amount = 40, 
                                    hivseed.age.min = 20,
                                    hivseed.age.max = 50,
                                    formation.hazard.agegapry.meanage = -0.025,
@@ -7941,6 +8993,7 @@ simpact4ABC.classic.phylo.MAR.90 <- function(inputvector){
   
   # Avoid overlaping in same directory
   
+  
   #creating subfolder with unique name for each simulation
   generate.filename <- function(how.long){
     
@@ -7960,30 +9013,30 @@ simpact4ABC.classic.phylo.MAR.90 <- function(inputvector){
     return(sub.dir.sim.id)
   }
   
-  ABC_DestDir.classic.phylo.MAR.90 <- paste0(work.dir,"/temp/",generate.filename(10))
+  ABC_DestDir.classic.phylo.MAR.a.90 <- paste0(work.dir,"/temp/",generate.filename(10))
   
   
   # Error function when computing summary statistics
   
   err.functionGEN <- function(e){
-    return(chunk.summary.stats = rep(NA,28))
+    return(chunk.summary.stats = rep(NA,64))
     stop(e)
   }
   
   
   
   results <- tryCatch(simpact.run(configParams = cfg.list,
-                                  destDir = ABC_DestDir.classic.phylo.MAR.90,
+                                  destDir = ABC_DestDir.classic.phylo.MAR.a.90,
                                   agedist = age.distr,
                                   intervention = intervention),
                       error = simpact.errFunction)
   
   
   if (length(results) == 0){
-    outputvector <- rep(NA, 28) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
   }else{
     if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
-      outputvector <- rep(NA, 28)
+      outputvector <- rep(NA, 64)
     }else{
       
       
@@ -7991,67 +9044,101 @@ simpact4ABC.classic.phylo.MAR.90 <- function(inputvector){
       
       simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
       
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
       
-      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist,
-                                                                          simpact.trans.net = simpact.trans.net,
-                                                                          work.dir = work.dir,
-                                                                          sub.dir.rename = ABC_DestDir.classic.phylo.MAR.90,
-                                                                          dirfasttree = work.dir,
-                                                                          limitTransmEvents = 7,
-                                                                          seq.cov = 100,
-                                                                          age.group.15.25 = c(15,25),
-                                                                          age.group.25.40 = c(25,40),
-                                                                          age.group.40.50 = c(40,50),
-                                                                          endpoint = 40,
-                                                                          timewindow = c(30,40)),
-                                       error=function(e) return(rep(NA, 28)))
       
-      summary.stat.phylo.MAR.90 <- compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
-                                                                        work.dir = work.dir,
-                                                                        sub.dir.rename = ABC_DestDir.classic.phylo.MAR.90,
-                                                                        dirfasttree = work.dir,
-                                                                        limitTransmEvents = 7,
-                                                                        seq.cov = 90,
-                                                                        age.group.15.25 = c(15,25),
-                                                                        age.group.25.40 = c(25,40),
-                                                                        age.group.40.50 = c(40,50),
-                                                                        endpoint = 40,
-                                                                        timewindow = c(30,40))
+      
+      summary.stat.phylo.MAR.a.90 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                    datalist.agemix = datalist,
+                                                                                    work.dir = work.dir,
+                                                                                    sub.dir.rename = ABC_DestDir.classic.phylo.MAR.a.90,
+                                                                                    dirfasttree = work.dir,
+                                                                                    limitTransmEvents = 7,
+                                                                                    seq.cov = 45,
+                                                                                    seq.gender.ratio = 0.7,
+                                                                                    age.group.15.25 = c(15,25),
+                                                                                    age.group.25.40 = c(25,40),
+                                                                                    age.group.40.50 = c(40,50),
+                                                                                    endpoint = 40,
+                                                                                    timewindow = c(37,40),
+                                                                                    cut.off = 7),
+                                              error=function(e) return(rep(NA, 37)))
       
       
       
       
       
-      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.100)
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.a.90)
       
     }
     
   }
   
-  unlink(paste0(ABC_DestDir.classic.phylo.MAR.90), recursive = TRUE)
+  unlink(paste0(ABC_DestDir.classic.phylo.MAR.a.90), recursive = TRUE)
   
   return(outputvector)
 }
 
 
-# Coverage of 95%
 
 
-simpact4ABC.classic.phylo.MAR.95 <- function(inputvector){
+
+
+## V. thirteen simpact models calibrated to classic summary statistics (full) 
+#    and phylogenetic summary statistics in MAR scenarios (35:95%, by=5%; women proportion = 0.3)
+####################################################################################################
+
+
+# Coverage of 35%
+simpact4ABC.classic.phylo.MAR.b.35 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
   
   
-  work.dir <- "/home/niyukuri/Desktop/calibration" # on laptop
   
-  # work.dir <- "/home/niyukuri/Desktop/calibration" # on PC
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
   
   
   setwd(paste0(work.dir))
   
   
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
-  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")  
   
-  library(EasyABC)
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
   library(RSimpactCyan)
   library(RSimpactHelper)
   library(Rcpp)
@@ -8059,10 +9146,9 @@ simpact4ABC.classic.phylo.MAR.95 <- function(inputvector){
   library(expoTree)
   library(data.table)
   library(readr)
-  # library(phangorn)
-  # library(lme4)
-  # library(nlme)
-  library(minque) # with lmer
+  library(phangorn)
+  library(lme4)
+  library(nlme)
   library(dplyr)
   library(adephylo)
   library(treedater)
@@ -8071,9 +9157,22 @@ simpact4ABC.classic.phylo.MAR.95 <- function(inputvector){
   library(igraph)
   library(phyloTop)
   library(phytools)
-  library(Rsamtools) # select IDs sequences in a file
-  library(robustbase) # colMedians
-  library(lme4)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
   
   
   
@@ -8082,12 +9181,12 @@ simpact4ABC.classic.phylo.MAR.95 <- function(inputvector){
   age.distr <- agedistr.creator(shape = 5, scale = 65)
   #
   cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
-                                   population.simtime = 40, 
+                                   population.simtime = 50, 
                                    population.nummen = 4000, 
                                    population.numwomen = 4000,
                                    hivseed.time = 10, 
                                    hivseed.type = "amount",
-                                   hivseed.amount = 20, 
+                                   hivseed.amount = 40, 
                                    hivseed.age.min = 20,
                                    hivseed.age.max = 50,
                                    formation.hazard.agegapry.meanage = -0.025,
@@ -8239,6 +9338,7 @@ simpact4ABC.classic.phylo.MAR.95 <- function(inputvector){
   
   # Avoid overlaping in same directory
   
+  
   #creating subfolder with unique name for each simulation
   generate.filename <- function(how.long){
     
@@ -8258,30 +9358,30 @@ simpact4ABC.classic.phylo.MAR.95 <- function(inputvector){
     return(sub.dir.sim.id)
   }
   
-  ABC_DestDir.classic.phylo.MAR.95 <- paste0(work.dir,"/temp/",generate.filename(10))
+  ABC_DestDir.classic.phylo.MAR.b.35 <- paste0(work.dir,"/temp/",generate.filename(10))
   
   
   # Error function when computing summary statistics
   
   err.functionGEN <- function(e){
-    return(chunk.summary.stats = rep(NA,28))
+    return(chunk.summary.stats = rep(NA,64))
     stop(e)
   }
   
   
   
   results <- tryCatch(simpact.run(configParams = cfg.list,
-                                  destDir = ABC_DestDir.classic.phylo.MAR.95,
+                                  destDir = ABC_DestDir.classic.phylo.MAR.b.35,
                                   agedist = age.distr,
                                   intervention = intervention),
                       error = simpact.errFunction)
   
   
   if (length(results) == 0){
-    outputvector <- rep(NA, 28) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
   }else{
     if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
-      outputvector <- rep(NA, 28)
+      outputvector <- rep(NA, 64)
     }else{
       
       
@@ -8289,45 +9389,7809 @@ simpact4ABC.classic.phylo.MAR.95 <- function(inputvector){
       
       simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
       
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
       
-      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist,
-                                                                          simpact.trans.net = simpact.trans.net,
-                                                                          work.dir = work.dir,
-                                                                          sub.dir.rename = ABC_DestDir.classic.phylo.MAR.95,
-                                                                          dirfasttree = work.dir,
-                                                                          limitTransmEvents = 7,
-                                                                          seq.cov = 100,
-                                                                          age.group.15.25 = c(15,25),
-                                                                          age.group.25.40 = c(25,40),
-                                                                          age.group.40.50 = c(40,50),
-                                                                          endpoint = 40,
-                                                                          timewindow = c(30,40)),
-                                       error=function(e) return(rep(NA, 28)))
       
-      summary.stat.phylo.MAR.95 <- compute.summary.statistics.phylo.MAR(simpact.trans.net = simpact.trans.net,
-                                                                        work.dir = work.dir,
-                                                                        sub.dir.rename = ABC_DestDir.classic.phylo.MAR.95,
-                                                                        dirfasttree = work.dir,
-                                                                        limitTransmEvents = 7,
-                                                                        seq.cov = 95,
-                                                                        age.group.15.25 = c(15,25),
-                                                                        age.group.25.40 = c(25,40),
-                                                                        age.group.40.50 = c(40,50),
-                                                                        endpoint = 40,
-                                                                        timewindow = c(30,40))
+      
+      summary.stat.phylo.MAR.b.35 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                    datalist.agemix = datalist,
+                                                                                    work.dir = work.dir,
+                                                                                    sub.dir.rename = ABC_DestDir.classic.phylo.MAR.b.35,
+                                                                                    dirfasttree = work.dir,
+                                                                                    limitTransmEvents = 7,
+                                                                                    seq.cov = 35,
+                                                                                    seq.gender.ratio = 0.3,
+                                                                                    age.group.15.25 = c(15,25),
+                                                                                    age.group.25.40 = c(25,40),
+                                                                                    age.group.40.50 = c(40,50),
+                                                                                    endpoint = 40,
+                                                                                    timewindow = c(37,40),
+                                                                                    cut.off = 7),
+                                              error=function(e) return(rep(NA, 37)))
       
       
       
       
       
-      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.100)
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.b.35)
       
     }
     
   }
   
-  unlink(paste0(ABC_DestDir.classic.phylo.MAR.95), recursive = TRUE)
+  unlink(paste0(ABC_DestDir.classic.phylo.MAR.b.35), recursive = TRUE)
   
   return(outputvector)
 }
+
+
+# Coverage of 40%
+simpact4ABC.classic.phylo.MAR.b.40 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
+  
+  
+  
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
+  
+  
+  setwd(paste0(work.dir))
+  
+  
+  
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
+  library(RSimpactCyan)
+  library(RSimpactHelper)
+  library(Rcpp)
+  library(ape)
+  library(expoTree)
+  library(data.table)
+  library(readr)
+  library(phangorn)
+  library(lme4)
+  library(nlme)
+  library(dplyr)
+  library(adephylo)
+  library(treedater)
+  library(geiger)
+  library(picante)
+  library(igraph)
+  library(phyloTop)
+  library(phytools)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
+  
+  
+  
+  ## Run Simpact for specific parameter combination
+  
+  age.distr <- agedistr.creator(shape = 5, scale = 65)
+  #
+  cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
+                                   population.simtime = 50, 
+                                   population.nummen = 4000, 
+                                   population.numwomen = 4000,
+                                   hivseed.time = 10, 
+                                   hivseed.type = "amount",
+                                   hivseed.amount = 40, 
+                                   hivseed.age.min = 20,
+                                   hivseed.age.max = 50,
+                                   formation.hazard.agegapry.meanage = -0.025,
+                                   debut.debutage = 15
+  )
+  
+  # # Assumption of nature of sexual network
+  # #########################################
+  #
+  cfg.list["population.msm"] = "no"
+  
+  
+  # # Sexual behaviour
+  # ###################
+  #
+  seedid <- inputvector[1]
+  
+  cfg.list["dissolution.alpha_0"] <- inputvector[2] # [1] # -0.52 c("unif", -1, 0)
+  cfg.list["dissolution.alpha_4"] <- inputvector [3] # [2] # -0.05 c("unif", -0.5, 0)
+  cfg.list["formation.hazard.agegapry.baseline"] <- inputvector[4] # [3] # 2 c("unif", 1, 3)
+  cfg.list["person.agegap.man.dist.normal.mu"] <- inputvector[5] # [4] # 0 c("unif", -0.5, 0.5)
+  cfg.list["person.agegap.woman.dist.normal.mu"] <- inputvector[5] # [4] # 0
+  cfg.list["person.agegap.man.dist.normal.sigma"] <- inputvector[6] # [5] # 3 c("unif", 2, 4)
+  cfg.list["person.agegap.woman.dist.normal.sigma"] <- inputvector[6] # [5] # 3 
+  cfg.list["formation.hazard.agegapry.gap_agescale_man"] <- inputvector[7] # [6] # 0.25 c("unif", 0, 1)
+  cfg.list["formation.hazard.agegapry.gap_agescale_woman"] <- inputvector[7] # [6] # 0.25
+  cfg.list["formation.hazard.agegapry.numrel_man"] <- inputvector[8] # [7] # -0.3 c("unif", -1, 0)
+  cfg.list["formation.hazard.agegapry.numrel_woman"] <- inputvector[8] # [7] # -0.3
+  cfg.list["formation.hazard.agegapry.numrel_diff"] <- inputvector[9] # [8] # -0.1 c("unif", -0.9, 0)
+  
+  
+  # # HIV transmission
+  # ###################
+  #
+  
+  cfg.list["hivtransmission.param.a"] <- inputvector[10] # [10] # -1 c("unif", -2, 0)
+  cfg.list["hivtransmission.param.b"] <- inputvector[11] # [11] # -90 c("unif", -100, -80)
+  cfg.list["hivtransmission.param.c"] <- inputvector[12] # [12] # 0.5 c("unif", 0, 1)
+  cfg.list["hivtransmission.param.f1"] <- inputvector[13] # [13] # 0.04879016 c("unif", 0, 0.5)
+  cfg.list["hivtransmission.param.f2"] <- inputvector[14] # [14] # -0.1386294 c("unif", -0.5, 0)
+  
+  # Disease progression > may be remove in parameter to estimates
+  
+  cfg.list["person.vsp.toacute.x"] <- inputvector[15] # [15] # 5 c("unif", 3, 7)
+  cfg.list["person.vsp.toaids.x"] <- inputvector[16] # [16] # 7 c("unif", 5, 9)
+  cfg.list["person.vsp.tofinalaids.x"] <- inputvector[17] # [17] # 12 c("unif", 10, 14)
+  
+  
+  #
+  # # Demographic
+  # ##############
+  #
+  
+  cfg.list["conception.alpha_base"] <- inputvector[18] # [18] # -2.7 c("unif", -3.5, -1.7)
+  
+  
+  # # Assumptions to avoid negative branch lengths
+  # ###############################################
+  # # + sampling == start ART
+  # # when someone start ART, he/she is sampled and becomes non-infectious
+  
+  cfg.list["monitoring.fraction.log_viralload"] <- 0
+  
+  
+  #
+  # ## Add-ons
+  #
+  ### BEGIN Add-on
+  cfg.list["formation.hazard.agegapry.baseline"] <- 2
+  cfg.list["mortality.aids.survtime.C"] <- 65
+  cfg.list["mortality.aids.survtime.k"] <- -0.2
+  cfg.list["monitoring.fraction.log_viralload"] <- 0 #0.3
+  cfg.list["dropout.interval.dist.type"] <- "uniform"
+  cfg.list["dropout.interval.dist.uniform.min"] <- 1000
+  cfg.list["dropout.interval.dist.uniform.max"] <- 2000
+  
+  cfg.list["person.survtime.logoffset.dist.type"] <- "normal"
+  cfg.list["person.survtime.logoffset.dist.normal.mu"] <- 0
+  cfg.list["person.survtime.logoffset.dist.normal.sigma"] <- 0.1
+  
+  cfg.list["person.agegap.man.dist.type"] <- "normal" #fixed
+  #cfg.list["person.agegap.man.dist.fixed.value"] <- -6
+  cfg.list["person.agegap.woman.dist.type"] <- "normal" #"fixed"
+  #cfg.list["person.agegap.woman.dist.fixed.value"] <- -6
+  
+  cfg.list["mortality.aids.survtime.C"] <- 65
+  cfg.list["mortality.aids.survtime.k"] <- -0.2
+  cfg.list["monitoring.cd4.threshold"] <- 0 # 0 means nobody qualifies for ART
+  cfg.list["diagnosis.baseline"] <- -2
+  
+  
+  cfg.list["person.eagerness.man.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.woman.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.man.dist.gamma.b"] <- 45 # 45
+  cfg.list["person.eagerness.woman.dist.gamma.b"] <- 45 # 45
+  
+  #### END Add-ons
+  
+  
+  # # ART intervention
+  # ###################
+  #
+  # # ART acceptability paramter and the ART  interventions
+  
+  cfg.list["person.art.accept.threshold.dist.fixed.value"] <- 0.6
+  
+  # Let's introduce ART, and evaluate whether the HIV prevalence drops less  rapidly
+  art.intro <- list()
+  art.intro["time"] <- 20
+  art.intro["diagnosis.baseline"] <- -2 # 0#100
+  art.intro["monitoring.cd4.threshold"] <- 100 # 1200
+  
+  ### add something about diagnosis
+  art.intro["diagnosis.agefactor"] <- 0
+  art.intro["diagnosis.genderfactor"] <- 0
+  art.intro["diagnosis.diagpartnersfactor"] <- 0
+  art.intro["diagnosis.isdiagnosedfactor"] <- 0
+  ### end of add-on about diagnosis
+  #art.intro["monitoring.interval.piecewise.cd4s"] <- "0,1300"
+  # Gradual increase in CD4 threshold. in 2007:200. in 2010:350. in 2013:500
+  art.intro1 <- list()
+  art.intro1["time"] <- 22
+  art.intro1["diagnosis.baseline"] <- -2 # 0#100
+  art.intro1["monitoring.cd4.threshold"] <- 150 # 1200
+  
+  art.intro2 <- list()
+  art.intro2["time"] <- 25 # inputvector[5] ######### 30
+  art.intro2["monitoring.cd4.threshold"] <- 200
+  
+  art.intro3 <- list()
+  art.intro3["time"] <- 30 # inputvector[4] + inputvector[5] + inputvector[6] ########### 33
+  art.intro3["monitoring.cd4.threshold"] <- 350
+  
+  art.intro4 <- list()
+  art.intro4["time"] <- 33 # inputvector[4] + inputvector[5] + inputvector[6] + inputvector[7] ########### 36
+  art.intro4["monitoring.cd4.threshold"] <- 500
+  
+  art.intro5 <- list()
+  art.intro5["time"] <- 36
+  art.intro5["monitoring.cd4.threshold"] <- 700 # This is equivalent to immediate access
+  
+  # tasp.indicator <- inputvector[9] # 1 if the scenario is TasP, 0 if the scenario is current status
+  interventionlist <- list(art.intro, art.intro1, art.intro2, art.intro3, art.intro4, art.intro5)
+  
+  intervention <- interventionlist
+  
+  # Events
+  cfg.list["population.maxevents"] <- as.numeric(cfg.list["population.simtime"][1]) * as.numeric(cfg.list["population.nummen"][1]) * 3
+  
+  # Avoid overlaping in same directory
+  
+  
+  #creating subfolder with unique name for each simulation
+  generate.filename <- function(how.long){
+    
+    rn <- sample(1:100,1)
+    t <- as.numeric(Sys.time())
+    set.seed((t - floor(t)) * 1e8)
+    chars <- c(letters, LETTERS)
+    sub.dir.sim.id <-  paste0(sample(chars,how.long), collapse = "")
+    
+    noise.sample1 <- sample(8:15,1, replace = TRUE)
+    sub.dir.sim.id.ext <- paste0(sample(chars,noise.sample1), collapse = "")
+    noise.sample <- sample(1:1000,1)
+    noise.sample2 <- sample(8:17,1, replace = TRUE)
+    sub.dir.sim.id <- paste0(sub.dir.sim.id.ext,
+                             paste0(sample(chars,noise.sample2), collapse = ""),noise.sample, rn)
+    
+    return(sub.dir.sim.id)
+  }
+  
+  ABC_DestDir.classic.phylo.MAR.b.40 <- paste0(work.dir,"/temp/",generate.filename(10))
+  
+  
+  # Error function when computing summary statistics
+  
+  err.functionGEN <- function(e){
+    return(chunk.summary.stats = rep(NA,64))
+    stop(e)
+  }
+  
+  
+  
+  results <- tryCatch(simpact.run(configParams = cfg.list,
+                                  destDir = ABC_DestDir.classic.phylo.MAR.b.40,
+                                  agedist = age.distr,
+                                  intervention = intervention),
+                      error = simpact.errFunction)
+  
+  
+  if (length(results) == 0){
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+  }else{
+    if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
+      outputvector <- rep(NA, 64)
+    }else{
+      
+      
+      datalist <- readthedata(results)
+      
+      simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
+      
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
+      
+      
+      
+      summary.stat.phylo.MAR.b.40 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                    datalist.agemix = datalist,
+                                                                                    work.dir = work.dir,
+                                                                                    sub.dir.rename = ABC_DestDir.classic.phylo.MAR.b.40,
+                                                                                    dirfasttree = work.dir,
+                                                                                    limitTransmEvents = 7,
+                                                                                    seq.cov = 40,
+                                                                                    seq.gender.ratio = 0.3,
+                                                                                    age.group.15.25 = c(15,25),
+                                                                                    age.group.25.40 = c(25,40),
+                                                                                    age.group.40.50 = c(40,50),
+                                                                                    endpoint = 40,
+                                                                                    timewindow = c(37,40),
+                                                                                    cut.off = 7),
+                                              error=function(e) return(rep(NA, 37)))
+      
+      
+      
+      
+      
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.b.40)
+      
+    }
+    
+  }
+  
+  unlink(paste0(ABC_DestDir.classic.phylo.MAR.b.40), recursive = TRUE)
+  
+  return(outputvector)
+}
+
+
+
+# Coverage of 45%
+simpact4ABC.classic.phylo.MAR.b.45 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
+  
+  
+  
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
+  
+  
+  setwd(paste0(work.dir))
+  
+  
+  
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
+  library(RSimpactCyan)
+  library(RSimpactHelper)
+  library(Rcpp)
+  library(ape)
+  library(expoTree)
+  library(data.table)
+  library(readr)
+  library(phangorn)
+  library(lme4)
+  library(nlme)
+  library(dplyr)
+  library(adephylo)
+  library(treedater)
+  library(geiger)
+  library(picante)
+  library(igraph)
+  library(phyloTop)
+  library(phytools)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
+  
+  
+  
+  ## Run Simpact for specific parameter combination
+  
+  age.distr <- agedistr.creator(shape = 5, scale = 65)
+  #
+  cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
+                                   population.simtime = 50, 
+                                   population.nummen = 4000, 
+                                   population.numwomen = 4000,
+                                   hivseed.time = 10, 
+                                   hivseed.type = "amount",
+                                   hivseed.amount = 40, 
+                                   hivseed.age.min = 20,
+                                   hivseed.age.max = 50,
+                                   formation.hazard.agegapry.meanage = -0.025,
+                                   debut.debutage = 15
+  )
+  
+  # # Assumption of nature of sexual network
+  # #########################################
+  #
+  cfg.list["population.msm"] = "no"
+  
+  
+  # # Sexual behaviour
+  # ###################
+  #
+  seedid <- inputvector[1]
+  
+  cfg.list["dissolution.alpha_0"] <- inputvector[2] # [1] # -0.52 c("unif", -1, 0)
+  cfg.list["dissolution.alpha_4"] <- inputvector [3] # [2] # -0.05 c("unif", -0.5, 0)
+  cfg.list["formation.hazard.agegapry.baseline"] <- inputvector[4] # [3] # 2 c("unif", 1, 3)
+  cfg.list["person.agegap.man.dist.normal.mu"] <- inputvector[5] # [4] # 0 c("unif", -0.5, 0.5)
+  cfg.list["person.agegap.woman.dist.normal.mu"] <- inputvector[5] # [4] # 0
+  cfg.list["person.agegap.man.dist.normal.sigma"] <- inputvector[6] # [5] # 3 c("unif", 2, 4)
+  cfg.list["person.agegap.woman.dist.normal.sigma"] <- inputvector[6] # [5] # 3 
+  cfg.list["formation.hazard.agegapry.gap_agescale_man"] <- inputvector[7] # [6] # 0.25 c("unif", 0, 1)
+  cfg.list["formation.hazard.agegapry.gap_agescale_woman"] <- inputvector[7] # [6] # 0.25
+  cfg.list["formation.hazard.agegapry.numrel_man"] <- inputvector[8] # [7] # -0.3 c("unif", -1, 0)
+  cfg.list["formation.hazard.agegapry.numrel_woman"] <- inputvector[8] # [7] # -0.3
+  cfg.list["formation.hazard.agegapry.numrel_diff"] <- inputvector[9] # [8] # -0.1 c("unif", -0.9, 0)
+  
+  
+  # # HIV transmission
+  # ###################
+  #
+  
+  cfg.list["hivtransmission.param.a"] <- inputvector[10] # [10] # -1 c("unif", -2, 0)
+  cfg.list["hivtransmission.param.b"] <- inputvector[11] # [11] # -90 c("unif", -100, -80)
+  cfg.list["hivtransmission.param.c"] <- inputvector[12] # [12] # 0.5 c("unif", 0, 1)
+  cfg.list["hivtransmission.param.f1"] <- inputvector[13] # [13] # 0.04879016 c("unif", 0, 0.5)
+  cfg.list["hivtransmission.param.f2"] <- inputvector[14] # [14] # -0.1386294 c("unif", -0.5, 0)
+  
+  # Disease progression > may be remove in parameter to estimates
+  
+  cfg.list["person.vsp.toacute.x"] <- inputvector[15] # [15] # 5 c("unif", 3, 7)
+  cfg.list["person.vsp.toaids.x"] <- inputvector[16] # [16] # 7 c("unif", 5, 9)
+  cfg.list["person.vsp.tofinalaids.x"] <- inputvector[17] # [17] # 12 c("unif", 10, 14)
+  
+  
+  #
+  # # Demographic
+  # ##############
+  #
+  
+  cfg.list["conception.alpha_base"] <- inputvector[18] # [18] # -2.7 c("unif", -3.5, -1.7)
+  
+  
+  # # Assumptions to avoid negative branch lengths
+  # ###############################################
+  # # + sampling == start ART
+  # # when someone start ART, he/she is sampled and becomes non-infectious
+  
+  cfg.list["monitoring.fraction.log_viralload"] <- 0
+  
+  
+  #
+  # ## Add-ons
+  #
+  ### BEGIN Add-on
+  cfg.list["formation.hazard.agegapry.baseline"] <- 2
+  cfg.list["mortality.aids.survtime.C"] <- 65
+  cfg.list["mortality.aids.survtime.k"] <- -0.2
+  cfg.list["monitoring.fraction.log_viralload"] <- 0 #0.3
+  cfg.list["dropout.interval.dist.type"] <- "uniform"
+  cfg.list["dropout.interval.dist.uniform.min"] <- 1000
+  cfg.list["dropout.interval.dist.uniform.max"] <- 2000
+  
+  cfg.list["person.survtime.logoffset.dist.type"] <- "normal"
+  cfg.list["person.survtime.logoffset.dist.normal.mu"] <- 0
+  cfg.list["person.survtime.logoffset.dist.normal.sigma"] <- 0.1
+  
+  cfg.list["person.agegap.man.dist.type"] <- "normal" #fixed
+  #cfg.list["person.agegap.man.dist.fixed.value"] <- -6
+  cfg.list["person.agegap.woman.dist.type"] <- "normal" #"fixed"
+  #cfg.list["person.agegap.woman.dist.fixed.value"] <- -6
+  
+  cfg.list["mortality.aids.survtime.C"] <- 65
+  cfg.list["mortality.aids.survtime.k"] <- -0.2
+  cfg.list["monitoring.cd4.threshold"] <- 0 # 0 means nobody qualifies for ART
+  cfg.list["diagnosis.baseline"] <- -2
+  
+  
+  cfg.list["person.eagerness.man.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.woman.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.man.dist.gamma.b"] <- 45 # 45
+  cfg.list["person.eagerness.woman.dist.gamma.b"] <- 45 # 45
+  
+  #### END Add-ons
+  
+  
+  # # ART intervention
+  # ###################
+  #
+  # # ART acceptability paramter and the ART  interventions
+  
+  cfg.list["person.art.accept.threshold.dist.fixed.value"] <- 0.6
+  
+  # Let's introduce ART, and evaluate whether the HIV prevalence drops less  rapidly
+  art.intro <- list()
+  art.intro["time"] <- 20
+  art.intro["diagnosis.baseline"] <- -2 # 0#100
+  art.intro["monitoring.cd4.threshold"] <- 100 # 1200
+  
+  ### add something about diagnosis
+  art.intro["diagnosis.agefactor"] <- 0
+  art.intro["diagnosis.genderfactor"] <- 0
+  art.intro["diagnosis.diagpartnersfactor"] <- 0
+  art.intro["diagnosis.isdiagnosedfactor"] <- 0
+  ### end of add-on about diagnosis
+  #art.intro["monitoring.interval.piecewise.cd4s"] <- "0,1300"
+  # Gradual increase in CD4 threshold. in 2007:200. in 2010:350. in 2013:500
+  art.intro1 <- list()
+  art.intro1["time"] <- 22
+  art.intro1["diagnosis.baseline"] <- -2 # 0#100
+  art.intro1["monitoring.cd4.threshold"] <- 150 # 1200
+  
+  art.intro2 <- list()
+  art.intro2["time"] <- 25 # inputvector[5] ######### 30
+  art.intro2["monitoring.cd4.threshold"] <- 200
+  
+  art.intro3 <- list()
+  art.intro3["time"] <- 30 # inputvector[4] + inputvector[5] + inputvector[6] ########### 33
+  art.intro3["monitoring.cd4.threshold"] <- 350
+  
+  art.intro4 <- list()
+  art.intro4["time"] <- 33 # inputvector[4] + inputvector[5] + inputvector[6] + inputvector[7] ########### 36
+  art.intro4["monitoring.cd4.threshold"] <- 500
+  
+  art.intro5 <- list()
+  art.intro5["time"] <- 36
+  art.intro5["monitoring.cd4.threshold"] <- 700 # This is equivalent to immediate access
+  
+  # tasp.indicator <- inputvector[9] # 1 if the scenario is TasP, 0 if the scenario is current status
+  interventionlist <- list(art.intro, art.intro1, art.intro2, art.intro3, art.intro4, art.intro5)
+  
+  intervention <- interventionlist
+  
+  # Events
+  cfg.list["population.maxevents"] <- as.numeric(cfg.list["population.simtime"][1]) * as.numeric(cfg.list["population.nummen"][1]) * 3
+  
+  # Avoid overlaping in same directory
+  
+  
+  #creating subfolder with unique name for each simulation
+  generate.filename <- function(how.long){
+    
+    rn <- sample(1:100,1)
+    t <- as.numeric(Sys.time())
+    set.seed((t - floor(t)) * 1e8)
+    chars <- c(letters, LETTERS)
+    sub.dir.sim.id <-  paste0(sample(chars,how.long), collapse = "")
+    
+    noise.sample1 <- sample(8:15,1, replace = TRUE)
+    sub.dir.sim.id.ext <- paste0(sample(chars,noise.sample1), collapse = "")
+    noise.sample <- sample(1:1000,1)
+    noise.sample2 <- sample(8:17,1, replace = TRUE)
+    sub.dir.sim.id <- paste0(sub.dir.sim.id.ext,
+                             paste0(sample(chars,noise.sample2), collapse = ""),noise.sample, rn)
+    
+    return(sub.dir.sim.id)
+  }
+  
+  ABC_DestDir.classic.phylo.MAR.b.45 <- paste0(work.dir,"/temp/",generate.filename(10))
+  
+  
+  # Error function when computing summary statistics
+  
+  err.functionGEN <- function(e){
+    return(chunk.summary.stats = rep(NA,64))
+    stop(e)
+  }
+  
+  
+  
+  results <- tryCatch(simpact.run(configParams = cfg.list,
+                                  destDir = ABC_DestDir.classic.phylo.MAR.b.45,
+                                  agedist = age.distr,
+                                  intervention = intervention),
+                      error = simpact.errFunction)
+  
+  
+  if (length(results) == 0){
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+  }else{
+    if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
+      outputvector <- rep(NA, 64)
+    }else{
+      
+      
+      datalist <- readthedata(results)
+      
+      simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
+      
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
+      
+      
+      
+      summary.stat.phylo.MAR.b.45 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                    datalist.agemix = datalist,
+                                                                                    work.dir = work.dir,
+                                                                                    sub.dir.rename = ABC_DestDir.classic.phylo.MAR.b.45,
+                                                                                    dirfasttree = work.dir,
+                                                                                    limitTransmEvents = 7,
+                                                                                    seq.cov = 45,
+                                                                                    seq.gender.ratio = 0.3,
+                                                                                    age.group.15.25 = c(15,25),
+                                                                                    age.group.25.40 = c(25,40),
+                                                                                    age.group.40.50 = c(40,50),
+                                                                                    endpoint = 40,
+                                                                                    timewindow = c(37,40),
+                                                                                    cut.off = 7),
+                                              error=function(e) return(rep(NA, 37)))
+      
+      
+      
+      
+      
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.b.45)
+      
+    }
+    
+  }
+  
+  unlink(paste0(ABC_DestDir.classic.phylo.MAR.b.45), recursive = TRUE)
+  
+  return(outputvector)
+}
+
+
+
+# Coverage of 50%
+simpact4ABC.classic.phylo.MAR.b.50 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
+  
+  
+  
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
+  
+  
+  setwd(paste0(work.dir))
+  
+  
+  
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
+  library(RSimpactCyan)
+  library(RSimpactHelper)
+  library(Rcpp)
+  library(ape)
+  library(expoTree)
+  library(data.table)
+  library(readr)
+  library(phangorn)
+  library(lme4)
+  library(nlme)
+  library(dplyr)
+  library(adephylo)
+  library(treedater)
+  library(geiger)
+  library(picante)
+  library(igraph)
+  library(phyloTop)
+  library(phytools)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
+  
+  
+  
+  ## Run Simpact for specific parameter combination
+  
+  age.distr <- agedistr.creator(shape = 5, scale = 65)
+  #
+  cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
+                                   population.simtime = 50, 
+                                   population.nummen = 4000, 
+                                   population.numwomen = 4000,
+                                   hivseed.time = 10, 
+                                   hivseed.type = "amount",
+                                   hivseed.amount = 40, 
+                                   hivseed.age.min = 20,
+                                   hivseed.age.max = 50,
+                                   formation.hazard.agegapry.meanage = -0.025,
+                                   debut.debutage = 15
+  )
+  
+  # # Assumption of nature of sexual network
+  # #########################################
+  #
+  cfg.list["population.msm"] = "no"
+  
+  
+  # # Sexual behaviour
+  # ###################
+  #
+  seedid <- inputvector[1]
+  
+  cfg.list["dissolution.alpha_0"] <- inputvector[2] # [1] # -0.52 c("unif", -1, 0)
+  cfg.list["dissolution.alpha_4"] <- inputvector [3] # [2] # -0.05 c("unif", -0.5, 0)
+  cfg.list["formation.hazard.agegapry.baseline"] <- inputvector[4] # [3] # 2 c("unif", 1, 3)
+  cfg.list["person.agegap.man.dist.normal.mu"] <- inputvector[5] # [4] # 0 c("unif", -0.5, 0.5)
+  cfg.list["person.agegap.woman.dist.normal.mu"] <- inputvector[5] # [4] # 0
+  cfg.list["person.agegap.man.dist.normal.sigma"] <- inputvector[6] # [5] # 3 c("unif", 2, 4)
+  cfg.list["person.agegap.woman.dist.normal.sigma"] <- inputvector[6] # [5] # 3 
+  cfg.list["formation.hazard.agegapry.gap_agescale_man"] <- inputvector[7] # [6] # 0.25 c("unif", 0, 1)
+  cfg.list["formation.hazard.agegapry.gap_agescale_woman"] <- inputvector[7] # [6] # 0.25
+  cfg.list["formation.hazard.agegapry.numrel_man"] <- inputvector[8] # [7] # -0.3 c("unif", -1, 0)
+  cfg.list["formation.hazard.agegapry.numrel_woman"] <- inputvector[8] # [7] # -0.3
+  cfg.list["formation.hazard.agegapry.numrel_diff"] <- inputvector[9] # [8] # -0.1 c("unif", -0.9, 0)
+  
+  
+  # # HIV transmission
+  # ###################
+  #
+  
+  cfg.list["hivtransmission.param.a"] <- inputvector[10] # [10] # -1 c("unif", -2, 0)
+  cfg.list["hivtransmission.param.b"] <- inputvector[11] # [11] # -90 c("unif", -100, -80)
+  cfg.list["hivtransmission.param.c"] <- inputvector[12] # [12] # 0.5 c("unif", 0, 1)
+  cfg.list["hivtransmission.param.f1"] <- inputvector[13] # [13] # 0.04879016 c("unif", 0, 0.5)
+  cfg.list["hivtransmission.param.f2"] <- inputvector[14] # [14] # -0.1386294 c("unif", -0.5, 0)
+  
+  # Disease progression > may be remove in parameter to estimates
+  
+  cfg.list["person.vsp.toacute.x"] <- inputvector[15] # [15] # 5 c("unif", 3, 7)
+  cfg.list["person.vsp.toaids.x"] <- inputvector[16] # [16] # 7 c("unif", 5, 9)
+  cfg.list["person.vsp.tofinalaids.x"] <- inputvector[17] # [17] # 12 c("unif", 10, 14)
+  
+  
+  #
+  # # Demographic
+  # ##############
+  #
+  
+  cfg.list["conception.alpha_base"] <- inputvector[18] # [18] # -2.7 c("unif", -3.5, -1.7)
+  
+  
+  # # Assumptions to avoid negative branch lengths
+  # ###############################################
+  # # + sampling == start ART
+  # # when someone start ART, he/she is sampled and becomes non-infectious
+  
+  cfg.list["monitoring.fraction.log_viralload"] <- 0
+  
+  
+  #
+  # ## Add-ons
+  #
+  ### BEGIN Add-on
+  cfg.list["formation.hazard.agegapry.baseline"] <- 2
+  cfg.list["mortality.aids.survtime.C"] <- 65
+  cfg.list["mortality.aids.survtime.k"] <- -0.2
+  cfg.list["monitoring.fraction.log_viralload"] <- 0 #0.3
+  cfg.list["dropout.interval.dist.type"] <- "uniform"
+  cfg.list["dropout.interval.dist.uniform.min"] <- 1000
+  cfg.list["dropout.interval.dist.uniform.max"] <- 2000
+  
+  cfg.list["person.survtime.logoffset.dist.type"] <- "normal"
+  cfg.list["person.survtime.logoffset.dist.normal.mu"] <- 0
+  cfg.list["person.survtime.logoffset.dist.normal.sigma"] <- 0.1
+  
+  cfg.list["person.agegap.man.dist.type"] <- "normal" #fixed
+  #cfg.list["person.agegap.man.dist.fixed.value"] <- -6
+  cfg.list["person.agegap.woman.dist.type"] <- "normal" #"fixed"
+  #cfg.list["person.agegap.woman.dist.fixed.value"] <- -6
+  
+  cfg.list["mortality.aids.survtime.C"] <- 65
+  cfg.list["mortality.aids.survtime.k"] <- -0.2
+  cfg.list["monitoring.cd4.threshold"] <- 0 # 0 means nobody qualifies for ART
+  cfg.list["diagnosis.baseline"] <- -2
+  
+  
+  cfg.list["person.eagerness.man.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.woman.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.man.dist.gamma.b"] <- 45 # 45
+  cfg.list["person.eagerness.woman.dist.gamma.b"] <- 45 # 45
+  
+  #### END Add-ons
+  
+  
+  # # ART intervention
+  # ###################
+  #
+  # # ART acceptability paramter and the ART  interventions
+  
+  cfg.list["person.art.accept.threshold.dist.fixed.value"] <- 0.6
+  
+  # Let's introduce ART, and evaluate whether the HIV prevalence drops less  rapidly
+  art.intro <- list()
+  art.intro["time"] <- 20
+  art.intro["diagnosis.baseline"] <- -2 # 0#100
+  art.intro["monitoring.cd4.threshold"] <- 100 # 1200
+  
+  ### add something about diagnosis
+  art.intro["diagnosis.agefactor"] <- 0
+  art.intro["diagnosis.genderfactor"] <- 0
+  art.intro["diagnosis.diagpartnersfactor"] <- 0
+  art.intro["diagnosis.isdiagnosedfactor"] <- 0
+  ### end of add-on about diagnosis
+  #art.intro["monitoring.interval.piecewise.cd4s"] <- "0,1300"
+  # Gradual increase in CD4 threshold. in 2007:200. in 2010:350. in 2013:500
+  art.intro1 <- list()
+  art.intro1["time"] <- 22
+  art.intro1["diagnosis.baseline"] <- -2 # 0#100
+  art.intro1["monitoring.cd4.threshold"] <- 150 # 1200
+  
+  art.intro2 <- list()
+  art.intro2["time"] <- 25 # inputvector[5] ######### 30
+  art.intro2["monitoring.cd4.threshold"] <- 200
+  
+  art.intro3 <- list()
+  art.intro3["time"] <- 30 # inputvector[4] + inputvector[5] + inputvector[6] ########### 33
+  art.intro3["monitoring.cd4.threshold"] <- 350
+  
+  art.intro4 <- list()
+  art.intro4["time"] <- 33 # inputvector[4] + inputvector[5] + inputvector[6] + inputvector[7] ########### 36
+  art.intro4["monitoring.cd4.threshold"] <- 500
+  
+  art.intro5 <- list()
+  art.intro5["time"] <- 36
+  art.intro5["monitoring.cd4.threshold"] <- 700 # This is equivalent to immediate access
+  
+  # tasp.indicator <- inputvector[9] # 1 if the scenario is TasP, 0 if the scenario is current status
+  interventionlist <- list(art.intro, art.intro1, art.intro2, art.intro3, art.intro4, art.intro5)
+  
+  intervention <- interventionlist
+  
+  # Events
+  cfg.list["population.maxevents"] <- as.numeric(cfg.list["population.simtime"][1]) * as.numeric(cfg.list["population.nummen"][1]) * 3
+  
+  # Avoid overlaping in same directory
+  
+  
+  #creating subfolder with unique name for each simulation
+  generate.filename <- function(how.long){
+    
+    rn <- sample(1:100,1)
+    t <- as.numeric(Sys.time())
+    set.seed((t - floor(t)) * 1e8)
+    chars <- c(letters, LETTERS)
+    sub.dir.sim.id <-  paste0(sample(chars,how.long), collapse = "")
+    
+    noise.sample1 <- sample(8:15,1, replace = TRUE)
+    sub.dir.sim.id.ext <- paste0(sample(chars,noise.sample1), collapse = "")
+    noise.sample <- sample(1:1000,1)
+    noise.sample2 <- sample(8:17,1, replace = TRUE)
+    sub.dir.sim.id <- paste0(sub.dir.sim.id.ext,
+                             paste0(sample(chars,noise.sample2), collapse = ""),noise.sample, rn)
+    
+    return(sub.dir.sim.id)
+  }
+  
+  ABC_DestDir.classic.phylo.MAR.b.50 <- paste0(work.dir,"/temp/",generate.filename(10))
+  
+  
+  # Error function when computing summary statistics
+  
+  err.functionGEN <- function(e){
+    return(chunk.summary.stats = rep(NA,64))
+    stop(e)
+  }
+  
+  
+  
+  results <- tryCatch(simpact.run(configParams = cfg.list,
+                                  destDir = ABC_DestDir.classic.phylo.MAR.b.50,
+                                  agedist = age.distr,
+                                  intervention = intervention),
+                      error = simpact.errFunction)
+  
+  
+  if (length(results) == 0){
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+  }else{
+    if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
+      outputvector <- rep(NA, 64)
+    }else{
+      
+      
+      datalist <- readthedata(results)
+      
+      simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
+      
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
+      
+      
+      
+      summary.stat.phylo.MAR.b.50 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                    datalist.agemix = datalist,
+                                                                                    work.dir = work.dir,
+                                                                                    sub.dir.rename = ABC_DestDir.classic.phylo.MAR.b.50,
+                                                                                    dirfasttree = work.dir,
+                                                                                    limitTransmEvents = 7,
+                                                                                    seq.cov = 45,
+                                                                                    seq.gender.ratio = 0.3,
+                                                                                    age.group.15.25 = c(15,25),
+                                                                                    age.group.25.40 = c(25,40),
+                                                                                    age.group.40.50 = c(40,50),
+                                                                                    endpoint = 40,
+                                                                                    timewindow = c(37,40),
+                                                                                    cut.off = 7),
+                                              error=function(e) return(rep(NA, 37)))
+      
+      
+      
+      
+      
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.b.50)
+      
+    }
+    
+  }
+  
+  unlink(paste0(ABC_DestDir.classic.phylo.MAR.b.50), recursive = TRUE)
+  
+  return(outputvector)
+}
+
+
+
+# Coverage of 55%
+simpact4ABC.classic.phylo.MAR.b.55 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
+  
+  
+  
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
+  
+  
+  setwd(paste0(work.dir))
+  
+  
+  
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
+  library(RSimpactCyan)
+  library(RSimpactHelper)
+  library(Rcpp)
+  library(ape)
+  library(expoTree)
+  library(data.table)
+  library(readr)
+  library(phangorn)
+  library(lme4)
+  library(nlme)
+  library(dplyr)
+  library(adephylo)
+  library(treedater)
+  library(geiger)
+  library(picante)
+  library(igraph)
+  library(phyloTop)
+  library(phytools)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
+  
+  
+  
+  ## Run Simpact for specific parameter combination
+  
+  age.distr <- agedistr.creator(shape = 5, scale = 65)
+  #
+  cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
+                                   population.simtime = 50, 
+                                   population.nummen = 4000, 
+                                   population.numwomen = 4000,
+                                   hivseed.time = 10, 
+                                   hivseed.type = "amount",
+                                   hivseed.amount = 40, 
+                                   hivseed.age.min = 20,
+                                   hivseed.age.max = 50,
+                                   formation.hazard.agegapry.meanage = -0.025,
+                                   debut.debutage = 15
+  )
+  
+  # # Assumption of nature of sexual network
+  # #########################################
+  #
+  cfg.list["population.msm"] = "no"
+  
+  
+  # # Sexual behaviour
+  # ###################
+  #
+  seedid <- inputvector[1]
+  
+  cfg.list["dissolution.alpha_0"] <- inputvector[2] # [1] # -0.52 c("unif", -1, 0)
+  cfg.list["dissolution.alpha_4"] <- inputvector [3] # [2] # -0.05 c("unif", -0.5, 0)
+  cfg.list["formation.hazard.agegapry.baseline"] <- inputvector[4] # [3] # 2 c("unif", 1, 3)
+  cfg.list["person.agegap.man.dist.normal.mu"] <- inputvector[5] # [4] # 0 c("unif", -0.5, 0.5)
+  cfg.list["person.agegap.woman.dist.normal.mu"] <- inputvector[5] # [4] # 0
+  cfg.list["person.agegap.man.dist.normal.sigma"] <- inputvector[6] # [5] # 3 c("unif", 2, 4)
+  cfg.list["person.agegap.woman.dist.normal.sigma"] <- inputvector[6] # [5] # 3 
+  cfg.list["formation.hazard.agegapry.gap_agescale_man"] <- inputvector[7] # [6] # 0.25 c("unif", 0, 1)
+  cfg.list["formation.hazard.agegapry.gap_agescale_woman"] <- inputvector[7] # [6] # 0.25
+  cfg.list["formation.hazard.agegapry.numrel_man"] <- inputvector[8] # [7] # -0.3 c("unif", -1, 0)
+  cfg.list["formation.hazard.agegapry.numrel_woman"] <- inputvector[8] # [7] # -0.3
+  cfg.list["formation.hazard.agegapry.numrel_diff"] <- inputvector[9] # [8] # -0.1 c("unif", -0.9, 0)
+  
+  
+  # # HIV transmission
+  # ###################
+  #
+  
+  cfg.list["hivtransmission.param.a"] <- inputvector[10] # [10] # -1 c("unif", -2, 0)
+  cfg.list["hivtransmission.param.b"] <- inputvector[11] # [11] # -90 c("unif", -100, -80)
+  cfg.list["hivtransmission.param.c"] <- inputvector[12] # [12] # 0.5 c("unif", 0, 1)
+  cfg.list["hivtransmission.param.f1"] <- inputvector[13] # [13] # 0.04879016 c("unif", 0, 0.5)
+  cfg.list["hivtransmission.param.f2"] <- inputvector[14] # [14] # -0.1386294 c("unif", -0.5, 0)
+  
+  # Disease progression > may be remove in parameter to estimates
+  
+  cfg.list["person.vsp.toacute.x"] <- inputvector[15] # [15] # 5 c("unif", 3, 7)
+  cfg.list["person.vsp.toaids.x"] <- inputvector[16] # [16] # 7 c("unif", 5, 9)
+  cfg.list["person.vsp.tofinalaids.x"] <- inputvector[17] # [17] # 12 c("unif", 10, 14)
+  
+  
+  #
+  # # Demographic
+  # ##############
+  #
+  
+  cfg.list["conception.alpha_base"] <- inputvector[18] # [18] # -2.7 c("unif", -3.5, -1.7)
+  
+  
+  # # Assumptions to avoid negative branch lengths
+  # ###############################################
+  # # + sampling == start ART
+  # # when someone start ART, he/she is sampled and becomes non-infectious
+  
+  cfg.list["monitoring.fraction.log_viralload"] <- 0
+  
+  
+  #
+  # ## Add-ons
+  #
+  ### BEGIN Add-on
+  cfg.list["formation.hazard.agegapry.baseline"] <- 2
+  cfg.list["mortality.aids.survtime.C"] <- 65
+  cfg.list["mortality.aids.survtime.k"] <- -0.2
+  cfg.list["monitoring.fraction.log_viralload"] <- 0 #0.3
+  cfg.list["dropout.interval.dist.type"] <- "uniform"
+  cfg.list["dropout.interval.dist.uniform.min"] <- 1000
+  cfg.list["dropout.interval.dist.uniform.max"] <- 2000
+  
+  cfg.list["person.survtime.logoffset.dist.type"] <- "normal"
+  cfg.list["person.survtime.logoffset.dist.normal.mu"] <- 0
+  cfg.list["person.survtime.logoffset.dist.normal.sigma"] <- 0.1
+  
+  cfg.list["person.agegap.man.dist.type"] <- "normal" #fixed
+  #cfg.list["person.agegap.man.dist.fixed.value"] <- -6
+  cfg.list["person.agegap.woman.dist.type"] <- "normal" #"fixed"
+  #cfg.list["person.agegap.woman.dist.fixed.value"] <- -6
+  
+  cfg.list["mortality.aids.survtime.C"] <- 65
+  cfg.list["mortality.aids.survtime.k"] <- -0.2
+  cfg.list["monitoring.cd4.threshold"] <- 0 # 0 means nobody qualifies for ART
+  cfg.list["diagnosis.baseline"] <- -2
+  
+  
+  cfg.list["person.eagerness.man.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.woman.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.man.dist.gamma.b"] <- 45 # 45
+  cfg.list["person.eagerness.woman.dist.gamma.b"] <- 45 # 45
+  
+  #### END Add-ons
+  
+  
+  # # ART intervention
+  # ###################
+  #
+  # # ART acceptability paramter and the ART  interventions
+  
+  cfg.list["person.art.accept.threshold.dist.fixed.value"] <- 0.6
+  
+  # Let's introduce ART, and evaluate whether the HIV prevalence drops less  rapidly
+  art.intro <- list()
+  art.intro["time"] <- 20
+  art.intro["diagnosis.baseline"] <- -2 # 0#100
+  art.intro["monitoring.cd4.threshold"] <- 100 # 1200
+  
+  ### add something about diagnosis
+  art.intro["diagnosis.agefactor"] <- 0
+  art.intro["diagnosis.genderfactor"] <- 0
+  art.intro["diagnosis.diagpartnersfactor"] <- 0
+  art.intro["diagnosis.isdiagnosedfactor"] <- 0
+  ### end of add-on about diagnosis
+  #art.intro["monitoring.interval.piecewise.cd4s"] <- "0,1300"
+  # Gradual increase in CD4 threshold. in 2007:200. in 2010:350. in 2013:500
+  art.intro1 <- list()
+  art.intro1["time"] <- 22
+  art.intro1["diagnosis.baseline"] <- -2 # 0#100
+  art.intro1["monitoring.cd4.threshold"] <- 150 # 1200
+  
+  art.intro2 <- list()
+  art.intro2["time"] <- 25 # inputvector[5] ######### 30
+  art.intro2["monitoring.cd4.threshold"] <- 200
+  
+  art.intro3 <- list()
+  art.intro3["time"] <- 30 # inputvector[4] + inputvector[5] + inputvector[6] ########### 33
+  art.intro3["monitoring.cd4.threshold"] <- 350
+  
+  art.intro4 <- list()
+  art.intro4["time"] <- 33 # inputvector[4] + inputvector[5] + inputvector[6] + inputvector[7] ########### 36
+  art.intro4["monitoring.cd4.threshold"] <- 500
+  
+  art.intro5 <- list()
+  art.intro5["time"] <- 36
+  art.intro5["monitoring.cd4.threshold"] <- 700 # This is equivalent to immediate access
+  
+  # tasp.indicator <- inputvector[9] # 1 if the scenario is TasP, 0 if the scenario is current status
+  interventionlist <- list(art.intro, art.intro1, art.intro2, art.intro3, art.intro4, art.intro5)
+  
+  intervention <- interventionlist
+  
+  # Events
+  cfg.list["population.maxevents"] <- as.numeric(cfg.list["population.simtime"][1]) * as.numeric(cfg.list["population.nummen"][1]) * 3
+  
+  # Avoid overlaping in same directory
+  
+  
+  #creating subfolder with unique name for each simulation
+  generate.filename <- function(how.long){
+    
+    rn <- sample(1:100,1)
+    t <- as.numeric(Sys.time())
+    set.seed((t - floor(t)) * 1e8)
+    chars <- c(letters, LETTERS)
+    sub.dir.sim.id <-  paste0(sample(chars,how.long), collapse = "")
+    
+    noise.sample1 <- sample(8:15,1, replace = TRUE)
+    sub.dir.sim.id.ext <- paste0(sample(chars,noise.sample1), collapse = "")
+    noise.sample <- sample(1:1000,1)
+    noise.sample2 <- sample(8:17,1, replace = TRUE)
+    sub.dir.sim.id <- paste0(sub.dir.sim.id.ext,
+                             paste0(sample(chars,noise.sample2), collapse = ""),noise.sample, rn)
+    
+    return(sub.dir.sim.id)
+  }
+  
+  ABC_DestDir.classic.phylo.MAR.b.55 <- paste0(work.dir,"/temp/",generate.filename(10))
+  
+  
+  # Error function when computing summary statistics
+  
+  err.functionGEN <- function(e){
+    return(chunk.summary.stats = rep(NA,64))
+    stop(e)
+  }
+  
+  
+  
+  results <- tryCatch(simpact.run(configParams = cfg.list,
+                                  destDir = ABC_DestDir.classic.phylo.MAR.b.55,
+                                  agedist = age.distr,
+                                  intervention = intervention),
+                      error = simpact.errFunction)
+  
+  
+  if (length(results) == 0){
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+  }else{
+    if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
+      outputvector <- rep(NA, 64)
+    }else{
+      
+      
+      datalist <- readthedata(results)
+      
+      simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
+      
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
+      
+      
+      
+      summary.stat.phylo.MAR.b.55 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                    datalist.agemix = datalist,
+                                                                                    work.dir = work.dir,
+                                                                                    sub.dir.rename = ABC_DestDir.classic.phylo.MAR.b.55,
+                                                                                    dirfasttree = work.dir,
+                                                                                    limitTransmEvents = 7,
+                                                                                    seq.cov = 45,
+                                                                                    seq.gender.ratio = 0.3,
+                                                                                    age.group.15.25 = c(15,25),
+                                                                                    age.group.25.40 = c(25,40),
+                                                                                    age.group.40.50 = c(40,50),
+                                                                                    endpoint = 40,
+                                                                                    timewindow = c(37,40),
+                                                                                    cut.off = 7),
+                                              error=function(e) return(rep(NA, 37)))
+      
+      
+      
+      
+      
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.b.55)
+      
+    }
+    
+  }
+  
+  unlink(paste0(ABC_DestDir.classic.phylo.MAR.b.55), recursive = TRUE)
+  
+  return(outputvector)
+}
+
+
+
+# Coverage of 60%
+simpact4ABC.classic.phylo.MAR.b.60 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
+  
+  
+  
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
+  
+  
+  setwd(paste0(work.dir))
+  
+  
+  
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
+  library(RSimpactCyan)
+  library(RSimpactHelper)
+  library(Rcpp)
+  library(ape)
+  library(expoTree)
+  library(data.table)
+  library(readr)
+  library(phangorn)
+  library(lme4)
+  library(nlme)
+  library(dplyr)
+  library(adephylo)
+  library(treedater)
+  library(geiger)
+  library(picante)
+  library(igraph)
+  library(phyloTop)
+  library(phytools)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
+  
+  
+  
+  ## Run Simpact for specific parameter combination
+  
+  age.distr <- agedistr.creator(shape = 5, scale = 65)
+  #
+  cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
+                                   population.simtime = 50, 
+                                   population.nummen = 4000, 
+                                   population.numwomen = 4000,
+                                   hivseed.time = 10, 
+                                   hivseed.type = "amount",
+                                   hivseed.amount = 40, 
+                                   hivseed.age.min = 20,
+                                   hivseed.age.max = 50,
+                                   formation.hazard.agegapry.meanage = -0.025,
+                                   debut.debutage = 15
+  )
+  
+  # # Assumption of nature of sexual network
+  # #########################################
+  #
+  cfg.list["population.msm"] = "no"
+  
+  
+  # # Sexual behaviour
+  # ###################
+  #
+  seedid <- inputvector[1]
+  
+  cfg.list["dissolution.alpha_0"] <- inputvector[2] # [1] # -0.52 c("unif", -1, 0)
+  cfg.list["dissolution.alpha_4"] <- inputvector [3] # [2] # -0.05 c("unif", -0.5, 0)
+  cfg.list["formation.hazard.agegapry.baseline"] <- inputvector[4] # [3] # 2 c("unif", 1, 3)
+  cfg.list["person.agegap.man.dist.normal.mu"] <- inputvector[5] # [4] # 0 c("unif", -0.5, 0.5)
+  cfg.list["person.agegap.woman.dist.normal.mu"] <- inputvector[5] # [4] # 0
+  cfg.list["person.agegap.man.dist.normal.sigma"] <- inputvector[6] # [5] # 3 c("unif", 2, 4)
+  cfg.list["person.agegap.woman.dist.normal.sigma"] <- inputvector[6] # [5] # 3 
+  cfg.list["formation.hazard.agegapry.gap_agescale_man"] <- inputvector[7] # [6] # 0.25 c("unif", 0, 1)
+  cfg.list["formation.hazard.agegapry.gap_agescale_woman"] <- inputvector[7] # [6] # 0.25
+  cfg.list["formation.hazard.agegapry.numrel_man"] <- inputvector[8] # [7] # -0.3 c("unif", -1, 0)
+  cfg.list["formation.hazard.agegapry.numrel_woman"] <- inputvector[8] # [7] # -0.3
+  cfg.list["formation.hazard.agegapry.numrel_diff"] <- inputvector[9] # [8] # -0.1 c("unif", -0.9, 0)
+  
+  
+  # # HIV transmission
+  # ###################
+  #
+  
+  cfg.list["hivtransmission.param.a"] <- inputvector[10] # [10] # -1 c("unif", -2, 0)
+  cfg.list["hivtransmission.param.b"] <- inputvector[11] # [11] # -90 c("unif", -100, -80)
+  cfg.list["hivtransmission.param.c"] <- inputvector[12] # [12] # 0.5 c("unif", 0, 1)
+  cfg.list["hivtransmission.param.f1"] <- inputvector[13] # [13] # 0.04879016 c("unif", 0, 0.5)
+  cfg.list["hivtransmission.param.f2"] <- inputvector[14] # [14] # -0.1386294 c("unif", -0.5, 0)
+  
+  # Disease progression > may be remove in parameter to estimates
+  
+  cfg.list["person.vsp.toacute.x"] <- inputvector[15] # [15] # 5 c("unif", 3, 7)
+  cfg.list["person.vsp.toaids.x"] <- inputvector[16] # [16] # 7 c("unif", 5, 9)
+  cfg.list["person.vsp.tofinalaids.x"] <- inputvector[17] # [17] # 12 c("unif", 10, 14)
+  
+  
+  #
+  # # Demographic
+  # ##############
+  #
+  
+  cfg.list["conception.alpha_base"] <- inputvector[18] # [18] # -2.7 c("unif", -3.5, -1.7)
+  
+  
+  # # Assumptions to avoid negative branch lengths
+  # ###############################################
+  # # + sampling == start ART
+  # # when someone start ART, he/she is sampled and becomes non-infectious
+  
+  cfg.list["monitoring.fraction.log_viralload"] <- 0
+  
+  
+  #
+  # ## Add-ons
+  #
+  ### BEGIN Add-on
+  cfg.list["formation.hazard.agegapry.baseline"] <- 2
+  cfg.list["mortality.aids.survtime.C"] <- 65
+  cfg.list["mortality.aids.survtime.k"] <- -0.2
+  cfg.list["monitoring.fraction.log_viralload"] <- 0 #0.3
+  cfg.list["dropout.interval.dist.type"] <- "uniform"
+  cfg.list["dropout.interval.dist.uniform.min"] <- 1000
+  cfg.list["dropout.interval.dist.uniform.max"] <- 2000
+  
+  cfg.list["person.survtime.logoffset.dist.type"] <- "normal"
+  cfg.list["person.survtime.logoffset.dist.normal.mu"] <- 0
+  cfg.list["person.survtime.logoffset.dist.normal.sigma"] <- 0.1
+  
+  cfg.list["person.agegap.man.dist.type"] <- "normal" #fixed
+  #cfg.list["person.agegap.man.dist.fixed.value"] <- -6
+  cfg.list["person.agegap.woman.dist.type"] <- "normal" #"fixed"
+  #cfg.list["person.agegap.woman.dist.fixed.value"] <- -6
+  
+  cfg.list["mortality.aids.survtime.C"] <- 65
+  cfg.list["mortality.aids.survtime.k"] <- -0.2
+  cfg.list["monitoring.cd4.threshold"] <- 0 # 0 means nobody qualifies for ART
+  cfg.list["diagnosis.baseline"] <- -2
+  
+  
+  cfg.list["person.eagerness.man.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.woman.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.man.dist.gamma.b"] <- 45 # 45
+  cfg.list["person.eagerness.woman.dist.gamma.b"] <- 45 # 45
+  
+  #### END Add-ons
+  
+  
+  # # ART intervention
+  # ###################
+  #
+  # # ART acceptability paramter and the ART  interventions
+  
+  cfg.list["person.art.accept.threshold.dist.fixed.value"] <- 0.6
+  
+  # Let's introduce ART, and evaluate whether the HIV prevalence drops less  rapidly
+  art.intro <- list()
+  art.intro["time"] <- 20
+  art.intro["diagnosis.baseline"] <- -2 # 0#100
+  art.intro["monitoring.cd4.threshold"] <- 100 # 1200
+  
+  ### add something about diagnosis
+  art.intro["diagnosis.agefactor"] <- 0
+  art.intro["diagnosis.genderfactor"] <- 0
+  art.intro["diagnosis.diagpartnersfactor"] <- 0
+  art.intro["diagnosis.isdiagnosedfactor"] <- 0
+  ### end of add-on about diagnosis
+  #art.intro["monitoring.interval.piecewise.cd4s"] <- "0,1300"
+  # Gradual increase in CD4 threshold. in 2007:200. in 2010:350. in 2013:500
+  art.intro1 <- list()
+  art.intro1["time"] <- 22
+  art.intro1["diagnosis.baseline"] <- -2 # 0#100
+  art.intro1["monitoring.cd4.threshold"] <- 150 # 1200
+  
+  art.intro2 <- list()
+  art.intro2["time"] <- 25 # inputvector[5] ######### 30
+  art.intro2["monitoring.cd4.threshold"] <- 200
+  
+  art.intro3 <- list()
+  art.intro3["time"] <- 30 # inputvector[4] + inputvector[5] + inputvector[6] ########### 33
+  art.intro3["monitoring.cd4.threshold"] <- 350
+  
+  art.intro4 <- list()
+  art.intro4["time"] <- 33 # inputvector[4] + inputvector[5] + inputvector[6] + inputvector[7] ########### 36
+  art.intro4["monitoring.cd4.threshold"] <- 500
+  
+  art.intro5 <- list()
+  art.intro5["time"] <- 36
+  art.intro5["monitoring.cd4.threshold"] <- 700 # This is equivalent to immediate access
+  
+  # tasp.indicator <- inputvector[9] # 1 if the scenario is TasP, 0 if the scenario is current status
+  interventionlist <- list(art.intro, art.intro1, art.intro2, art.intro3, art.intro4, art.intro5)
+  
+  intervention <- interventionlist
+  
+  # Events
+  cfg.list["population.maxevents"] <- as.numeric(cfg.list["population.simtime"][1]) * as.numeric(cfg.list["population.nummen"][1]) * 3
+  
+  # Avoid overlaping in same directory
+  
+  
+  #creating subfolder with unique name for each simulation
+  generate.filename <- function(how.long){
+    
+    rn <- sample(1:100,1)
+    t <- as.numeric(Sys.time())
+    set.seed((t - floor(t)) * 1e8)
+    chars <- c(letters, LETTERS)
+    sub.dir.sim.id <-  paste0(sample(chars,how.long), collapse = "")
+    
+    noise.sample1 <- sample(8:15,1, replace = TRUE)
+    sub.dir.sim.id.ext <- paste0(sample(chars,noise.sample1), collapse = "")
+    noise.sample <- sample(1:1000,1)
+    noise.sample2 <- sample(8:17,1, replace = TRUE)
+    sub.dir.sim.id <- paste0(sub.dir.sim.id.ext,
+                             paste0(sample(chars,noise.sample2), collapse = ""),noise.sample, rn)
+    
+    return(sub.dir.sim.id)
+  }
+  
+  ABC_DestDir.classic.phylo.MAR.b.60 <- paste0(work.dir,"/temp/",generate.filename(10))
+  
+  
+  # Error function when computing summary statistics
+  
+  err.functionGEN <- function(e){
+    return(chunk.summary.stats = rep(NA,64))
+    stop(e)
+  }
+  
+  
+  
+  results <- tryCatch(simpact.run(configParams = cfg.list,
+                                  destDir = ABC_DestDir.classic.phylo.MAR.b.60,
+                                  agedist = age.distr,
+                                  intervention = intervention),
+                      error = simpact.errFunction)
+  
+  
+  if (length(results) == 0){
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+  }else{
+    if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
+      outputvector <- rep(NA, 64)
+    }else{
+      
+      
+      datalist <- readthedata(results)
+      
+      simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
+      
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
+      
+      
+      
+      summary.stat.phylo.MAR.b.60 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                    datalist.agemix = datalist,
+                                                                                    work.dir = work.dir,
+                                                                                    sub.dir.rename = ABC_DestDir.classic.phylo.MAR.b.60,
+                                                                                    dirfasttree = work.dir,
+                                                                                    limitTransmEvents = 7,
+                                                                                    seq.cov = 45,
+                                                                                    seq.gender.ratio = 0.3,
+                                                                                    age.group.15.25 = c(15,25),
+                                                                                    age.group.25.40 = c(25,40),
+                                                                                    age.group.40.50 = c(40,50),
+                                                                                    endpoint = 40,
+                                                                                    timewindow = c(37,40),
+                                                                                    cut.off = 7),
+                                              error=function(e) return(rep(NA, 37)))
+      
+      
+      
+      
+      
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.b.60)
+      
+    }
+    
+  }
+  
+  unlink(paste0(ABC_DestDir.classic.phylo.MAR.b.60), recursive = TRUE)
+  
+  return(outputvector)
+}
+
+
+
+
+# Coverage of 65%
+simpact4ABC.classic.phylo.MAR.b.65 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
+  
+  
+  
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
+  
+  
+  setwd(paste0(work.dir))
+  
+  
+  
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
+  library(RSimpactCyan)
+  library(RSimpactHelper)
+  library(Rcpp)
+  library(ape)
+  library(expoTree)
+  library(data.table)
+  library(readr)
+  library(phangorn)
+  library(lme4)
+  library(nlme)
+  library(dplyr)
+  library(adephylo)
+  library(treedater)
+  library(geiger)
+  library(picante)
+  library(igraph)
+  library(phyloTop)
+  library(phytools)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
+  
+  
+  
+  ## Run Simpact for specific parameter combination
+  
+  age.distr <- agedistr.creator(shape = 5, scale = 65)
+  #
+  cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
+                                   population.simtime = 50, 
+                                   population.nummen = 4000, 
+                                   population.numwomen = 4000,
+                                   hivseed.time = 10, 
+                                   hivseed.type = "amount",
+                                   hivseed.amount = 40, 
+                                   hivseed.age.min = 20,
+                                   hivseed.age.max = 50,
+                                   formation.hazard.agegapry.meanage = -0.025,
+                                   debut.debutage = 15
+  )
+  
+  # # Assumption of nature of sexual network
+  # #########################################
+  #
+  cfg.list["population.msm"] = "no"
+  
+  
+  # # Sexual behaviour
+  # ###################
+  #
+  seedid <- inputvector[1]
+  
+  cfg.list["dissolution.alpha_0"] <- inputvector[2] # [1] # -0.52 c("unif", -1, 0)
+  cfg.list["dissolution.alpha_4"] <- inputvector [3] # [2] # -0.05 c("unif", -0.5, 0)
+  cfg.list["formation.hazard.agegapry.baseline"] <- inputvector[4] # [3] # 2 c("unif", 1, 3)
+  cfg.list["person.agegap.man.dist.normal.mu"] <- inputvector[5] # [4] # 0 c("unif", -0.5, 0.5)
+  cfg.list["person.agegap.woman.dist.normal.mu"] <- inputvector[5] # [4] # 0
+  cfg.list["person.agegap.man.dist.normal.sigma"] <- inputvector[6] # [5] # 3 c("unif", 2, 4)
+  cfg.list["person.agegap.woman.dist.normal.sigma"] <- inputvector[6] # [5] # 3 
+  cfg.list["formation.hazard.agegapry.gap_agescale_man"] <- inputvector[7] # [6] # 0.25 c("unif", 0, 1)
+  cfg.list["formation.hazard.agegapry.gap_agescale_woman"] <- inputvector[7] # [6] # 0.25
+  cfg.list["formation.hazard.agegapry.numrel_man"] <- inputvector[8] # [7] # -0.3 c("unif", -1, 0)
+  cfg.list["formation.hazard.agegapry.numrel_woman"] <- inputvector[8] # [7] # -0.3
+  cfg.list["formation.hazard.agegapry.numrel_diff"] <- inputvector[9] # [8] # -0.1 c("unif", -0.9, 0)
+  
+  
+  # # HIV transmission
+  # ###################
+  #
+  
+  cfg.list["hivtransmission.param.a"] <- inputvector[10] # [10] # -1 c("unif", -2, 0)
+  cfg.list["hivtransmission.param.b"] <- inputvector[11] # [11] # -90 c("unif", -100, -80)
+  cfg.list["hivtransmission.param.c"] <- inputvector[12] # [12] # 0.5 c("unif", 0, 1)
+  cfg.list["hivtransmission.param.f1"] <- inputvector[13] # [13] # 0.04879016 c("unif", 0, 0.5)
+  cfg.list["hivtransmission.param.f2"] <- inputvector[14] # [14] # -0.1386294 c("unif", -0.5, 0)
+  
+  # Disease progression > may be remove in parameter to estimates
+  
+  cfg.list["person.vsp.toacute.x"] <- inputvector[15] # [15] # 5 c("unif", 3, 7)
+  cfg.list["person.vsp.toaids.x"] <- inputvector[16] # [16] # 7 c("unif", 5, 9)
+  cfg.list["person.vsp.tofinalaids.x"] <- inputvector[17] # [17] # 12 c("unif", 10, 14)
+  
+  
+  #
+  # # Demographic
+  # ##############
+  #
+  
+  cfg.list["conception.alpha_base"] <- inputvector[18] # [18] # -2.7 c("unif", -3.5, -1.7)
+  
+  
+  # # Assumptions to avoid negative branch lengths
+  # ###############################################
+  # # + sampling == start ART
+  # # when someone start ART, he/she is sampled and becomes non-infectious
+  
+  cfg.list["monitoring.fraction.log_viralload"] <- 0
+  
+  
+  #
+  # ## Add-ons
+  #
+  ### BEGIN Add-on
+  cfg.list["formation.hazard.agegapry.baseline"] <- 2
+  cfg.list["mortality.aids.survtime.C"] <- 65
+  cfg.list["mortality.aids.survtime.k"] <- -0.2
+  cfg.list["monitoring.fraction.log_viralload"] <- 0 #0.3
+  cfg.list["dropout.interval.dist.type"] <- "uniform"
+  cfg.list["dropout.interval.dist.uniform.min"] <- 1000
+  cfg.list["dropout.interval.dist.uniform.max"] <- 2000
+  
+  cfg.list["person.survtime.logoffset.dist.type"] <- "normal"
+  cfg.list["person.survtime.logoffset.dist.normal.mu"] <- 0
+  cfg.list["person.survtime.logoffset.dist.normal.sigma"] <- 0.1
+  
+  cfg.list["person.agegap.man.dist.type"] <- "normal" #fixed
+  #cfg.list["person.agegap.man.dist.fixed.value"] <- -6
+  cfg.list["person.agegap.woman.dist.type"] <- "normal" #"fixed"
+  #cfg.list["person.agegap.woman.dist.fixed.value"] <- -6
+  
+  cfg.list["mortality.aids.survtime.C"] <- 65
+  cfg.list["mortality.aids.survtime.k"] <- -0.2
+  cfg.list["monitoring.cd4.threshold"] <- 0 # 0 means nobody qualifies for ART
+  cfg.list["diagnosis.baseline"] <- -2
+  
+  
+  cfg.list["person.eagerness.man.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.woman.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.man.dist.gamma.b"] <- 45 # 45
+  cfg.list["person.eagerness.woman.dist.gamma.b"] <- 45 # 45
+  
+  #### END Add-ons
+  
+  
+  # # ART intervention
+  # ###################
+  #
+  # # ART acceptability paramter and the ART  interventions
+  
+  cfg.list["person.art.accept.threshold.dist.fixed.value"] <- 0.6
+  
+  # Let's introduce ART, and evaluate whether the HIV prevalence drops less  rapidly
+  art.intro <- list()
+  art.intro["time"] <- 20
+  art.intro["diagnosis.baseline"] <- -2 # 0#100
+  art.intro["monitoring.cd4.threshold"] <- 100 # 1200
+  
+  ### add something about diagnosis
+  art.intro["diagnosis.agefactor"] <- 0
+  art.intro["diagnosis.genderfactor"] <- 0
+  art.intro["diagnosis.diagpartnersfactor"] <- 0
+  art.intro["diagnosis.isdiagnosedfactor"] <- 0
+  ### end of add-on about diagnosis
+  #art.intro["monitoring.interval.piecewise.cd4s"] <- "0,1300"
+  # Gradual increase in CD4 threshold. in 2007:200. in 2010:350. in 2013:500
+  art.intro1 <- list()
+  art.intro1["time"] <- 22
+  art.intro1["diagnosis.baseline"] <- -2 # 0#100
+  art.intro1["monitoring.cd4.threshold"] <- 150 # 1200
+  
+  art.intro2 <- list()
+  art.intro2["time"] <- 25 # inputvector[5] ######### 30
+  art.intro2["monitoring.cd4.threshold"] <- 200
+  
+  art.intro3 <- list()
+  art.intro3["time"] <- 30 # inputvector[4] + inputvector[5] + inputvector[6] ########### 33
+  art.intro3["monitoring.cd4.threshold"] <- 350
+  
+  art.intro4 <- list()
+  art.intro4["time"] <- 33 # inputvector[4] + inputvector[5] + inputvector[6] + inputvector[7] ########### 36
+  art.intro4["monitoring.cd4.threshold"] <- 500
+  
+  art.intro5 <- list()
+  art.intro5["time"] <- 36
+  art.intro5["monitoring.cd4.threshold"] <- 700 # This is equivalent to immediate access
+  
+  # tasp.indicator <- inputvector[9] # 1 if the scenario is TasP, 0 if the scenario is current status
+  interventionlist <- list(art.intro, art.intro1, art.intro2, art.intro3, art.intro4, art.intro5)
+  
+  intervention <- interventionlist
+  
+  # Events
+  cfg.list["population.maxevents"] <- as.numeric(cfg.list["population.simtime"][1]) * as.numeric(cfg.list["population.nummen"][1]) * 3
+  
+  # Avoid overlaping in same directory
+  
+  
+  #creating subfolder with unique name for each simulation
+  generate.filename <- function(how.long){
+    
+    rn <- sample(1:100,1)
+    t <- as.numeric(Sys.time())
+    set.seed((t - floor(t)) * 1e8)
+    chars <- c(letters, LETTERS)
+    sub.dir.sim.id <-  paste0(sample(chars,how.long), collapse = "")
+    
+    noise.sample1 <- sample(8:15,1, replace = TRUE)
+    sub.dir.sim.id.ext <- paste0(sample(chars,noise.sample1), collapse = "")
+    noise.sample <- sample(1:1000,1)
+    noise.sample2 <- sample(8:17,1, replace = TRUE)
+    sub.dir.sim.id <- paste0(sub.dir.sim.id.ext,
+                             paste0(sample(chars,noise.sample2), collapse = ""),noise.sample, rn)
+    
+    return(sub.dir.sim.id)
+  }
+  
+  ABC_DestDir.classic.phylo.MAR.b.65 <- paste0(work.dir,"/temp/",generate.filename(10))
+  
+  
+  # Error function when computing summary statistics
+  
+  err.functionGEN <- function(e){
+    return(chunk.summary.stats = rep(NA,64))
+    stop(e)
+  }
+  
+  
+  
+  results <- tryCatch(simpact.run(configParams = cfg.list,
+                                  destDir = ABC_DestDir.classic.phylo.MAR.b.65,
+                                  agedist = age.distr,
+                                  intervention = intervention),
+                      error = simpact.errFunction)
+  
+  
+  if (length(results) == 0){
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+  }else{
+    if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
+      outputvector <- rep(NA, 64)
+    }else{
+      
+      
+      datalist <- readthedata(results)
+      
+      simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
+      
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
+      
+      
+      
+      summary.stat.phylo.MAR.b.65 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                    datalist.agemix = datalist,
+                                                                                    work.dir = work.dir,
+                                                                                    sub.dir.rename = ABC_DestDir.classic.phylo.MAR.b.65,
+                                                                                    dirfasttree = work.dir,
+                                                                                    limitTransmEvents = 7,
+                                                                                    seq.cov = 45,
+                                                                                    seq.gender.ratio = 0.3,
+                                                                                    age.group.15.25 = c(15,25),
+                                                                                    age.group.25.40 = c(25,40),
+                                                                                    age.group.40.50 = c(40,50),
+                                                                                    endpoint = 40,
+                                                                                    timewindow = c(37,40),
+                                                                                    cut.off = 7),
+                                              error=function(e) return(rep(NA, 37)))
+      
+      
+      
+      
+      
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.b.65)
+      
+    }
+    
+  }
+  
+  unlink(paste0(ABC_DestDir.classic.phylo.MAR.b.65), recursive = TRUE)
+  
+  return(outputvector)
+}
+
+
+
+# Coverage of 70%
+simpact4ABC.classic.phylo.MAR.b.70 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
+  
+  
+  
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
+  
+  
+  setwd(paste0(work.dir))
+  
+  
+  
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
+  library(RSimpactCyan)
+  library(RSimpactHelper)
+  library(Rcpp)
+  library(ape)
+  library(expoTree)
+  library(data.table)
+  library(readr)
+  library(phangorn)
+  library(lme4)
+  library(nlme)
+  library(dplyr)
+  library(adephylo)
+  library(treedater)
+  library(geiger)
+  library(picante)
+  library(igraph)
+  library(phyloTop)
+  library(phytools)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
+  
+  
+  
+  ## Run Simpact for specific parameter combination
+  
+  age.distr <- agedistr.creator(shape = 5, scale = 65)
+  #
+  cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
+                                   population.simtime = 50, 
+                                   population.nummen = 4000, 
+                                   population.numwomen = 4000,
+                                   hivseed.time = 10, 
+                                   hivseed.type = "amount",
+                                   hivseed.amount = 40, 
+                                   hivseed.age.min = 20,
+                                   hivseed.age.max = 50,
+                                   formation.hazard.agegapry.meanage = -0.025,
+                                   debut.debutage = 15
+  )
+  
+  # # Assumption of nature of sexual network
+  # #########################################
+  #
+  cfg.list["population.msm"] = "no"
+  
+  
+  # # Sexual behaviour
+  # ###################
+  #
+  seedid <- inputvector[1]
+  
+  cfg.list["dissolution.alpha_0"] <- inputvector[2] # [1] # -0.52 c("unif", -1, 0)
+  cfg.list["dissolution.alpha_4"] <- inputvector [3] # [2] # -0.05 c("unif", -0.5, 0)
+  cfg.list["formation.hazard.agegapry.baseline"] <- inputvector[4] # [3] # 2 c("unif", 1, 3)
+  cfg.list["person.agegap.man.dist.normal.mu"] <- inputvector[5] # [4] # 0 c("unif", -0.5, 0.5)
+  cfg.list["person.agegap.woman.dist.normal.mu"] <- inputvector[5] # [4] # 0
+  cfg.list["person.agegap.man.dist.normal.sigma"] <- inputvector[6] # [5] # 3 c("unif", 2, 4)
+  cfg.list["person.agegap.woman.dist.normal.sigma"] <- inputvector[6] # [5] # 3 
+  cfg.list["formation.hazard.agegapry.gap_agescale_man"] <- inputvector[7] # [6] # 0.25 c("unif", 0, 1)
+  cfg.list["formation.hazard.agegapry.gap_agescale_woman"] <- inputvector[7] # [6] # 0.25
+  cfg.list["formation.hazard.agegapry.numrel_man"] <- inputvector[8] # [7] # -0.3 c("unif", -1, 0)
+  cfg.list["formation.hazard.agegapry.numrel_woman"] <- inputvector[8] # [7] # -0.3
+  cfg.list["formation.hazard.agegapry.numrel_diff"] <- inputvector[9] # [8] # -0.1 c("unif", -0.9, 0)
+  
+  
+  # # HIV transmission
+  # ###################
+  #
+  
+  cfg.list["hivtransmission.param.a"] <- inputvector[10] # [10] # -1 c("unif", -2, 0)
+  cfg.list["hivtransmission.param.b"] <- inputvector[11] # [11] # -90 c("unif", -100, -80)
+  cfg.list["hivtransmission.param.c"] <- inputvector[12] # [12] # 0.5 c("unif", 0, 1)
+  cfg.list["hivtransmission.param.f1"] <- inputvector[13] # [13] # 0.04879016 c("unif", 0, 0.5)
+  cfg.list["hivtransmission.param.f2"] <- inputvector[14] # [14] # -0.1386294 c("unif", -0.5, 0)
+  
+  # Disease progression > may be remove in parameter to estimates
+  
+  cfg.list["person.vsp.toacute.x"] <- inputvector[15] # [15] # 5 c("unif", 3, 7)
+  cfg.list["person.vsp.toaids.x"] <- inputvector[16] # [16] # 7 c("unif", 5, 9)
+  cfg.list["person.vsp.tofinalaids.x"] <- inputvector[17] # [17] # 12 c("unif", 10, 14)
+  
+  
+  #
+  # # Demographic
+  # ##############
+  #
+  
+  cfg.list["conception.alpha_base"] <- inputvector[18] # [18] # -2.7 c("unif", -3.5, -1.7)
+  
+  
+  # # Assumptions to avoid negative branch lengths
+  # ###############################################
+  # # + sampling == start ART
+  # # when someone start ART, he/she is sampled and becomes non-infectious
+  
+  cfg.list["monitoring.fraction.log_viralload"] <- 0
+  
+  
+  #
+  # ## Add-ons
+  #
+  ### BEGIN Add-on
+  cfg.list["formation.hazard.agegapry.baseline"] <- 2
+  cfg.list["mortality.aids.survtime.C"] <- 65
+  cfg.list["mortality.aids.survtime.k"] <- -0.2
+  cfg.list["monitoring.fraction.log_viralload"] <- 0 #0.3
+  cfg.list["dropout.interval.dist.type"] <- "uniform"
+  cfg.list["dropout.interval.dist.uniform.min"] <- 1000
+  cfg.list["dropout.interval.dist.uniform.max"] <- 2000
+  
+  cfg.list["person.survtime.logoffset.dist.type"] <- "normal"
+  cfg.list["person.survtime.logoffset.dist.normal.mu"] <- 0
+  cfg.list["person.survtime.logoffset.dist.normal.sigma"] <- 0.1
+  
+  cfg.list["person.agegap.man.dist.type"] <- "normal" #fixed
+  #cfg.list["person.agegap.man.dist.fixed.value"] <- -6
+  cfg.list["person.agegap.woman.dist.type"] <- "normal" #"fixed"
+  #cfg.list["person.agegap.woman.dist.fixed.value"] <- -6
+  
+  cfg.list["mortality.aids.survtime.C"] <- 65
+  cfg.list["mortality.aids.survtime.k"] <- -0.2
+  cfg.list["monitoring.cd4.threshold"] <- 0 # 0 means nobody qualifies for ART
+  cfg.list["diagnosis.baseline"] <- -2
+  
+  
+  cfg.list["person.eagerness.man.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.woman.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.man.dist.gamma.b"] <- 45 # 45
+  cfg.list["person.eagerness.woman.dist.gamma.b"] <- 45 # 45
+  
+  #### END Add-ons
+  
+  
+  # # ART intervention
+  # ###################
+  #
+  # # ART acceptability paramter and the ART  interventions
+  
+  cfg.list["person.art.accept.threshold.dist.fixed.value"] <- 0.6
+  
+  # Let's introduce ART, and evaluate whether the HIV prevalence drops less  rapidly
+  art.intro <- list()
+  art.intro["time"] <- 20
+  art.intro["diagnosis.baseline"] <- -2 # 0#100
+  art.intro["monitoring.cd4.threshold"] <- 100 # 1200
+  
+  ### add something about diagnosis
+  art.intro["diagnosis.agefactor"] <- 0
+  art.intro["diagnosis.genderfactor"] <- 0
+  art.intro["diagnosis.diagpartnersfactor"] <- 0
+  art.intro["diagnosis.isdiagnosedfactor"] <- 0
+  ### end of add-on about diagnosis
+  #art.intro["monitoring.interval.piecewise.cd4s"] <- "0,1300"
+  # Gradual increase in CD4 threshold. in 2007:200. in 2010:350. in 2013:500
+  art.intro1 <- list()
+  art.intro1["time"] <- 22
+  art.intro1["diagnosis.baseline"] <- -2 # 0#100
+  art.intro1["monitoring.cd4.threshold"] <- 150 # 1200
+  
+  art.intro2 <- list()
+  art.intro2["time"] <- 25 # inputvector[5] ######### 30
+  art.intro2["monitoring.cd4.threshold"] <- 200
+  
+  art.intro3 <- list()
+  art.intro3["time"] <- 30 # inputvector[4] + inputvector[5] + inputvector[6] ########### 33
+  art.intro3["monitoring.cd4.threshold"] <- 350
+  
+  art.intro4 <- list()
+  art.intro4["time"] <- 33 # inputvector[4] + inputvector[5] + inputvector[6] + inputvector[7] ########### 36
+  art.intro4["monitoring.cd4.threshold"] <- 500
+  
+  art.intro5 <- list()
+  art.intro5["time"] <- 36
+  art.intro5["monitoring.cd4.threshold"] <- 700 # This is equivalent to immediate access
+  
+  # tasp.indicator <- inputvector[9] # 1 if the scenario is TasP, 0 if the scenario is current status
+  interventionlist <- list(art.intro, art.intro1, art.intro2, art.intro3, art.intro4, art.intro5)
+  
+  intervention <- interventionlist
+  
+  # Events
+  cfg.list["population.maxevents"] <- as.numeric(cfg.list["population.simtime"][1]) * as.numeric(cfg.list["population.nummen"][1]) * 3
+  
+  # Avoid overlaping in same directory
+  
+  
+  #creating subfolder with unique name for each simulation
+  generate.filename <- function(how.long){
+    
+    rn <- sample(1:100,1)
+    t <- as.numeric(Sys.time())
+    set.seed((t - floor(t)) * 1e8)
+    chars <- c(letters, LETTERS)
+    sub.dir.sim.id <-  paste0(sample(chars,how.long), collapse = "")
+    
+    noise.sample1 <- sample(8:15,1, replace = TRUE)
+    sub.dir.sim.id.ext <- paste0(sample(chars,noise.sample1), collapse = "")
+    noise.sample <- sample(1:1000,1)
+    noise.sample2 <- sample(8:17,1, replace = TRUE)
+    sub.dir.sim.id <- paste0(sub.dir.sim.id.ext,
+                             paste0(sample(chars,noise.sample2), collapse = ""),noise.sample, rn)
+    
+    return(sub.dir.sim.id)
+  }
+  
+  ABC_DestDir.classic.phylo.MAR.b.70 <- paste0(work.dir,"/temp/",generate.filename(10))
+  
+  
+  # Error function when computing summary statistics
+  
+  err.functionGEN <- function(e){
+    return(chunk.summary.stats = rep(NA,64))
+    stop(e)
+  }
+  
+  
+  
+  results <- tryCatch(simpact.run(configParams = cfg.list,
+                                  destDir = ABC_DestDir.classic.phylo.MAR.b.70,
+                                  agedist = age.distr,
+                                  intervention = intervention),
+                      error = simpact.errFunction)
+  
+  
+  if (length(results) == 0){
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+  }else{
+    if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
+      outputvector <- rep(NA, 64)
+    }else{
+      
+      
+      datalist <- readthedata(results)
+      
+      simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
+      
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
+      
+      
+      
+      summary.stat.phylo.MAR.b.70 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                    datalist.agemix = datalist,
+                                                                                    work.dir = work.dir,
+                                                                                    sub.dir.rename = ABC_DestDir.classic.phylo.MAR.b.70,
+                                                                                    dirfasttree = work.dir,
+                                                                                    limitTransmEvents = 7,
+                                                                                    seq.cov = 45,
+                                                                                    seq.gender.ratio = 0.3,
+                                                                                    age.group.15.25 = c(15,25),
+                                                                                    age.group.25.40 = c(25,40),
+                                                                                    age.group.40.50 = c(40,50),
+                                                                                    endpoint = 40,
+                                                                                    timewindow = c(37,40),
+                                                                                    cut.off = 7),
+                                              error=function(e) return(rep(NA, 37)))
+      
+      
+      
+      
+      
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.b.70)
+      
+    }
+    
+  }
+  
+  unlink(paste0(ABC_DestDir.classic.phylo.MAR.b.70), recursive = TRUE)
+  
+  return(outputvector)
+}
+
+
+
+# Coverage of 75%
+simpact4ABC.classic.phylo.MAR.b.75 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
+  
+  
+  
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
+  
+  
+  setwd(paste0(work.dir))
+  
+  
+  
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
+  library(RSimpactCyan)
+  library(RSimpactHelper)
+  library(Rcpp)
+  library(ape)
+  library(expoTree)
+  library(data.table)
+  library(readr)
+  library(phangorn)
+  library(lme4)
+  library(nlme)
+  library(dplyr)
+  library(adephylo)
+  library(treedater)
+  library(geiger)
+  library(picante)
+  library(igraph)
+  library(phyloTop)
+  library(phytools)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
+  
+  
+  
+  ## Run Simpact for specific parameter combination
+  
+  age.distr <- agedistr.creator(shape = 5, scale = 65)
+  #
+  cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
+                                   population.simtime = 50, 
+                                   population.nummen = 4000, 
+                                   population.numwomen = 4000,
+                                   hivseed.time = 10, 
+                                   hivseed.type = "amount",
+                                   hivseed.amount = 40, 
+                                   hivseed.age.min = 20,
+                                   hivseed.age.max = 50,
+                                   formation.hazard.agegapry.meanage = -0.025,
+                                   debut.debutage = 15
+  )
+  
+  # # Assumption of nature of sexual network
+  # #########################################
+  #
+  cfg.list["population.msm"] = "no"
+  
+  
+  # # Sexual behaviour
+  # ###################
+  #
+  seedid <- inputvector[1]
+  
+  cfg.list["dissolution.alpha_0"] <- inputvector[2] # [1] # -0.52 c("unif", -1, 0)
+  cfg.list["dissolution.alpha_4"] <- inputvector [3] # [2] # -0.05 c("unif", -0.5, 0)
+  cfg.list["formation.hazard.agegapry.baseline"] <- inputvector[4] # [3] # 2 c("unif", 1, 3)
+  cfg.list["person.agegap.man.dist.normal.mu"] <- inputvector[5] # [4] # 0 c("unif", -0.5, 0.5)
+  cfg.list["person.agegap.woman.dist.normal.mu"] <- inputvector[5] # [4] # 0
+  cfg.list["person.agegap.man.dist.normal.sigma"] <- inputvector[6] # [5] # 3 c("unif", 2, 4)
+  cfg.list["person.agegap.woman.dist.normal.sigma"] <- inputvector[6] # [5] # 3 
+  cfg.list["formation.hazard.agegapry.gap_agescale_man"] <- inputvector[7] # [6] # 0.25 c("unif", 0, 1)
+  cfg.list["formation.hazard.agegapry.gap_agescale_woman"] <- inputvector[7] # [6] # 0.25
+  cfg.list["formation.hazard.agegapry.numrel_man"] <- inputvector[8] # [7] # -0.3 c("unif", -1, 0)
+  cfg.list["formation.hazard.agegapry.numrel_woman"] <- inputvector[8] # [7] # -0.3
+  cfg.list["formation.hazard.agegapry.numrel_diff"] <- inputvector[9] # [8] # -0.1 c("unif", -0.9, 0)
+  
+  
+  # # HIV transmission
+  # ###################
+  #
+  
+  cfg.list["hivtransmission.param.a"] <- inputvector[10] # [10] # -1 c("unif", -2, 0)
+  cfg.list["hivtransmission.param.b"] <- inputvector[11] # [11] # -90 c("unif", -100, -80)
+  cfg.list["hivtransmission.param.c"] <- inputvector[12] # [12] # 0.5 c("unif", 0, 1)
+  cfg.list["hivtransmission.param.f1"] <- inputvector[13] # [13] # 0.04879016 c("unif", 0, 0.5)
+  cfg.list["hivtransmission.param.f2"] <- inputvector[14] # [14] # -0.1386294 c("unif", -0.5, 0)
+  
+  # Disease progression > may be remove in parameter to estimates
+  
+  cfg.list["person.vsp.toacute.x"] <- inputvector[15] # [15] # 5 c("unif", 3, 7)
+  cfg.list["person.vsp.toaids.x"] <- inputvector[16] # [16] # 7 c("unif", 5, 9)
+  cfg.list["person.vsp.tofinalaids.x"] <- inputvector[17] # [17] # 12 c("unif", 10, 14)
+  
+  
+  #
+  # # Demographic
+  # ##############
+  #
+  
+  cfg.list["conception.alpha_base"] <- inputvector[18] # [18] # -2.7 c("unif", -3.5, -1.7)
+  
+  
+  # # Assumptions to avoid negative branch lengths
+  # ###############################################
+  # # + sampling == start ART
+  # # when someone start ART, he/she is sampled and becomes non-infectious
+  
+  cfg.list["monitoring.fraction.log_viralload"] <- 0
+  
+  
+  #
+  # ## Add-ons
+  #
+  ### BEGIN Add-on
+  cfg.list["formation.hazard.agegapry.baseline"] <- 2
+  cfg.list["mortality.aids.survtime.C"] <- 65
+  cfg.list["mortality.aids.survtime.k"] <- -0.2
+  cfg.list["monitoring.fraction.log_viralload"] <- 0 #0.3
+  cfg.list["dropout.interval.dist.type"] <- "uniform"
+  cfg.list["dropout.interval.dist.uniform.min"] <- 1000
+  cfg.list["dropout.interval.dist.uniform.max"] <- 2000
+  
+  cfg.list["person.survtime.logoffset.dist.type"] <- "normal"
+  cfg.list["person.survtime.logoffset.dist.normal.mu"] <- 0
+  cfg.list["person.survtime.logoffset.dist.normal.sigma"] <- 0.1
+  
+  cfg.list["person.agegap.man.dist.type"] <- "normal" #fixed
+  #cfg.list["person.agegap.man.dist.fixed.value"] <- -6
+  cfg.list["person.agegap.woman.dist.type"] <- "normal" #"fixed"
+  #cfg.list["person.agegap.woman.dist.fixed.value"] <- -6
+  
+  cfg.list["mortality.aids.survtime.C"] <- 65
+  cfg.list["mortality.aids.survtime.k"] <- -0.2
+  cfg.list["monitoring.cd4.threshold"] <- 0 # 0 means nobody qualifies for ART
+  cfg.list["diagnosis.baseline"] <- -2
+  
+  
+  cfg.list["person.eagerness.man.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.woman.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.man.dist.gamma.b"] <- 45 # 45
+  cfg.list["person.eagerness.woman.dist.gamma.b"] <- 45 # 45
+  
+  #### END Add-ons
+  
+  
+  # # ART intervention
+  # ###################
+  #
+  # # ART acceptability paramter and the ART  interventions
+  
+  cfg.list["person.art.accept.threshold.dist.fixed.value"] <- 0.6
+  
+  # Let's introduce ART, and evaluate whether the HIV prevalence drops less  rapidly
+  art.intro <- list()
+  art.intro["time"] <- 20
+  art.intro["diagnosis.baseline"] <- -2 # 0#100
+  art.intro["monitoring.cd4.threshold"] <- 100 # 1200
+  
+  ### add something about diagnosis
+  art.intro["diagnosis.agefactor"] <- 0
+  art.intro["diagnosis.genderfactor"] <- 0
+  art.intro["diagnosis.diagpartnersfactor"] <- 0
+  art.intro["diagnosis.isdiagnosedfactor"] <- 0
+  ### end of add-on about diagnosis
+  #art.intro["monitoring.interval.piecewise.cd4s"] <- "0,1300"
+  # Gradual increase in CD4 threshold. in 2007:200. in 2010:350. in 2013:500
+  art.intro1 <- list()
+  art.intro1["time"] <- 22
+  art.intro1["diagnosis.baseline"] <- -2 # 0#100
+  art.intro1["monitoring.cd4.threshold"] <- 150 # 1200
+  
+  art.intro2 <- list()
+  art.intro2["time"] <- 25 # inputvector[5] ######### 30
+  art.intro2["monitoring.cd4.threshold"] <- 200
+  
+  art.intro3 <- list()
+  art.intro3["time"] <- 30 # inputvector[4] + inputvector[5] + inputvector[6] ########### 33
+  art.intro3["monitoring.cd4.threshold"] <- 350
+  
+  art.intro4 <- list()
+  art.intro4["time"] <- 33 # inputvector[4] + inputvector[5] + inputvector[6] + inputvector[7] ########### 36
+  art.intro4["monitoring.cd4.threshold"] <- 500
+  
+  art.intro5 <- list()
+  art.intro5["time"] <- 36
+  art.intro5["monitoring.cd4.threshold"] <- 700 # This is equivalent to immediate access
+  
+  # tasp.indicator <- inputvector[9] # 1 if the scenario is TasP, 0 if the scenario is current status
+  interventionlist <- list(art.intro, art.intro1, art.intro2, art.intro3, art.intro4, art.intro5)
+  
+  intervention <- interventionlist
+  
+  # Events
+  cfg.list["population.maxevents"] <- as.numeric(cfg.list["population.simtime"][1]) * as.numeric(cfg.list["population.nummen"][1]) * 3
+  
+  # Avoid overlaping in same directory
+  
+  
+  #creating subfolder with unique name for each simulation
+  generate.filename <- function(how.long){
+    
+    rn <- sample(1:100,1)
+    t <- as.numeric(Sys.time())
+    set.seed((t - floor(t)) * 1e8)
+    chars <- c(letters, LETTERS)
+    sub.dir.sim.id <-  paste0(sample(chars,how.long), collapse = "")
+    
+    noise.sample1 <- sample(8:15,1, replace = TRUE)
+    sub.dir.sim.id.ext <- paste0(sample(chars,noise.sample1), collapse = "")
+    noise.sample <- sample(1:1000,1)
+    noise.sample2 <- sample(8:17,1, replace = TRUE)
+    sub.dir.sim.id <- paste0(sub.dir.sim.id.ext,
+                             paste0(sample(chars,noise.sample2), collapse = ""),noise.sample, rn)
+    
+    return(sub.dir.sim.id)
+  }
+  
+  ABC_DestDir.classic.phylo.MAR.b.75 <- paste0(work.dir,"/temp/",generate.filename(10))
+  
+  
+  # Error function when computing summary statistics
+  
+  err.functionGEN <- function(e){
+    return(chunk.summary.stats = rep(NA,64))
+    stop(e)
+  }
+  
+  
+  
+  results <- tryCatch(simpact.run(configParams = cfg.list,
+                                  destDir = ABC_DestDir.classic.phylo.MAR.b.75,
+                                  agedist = age.distr,
+                                  intervention = intervention),
+                      error = simpact.errFunction)
+  
+  
+  if (length(results) == 0){
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+  }else{
+    if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
+      outputvector <- rep(NA, 64)
+    }else{
+      
+      
+      datalist <- readthedata(results)
+      
+      simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
+      
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
+      
+      
+      
+      summary.stat.phylo.MAR.b.75 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                    datalist.agemix = datalist,
+                                                                                    work.dir = work.dir,
+                                                                                    sub.dir.rename = ABC_DestDir.classic.phylo.MAR.b.75,
+                                                                                    dirfasttree = work.dir,
+                                                                                    limitTransmEvents = 7,
+                                                                                    seq.cov = 45,
+                                                                                    seq.gender.ratio = 0.3,
+                                                                                    age.group.15.25 = c(15,25),
+                                                                                    age.group.25.40 = c(25,40),
+                                                                                    age.group.40.50 = c(40,50),
+                                                                                    endpoint = 40,
+                                                                                    timewindow = c(37,40),
+                                                                                    cut.off = 7),
+                                              error=function(e) return(rep(NA, 37)))
+      
+      
+      
+      
+      
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.b.75)
+      
+    }
+    
+  }
+  
+  unlink(paste0(ABC_DestDir.classic.phylo.MAR.b.75), recursive = TRUE)
+  
+  return(outputvector)
+}
+
+
+
+
+# Coverage of 80 %
+simpact4ABC.classic.phylo.MAR.b.80 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
+  
+  
+  
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
+  
+  
+  setwd(paste0(work.dir))
+  
+  
+  
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
+  library(RSimpactCyan)
+  library(RSimpactHelper)
+  library(Rcpp)
+  library(ape)
+  library(expoTree)
+  library(data.table)
+  library(readr)
+  library(phangorn)
+  library(lme4)
+  library(nlme)
+  library(dplyr)
+  library(adephylo)
+  library(treedater)
+  library(geiger)
+  library(picante)
+  library(igraph)
+  library(phyloTop)
+  library(phytools)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
+  
+  
+  
+  ## Run Simpact for specific parameter combination
+  
+  age.distr <- agedistr.creator(shape = 5, scale = 65)
+  #
+  cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
+                                   population.simtime = 50, 
+                                   population.nummen = 4000, 
+                                   population.numwomen = 4000,
+                                   hivseed.time = 10, 
+                                   hivseed.type = "amount",
+                                   hivseed.amount = 40, 
+                                   hivseed.age.min = 20,
+                                   hivseed.age.max = 50,
+                                   formation.hazard.agegapry.meanage = -0.025,
+                                   debut.debutage = 15
+  )
+  
+  # # Assumption of nature of sexual network
+  # #########################################
+  #
+  cfg.list["population.msm"] = "no"
+  
+  
+  # # Sexual behaviour
+  # ###################
+  #
+  seedid <- inputvector[1]
+  
+  cfg.list["dissolution.alpha_0"] <- inputvector[2] # [1] # -0.52 c("unif", -1, 0)
+  cfg.list["dissolution.alpha_4"] <- inputvector [3] # [2] # -0.05 c("unif", -0.5, 0)
+  cfg.list["formation.hazard.agegapry.baseline"] <- inputvector[4] # [3] # 2 c("unif", 1, 3)
+  cfg.list["person.agegap.man.dist.normal.mu"] <- inputvector[5] # [4] # 0 c("unif", -0.5, 0.5)
+  cfg.list["person.agegap.woman.dist.normal.mu"] <- inputvector[5] # [4] # 0
+  cfg.list["person.agegap.man.dist.normal.sigma"] <- inputvector[6] # [5] # 3 c("unif", 2, 4)
+  cfg.list["person.agegap.woman.dist.normal.sigma"] <- inputvector[6] # [5] # 3 
+  cfg.list["formation.hazard.agegapry.gap_agescale_man"] <- inputvector[7] # [6] # 0.25 c("unif", 0, 1)
+  cfg.list["formation.hazard.agegapry.gap_agescale_woman"] <- inputvector[7] # [6] # 0.25
+  cfg.list["formation.hazard.agegapry.numrel_man"] <- inputvector[8] # [7] # -0.3 c("unif", -1, 0)
+  cfg.list["formation.hazard.agegapry.numrel_woman"] <- inputvector[8] # [7] # -0.3
+  cfg.list["formation.hazard.agegapry.numrel_diff"] <- inputvector[9] # [8] # -0.1 c("unif", -0.9, 0)
+  
+  
+  # # HIV transmission
+  # ###################
+  #
+  
+  cfg.list["hivtransmission.param.a"] <- inputvector[10] # [10] # -1 c("unif", -2, 0)
+  cfg.list["hivtransmission.param.b"] <- inputvector[11] # [11] # -90 c("unif", -100, -80)
+  cfg.list["hivtransmission.param.c"] <- inputvector[12] # [12] # 0.5 c("unif", 0, 1)
+  cfg.list["hivtransmission.param.f1"] <- inputvector[13] # [13] # 0.04879016 c("unif", 0, 0.5)
+  cfg.list["hivtransmission.param.f2"] <- inputvector[14] # [14] # -0.1386294 c("unif", -0.5, 0)
+  
+  # Disease progression > may be remove in parameter to estimates
+  
+  cfg.list["person.vsp.toacute.x"] <- inputvector[15] # [15] # 5 c("unif", 3, 7)
+  cfg.list["person.vsp.toaids.x"] <- inputvector[16] # [16] # 7 c("unif", 5, 9)
+  cfg.list["person.vsp.tofinalaids.x"] <- inputvector[17] # [17] # 12 c("unif", 10, 14)
+  
+  
+  #
+  # # Demographic
+  # ##############
+  #
+  
+  cfg.list["conception.alpha_base"] <- inputvector[18] # [18] # -2.7 c("unif", -3.5, -1.7)
+  
+  
+  # # Assumptions to avoid negative branch lengths
+  # ###############################################
+  # # + sampling == start ART
+  # # when someone start ART, he/she is sampled and becomes non-infectious
+  
+  cfg.list["monitoring.fraction.log_viralload"] <- 0
+  
+  
+  #
+  # ## Add-ons
+  #
+  ### BEGIN Add-on
+  cfg.list["formation.hazard.agegapry.baseline"] <- 2
+  cfg.list["mortality.aids.survtime.C"] <- 65
+  cfg.list["mortality.aids.survtime.k"] <- -0.2
+  cfg.list["monitoring.fraction.log_viralload"] <- 0 #0.3
+  cfg.list["dropout.interval.dist.type"] <- "uniform"
+  cfg.list["dropout.interval.dist.uniform.min"] <- 1000
+  cfg.list["dropout.interval.dist.uniform.max"] <- 2000
+  
+  cfg.list["person.survtime.logoffset.dist.type"] <- "normal"
+  cfg.list["person.survtime.logoffset.dist.normal.mu"] <- 0
+  cfg.list["person.survtime.logoffset.dist.normal.sigma"] <- 0.1
+  
+  cfg.list["person.agegap.man.dist.type"] <- "normal" #fixed
+  #cfg.list["person.agegap.man.dist.fixed.value"] <- -6
+  cfg.list["person.agegap.woman.dist.type"] <- "normal" #"fixed"
+  #cfg.list["person.agegap.woman.dist.fixed.value"] <- -6
+  
+  cfg.list["mortality.aids.survtime.C"] <- 65
+  cfg.list["mortality.aids.survtime.k"] <- -0.2
+  cfg.list["monitoring.cd4.threshold"] <- 0 # 0 means nobody qualifies for ART
+  cfg.list["diagnosis.baseline"] <- -2
+  
+  
+  cfg.list["person.eagerness.man.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.woman.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.man.dist.gamma.b"] <- 45 # 45
+  cfg.list["person.eagerness.woman.dist.gamma.b"] <- 45 # 45
+  
+  #### END Add-ons
+  
+  
+  # # ART intervention
+  # ###################
+  #
+  # # ART acceptability paramter and the ART  interventions
+  
+  cfg.list["person.art.accept.threshold.dist.fixed.value"] <- 0.6
+  
+  # Let's introduce ART, and evaluate whether the HIV prevalence drops less  rapidly
+  art.intro <- list()
+  art.intro["time"] <- 20
+  art.intro["diagnosis.baseline"] <- -2 # 0#100
+  art.intro["monitoring.cd4.threshold"] <- 100 # 1200
+  
+  ### add something about diagnosis
+  art.intro["diagnosis.agefactor"] <- 0
+  art.intro["diagnosis.genderfactor"] <- 0
+  art.intro["diagnosis.diagpartnersfactor"] <- 0
+  art.intro["diagnosis.isdiagnosedfactor"] <- 0
+  ### end of add-on about diagnosis
+  #art.intro["monitoring.interval.piecewise.cd4s"] <- "0,1300"
+  # Gradual increase in CD4 threshold. in 2007:200. in 2010:350. in 2013:500
+  art.intro1 <- list()
+  art.intro1["time"] <- 22
+  art.intro1["diagnosis.baseline"] <- -2 # 0#100
+  art.intro1["monitoring.cd4.threshold"] <- 150 # 1200
+  
+  art.intro2 <- list()
+  art.intro2["time"] <- 25 # inputvector[5] ######### 30
+  art.intro2["monitoring.cd4.threshold"] <- 200
+  
+  art.intro3 <- list()
+  art.intro3["time"] <- 30 # inputvector[4] + inputvector[5] + inputvector[6] ########### 33
+  art.intro3["monitoring.cd4.threshold"] <- 350
+  
+  art.intro4 <- list()
+  art.intro4["time"] <- 33 # inputvector[4] + inputvector[5] + inputvector[6] + inputvector[7] ########### 36
+  art.intro4["monitoring.cd4.threshold"] <- 500
+  
+  art.intro5 <- list()
+  art.intro5["time"] <- 36
+  art.intro5["monitoring.cd4.threshold"] <- 700 # This is equivalent to immediate access
+  
+  # tasp.indicator <- inputvector[9] # 1 if the scenario is TasP, 0 if the scenario is current status
+  interventionlist <- list(art.intro, art.intro1, art.intro2, art.intro3, art.intro4, art.intro5)
+  
+  intervention <- interventionlist
+  
+  # Events
+  cfg.list["population.maxevents"] <- as.numeric(cfg.list["population.simtime"][1]) * as.numeric(cfg.list["population.nummen"][1]) * 3
+  
+  # Avoid overlaping in same directory
+  
+  
+  #creating subfolder with unique name for each simulation
+  generate.filename <- function(how.long){
+    
+    rn <- sample(1:100,1)
+    t <- as.numeric(Sys.time())
+    set.seed((t - floor(t)) * 1e8)
+    chars <- c(letters, LETTERS)
+    sub.dir.sim.id <-  paste0(sample(chars,how.long), collapse = "")
+    
+    noise.sample1 <- sample(8:15,1, replace = TRUE)
+    sub.dir.sim.id.ext <- paste0(sample(chars,noise.sample1), collapse = "")
+    noise.sample <- sample(1:1000,1)
+    noise.sample2 <- sample(8:17,1, replace = TRUE)
+    sub.dir.sim.id <- paste0(sub.dir.sim.id.ext,
+                             paste0(sample(chars,noise.sample2), collapse = ""),noise.sample, rn)
+    
+    return(sub.dir.sim.id)
+  }
+  
+  ABC_DestDir.classic.phylo.MAR.b.80 <- paste0(work.dir,"/temp/",generate.filename(10))
+  
+  
+  # Error function when computing summary statistics
+  
+  err.functionGEN <- function(e){
+    return(chunk.summary.stats = rep(NA,64))
+    stop(e)
+  }
+  
+  
+  
+  results <- tryCatch(simpact.run(configParams = cfg.list,
+                                  destDir = ABC_DestDir.classic.phylo.MAR.b.80,
+                                  agedist = age.distr,
+                                  intervention = intervention),
+                      error = simpact.errFunction)
+  
+  
+  if (length(results) == 0){
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+  }else{
+    if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
+      outputvector <- rep(NA, 64)
+    }else{
+      
+      
+      datalist <- readthedata(results)
+      
+      simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
+      
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
+      
+      
+      
+      summary.stat.phylo.MAR.b.80 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                    datalist.agemix = datalist,
+                                                                                    work.dir = work.dir,
+                                                                                    sub.dir.rename = ABC_DestDir.classic.phylo.MAR.b.80,
+                                                                                    dirfasttree = work.dir,
+                                                                                    limitTransmEvents = 7,
+                                                                                    seq.cov = 45,
+                                                                                    seq.gender.ratio = 0.3,
+                                                                                    age.group.15.25 = c(15,25),
+                                                                                    age.group.25.40 = c(25,40),
+                                                                                    age.group.40.50 = c(40,50),
+                                                                                    endpoint = 40,
+                                                                                    timewindow = c(37,40),
+                                                                                    cut.off = 7),
+                                              error=function(e) return(rep(NA, 37)))
+      
+      
+      
+      
+      
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.b.80)
+      
+    }
+    
+  }
+  
+  unlink(paste0(ABC_DestDir.classic.phylo.MAR.b.80), recursive = TRUE)
+  
+  return(outputvector)
+}
+
+
+
+
+# Coverage of 85 %
+simpact4ABC.classic.phylo.MAR.b.85 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
+  
+  
+  
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
+  
+  
+  setwd(paste0(work.dir))
+  
+  
+  
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
+  library(RSimpactCyan)
+  library(RSimpactHelper)
+  library(Rcpp)
+  library(ape)
+  library(expoTree)
+  library(data.table)
+  library(readr)
+  library(phangorn)
+  library(lme4)
+  library(nlme)
+  library(dplyr)
+  library(adephylo)
+  library(treedater)
+  library(geiger)
+  library(picante)
+  library(igraph)
+  library(phyloTop)
+  library(phytools)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
+  
+  
+  
+  ## Run Simpact for specific parameter combination
+  
+  age.distr <- agedistr.creator(shape = 5, scale = 65)
+  #
+  cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
+                                   population.simtime = 50, 
+                                   population.nummen = 4000, 
+                                   population.numwomen = 4000,
+                                   hivseed.time = 10, 
+                                   hivseed.type = "amount",
+                                   hivseed.amount = 40, 
+                                   hivseed.age.min = 20,
+                                   hivseed.age.max = 50,
+                                   formation.hazard.agegapry.meanage = -0.025,
+                                   debut.debutage = 15
+  )
+  
+  # # Assumption of nature of sexual network
+  # #########################################
+  #
+  cfg.list["population.msm"] = "no"
+  
+  
+  # # Sexual behaviour
+  # ###################
+  #
+  seedid <- inputvector[1]
+  
+  cfg.list["dissolution.alpha_0"] <- inputvector[2] # [1] # -0.52 c("unif", -1, 0)
+  cfg.list["dissolution.alpha_4"] <- inputvector [3] # [2] # -0.05 c("unif", -0.5, 0)
+  cfg.list["formation.hazard.agegapry.baseline"] <- inputvector[4] # [3] # 2 c("unif", 1, 3)
+  cfg.list["person.agegap.man.dist.normal.mu"] <- inputvector[5] # [4] # 0 c("unif", -0.5, 0.5)
+  cfg.list["person.agegap.woman.dist.normal.mu"] <- inputvector[5] # [4] # 0
+  cfg.list["person.agegap.man.dist.normal.sigma"] <- inputvector[6] # [5] # 3 c("unif", 2, 4)
+  cfg.list["person.agegap.woman.dist.normal.sigma"] <- inputvector[6] # [5] # 3 
+  cfg.list["formation.hazard.agegapry.gap_agescale_man"] <- inputvector[7] # [6] # 0.25 c("unif", 0, 1)
+  cfg.list["formation.hazard.agegapry.gap_agescale_woman"] <- inputvector[7] # [6] # 0.25
+  cfg.list["formation.hazard.agegapry.numrel_man"] <- inputvector[8] # [7] # -0.3 c("unif", -1, 0)
+  cfg.list["formation.hazard.agegapry.numrel_woman"] <- inputvector[8] # [7] # -0.3
+  cfg.list["formation.hazard.agegapry.numrel_diff"] <- inputvector[9] # [8] # -0.1 c("unif", -0.9, 0)
+  
+  
+  # # HIV transmission
+  # ###################
+  #
+  
+  cfg.list["hivtransmission.param.a"] <- inputvector[10] # [10] # -1 c("unif", -2, 0)
+  cfg.list["hivtransmission.param.b"] <- inputvector[11] # [11] # -90 c("unif", -100, -80)
+  cfg.list["hivtransmission.param.c"] <- inputvector[12] # [12] # 0.5 c("unif", 0, 1)
+  cfg.list["hivtransmission.param.f1"] <- inputvector[13] # [13] # 0.04879016 c("unif", 0, 0.5)
+  cfg.list["hivtransmission.param.f2"] <- inputvector[14] # [14] # -0.1386294 c("unif", -0.5, 0)
+  
+  # Disease progression > may be remove in parameter to estimates
+  
+  cfg.list["person.vsp.toacute.x"] <- inputvector[15] # [15] # 5 c("unif", 3, 7)
+  cfg.list["person.vsp.toaids.x"] <- inputvector[16] # [16] # 7 c("unif", 5, 9)
+  cfg.list["person.vsp.tofinalaids.x"] <- inputvector[17] # [17] # 12 c("unif", 10, 14)
+  
+  
+  #
+  # # Demographic
+  # ##############
+  #
+  
+  cfg.list["conception.alpha_base"] <- inputvector[18] # [18] # -2.7 c("unif", -3.5, -1.7)
+  
+  
+  # # Assumptions to avoid negative branch lengths
+  # ###############################################
+  # # + sampling == start ART
+  # # when someone start ART, he/she is sampled and becomes non-infectious
+  
+  cfg.list["monitoring.fraction.log_viralload"] <- 0
+  
+  
+  #
+  # ## Add-ons
+  #
+  ### BEGIN Add-on
+  cfg.list["formation.hazard.agegapry.baseline"] <- 2
+  cfg.list["mortality.aids.survtime.C"] <- 65
+  cfg.list["mortality.aids.survtime.k"] <- -0.2
+  cfg.list["monitoring.fraction.log_viralload"] <- 0 #0.3
+  cfg.list["dropout.interval.dist.type"] <- "uniform"
+  cfg.list["dropout.interval.dist.uniform.min"] <- 1000
+  cfg.list["dropout.interval.dist.uniform.max"] <- 2000
+  
+  cfg.list["person.survtime.logoffset.dist.type"] <- "normal"
+  cfg.list["person.survtime.logoffset.dist.normal.mu"] <- 0
+  cfg.list["person.survtime.logoffset.dist.normal.sigma"] <- 0.1
+  
+  cfg.list["person.agegap.man.dist.type"] <- "normal" #fixed
+  #cfg.list["person.agegap.man.dist.fixed.value"] <- -6
+  cfg.list["person.agegap.woman.dist.type"] <- "normal" #"fixed"
+  #cfg.list["person.agegap.woman.dist.fixed.value"] <- -6
+  
+  cfg.list["mortality.aids.survtime.C"] <- 65
+  cfg.list["mortality.aids.survtime.k"] <- -0.2
+  cfg.list["monitoring.cd4.threshold"] <- 0 # 0 means nobody qualifies for ART
+  cfg.list["diagnosis.baseline"] <- -2
+  
+  
+  cfg.list["person.eagerness.man.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.woman.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.man.dist.gamma.b"] <- 45 # 45
+  cfg.list["person.eagerness.woman.dist.gamma.b"] <- 45 # 45
+  
+  #### END Add-ons
+  
+  
+  # # ART intervention
+  # ###################
+  #
+  # # ART acceptability paramter and the ART  interventions
+  
+  cfg.list["person.art.accept.threshold.dist.fixed.value"] <- 0.6
+  
+  # Let's introduce ART, and evaluate whether the HIV prevalence drops less  rapidly
+  art.intro <- list()
+  art.intro["time"] <- 20
+  art.intro["diagnosis.baseline"] <- -2 # 0#100
+  art.intro["monitoring.cd4.threshold"] <- 100 # 1200
+  
+  ### add something about diagnosis
+  art.intro["diagnosis.agefactor"] <- 0
+  art.intro["diagnosis.genderfactor"] <- 0
+  art.intro["diagnosis.diagpartnersfactor"] <- 0
+  art.intro["diagnosis.isdiagnosedfactor"] <- 0
+  ### end of add-on about diagnosis
+  #art.intro["monitoring.interval.piecewise.cd4s"] <- "0,1300"
+  # Gradual increase in CD4 threshold. in 2007:200. in 2010:350. in 2013:500
+  art.intro1 <- list()
+  art.intro1["time"] <- 22
+  art.intro1["diagnosis.baseline"] <- -2 # 0#100
+  art.intro1["monitoring.cd4.threshold"] <- 150 # 1200
+  
+  art.intro2 <- list()
+  art.intro2["time"] <- 25 # inputvector[5] ######### 30
+  art.intro2["monitoring.cd4.threshold"] <- 200
+  
+  art.intro3 <- list()
+  art.intro3["time"] <- 30 # inputvector[4] + inputvector[5] + inputvector[6] ########### 33
+  art.intro3["monitoring.cd4.threshold"] <- 350
+  
+  art.intro4 <- list()
+  art.intro4["time"] <- 33 # inputvector[4] + inputvector[5] + inputvector[6] + inputvector[7] ########### 36
+  art.intro4["monitoring.cd4.threshold"] <- 500
+  
+  art.intro5 <- list()
+  art.intro5["time"] <- 36
+  art.intro5["monitoring.cd4.threshold"] <- 700 # This is equivalent to immediate access
+  
+  # tasp.indicator <- inputvector[9] # 1 if the scenario is TasP, 0 if the scenario is current status
+  interventionlist <- list(art.intro, art.intro1, art.intro2, art.intro3, art.intro4, art.intro5)
+  
+  intervention <- interventionlist
+  
+  # Events
+  cfg.list["population.maxevents"] <- as.numeric(cfg.list["population.simtime"][1]) * as.numeric(cfg.list["population.nummen"][1]) * 3
+  
+  # Avoid overlaping in same directory
+  
+  
+  #creating subfolder with unique name for each simulation
+  generate.filename <- function(how.long){
+    
+    rn <- sample(1:100,1)
+    t <- as.numeric(Sys.time())
+    set.seed((t - floor(t)) * 1e8)
+    chars <- c(letters, LETTERS)
+    sub.dir.sim.id <-  paste0(sample(chars,how.long), collapse = "")
+    
+    noise.sample1 <- sample(8:15,1, replace = TRUE)
+    sub.dir.sim.id.ext <- paste0(sample(chars,noise.sample1), collapse = "")
+    noise.sample <- sample(1:1000,1)
+    noise.sample2 <- sample(8:17,1, replace = TRUE)
+    sub.dir.sim.id <- paste0(sub.dir.sim.id.ext,
+                             paste0(sample(chars,noise.sample2), collapse = ""),noise.sample, rn)
+    
+    return(sub.dir.sim.id)
+  }
+  
+  ABC_DestDir.classic.phylo.MAR.b.85 <- paste0(work.dir,"/temp/",generate.filename(10))
+  
+  
+  # Error function when computing summary statistics
+  
+  err.functionGEN <- function(e){
+    return(chunk.summary.stats = rep(NA,64))
+    stop(e)
+  }
+  
+  
+  
+  results <- tryCatch(simpact.run(configParams = cfg.list,
+                                  destDir = ABC_DestDir.classic.phylo.MAR.b.85,
+                                  agedist = age.distr,
+                                  intervention = intervention),
+                      error = simpact.errFunction)
+  
+  
+  if (length(results) == 0){
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+  }else{
+    if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
+      outputvector <- rep(NA, 64)
+    }else{
+      
+      
+      datalist <- readthedata(results)
+      
+      simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
+      
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
+      
+      
+      
+      summary.stat.phylo.MAR.b.85 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                    datalist.agemix = datalist,
+                                                                                    work.dir = work.dir,
+                                                                                    sub.dir.rename = ABC_DestDir.classic.phylo.MAR.b.85,
+                                                                                    dirfasttree = work.dir,
+                                                                                    limitTransmEvents = 7,
+                                                                                    seq.cov = 45,
+                                                                                    seq.gender.ratio = 0.3,
+                                                                                    age.group.15.25 = c(15,25),
+                                                                                    age.group.25.40 = c(25,40),
+                                                                                    age.group.40.50 = c(40,50),
+                                                                                    endpoint = 40,
+                                                                                    timewindow = c(37,40),
+                                                                                    cut.off = 7),
+                                              error=function(e) return(rep(NA, 37)))
+      
+      
+      
+      
+      
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.b.85)
+      
+    }
+    
+  }
+  
+  unlink(paste0(ABC_DestDir.classic.phylo.MAR.b.85), recursive = TRUE)
+  
+  return(outputvector)
+}
+
+
+
+
+# Coverage of 90 %
+simpact4ABC.classic.phylo.MAR.b.90 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
+  
+  
+  
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
+  
+  
+  setwd(paste0(work.dir))
+  
+  
+  
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
+  library(RSimpactCyan)
+  library(RSimpactHelper)
+  library(Rcpp)
+  library(ape)
+  library(expoTree)
+  library(data.table)
+  library(readr)
+  library(phangorn)
+  library(lme4)
+  library(nlme)
+  library(dplyr)
+  library(adephylo)
+  library(treedater)
+  library(geiger)
+  library(picante)
+  library(igraph)
+  library(phyloTop)
+  library(phytools)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
+  
+  
+  
+  ## Run Simpact for specific parameter combination
+  
+  age.distr <- agedistr.creator(shape = 5, scale = 65)
+  #
+  cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
+                                   population.simtime = 50, 
+                                   population.nummen = 4000, 
+                                   population.numwomen = 4000,
+                                   hivseed.time = 10, 
+                                   hivseed.type = "amount",
+                                   hivseed.amount = 40, 
+                                   hivseed.age.min = 20,
+                                   hivseed.age.max = 50,
+                                   formation.hazard.agegapry.meanage = -0.025,
+                                   debut.debutage = 15
+  )
+  
+  # # Assumption of nature of sexual network
+  # #########################################
+  #
+  cfg.list["population.msm"] = "no"
+  
+  
+  # # Sexual behaviour
+  # ###################
+  #
+  seedid <- inputvector[1]
+  
+  cfg.list["dissolution.alpha_0"] <- inputvector[2] # [1] # -0.52 c("unif", -1, 0)
+  cfg.list["dissolution.alpha_4"] <- inputvector [3] # [2] # -0.05 c("unif", -0.5, 0)
+  cfg.list["formation.hazard.agegapry.baseline"] <- inputvector[4] # [3] # 2 c("unif", 1, 3)
+  cfg.list["person.agegap.man.dist.normal.mu"] <- inputvector[5] # [4] # 0 c("unif", -0.5, 0.5)
+  cfg.list["person.agegap.woman.dist.normal.mu"] <- inputvector[5] # [4] # 0
+  cfg.list["person.agegap.man.dist.normal.sigma"] <- inputvector[6] # [5] # 3 c("unif", 2, 4)
+  cfg.list["person.agegap.woman.dist.normal.sigma"] <- inputvector[6] # [5] # 3 
+  cfg.list["formation.hazard.agegapry.gap_agescale_man"] <- inputvector[7] # [6] # 0.25 c("unif", 0, 1)
+  cfg.list["formation.hazard.agegapry.gap_agescale_woman"] <- inputvector[7] # [6] # 0.25
+  cfg.list["formation.hazard.agegapry.numrel_man"] <- inputvector[8] # [7] # -0.3 c("unif", -1, 0)
+  cfg.list["formation.hazard.agegapry.numrel_woman"] <- inputvector[8] # [7] # -0.3
+  cfg.list["formation.hazard.agegapry.numrel_diff"] <- inputvector[9] # [8] # -0.1 c("unif", -0.9, 0)
+  
+  
+  # # HIV transmission
+  # ###################
+  #
+  
+  cfg.list["hivtransmission.param.a"] <- inputvector[10] # [10] # -1 c("unif", -2, 0)
+  cfg.list["hivtransmission.param.b"] <- inputvector[11] # [11] # -90 c("unif", -100, -80)
+  cfg.list["hivtransmission.param.c"] <- inputvector[12] # [12] # 0.5 c("unif", 0, 1)
+  cfg.list["hivtransmission.param.f1"] <- inputvector[13] # [13] # 0.04879016 c("unif", 0, 0.5)
+  cfg.list["hivtransmission.param.f2"] <- inputvector[14] # [14] # -0.1386294 c("unif", -0.5, 0)
+  
+  # Disease progression > may be remove in parameter to estimates
+  
+  cfg.list["person.vsp.toacute.x"] <- inputvector[15] # [15] # 5 c("unif", 3, 7)
+  cfg.list["person.vsp.toaids.x"] <- inputvector[16] # [16] # 7 c("unif", 5, 9)
+  cfg.list["person.vsp.tofinalaids.x"] <- inputvector[17] # [17] # 12 c("unif", 10, 14)
+  
+  
+  #
+  # # Demographic
+  # ##############
+  #
+  
+  cfg.list["conception.alpha_base"] <- inputvector[18] # [18] # -2.7 c("unif", -3.5, -1.7)
+  
+  
+  # # Assumptions to avoid negative branch lengths
+  # ###############################################
+  # # + sampling == start ART
+  # # when someone start ART, he/she is sampled and becomes non-infectious
+  
+  cfg.list["monitoring.fraction.log_viralload"] <- 0
+  
+  
+  #
+  # ## Add-ons
+  #
+  ### BEGIN Add-on
+  cfg.list["formation.hazard.agegapry.baseline"] <- 2
+  cfg.list["mortality.aids.survtime.C"] <- 65
+  cfg.list["mortality.aids.survtime.k"] <- -0.2
+  cfg.list["monitoring.fraction.log_viralload"] <- 0 #0.3
+  cfg.list["dropout.interval.dist.type"] <- "uniform"
+  cfg.list["dropout.interval.dist.uniform.min"] <- 1000
+  cfg.list["dropout.interval.dist.uniform.max"] <- 2000
+  
+  cfg.list["person.survtime.logoffset.dist.type"] <- "normal"
+  cfg.list["person.survtime.logoffset.dist.normal.mu"] <- 0
+  cfg.list["person.survtime.logoffset.dist.normal.sigma"] <- 0.1
+  
+  cfg.list["person.agegap.man.dist.type"] <- "normal" #fixed
+  #cfg.list["person.agegap.man.dist.fixed.value"] <- -6
+  cfg.list["person.agegap.woman.dist.type"] <- "normal" #"fixed"
+  #cfg.list["person.agegap.woman.dist.fixed.value"] <- -6
+  
+  cfg.list["mortality.aids.survtime.C"] <- 65
+  cfg.list["mortality.aids.survtime.k"] <- -0.2
+  cfg.list["monitoring.cd4.threshold"] <- 0 # 0 means nobody qualifies for ART
+  cfg.list["diagnosis.baseline"] <- -2
+  
+  
+  cfg.list["person.eagerness.man.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.woman.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.man.dist.gamma.b"] <- 45 # 45
+  cfg.list["person.eagerness.woman.dist.gamma.b"] <- 45 # 45
+  
+  #### END Add-ons
+  
+  
+  # # ART intervention
+  # ###################
+  #
+  # # ART acceptability paramter and the ART  interventions
+  
+  cfg.list["person.art.accept.threshold.dist.fixed.value"] <- 0.6
+  
+  # Let's introduce ART, and evaluate whether the HIV prevalence drops less  rapidly
+  art.intro <- list()
+  art.intro["time"] <- 20
+  art.intro["diagnosis.baseline"] <- -2 # 0#100
+  art.intro["monitoring.cd4.threshold"] <- 100 # 1200
+  
+  ### add something about diagnosis
+  art.intro["diagnosis.agefactor"] <- 0
+  art.intro["diagnosis.genderfactor"] <- 0
+  art.intro["diagnosis.diagpartnersfactor"] <- 0
+  art.intro["diagnosis.isdiagnosedfactor"] <- 0
+  ### end of add-on about diagnosis
+  #art.intro["monitoring.interval.piecewise.cd4s"] <- "0,1300"
+  # Gradual increase in CD4 threshold. in 2007:200. in 2010:350. in 2013:500
+  art.intro1 <- list()
+  art.intro1["time"] <- 22
+  art.intro1["diagnosis.baseline"] <- -2 # 0#100
+  art.intro1["monitoring.cd4.threshold"] <- 150 # 1200
+  
+  art.intro2 <- list()
+  art.intro2["time"] <- 25 # inputvector[5] ######### 30
+  art.intro2["monitoring.cd4.threshold"] <- 200
+  
+  art.intro3 <- list()
+  art.intro3["time"] <- 30 # inputvector[4] + inputvector[5] + inputvector[6] ########### 33
+  art.intro3["monitoring.cd4.threshold"] <- 350
+  
+  art.intro4 <- list()
+  art.intro4["time"] <- 33 # inputvector[4] + inputvector[5] + inputvector[6] + inputvector[7] ########### 36
+  art.intro4["monitoring.cd4.threshold"] <- 500
+  
+  art.intro5 <- list()
+  art.intro5["time"] <- 36
+  art.intro5["monitoring.cd4.threshold"] <- 700 # This is equivalent to immediate access
+  
+  # tasp.indicator <- inputvector[9] # 1 if the scenario is TasP, 0 if the scenario is current status
+  interventionlist <- list(art.intro, art.intro1, art.intro2, art.intro3, art.intro4, art.intro5)
+  
+  intervention <- interventionlist
+  
+  # Events
+  cfg.list["population.maxevents"] <- as.numeric(cfg.list["population.simtime"][1]) * as.numeric(cfg.list["population.nummen"][1]) * 3
+  
+  # Avoid overlaping in same directory
+  
+  
+  #creating subfolder with unique name for each simulation
+  generate.filename <- function(how.long){
+    
+    rn <- sample(1:100,1)
+    t <- as.numeric(Sys.time())
+    set.seed((t - floor(t)) * 1e8)
+    chars <- c(letters, LETTERS)
+    sub.dir.sim.id <-  paste0(sample(chars,how.long), collapse = "")
+    
+    noise.sample1 <- sample(8:15,1, replace = TRUE)
+    sub.dir.sim.id.ext <- paste0(sample(chars,noise.sample1), collapse = "")
+    noise.sample <- sample(1:1000,1)
+    noise.sample2 <- sample(8:17,1, replace = TRUE)
+    sub.dir.sim.id <- paste0(sub.dir.sim.id.ext,
+                             paste0(sample(chars,noise.sample2), collapse = ""),noise.sample, rn)
+    
+    return(sub.dir.sim.id)
+  }
+  
+  ABC_DestDir.classic.phylo.MAR.b.90 <- paste0(work.dir,"/temp/",generate.filename(10))
+  
+  
+  # Error function when computing summary statistics
+  
+  err.functionGEN <- function(e){
+    return(chunk.summary.stats = rep(NA,64))
+    stop(e)
+  }
+  
+  
+  
+  results <- tryCatch(simpact.run(configParams = cfg.list,
+                                  destDir = ABC_DestDir.classic.phylo.MAR.b.90,
+                                  agedist = age.distr,
+                                  intervention = intervention),
+                      error = simpact.errFunction)
+  
+  
+  if (length(results) == 0){
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+  }else{
+    if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
+      outputvector <- rep(NA, 64)
+    }else{
+      
+      
+      datalist <- readthedata(results)
+      
+      simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
+      
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
+      
+      
+      
+      summary.stat.phylo.MAR.b.90 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                    datalist.agemix = datalist,
+                                                                                    work.dir = work.dir,
+                                                                                    sub.dir.rename = ABC_DestDir.classic.phylo.MAR.b.90,
+                                                                                    dirfasttree = work.dir,
+                                                                                    limitTransmEvents = 7,
+                                                                                    seq.cov = 45,
+                                                                                    seq.gender.ratio = 0.3,
+                                                                                    age.group.15.25 = c(15,25),
+                                                                                    age.group.25.40 = c(25,40),
+                                                                                    age.group.40.50 = c(40,50),
+                                                                                    endpoint = 40,
+                                                                                    timewindow = c(37,40),
+                                                                                    cut.off = 7),
+                                              error=function(e) return(rep(NA, 37)))
+      
+      
+      
+      
+      
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.b.90)
+      
+    }
+    
+  }
+  
+  unlink(paste0(ABC_DestDir.classic.phylo.MAR.b.90), recursive = TRUE)
+  
+  return(outputvector)
+}
+
+
+
+
+## V. thirteen simpact models calibrated to classic summary statistics (full) 
+#    and phylogenetic summary statistics in MAR scenarios (35:95%, by=5%; women proportion = 0.5)
+####################################################################################################
+
+
+# Coverage of 35%
+simpact4ABC.classic.phylo.MAR.c.35 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
+  
+  
+  
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
+  
+  
+  setwd(paste0(work.dir))
+  
+  
+  
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
+  library(RSimpactCyan)
+  library(RSimpactHelper)
+  library(Rcpp)
+  library(ape)
+  library(expoTree)
+  library(data.table)
+  library(readr)
+  library(phangorn)
+  library(lme4)
+  library(nlme)
+  library(dplyr)
+  library(adephylo)
+  library(treedater)
+  library(geiger)
+  library(picante)
+  library(igraph)
+  library(phyloTop)
+  library(phytools)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
+  
+  
+  
+  ## Run Simpact for specific parameter combination
+  
+  age.distr <- agedistr.creator(shape = 5, scale = 65)
+  #
+  cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
+                                   population.simtime = 50, 
+                                   population.nummen = 4000, 
+                                   population.numwomen = 4000,
+                                   hivseed.time = 10, 
+                                   hivseed.type = "amount",
+                                   hivseed.amount = 40, 
+                                   hivseed.age.min = 20,
+                                   hivseed.age.max = 50,
+                                   formation.hazard.agegapry.meanage = -0.025,
+                                   debut.debutage = 15
+  )
+  
+  # # Assumption of nature of sexual network
+  # #########################################
+  #
+  cfg.list["population.msm"] = "no"
+  
+  
+  # # Sexual behaviour
+  # ###################
+  #
+  seedid <- inputvector[1]
+  
+  cfg.list["dissolution.alpha_0"] <- inputvector[2] # [1] # -0.52 c("unif", -1, 0)
+  cfg.list["dissolution.alpha_4"] <- inputvector [3] # [2] # -0.05 c("unif", -0.5, 0)
+  cfg.list["formation.hazard.agegapry.baseline"] <- inputvector[4] # [3] # 2 c("unif", 1, 3)
+  cfg.list["person.agegap.man.dist.normal.mu"] <- inputvector[5] # [4] # 0 c("unif", -0.5, 0.5)
+  cfg.list["person.agegap.woman.dist.normal.mu"] <- inputvector[5] # [4] # 0
+  cfg.list["person.agegap.man.dist.normal.sigma"] <- inputvector[6] # [5] # 3 c("unif", 2, 4)
+  cfg.list["person.agegap.woman.dist.normal.sigma"] <- inputvector[6] # [5] # 3 
+  cfg.list["formation.hazard.agegapry.gap_agescale_man"] <- inputvector[7] # [6] # 0.25 c("unif", 0, 1)
+  cfg.list["formation.hazard.agegapry.gap_agescale_woman"] <- inputvector[7] # [6] # 0.25
+  cfg.list["formation.hazard.agegapry.numrel_man"] <- inputvector[8] # [7] # -0.3 c("unif", -1, 0)
+  cfg.list["formation.hazard.agegapry.numrel_woman"] <- inputvector[8] # [7] # -0.3
+  cfg.list["formation.hazard.agegapry.numrel_diff"] <- inputvector[9] # [8] # -0.1 c("unif", -0.9, 0)
+  
+  
+  # # HIV transmission
+  # ###################
+  #
+  
+  cfg.list["hivtransmission.param.a"] <- inputvector[10] # [10] # -1 c("unif", -2, 0)
+  cfg.list["hivtransmission.param.b"] <- inputvector[11] # [11] # -90 c("unif", -100, -80)
+  cfg.list["hivtransmission.param.c"] <- inputvector[12] # [12] # 0.5 c("unif", 0, 1)
+  cfg.list["hivtransmission.param.f1"] <- inputvector[13] # [13] # 0.04879016 c("unif", 0, 0.5)
+  cfg.list["hivtransmission.param.f2"] <- inputvector[14] # [14] # -0.1386294 c("unif", -0.5, 0)
+  
+  # Disease progression > may be remove in parameter to estimates
+  
+  cfg.list["person.vsp.toacute.x"] <- inputvector[15] # [15] # 5 c("unif", 3, 7)
+  cfg.list["person.vsp.toaids.x"] <- inputvector[16] # [16] # 7 c("unif", 5, 9)
+  cfg.list["person.vsp.tofinalaids.x"] <- inputvector[17] # [17] # 12 c("unif", 10, 14)
+  
+  
+  #
+  # # Demographic
+  # ##############
+  #
+  
+  cfg.list["conception.alpha_base"] <- inputvector[18] # [18] # -2.7 c("unif", -3.5, -1.7)
+  
+  
+  # # Assumptions to avoid negative branch lengths
+  # ###############################################
+  # # + sampling == start ART
+  # # when someone start ART, he/she is sampled and becomes non-infectious
+  
+  cfg.list["monitoring.fraction.log_viralload"] <- 0
+  
+  
+  #
+  # ## Add-ons
+  #
+  ### BEGIN Add-on
+  cfg.list["formation.hazard.agegapry.baseline"] <- 2
+  cfg.list["mortality.aids.survtime.C"] <- 65
+  cfg.list["mortality.aids.survtime.k"] <- -0.2
+  cfg.list["monitoring.fraction.log_viralload"] <- 0 #0.3
+  cfg.list["dropout.interval.dist.type"] <- "uniform"
+  cfg.list["dropout.interval.dist.uniform.min"] <- 1000
+  cfg.list["dropout.interval.dist.uniform.max"] <- 2000
+  
+  cfg.list["person.survtime.logoffset.dist.type"] <- "normal"
+  cfg.list["person.survtime.logoffset.dist.normal.mu"] <- 0
+  cfg.list["person.survtime.logoffset.dist.normal.sigma"] <- 0.1
+  
+  cfg.list["person.agegap.man.dist.type"] <- "normal" #fixed
+  #cfg.list["person.agegap.man.dist.fixed.value"] <- -6
+  cfg.list["person.agegap.woman.dist.type"] <- "normal" #"fixed"
+  #cfg.list["person.agegap.woman.dist.fixed.value"] <- -6
+  
+  cfg.list["mortality.aids.survtime.C"] <- 65
+  cfg.list["mortality.aids.survtime.k"] <- -0.2
+  cfg.list["monitoring.cd4.threshold"] <- 0 # 0 means nobody qualifies for ART
+  cfg.list["diagnosis.baseline"] <- -2
+  
+  
+  cfg.list["person.eagerness.man.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.woman.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.man.dist.gamma.b"] <- 45 # 45
+  cfg.list["person.eagerness.woman.dist.gamma.b"] <- 45 # 45
+  
+  #### END Add-ons
+  
+  
+  # # ART intervention
+  # ###################
+  #
+  # # ART acceptability paramter and the ART  interventions
+  
+  cfg.list["person.art.accept.threshold.dist.fixed.value"] <- 0.6
+  
+  # Let's introduce ART, and evaluate whether the HIV prevalence drops less  rapidly
+  art.intro <- list()
+  art.intro["time"] <- 20
+  art.intro["diagnosis.baseline"] <- -2 # 0#100
+  art.intro["monitoring.cd4.threshold"] <- 100 # 1200
+  
+  ### add something about diagnosis
+  art.intro["diagnosis.agefactor"] <- 0
+  art.intro["diagnosis.genderfactor"] <- 0
+  art.intro["diagnosis.diagpartnersfactor"] <- 0
+  art.intro["diagnosis.isdiagnosedfactor"] <- 0
+  ### end of add-on about diagnosis
+  #art.intro["monitoring.interval.piecewise.cd4s"] <- "0,1300"
+  # Gradual increase in CD4 threshold. in 2007:200. in 2010:350. in 2013:500
+  art.intro1 <- list()
+  art.intro1["time"] <- 22
+  art.intro1["diagnosis.baseline"] <- -2 # 0#100
+  art.intro1["monitoring.cd4.threshold"] <- 150 # 1200
+  
+  art.intro2 <- list()
+  art.intro2["time"] <- 25 # inputvector[5] ######### 30
+  art.intro2["monitoring.cd4.threshold"] <- 200
+  
+  art.intro3 <- list()
+  art.intro3["time"] <- 30 # inputvector[4] + inputvector[5] + inputvector[6] ########### 33
+  art.intro3["monitoring.cd4.threshold"] <- 350
+  
+  art.intro4 <- list()
+  art.intro4["time"] <- 33 # inputvector[4] + inputvector[5] + inputvector[6] + inputvector[7] ########### 36
+  art.intro4["monitoring.cd4.threshold"] <- 500
+  
+  art.intro5 <- list()
+  art.intro5["time"] <- 36
+  art.intro5["monitoring.cd4.threshold"] <- 700 # This is equivalent to immediate access
+  
+  # tasp.indicator <- inputvector[9] # 1 if the scenario is TasP, 0 if the scenario is current status
+  interventionlist <- list(art.intro, art.intro1, art.intro2, art.intro3, art.intro4, art.intro5)
+  
+  intervention <- interventionlist
+  
+  # Events
+  cfg.list["population.maxevents"] <- as.numeric(cfg.list["population.simtime"][1]) * as.numeric(cfg.list["population.nummen"][1]) * 3
+  
+  # Avoid overlaping in same directory
+  
+  
+  #creating subfolder with unique name for each simulation
+  generate.filename <- function(how.long){
+    
+    rn <- sample(1:100,1)
+    t <- as.numeric(Sys.time())
+    set.seed((t - floor(t)) * 1e8)
+    chars <- c(letters, LETTERS)
+    sub.dir.sim.id <-  paste0(sample(chars,how.long), collapse = "")
+    
+    noise.sample1 <- sample(8:15,1, replace = TRUE)
+    sub.dir.sim.id.ext <- paste0(sample(chars,noise.sample1), collapse = "")
+    noise.sample <- sample(1:1000,1)
+    noise.sample2 <- sample(8:17,1, replace = TRUE)
+    sub.dir.sim.id <- paste0(sub.dir.sim.id.ext,
+                             paste0(sample(chars,noise.sample2), collapse = ""),noise.sample, rn)
+    
+    return(sub.dir.sim.id)
+  }
+  
+  ABC_DestDir.classic.phylo.MAR.c.35 <- paste0(work.dir,"/temp/",generate.filename(10))
+  
+  
+  # Error function when computing summary statistics
+  
+  err.functionGEN <- function(e){
+    return(chunk.summary.stats = rep(NA,64))
+    stop(e)
+  }
+  
+  
+  
+  results <- tryCatch(simpact.run(configParams = cfg.list,
+                                  destDir = ABC_DestDir.classic.phylo.MAR.c.35,
+                                  agedist = age.distr,
+                                  intervention = intervention),
+                      error = simpact.errFunction)
+  
+  
+  if (length(results) == 0){
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+  }else{
+    if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
+      outputvector <- rep(NA, 64)
+    }else{
+      
+      
+      datalist <- readthedata(results)
+      
+      simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
+      
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
+      
+      
+      
+      summary.stat.phylo.MAR.c.35 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                    datalist.agemix = datalist,
+                                                                                    work.dir = work.dir,
+                                                                                    sub.dir.rename = ABC_DestDir.classic.phylo.MAR.c.35,
+                                                                                    dirfasttree = work.dir,
+                                                                                    limitTransmEvents = 7,
+                                                                                    seq.cov = 35,
+                                                                                    seq.gender.ratio = 0.5,
+                                                                                    age.group.15.25 = c(15,25),
+                                                                                    age.group.25.40 = c(25,40),
+                                                                                    age.group.40.50 = c(40,50),
+                                                                                    endpoint = 40,
+                                                                                    timewindow = c(37,40),
+                                                                                    cut.off = 7),
+                                              error=function(e) return(rep(NA, 37)))
+      
+      
+      
+      
+      
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.c.35)
+      
+    }
+    
+  }
+  
+  unlink(paste0(ABC_DestDir.classic.phylo.MAR.c.35), recursive = TRUE)
+  
+  return(outputvector)
+}
+
+
+# Coverage of 40%
+simpact4ABC.classic.phylo.MAR.c.40 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
+  
+  
+  
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
+  
+  
+  setwd(paste0(work.dir))
+  
+  
+  
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
+  library(RSimpactCyan)
+  library(RSimpactHelper)
+  library(Rcpp)
+  library(ape)
+  library(expoTree)
+  library(data.table)
+  library(readr)
+  library(phangorn)
+  library(lme4)
+  library(nlme)
+  library(dplyr)
+  library(adephylo)
+  library(treedater)
+  library(geiger)
+  library(picante)
+  library(igraph)
+  library(phyloTop)
+  library(phytools)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
+  
+  
+  
+  ## Run Simpact for specific parameter combination
+  
+  age.distr <- agedistr.creator(shape = 5, scale = 65)
+  #
+  cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
+                                   population.simtime = 50, 
+                                   population.nummen = 4000, 
+                                   population.numwomen = 4000,
+                                   hivseed.time = 10, 
+                                   hivseed.type = "amount",
+                                   hivseed.amount = 40, 
+                                   hivseed.age.min = 20,
+                                   hivseed.age.max = 50,
+                                   formation.hazard.agegapry.meanage = -0.025,
+                                   debut.debutage = 15
+  )
+  
+  # # Assumption of nature of sexual network
+  # #########################################
+  #
+  cfg.list["population.msm"] = "no"
+  
+  
+  # # Sexual behaviour
+  # ###################
+  #
+  seedid <- inputvector[1]
+  
+  cfg.list["dissolution.alpha_0"] <- inputvector[2] # [1] # -0.52 c("unif", -1, 0)
+  cfg.list["dissolution.alpha_4"] <- inputvector [3] # [2] # -0.05 c("unif", -0.5, 0)
+  cfg.list["formation.hazard.agegapry.baseline"] <- inputvector[4] # [3] # 2 c("unif", 1, 3)
+  cfg.list["person.agegap.man.dist.normal.mu"] <- inputvector[5] # [4] # 0 c("unif", -0.5, 0.5)
+  cfg.list["person.agegap.woman.dist.normal.mu"] <- inputvector[5] # [4] # 0
+  cfg.list["person.agegap.man.dist.normal.sigma"] <- inputvector[6] # [5] # 3 c("unif", 2, 4)
+  cfg.list["person.agegap.woman.dist.normal.sigma"] <- inputvector[6] # [5] # 3 
+  cfg.list["formation.hazard.agegapry.gap_agescale_man"] <- inputvector[7] # [6] # 0.25 c("unif", 0, 1)
+  cfg.list["formation.hazard.agegapry.gap_agescale_woman"] <- inputvector[7] # [6] # 0.25
+  cfg.list["formation.hazard.agegapry.numrel_man"] <- inputvector[8] # [7] # -0.3 c("unif", -1, 0)
+  cfg.list["formation.hazard.agegapry.numrel_woman"] <- inputvector[8] # [7] # -0.3
+  cfg.list["formation.hazard.agegapry.numrel_diff"] <- inputvector[9] # [8] # -0.1 c("unif", -0.9, 0)
+  
+  
+  # # HIV transmission
+  # ###################
+  #
+  
+  cfg.list["hivtransmission.param.a"] <- inputvector[10] # [10] # -1 c("unif", -2, 0)
+  cfg.list["hivtransmission.param.b"] <- inputvector[11] # [11] # -90 c("unif", -100, -80)
+  cfg.list["hivtransmission.param.c"] <- inputvector[12] # [12] # 0.5 c("unif", 0, 1)
+  cfg.list["hivtransmission.param.f1"] <- inputvector[13] # [13] # 0.04879016 c("unif", 0, 0.5)
+  cfg.list["hivtransmission.param.f2"] <- inputvector[14] # [14] # -0.1386294 c("unif", -0.5, 0)
+  
+  # Disease progression > may be remove in parameter to estimates
+  
+  cfg.list["person.vsp.toacute.x"] <- inputvector[15] # [15] # 5 c("unif", 3, 7)
+  cfg.list["person.vsp.toaids.x"] <- inputvector[16] # [16] # 7 c("unif", 5, 9)
+  cfg.list["person.vsp.tofinalaids.x"] <- inputvector[17] # [17] # 12 c("unif", 10, 14)
+  
+  
+  #
+  # # Demographic
+  # ##############
+  #
+  
+  cfg.list["conception.alpha_base"] <- inputvector[18] # [18] # -2.7 c("unif", -3.5, -1.7)
+  
+  
+  # # Assumptions to avoid negative branch lengths
+  # ###############################################
+  # # + sampling == start ART
+  # # when someone start ART, he/she is sampled and becomes non-infectious
+  
+  cfg.list["monitoring.fraction.log_viralload"] <- 0
+  
+  
+  #
+  # ## Add-ons
+  #
+  ### BEGIN Add-on
+  cfg.list["formation.hazard.agegapry.baseline"] <- 2
+  cfg.list["mortality.aids.survtime.C"] <- 65
+  cfg.list["mortality.aids.survtime.k"] <- -0.2
+  cfg.list["monitoring.fraction.log_viralload"] <- 0 #0.3
+  cfg.list["dropout.interval.dist.type"] <- "uniform"
+  cfg.list["dropout.interval.dist.uniform.min"] <- 1000
+  cfg.list["dropout.interval.dist.uniform.max"] <- 2000
+  
+  cfg.list["person.survtime.logoffset.dist.type"] <- "normal"
+  cfg.list["person.survtime.logoffset.dist.normal.mu"] <- 0
+  cfg.list["person.survtime.logoffset.dist.normal.sigma"] <- 0.1
+  
+  cfg.list["person.agegap.man.dist.type"] <- "normal" #fixed
+  #cfg.list["person.agegap.man.dist.fixed.value"] <- -6
+  cfg.list["person.agegap.woman.dist.type"] <- "normal" #"fixed"
+  #cfg.list["person.agegap.woman.dist.fixed.value"] <- -6
+  
+  cfg.list["mortality.aids.survtime.C"] <- 65
+  cfg.list["mortality.aids.survtime.k"] <- -0.2
+  cfg.list["monitoring.cd4.threshold"] <- 0 # 0 means nobody qualifies for ART
+  cfg.list["diagnosis.baseline"] <- -2
+  
+  
+  cfg.list["person.eagerness.man.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.woman.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.man.dist.gamma.b"] <- 45 # 45
+  cfg.list["person.eagerness.woman.dist.gamma.b"] <- 45 # 45
+  
+  #### END Add-ons
+  
+  
+  # # ART intervention
+  # ###################
+  #
+  # # ART acceptability paramter and the ART  interventions
+  
+  cfg.list["person.art.accept.threshold.dist.fixed.value"] <- 0.6
+  
+  # Let's introduce ART, and evaluate whether the HIV prevalence drops less  rapidly
+  art.intro <- list()
+  art.intro["time"] <- 20
+  art.intro["diagnosis.baseline"] <- -2 # 0#100
+  art.intro["monitoring.cd4.threshold"] <- 100 # 1200
+  
+  ### add something about diagnosis
+  art.intro["diagnosis.agefactor"] <- 0
+  art.intro["diagnosis.genderfactor"] <- 0
+  art.intro["diagnosis.diagpartnersfactor"] <- 0
+  art.intro["diagnosis.isdiagnosedfactor"] <- 0
+  ### end of add-on about diagnosis
+  #art.intro["monitoring.interval.piecewise.cd4s"] <- "0,1300"
+  # Gradual increase in CD4 threshold. in 2007:200. in 2010:350. in 2013:500
+  art.intro1 <- list()
+  art.intro1["time"] <- 22
+  art.intro1["diagnosis.baseline"] <- -2 # 0#100
+  art.intro1["monitoring.cd4.threshold"] <- 150 # 1200
+  
+  art.intro2 <- list()
+  art.intro2["time"] <- 25 # inputvector[5] ######### 30
+  art.intro2["monitoring.cd4.threshold"] <- 200
+  
+  art.intro3 <- list()
+  art.intro3["time"] <- 30 # inputvector[4] + inputvector[5] + inputvector[6] ########### 33
+  art.intro3["monitoring.cd4.threshold"] <- 350
+  
+  art.intro4 <- list()
+  art.intro4["time"] <- 33 # inputvector[4] + inputvector[5] + inputvector[6] + inputvector[7] ########### 36
+  art.intro4["monitoring.cd4.threshold"] <- 500
+  
+  art.intro5 <- list()
+  art.intro5["time"] <- 36
+  art.intro5["monitoring.cd4.threshold"] <- 700 # This is equivalent to immediate access
+  
+  # tasp.indicator <- inputvector[9] # 1 if the scenario is TasP, 0 if the scenario is current status
+  interventionlist <- list(art.intro, art.intro1, art.intro2, art.intro3, art.intro4, art.intro5)
+  
+  intervention <- interventionlist
+  
+  # Events
+  cfg.list["population.maxevents"] <- as.numeric(cfg.list["population.simtime"][1]) * as.numeric(cfg.list["population.nummen"][1]) * 3
+  
+  # Avoid overlaping in same directory
+  
+  
+  #creating subfolder with unique name for each simulation
+  generate.filename <- function(how.long){
+    
+    rn <- sample(1:100,1)
+    t <- as.numeric(Sys.time())
+    set.seed((t - floor(t)) * 1e8)
+    chars <- c(letters, LETTERS)
+    sub.dir.sim.id <-  paste0(sample(chars,how.long), collapse = "")
+    
+    noise.sample1 <- sample(8:15,1, replace = TRUE)
+    sub.dir.sim.id.ext <- paste0(sample(chars,noise.sample1), collapse = "")
+    noise.sample <- sample(1:1000,1)
+    noise.sample2 <- sample(8:17,1, replace = TRUE)
+    sub.dir.sim.id <- paste0(sub.dir.sim.id.ext,
+                             paste0(sample(chars,noise.sample2), collapse = ""),noise.sample, rn)
+    
+    return(sub.dir.sim.id)
+  }
+  
+  ABC_DestDir.classic.phylo.MAR.c.40 <- paste0(work.dir,"/temp/",generate.filename(10))
+  
+  
+  # Error function when computing summary statistics
+  
+  err.functionGEN <- function(e){
+    return(chunk.summary.stats = rep(NA,64))
+    stop(e)
+  }
+  
+  
+  
+  results <- tryCatch(simpact.run(configParams = cfg.list,
+                                  destDir = ABC_DestDir.classic.phylo.MAR.c.40,
+                                  agedist = age.distr,
+                                  intervention = intervention),
+                      error = simpact.errFunction)
+  
+  
+  if (length(results) == 0){
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+  }else{
+    if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
+      outputvector <- rep(NA, 64)
+    }else{
+      
+      
+      datalist <- readthedata(results)
+      
+      simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
+      
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
+      
+      
+      
+      summary.stat.phylo.MAR.c.40 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                    datalist.agemix = datalist,
+                                                                                    work.dir = work.dir,
+                                                                                    sub.dir.rename = ABC_DestDir.classic.phylo.MAR.c.40,
+                                                                                    dirfasttree = work.dir,
+                                                                                    limitTransmEvents = 7,
+                                                                                    seq.cov = 40,
+                                                                                    seq.gender.ratio = 0.5,
+                                                                                    age.group.15.25 = c(15,25),
+                                                                                    age.group.25.40 = c(25,40),
+                                                                                    age.group.40.50 = c(40,50),
+                                                                                    endpoint = 40,
+                                                                                    timewindow = c(37,40),
+                                                                                    cut.off = 7),
+                                              error=function(e) return(rep(NA, 37)))
+      
+      
+      
+      
+      
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.c.40)
+      
+    }
+    
+  }
+  
+  unlink(paste0(ABC_DestDir.classic.phylo.MAR.c.40), recursive = TRUE)
+  
+  return(outputvector)
+}
+
+
+
+# Coverage of 45%
+simpact4ABC.classic.phylo.MAR.c.45 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
+  
+  
+  
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
+  
+  
+  setwd(paste0(work.dir))
+  
+  
+  
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
+  library(RSimpactCyan)
+  library(RSimpactHelper)
+  library(Rcpp)
+  library(ape)
+  library(expoTree)
+  library(data.table)
+  library(readr)
+  library(phangorn)
+  library(lme4)
+  library(nlme)
+  library(dplyr)
+  library(adephylo)
+  library(treedater)
+  library(geiger)
+  library(picante)
+  library(igraph)
+  library(phyloTop)
+  library(phytools)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
+  
+  
+  
+  ## Run Simpact for specific parameter combination
+  
+  age.distr <- agedistr.creator(shape = 5, scale = 65)
+  #
+  cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
+                                   population.simtime = 50, 
+                                   population.nummen = 4000, 
+                                   population.numwomen = 4000,
+                                   hivseed.time = 10, 
+                                   hivseed.type = "amount",
+                                   hivseed.amount = 40, 
+                                   hivseed.age.min = 20,
+                                   hivseed.age.max = 50,
+                                   formation.hazard.agegapry.meanage = -0.025,
+                                   debut.debutage = 15
+  )
+  
+  # # Assumption of nature of sexual network
+  # #########################################
+  #
+  cfg.list["population.msm"] = "no"
+  
+  
+  # # Sexual behaviour
+  # ###################
+  #
+  seedid <- inputvector[1]
+  
+  cfg.list["dissolution.alpha_0"] <- inputvector[2] # [1] # -0.52 c("unif", -1, 0)
+  cfg.list["dissolution.alpha_4"] <- inputvector [3] # [2] # -0.05 c("unif", -0.5, 0)
+  cfg.list["formation.hazard.agegapry.baseline"] <- inputvector[4] # [3] # 2 c("unif", 1, 3)
+  cfg.list["person.agegap.man.dist.normal.mu"] <- inputvector[5] # [4] # 0 c("unif", -0.5, 0.5)
+  cfg.list["person.agegap.woman.dist.normal.mu"] <- inputvector[5] # [4] # 0
+  cfg.list["person.agegap.man.dist.normal.sigma"] <- inputvector[6] # [5] # 3 c("unif", 2, 4)
+  cfg.list["person.agegap.woman.dist.normal.sigma"] <- inputvector[6] # [5] # 3 
+  cfg.list["formation.hazard.agegapry.gap_agescale_man"] <- inputvector[7] # [6] # 0.25 c("unif", 0, 1)
+  cfg.list["formation.hazard.agegapry.gap_agescale_woman"] <- inputvector[7] # [6] # 0.25
+  cfg.list["formation.hazard.agegapry.numrel_man"] <- inputvector[8] # [7] # -0.3 c("unif", -1, 0)
+  cfg.list["formation.hazard.agegapry.numrel_woman"] <- inputvector[8] # [7] # -0.3
+  cfg.list["formation.hazard.agegapry.numrel_diff"] <- inputvector[9] # [8] # -0.1 c("unif", -0.9, 0)
+  
+  
+  # # HIV transmission
+  # ###################
+  #
+  
+  cfg.list["hivtransmission.param.a"] <- inputvector[10] # [10] # -1 c("unif", -2, 0)
+  cfg.list["hivtransmission.param.b"] <- inputvector[11] # [11] # -90 c("unif", -100, -80)
+  cfg.list["hivtransmission.param.c"] <- inputvector[12] # [12] # 0.5 c("unif", 0, 1)
+  cfg.list["hivtransmission.param.f1"] <- inputvector[13] # [13] # 0.04879016 c("unif", 0, 0.5)
+  cfg.list["hivtransmission.param.f2"] <- inputvector[14] # [14] # -0.1386294 c("unif", -0.5, 0)
+  
+  # Disease progression > may be remove in parameter to estimates
+  
+  cfg.list["person.vsp.toacute.x"] <- inputvector[15] # [15] # 5 c("unif", 3, 7)
+  cfg.list["person.vsp.toaids.x"] <- inputvector[16] # [16] # 7 c("unif", 5, 9)
+  cfg.list["person.vsp.tofinalaids.x"] <- inputvector[17] # [17] # 12 c("unif", 10, 14)
+  
+  
+  #
+  # # Demographic
+  # ##############
+  #
+  
+  cfg.list["conception.alpha_base"] <- inputvector[18] # [18] # -2.7 c("unif", -3.5, -1.7)
+  
+  
+  # # Assumptions to avoid negative branch lengths
+  # ###############################################
+  # # + sampling == start ART
+  # # when someone start ART, he/she is sampled and becomes non-infectious
+  
+  cfg.list["monitoring.fraction.log_viralload"] <- 0
+  
+  
+  #
+  # ## Add-ons
+  #
+  ### BEGIN Add-on
+  cfg.list["formation.hazard.agegapry.baseline"] <- 2
+  cfg.list["mortality.aids.survtime.C"] <- 65
+  cfg.list["mortality.aids.survtime.k"] <- -0.2
+  cfg.list["monitoring.fraction.log_viralload"] <- 0 #0.3
+  cfg.list["dropout.interval.dist.type"] <- "uniform"
+  cfg.list["dropout.interval.dist.uniform.min"] <- 1000
+  cfg.list["dropout.interval.dist.uniform.max"] <- 2000
+  
+  cfg.list["person.survtime.logoffset.dist.type"] <- "normal"
+  cfg.list["person.survtime.logoffset.dist.normal.mu"] <- 0
+  cfg.list["person.survtime.logoffset.dist.normal.sigma"] <- 0.1
+  
+  cfg.list["person.agegap.man.dist.type"] <- "normal" #fixed
+  #cfg.list["person.agegap.man.dist.fixed.value"] <- -6
+  cfg.list["person.agegap.woman.dist.type"] <- "normal" #"fixed"
+  #cfg.list["person.agegap.woman.dist.fixed.value"] <- -6
+  
+  cfg.list["mortality.aids.survtime.C"] <- 65
+  cfg.list["mortality.aids.survtime.k"] <- -0.2
+  cfg.list["monitoring.cd4.threshold"] <- 0 # 0 means nobody qualifies for ART
+  cfg.list["diagnosis.baseline"] <- -2
+  
+  
+  cfg.list["person.eagerness.man.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.woman.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.man.dist.gamma.b"] <- 45 # 45
+  cfg.list["person.eagerness.woman.dist.gamma.b"] <- 45 # 45
+  
+  #### END Add-ons
+  
+  
+  # # ART intervention
+  # ###################
+  #
+  # # ART acceptability paramter and the ART  interventions
+  
+  cfg.list["person.art.accept.threshold.dist.fixed.value"] <- 0.6
+  
+  # Let's introduce ART, and evaluate whether the HIV prevalence drops less  rapidly
+  art.intro <- list()
+  art.intro["time"] <- 20
+  art.intro["diagnosis.baseline"] <- -2 # 0#100
+  art.intro["monitoring.cd4.threshold"] <- 100 # 1200
+  
+  ### add something about diagnosis
+  art.intro["diagnosis.agefactor"] <- 0
+  art.intro["diagnosis.genderfactor"] <- 0
+  art.intro["diagnosis.diagpartnersfactor"] <- 0
+  art.intro["diagnosis.isdiagnosedfactor"] <- 0
+  ### end of add-on about diagnosis
+  #art.intro["monitoring.interval.piecewise.cd4s"] <- "0,1300"
+  # Gradual increase in CD4 threshold. in 2007:200. in 2010:350. in 2013:500
+  art.intro1 <- list()
+  art.intro1["time"] <- 22
+  art.intro1["diagnosis.baseline"] <- -2 # 0#100
+  art.intro1["monitoring.cd4.threshold"] <- 150 # 1200
+  
+  art.intro2 <- list()
+  art.intro2["time"] <- 25 # inputvector[5] ######### 30
+  art.intro2["monitoring.cd4.threshold"] <- 200
+  
+  art.intro3 <- list()
+  art.intro3["time"] <- 30 # inputvector[4] + inputvector[5] + inputvector[6] ########### 33
+  art.intro3["monitoring.cd4.threshold"] <- 350
+  
+  art.intro4 <- list()
+  art.intro4["time"] <- 33 # inputvector[4] + inputvector[5] + inputvector[6] + inputvector[7] ########### 36
+  art.intro4["monitoring.cd4.threshold"] <- 500
+  
+  art.intro5 <- list()
+  art.intro5["time"] <- 36
+  art.intro5["monitoring.cd4.threshold"] <- 700 # This is equivalent to immediate access
+  
+  # tasp.indicator <- inputvector[9] # 1 if the scenario is TasP, 0 if the scenario is current status
+  interventionlist <- list(art.intro, art.intro1, art.intro2, art.intro3, art.intro4, art.intro5)
+  
+  intervention <- interventionlist
+  
+  # Events
+  cfg.list["population.maxevents"] <- as.numeric(cfg.list["population.simtime"][1]) * as.numeric(cfg.list["population.nummen"][1]) * 3
+  
+  # Avoid overlaping in same directory
+  
+  
+  #creating subfolder with unique name for each simulation
+  generate.filename <- function(how.long){
+    
+    rn <- sample(1:100,1)
+    t <- as.numeric(Sys.time())
+    set.seed((t - floor(t)) * 1e8)
+    chars <- c(letters, LETTERS)
+    sub.dir.sim.id <-  paste0(sample(chars,how.long), collapse = "")
+    
+    noise.sample1 <- sample(8:15,1, replace = TRUE)
+    sub.dir.sim.id.ext <- paste0(sample(chars,noise.sample1), collapse = "")
+    noise.sample <- sample(1:1000,1)
+    noise.sample2 <- sample(8:17,1, replace = TRUE)
+    sub.dir.sim.id <- paste0(sub.dir.sim.id.ext,
+                             paste0(sample(chars,noise.sample2), collapse = ""),noise.sample, rn)
+    
+    return(sub.dir.sim.id)
+  }
+  
+  ABC_DestDir.classic.phylo.MAR.c.45 <- paste0(work.dir,"/temp/",generate.filename(10))
+  
+  
+  # Error function when computing summary statistics
+  
+  err.functionGEN <- function(e){
+    return(chunk.summary.stats = rep(NA,64))
+    stop(e)
+  }
+  
+  
+  
+  results <- tryCatch(simpact.run(configParams = cfg.list,
+                                  destDir = ABC_DestDir.classic.phylo.MAR.c.45,
+                                  agedist = age.distr,
+                                  intervention = intervention),
+                      error = simpact.errFunction)
+  
+  
+  if (length(results) == 0){
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+  }else{
+    if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
+      outputvector <- rep(NA, 64)
+    }else{
+      
+      
+      datalist <- readthedata(results)
+      
+      simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
+      
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
+      
+      
+      
+      summary.stat.phylo.MAR.c.45 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                    datalist.agemix = datalist,
+                                                                                    work.dir = work.dir,
+                                                                                    sub.dir.rename = ABC_DestDir.classic.phylo.MAR.c.45,
+                                                                                    dirfasttree = work.dir,
+                                                                                    limitTransmEvents = 7,
+                                                                                    seq.cov = 45,
+                                                                                    seq.gender.ratio = 0.5,
+                                                                                    age.group.15.25 = c(15,25),
+                                                                                    age.group.25.40 = c(25,40),
+                                                                                    age.group.40.50 = c(40,50),
+                                                                                    endpoint = 40,
+                                                                                    timewindow = c(37,40),
+                                                                                    cut.off = 7),
+                                              error=function(e) return(rep(NA, 37)))
+      
+      
+      
+      
+      
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.c.45)
+      
+    }
+    
+  }
+  
+  unlink(paste0(ABC_DestDir.classic.phylo.MAR.c.45), recursive = TRUE)
+  
+  return(outputvector)
+}
+
+
+
+# Coverage of 50%
+simpact4ABC.classic.phylo.MAR.c.50 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
+  
+  
+  
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
+  
+  
+  setwd(paste0(work.dir))
+  
+  
+  
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
+  library(RSimpactCyan)
+  library(RSimpactHelper)
+  library(Rcpp)
+  library(ape)
+  library(expoTree)
+  library(data.table)
+  library(readr)
+  library(phangorn)
+  library(lme4)
+  library(nlme)
+  library(dplyr)
+  library(adephylo)
+  library(treedater)
+  library(geiger)
+  library(picante)
+  library(igraph)
+  library(phyloTop)
+  library(phytools)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
+  
+  
+  
+  ## Run Simpact for specific parameter combination
+  
+  age.distr <- agedistr.creator(shape = 5, scale = 65)
+  #
+  cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
+                                   population.simtime = 50, 
+                                   population.nummen = 4000, 
+                                   population.numwomen = 4000,
+                                   hivseed.time = 10, 
+                                   hivseed.type = "amount",
+                                   hivseed.amount = 40, 
+                                   hivseed.age.min = 20,
+                                   hivseed.age.max = 50,
+                                   formation.hazard.agegapry.meanage = -0.025,
+                                   debut.debutage = 15
+  )
+  
+  # # Assumption of nature of sexual network
+  # #########################################
+  #
+  cfg.list["population.msm"] = "no"
+  
+  
+  # # Sexual behaviour
+  # ###################
+  #
+  seedid <- inputvector[1]
+  
+  cfg.list["dissolution.alpha_0"] <- inputvector[2] # [1] # -0.52 c("unif", -1, 0)
+  cfg.list["dissolution.alpha_4"] <- inputvector [3] # [2] # -0.05 c("unif", -0.5, 0)
+  cfg.list["formation.hazard.agegapry.baseline"] <- inputvector[4] # [3] # 2 c("unif", 1, 3)
+  cfg.list["person.agegap.man.dist.normal.mu"] <- inputvector[5] # [4] # 0 c("unif", -0.5, 0.5)
+  cfg.list["person.agegap.woman.dist.normal.mu"] <- inputvector[5] # [4] # 0
+  cfg.list["person.agegap.man.dist.normal.sigma"] <- inputvector[6] # [5] # 3 c("unif", 2, 4)
+  cfg.list["person.agegap.woman.dist.normal.sigma"] <- inputvector[6] # [5] # 3 
+  cfg.list["formation.hazard.agegapry.gap_agescale_man"] <- inputvector[7] # [6] # 0.25 c("unif", 0, 1)
+  cfg.list["formation.hazard.agegapry.gap_agescale_woman"] <- inputvector[7] # [6] # 0.25
+  cfg.list["formation.hazard.agegapry.numrel_man"] <- inputvector[8] # [7] # -0.3 c("unif", -1, 0)
+  cfg.list["formation.hazard.agegapry.numrel_woman"] <- inputvector[8] # [7] # -0.3
+  cfg.list["formation.hazard.agegapry.numrel_diff"] <- inputvector[9] # [8] # -0.1 c("unif", -0.9, 0)
+  
+  
+  # # HIV transmission
+  # ###################
+  #
+  
+  cfg.list["hivtransmission.param.a"] <- inputvector[10] # [10] # -1 c("unif", -2, 0)
+  cfg.list["hivtransmission.param.b"] <- inputvector[11] # [11] # -90 c("unif", -100, -80)
+  cfg.list["hivtransmission.param.c"] <- inputvector[12] # [12] # 0.5 c("unif", 0, 1)
+  cfg.list["hivtransmission.param.f1"] <- inputvector[13] # [13] # 0.04879016 c("unif", 0, 0.5)
+  cfg.list["hivtransmission.param.f2"] <- inputvector[14] # [14] # -0.1386294 c("unif", -0.5, 0)
+  
+  # Disease progression > may be remove in parameter to estimates
+  
+  cfg.list["person.vsp.toacute.x"] <- inputvector[15] # [15] # 5 c("unif", 3, 7)
+  cfg.list["person.vsp.toaids.x"] <- inputvector[16] # [16] # 7 c("unif", 5, 9)
+  cfg.list["person.vsp.tofinalaids.x"] <- inputvector[17] # [17] # 12 c("unif", 10, 14)
+  
+  
+  #
+  # # Demographic
+  # ##############
+  #
+  
+  cfg.list["conception.alpha_base"] <- inputvector[18] # [18] # -2.7 c("unif", -3.5, -1.7)
+  
+  
+  # # Assumptions to avoid negative branch lengths
+  # ###############################################
+  # # + sampling == start ART
+  # # when someone start ART, he/she is sampled and becomes non-infectious
+  
+  cfg.list["monitoring.fraction.log_viralload"] <- 0
+  
+  
+  #
+  # ## Add-ons
+  #
+  ### BEGIN Add-on
+  cfg.list["formation.hazard.agegapry.baseline"] <- 2
+  cfg.list["mortality.aids.survtime.C"] <- 65
+  cfg.list["mortality.aids.survtime.k"] <- -0.2
+  cfg.list["monitoring.fraction.log_viralload"] <- 0 #0.3
+  cfg.list["dropout.interval.dist.type"] <- "uniform"
+  cfg.list["dropout.interval.dist.uniform.min"] <- 1000
+  cfg.list["dropout.interval.dist.uniform.max"] <- 2000
+  
+  cfg.list["person.survtime.logoffset.dist.type"] <- "normal"
+  cfg.list["person.survtime.logoffset.dist.normal.mu"] <- 0
+  cfg.list["person.survtime.logoffset.dist.normal.sigma"] <- 0.1
+  
+  cfg.list["person.agegap.man.dist.type"] <- "normal" #fixed
+  #cfg.list["person.agegap.man.dist.fixed.value"] <- -6
+  cfg.list["person.agegap.woman.dist.type"] <- "normal" #"fixed"
+  #cfg.list["person.agegap.woman.dist.fixed.value"] <- -6
+  
+  cfg.list["mortality.aids.survtime.C"] <- 65
+  cfg.list["mortality.aids.survtime.k"] <- -0.2
+  cfg.list["monitoring.cd4.threshold"] <- 0 # 0 means nobody qualifies for ART
+  cfg.list["diagnosis.baseline"] <- -2
+  
+  
+  cfg.list["person.eagerness.man.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.woman.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.man.dist.gamma.b"] <- 45 # 45
+  cfg.list["person.eagerness.woman.dist.gamma.b"] <- 45 # 45
+  
+  #### END Add-ons
+  
+  
+  # # ART intervention
+  # ###################
+  #
+  # # ART acceptability paramter and the ART  interventions
+  
+  cfg.list["person.art.accept.threshold.dist.fixed.value"] <- 0.6
+  
+  # Let's introduce ART, and evaluate whether the HIV prevalence drops less  rapidly
+  art.intro <- list()
+  art.intro["time"] <- 20
+  art.intro["diagnosis.baseline"] <- -2 # 0#100
+  art.intro["monitoring.cd4.threshold"] <- 100 # 1200
+  
+  ### add something about diagnosis
+  art.intro["diagnosis.agefactor"] <- 0
+  art.intro["diagnosis.genderfactor"] <- 0
+  art.intro["diagnosis.diagpartnersfactor"] <- 0
+  art.intro["diagnosis.isdiagnosedfactor"] <- 0
+  ### end of add-on about diagnosis
+  #art.intro["monitoring.interval.piecewise.cd4s"] <- "0,1300"
+  # Gradual increase in CD4 threshold. in 2007:200. in 2010:350. in 2013:500
+  art.intro1 <- list()
+  art.intro1["time"] <- 22
+  art.intro1["diagnosis.baseline"] <- -2 # 0#100
+  art.intro1["monitoring.cd4.threshold"] <- 150 # 1200
+  
+  art.intro2 <- list()
+  art.intro2["time"] <- 25 # inputvector[5] ######### 30
+  art.intro2["monitoring.cd4.threshold"] <- 200
+  
+  art.intro3 <- list()
+  art.intro3["time"] <- 30 # inputvector[4] + inputvector[5] + inputvector[6] ########### 33
+  art.intro3["monitoring.cd4.threshold"] <- 350
+  
+  art.intro4 <- list()
+  art.intro4["time"] <- 33 # inputvector[4] + inputvector[5] + inputvector[6] + inputvector[7] ########### 36
+  art.intro4["monitoring.cd4.threshold"] <- 500
+  
+  art.intro5 <- list()
+  art.intro5["time"] <- 36
+  art.intro5["monitoring.cd4.threshold"] <- 700 # This is equivalent to immediate access
+  
+  # tasp.indicator <- inputvector[9] # 1 if the scenario is TasP, 0 if the scenario is current status
+  interventionlist <- list(art.intro, art.intro1, art.intro2, art.intro3, art.intro4, art.intro5)
+  
+  intervention <- interventionlist
+  
+  # Events
+  cfg.list["population.maxevents"] <- as.numeric(cfg.list["population.simtime"][1]) * as.numeric(cfg.list["population.nummen"][1]) * 3
+  
+  # Avoid overlaping in same directory
+  
+  
+  #creating subfolder with unique name for each simulation
+  generate.filename <- function(how.long){
+    
+    rn <- sample(1:100,1)
+    t <- as.numeric(Sys.time())
+    set.seed((t - floor(t)) * 1e8)
+    chars <- c(letters, LETTERS)
+    sub.dir.sim.id <-  paste0(sample(chars,how.long), collapse = "")
+    
+    noise.sample1 <- sample(8:15,1, replace = TRUE)
+    sub.dir.sim.id.ext <- paste0(sample(chars,noise.sample1), collapse = "")
+    noise.sample <- sample(1:1000,1)
+    noise.sample2 <- sample(8:17,1, replace = TRUE)
+    sub.dir.sim.id <- paste0(sub.dir.sim.id.ext,
+                             paste0(sample(chars,noise.sample2), collapse = ""),noise.sample, rn)
+    
+    return(sub.dir.sim.id)
+  }
+  
+  ABC_DestDir.classic.phylo.MAR.c.50 <- paste0(work.dir,"/temp/",generate.filename(10))
+  
+  
+  # Error function when computing summary statistics
+  
+  err.functionGEN <- function(e){
+    return(chunk.summary.stats = rep(NA,64))
+    stop(e)
+  }
+  
+  
+  
+  results <- tryCatch(simpact.run(configParams = cfg.list,
+                                  destDir = ABC_DestDir.classic.phylo.MAR.c.50,
+                                  agedist = age.distr,
+                                  intervention = intervention),
+                      error = simpact.errFunction)
+  
+  
+  if (length(results) == 0){
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+  }else{
+    if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
+      outputvector <- rep(NA, 64)
+    }else{
+      
+      
+      datalist <- readthedata(results)
+      
+      simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
+      
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
+      
+      
+      
+      summary.stat.phylo.MAR.c.50 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                    datalist.agemix = datalist,
+                                                                                    work.dir = work.dir,
+                                                                                    sub.dir.rename = ABC_DestDir.classic.phylo.MAR.c.50,
+                                                                                    dirfasttree = work.dir,
+                                                                                    limitTransmEvents = 7,
+                                                                                    seq.cov = 45,
+                                                                                    seq.gender.ratio = 0.5,
+                                                                                    age.group.15.25 = c(15,25),
+                                                                                    age.group.25.40 = c(25,40),
+                                                                                    age.group.40.50 = c(40,50),
+                                                                                    endpoint = 40,
+                                                                                    timewindow = c(37,40),
+                                                                                    cut.off = 7),
+                                              error=function(e) return(rep(NA, 37)))
+      
+      
+      
+      
+      
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.c.50)
+      
+    }
+    
+  }
+  
+  unlink(paste0(ABC_DestDir.classic.phylo.MAR.c.50), recursive = TRUE)
+  
+  return(outputvector)
+}
+
+
+
+# Coverage of 55%
+simpact4ABC.classic.phylo.MAR.c.55 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
+  
+  
+  
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
+  
+  
+  setwd(paste0(work.dir))
+  
+  
+  
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
+  library(RSimpactCyan)
+  library(RSimpactHelper)
+  library(Rcpp)
+  library(ape)
+  library(expoTree)
+  library(data.table)
+  library(readr)
+  library(phangorn)
+  library(lme4)
+  library(nlme)
+  library(dplyr)
+  library(adephylo)
+  library(treedater)
+  library(geiger)
+  library(picante)
+  library(igraph)
+  library(phyloTop)
+  library(phytools)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
+  
+  
+  
+  ## Run Simpact for specific parameter combination
+  
+  age.distr <- agedistr.creator(shape = 5, scale = 65)
+  #
+  cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
+                                   population.simtime = 50, 
+                                   population.nummen = 4000, 
+                                   population.numwomen = 4000,
+                                   hivseed.time = 10, 
+                                   hivseed.type = "amount",
+                                   hivseed.amount = 40, 
+                                   hivseed.age.min = 20,
+                                   hivseed.age.max = 50,
+                                   formation.hazard.agegapry.meanage = -0.025,
+                                   debut.debutage = 15
+  )
+  
+  # # Assumption of nature of sexual network
+  # #########################################
+  #
+  cfg.list["population.msm"] = "no"
+  
+  
+  # # Sexual behaviour
+  # ###################
+  #
+  seedid <- inputvector[1]
+  
+  cfg.list["dissolution.alpha_0"] <- inputvector[2] # [1] # -0.52 c("unif", -1, 0)
+  cfg.list["dissolution.alpha_4"] <- inputvector [3] # [2] # -0.05 c("unif", -0.5, 0)
+  cfg.list["formation.hazard.agegapry.baseline"] <- inputvector[4] # [3] # 2 c("unif", 1, 3)
+  cfg.list["person.agegap.man.dist.normal.mu"] <- inputvector[5] # [4] # 0 c("unif", -0.5, 0.5)
+  cfg.list["person.agegap.woman.dist.normal.mu"] <- inputvector[5] # [4] # 0
+  cfg.list["person.agegap.man.dist.normal.sigma"] <- inputvector[6] # [5] # 3 c("unif", 2, 4)
+  cfg.list["person.agegap.woman.dist.normal.sigma"] <- inputvector[6] # [5] # 3 
+  cfg.list["formation.hazard.agegapry.gap_agescale_man"] <- inputvector[7] # [6] # 0.25 c("unif", 0, 1)
+  cfg.list["formation.hazard.agegapry.gap_agescale_woman"] <- inputvector[7] # [6] # 0.25
+  cfg.list["formation.hazard.agegapry.numrel_man"] <- inputvector[8] # [7] # -0.3 c("unif", -1, 0)
+  cfg.list["formation.hazard.agegapry.numrel_woman"] <- inputvector[8] # [7] # -0.3
+  cfg.list["formation.hazard.agegapry.numrel_diff"] <- inputvector[9] # [8] # -0.1 c("unif", -0.9, 0)
+  
+  
+  # # HIV transmission
+  # ###################
+  #
+  
+  cfg.list["hivtransmission.param.a"] <- inputvector[10] # [10] # -1 c("unif", -2, 0)
+  cfg.list["hivtransmission.param.b"] <- inputvector[11] # [11] # -90 c("unif", -100, -80)
+  cfg.list["hivtransmission.param.c"] <- inputvector[12] # [12] # 0.5 c("unif", 0, 1)
+  cfg.list["hivtransmission.param.f1"] <- inputvector[13] # [13] # 0.04879016 c("unif", 0, 0.5)
+  cfg.list["hivtransmission.param.f2"] <- inputvector[14] # [14] # -0.1386294 c("unif", -0.5, 0)
+  
+  # Disease progression > may be remove in parameter to estimates
+  
+  cfg.list["person.vsp.toacute.x"] <- inputvector[15] # [15] # 5 c("unif", 3, 7)
+  cfg.list["person.vsp.toaids.x"] <- inputvector[16] # [16] # 7 c("unif", 5, 9)
+  cfg.list["person.vsp.tofinalaids.x"] <- inputvector[17] # [17] # 12 c("unif", 10, 14)
+  
+  
+  #
+  # # Demographic
+  # ##############
+  #
+  
+  cfg.list["conception.alpha_base"] <- inputvector[18] # [18] # -2.7 c("unif", -3.5, -1.7)
+  
+  
+  # # Assumptions to avoid negative branch lengths
+  # ###############################################
+  # # + sampling == start ART
+  # # when someone start ART, he/she is sampled and becomes non-infectious
+  
+  cfg.list["monitoring.fraction.log_viralload"] <- 0
+  
+  
+  #
+  # ## Add-ons
+  #
+  ### BEGIN Add-on
+  cfg.list["formation.hazard.agegapry.baseline"] <- 2
+  cfg.list["mortality.aids.survtime.C"] <- 65
+  cfg.list["mortality.aids.survtime.k"] <- -0.2
+  cfg.list["monitoring.fraction.log_viralload"] <- 0 #0.3
+  cfg.list["dropout.interval.dist.type"] <- "uniform"
+  cfg.list["dropout.interval.dist.uniform.min"] <- 1000
+  cfg.list["dropout.interval.dist.uniform.max"] <- 2000
+  
+  cfg.list["person.survtime.logoffset.dist.type"] <- "normal"
+  cfg.list["person.survtime.logoffset.dist.normal.mu"] <- 0
+  cfg.list["person.survtime.logoffset.dist.normal.sigma"] <- 0.1
+  
+  cfg.list["person.agegap.man.dist.type"] <- "normal" #fixed
+  #cfg.list["person.agegap.man.dist.fixed.value"] <- -6
+  cfg.list["person.agegap.woman.dist.type"] <- "normal" #"fixed"
+  #cfg.list["person.agegap.woman.dist.fixed.value"] <- -6
+  
+  cfg.list["mortality.aids.survtime.C"] <- 65
+  cfg.list["mortality.aids.survtime.k"] <- -0.2
+  cfg.list["monitoring.cd4.threshold"] <- 0 # 0 means nobody qualifies for ART
+  cfg.list["diagnosis.baseline"] <- -2
+  
+  
+  cfg.list["person.eagerness.man.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.woman.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.man.dist.gamma.b"] <- 45 # 45
+  cfg.list["person.eagerness.woman.dist.gamma.b"] <- 45 # 45
+  
+  #### END Add-ons
+  
+  
+  # # ART intervention
+  # ###################
+  #
+  # # ART acceptability paramter and the ART  interventions
+  
+  cfg.list["person.art.accept.threshold.dist.fixed.value"] <- 0.6
+  
+  # Let's introduce ART, and evaluate whether the HIV prevalence drops less  rapidly
+  art.intro <- list()
+  art.intro["time"] <- 20
+  art.intro["diagnosis.baseline"] <- -2 # 0#100
+  art.intro["monitoring.cd4.threshold"] <- 100 # 1200
+  
+  ### add something about diagnosis
+  art.intro["diagnosis.agefactor"] <- 0
+  art.intro["diagnosis.genderfactor"] <- 0
+  art.intro["diagnosis.diagpartnersfactor"] <- 0
+  art.intro["diagnosis.isdiagnosedfactor"] <- 0
+  ### end of add-on about diagnosis
+  #art.intro["monitoring.interval.piecewise.cd4s"] <- "0,1300"
+  # Gradual increase in CD4 threshold. in 2007:200. in 2010:350. in 2013:500
+  art.intro1 <- list()
+  art.intro1["time"] <- 22
+  art.intro1["diagnosis.baseline"] <- -2 # 0#100
+  art.intro1["monitoring.cd4.threshold"] <- 150 # 1200
+  
+  art.intro2 <- list()
+  art.intro2["time"] <- 25 # inputvector[5] ######### 30
+  art.intro2["monitoring.cd4.threshold"] <- 200
+  
+  art.intro3 <- list()
+  art.intro3["time"] <- 30 # inputvector[4] + inputvector[5] + inputvector[6] ########### 33
+  art.intro3["monitoring.cd4.threshold"] <- 350
+  
+  art.intro4 <- list()
+  art.intro4["time"] <- 33 # inputvector[4] + inputvector[5] + inputvector[6] + inputvector[7] ########### 36
+  art.intro4["monitoring.cd4.threshold"] <- 500
+  
+  art.intro5 <- list()
+  art.intro5["time"] <- 36
+  art.intro5["monitoring.cd4.threshold"] <- 700 # This is equivalent to immediate access
+  
+  # tasp.indicator <- inputvector[9] # 1 if the scenario is TasP, 0 if the scenario is current status
+  interventionlist <- list(art.intro, art.intro1, art.intro2, art.intro3, art.intro4, art.intro5)
+  
+  intervention <- interventionlist
+  
+  # Events
+  cfg.list["population.maxevents"] <- as.numeric(cfg.list["population.simtime"][1]) * as.numeric(cfg.list["population.nummen"][1]) * 3
+  
+  # Avoid overlaping in same directory
+  
+  
+  #creating subfolder with unique name for each simulation
+  generate.filename <- function(how.long){
+    
+    rn <- sample(1:100,1)
+    t <- as.numeric(Sys.time())
+    set.seed((t - floor(t)) * 1e8)
+    chars <- c(letters, LETTERS)
+    sub.dir.sim.id <-  paste0(sample(chars,how.long), collapse = "")
+    
+    noise.sample1 <- sample(8:15,1, replace = TRUE)
+    sub.dir.sim.id.ext <- paste0(sample(chars,noise.sample1), collapse = "")
+    noise.sample <- sample(1:1000,1)
+    noise.sample2 <- sample(8:17,1, replace = TRUE)
+    sub.dir.sim.id <- paste0(sub.dir.sim.id.ext,
+                             paste0(sample(chars,noise.sample2), collapse = ""),noise.sample, rn)
+    
+    return(sub.dir.sim.id)
+  }
+  
+  ABC_DestDir.classic.phylo.MAR.c.55 <- paste0(work.dir,"/temp/",generate.filename(10))
+  
+  
+  # Error function when computing summary statistics
+  
+  err.functionGEN <- function(e){
+    return(chunk.summary.stats = rep(NA,64))
+    stop(e)
+  }
+  
+  
+  
+  results <- tryCatch(simpact.run(configParams = cfg.list,
+                                  destDir = ABC_DestDir.classic.phylo.MAR.c.55,
+                                  agedist = age.distr,
+                                  intervention = intervention),
+                      error = simpact.errFunction)
+  
+  
+  if (length(results) == 0){
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+  }else{
+    if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
+      outputvector <- rep(NA, 64)
+    }else{
+      
+      
+      datalist <- readthedata(results)
+      
+      simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
+      
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
+      
+      
+      
+      summary.stat.phylo.MAR.c.55 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                    datalist.agemix = datalist,
+                                                                                    work.dir = work.dir,
+                                                                                    sub.dir.rename = ABC_DestDir.classic.phylo.MAR.c.55,
+                                                                                    dirfasttree = work.dir,
+                                                                                    limitTransmEvents = 7,
+                                                                                    seq.cov = 45,
+                                                                                    seq.gender.ratio = 0.5,
+                                                                                    age.group.15.25 = c(15,25),
+                                                                                    age.group.25.40 = c(25,40),
+                                                                                    age.group.40.50 = c(40,50),
+                                                                                    endpoint = 40,
+                                                                                    timewindow = c(37,40),
+                                                                                    cut.off = 7),
+                                              error=function(e) return(rep(NA, 37)))
+      
+      
+      
+      
+      
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.c.55)
+      
+    }
+    
+  }
+  
+  unlink(paste0(ABC_DestDir.classic.phylo.MAR.c.55), recursive = TRUE)
+  
+  return(outputvector)
+}
+
+
+
+# Coverage of 60%
+simpact4ABC.classic.phylo.MAR.c.60 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
+  
+  
+  
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
+  
+  
+  setwd(paste0(work.dir))
+  
+  
+  
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
+  library(RSimpactCyan)
+  library(RSimpactHelper)
+  library(Rcpp)
+  library(ape)
+  library(expoTree)
+  library(data.table)
+  library(readr)
+  library(phangorn)
+  library(lme4)
+  library(nlme)
+  library(dplyr)
+  library(adephylo)
+  library(treedater)
+  library(geiger)
+  library(picante)
+  library(igraph)
+  library(phyloTop)
+  library(phytools)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
+  
+  
+  
+  ## Run Simpact for specific parameter combination
+  
+  age.distr <- agedistr.creator(shape = 5, scale = 65)
+  #
+  cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
+                                   population.simtime = 50, 
+                                   population.nummen = 4000, 
+                                   population.numwomen = 4000,
+                                   hivseed.time = 10, 
+                                   hivseed.type = "amount",
+                                   hivseed.amount = 40, 
+                                   hivseed.age.min = 20,
+                                   hivseed.age.max = 50,
+                                   formation.hazard.agegapry.meanage = -0.025,
+                                   debut.debutage = 15
+  )
+  
+  # # Assumption of nature of sexual network
+  # #########################################
+  #
+  cfg.list["population.msm"] = "no"
+  
+  
+  # # Sexual behaviour
+  # ###################
+  #
+  seedid <- inputvector[1]
+  
+  cfg.list["dissolution.alpha_0"] <- inputvector[2] # [1] # -0.52 c("unif", -1, 0)
+  cfg.list["dissolution.alpha_4"] <- inputvector [3] # [2] # -0.05 c("unif", -0.5, 0)
+  cfg.list["formation.hazard.agegapry.baseline"] <- inputvector[4] # [3] # 2 c("unif", 1, 3)
+  cfg.list["person.agegap.man.dist.normal.mu"] <- inputvector[5] # [4] # 0 c("unif", -0.5, 0.5)
+  cfg.list["person.agegap.woman.dist.normal.mu"] <- inputvector[5] # [4] # 0
+  cfg.list["person.agegap.man.dist.normal.sigma"] <- inputvector[6] # [5] # 3 c("unif", 2, 4)
+  cfg.list["person.agegap.woman.dist.normal.sigma"] <- inputvector[6] # [5] # 3 
+  cfg.list["formation.hazard.agegapry.gap_agescale_man"] <- inputvector[7] # [6] # 0.25 c("unif", 0, 1)
+  cfg.list["formation.hazard.agegapry.gap_agescale_woman"] <- inputvector[7] # [6] # 0.25
+  cfg.list["formation.hazard.agegapry.numrel_man"] <- inputvector[8] # [7] # -0.3 c("unif", -1, 0)
+  cfg.list["formation.hazard.agegapry.numrel_woman"] <- inputvector[8] # [7] # -0.3
+  cfg.list["formation.hazard.agegapry.numrel_diff"] <- inputvector[9] # [8] # -0.1 c("unif", -0.9, 0)
+  
+  
+  # # HIV transmission
+  # ###################
+  #
+  
+  cfg.list["hivtransmission.param.a"] <- inputvector[10] # [10] # -1 c("unif", -2, 0)
+  cfg.list["hivtransmission.param.b"] <- inputvector[11] # [11] # -90 c("unif", -100, -80)
+  cfg.list["hivtransmission.param.c"] <- inputvector[12] # [12] # 0.5 c("unif", 0, 1)
+  cfg.list["hivtransmission.param.f1"] <- inputvector[13] # [13] # 0.04879016 c("unif", 0, 0.5)
+  cfg.list["hivtransmission.param.f2"] <- inputvector[14] # [14] # -0.1386294 c("unif", -0.5, 0)
+  
+  # Disease progression > may be remove in parameter to estimates
+  
+  cfg.list["person.vsp.toacute.x"] <- inputvector[15] # [15] # 5 c("unif", 3, 7)
+  cfg.list["person.vsp.toaids.x"] <- inputvector[16] # [16] # 7 c("unif", 5, 9)
+  cfg.list["person.vsp.tofinalaids.x"] <- inputvector[17] # [17] # 12 c("unif", 10, 14)
+  
+  
+  #
+  # # Demographic
+  # ##############
+  #
+  
+  cfg.list["conception.alpha_base"] <- inputvector[18] # [18] # -2.7 c("unif", -3.5, -1.7)
+  
+  
+  # # Assumptions to avoid negative branch lengths
+  # ###############################################
+  # # + sampling == start ART
+  # # when someone start ART, he/she is sampled and becomes non-infectious
+  
+  cfg.list["monitoring.fraction.log_viralload"] <- 0
+  
+  
+  #
+  # ## Add-ons
+  #
+  ### BEGIN Add-on
+  cfg.list["formation.hazard.agegapry.baseline"] <- 2
+  cfg.list["mortality.aids.survtime.C"] <- 65
+  cfg.list["mortality.aids.survtime.k"] <- -0.2
+  cfg.list["monitoring.fraction.log_viralload"] <- 0 #0.3
+  cfg.list["dropout.interval.dist.type"] <- "uniform"
+  cfg.list["dropout.interval.dist.uniform.min"] <- 1000
+  cfg.list["dropout.interval.dist.uniform.max"] <- 2000
+  
+  cfg.list["person.survtime.logoffset.dist.type"] <- "normal"
+  cfg.list["person.survtime.logoffset.dist.normal.mu"] <- 0
+  cfg.list["person.survtime.logoffset.dist.normal.sigma"] <- 0.1
+  
+  cfg.list["person.agegap.man.dist.type"] <- "normal" #fixed
+  #cfg.list["person.agegap.man.dist.fixed.value"] <- -6
+  cfg.list["person.agegap.woman.dist.type"] <- "normal" #"fixed"
+  #cfg.list["person.agegap.woman.dist.fixed.value"] <- -6
+  
+  cfg.list["mortality.aids.survtime.C"] <- 65
+  cfg.list["mortality.aids.survtime.k"] <- -0.2
+  cfg.list["monitoring.cd4.threshold"] <- 0 # 0 means nobody qualifies for ART
+  cfg.list["diagnosis.baseline"] <- -2
+  
+  
+  cfg.list["person.eagerness.man.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.woman.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.man.dist.gamma.b"] <- 45 # 45
+  cfg.list["person.eagerness.woman.dist.gamma.b"] <- 45 # 45
+  
+  #### END Add-ons
+  
+  
+  # # ART intervention
+  # ###################
+  #
+  # # ART acceptability paramter and the ART  interventions
+  
+  cfg.list["person.art.accept.threshold.dist.fixed.value"] <- 0.6
+  
+  # Let's introduce ART, and evaluate whether the HIV prevalence drops less  rapidly
+  art.intro <- list()
+  art.intro["time"] <- 20
+  art.intro["diagnosis.baseline"] <- -2 # 0#100
+  art.intro["monitoring.cd4.threshold"] <- 100 # 1200
+  
+  ### add something about diagnosis
+  art.intro["diagnosis.agefactor"] <- 0
+  art.intro["diagnosis.genderfactor"] <- 0
+  art.intro["diagnosis.diagpartnersfactor"] <- 0
+  art.intro["diagnosis.isdiagnosedfactor"] <- 0
+  ### end of add-on about diagnosis
+  #art.intro["monitoring.interval.piecewise.cd4s"] <- "0,1300"
+  # Gradual increase in CD4 threshold. in 2007:200. in 2010:350. in 2013:500
+  art.intro1 <- list()
+  art.intro1["time"] <- 22
+  art.intro1["diagnosis.baseline"] <- -2 # 0#100
+  art.intro1["monitoring.cd4.threshold"] <- 150 # 1200
+  
+  art.intro2 <- list()
+  art.intro2["time"] <- 25 # inputvector[5] ######### 30
+  art.intro2["monitoring.cd4.threshold"] <- 200
+  
+  art.intro3 <- list()
+  art.intro3["time"] <- 30 # inputvector[4] + inputvector[5] + inputvector[6] ########### 33
+  art.intro3["monitoring.cd4.threshold"] <- 350
+  
+  art.intro4 <- list()
+  art.intro4["time"] <- 33 # inputvector[4] + inputvector[5] + inputvector[6] + inputvector[7] ########### 36
+  art.intro4["monitoring.cd4.threshold"] <- 500
+  
+  art.intro5 <- list()
+  art.intro5["time"] <- 36
+  art.intro5["monitoring.cd4.threshold"] <- 700 # This is equivalent to immediate access
+  
+  # tasp.indicator <- inputvector[9] # 1 if the scenario is TasP, 0 if the scenario is current status
+  interventionlist <- list(art.intro, art.intro1, art.intro2, art.intro3, art.intro4, art.intro5)
+  
+  intervention <- interventionlist
+  
+  # Events
+  cfg.list["population.maxevents"] <- as.numeric(cfg.list["population.simtime"][1]) * as.numeric(cfg.list["population.nummen"][1]) * 3
+  
+  # Avoid overlaping in same directory
+  
+  
+  #creating subfolder with unique name for each simulation
+  generate.filename <- function(how.long){
+    
+    rn <- sample(1:100,1)
+    t <- as.numeric(Sys.time())
+    set.seed((t - floor(t)) * 1e8)
+    chars <- c(letters, LETTERS)
+    sub.dir.sim.id <-  paste0(sample(chars,how.long), collapse = "")
+    
+    noise.sample1 <- sample(8:15,1, replace = TRUE)
+    sub.dir.sim.id.ext <- paste0(sample(chars,noise.sample1), collapse = "")
+    noise.sample <- sample(1:1000,1)
+    noise.sample2 <- sample(8:17,1, replace = TRUE)
+    sub.dir.sim.id <- paste0(sub.dir.sim.id.ext,
+                             paste0(sample(chars,noise.sample2), collapse = ""),noise.sample, rn)
+    
+    return(sub.dir.sim.id)
+  }
+  
+  ABC_DestDir.classic.phylo.MAR.c.60 <- paste0(work.dir,"/temp/",generate.filename(10))
+  
+  
+  # Error function when computing summary statistics
+  
+  err.functionGEN <- function(e){
+    return(chunk.summary.stats = rep(NA,64))
+    stop(e)
+  }
+  
+  
+  
+  results <- tryCatch(simpact.run(configParams = cfg.list,
+                                  destDir = ABC_DestDir.classic.phylo.MAR.c.60,
+                                  agedist = age.distr,
+                                  intervention = intervention),
+                      error = simpact.errFunction)
+  
+  
+  if (length(results) == 0){
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+  }else{
+    if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
+      outputvector <- rep(NA, 64)
+    }else{
+      
+      
+      datalist <- readthedata(results)
+      
+      simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
+      
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
+      
+      
+      
+      summary.stat.phylo.MAR.c.60 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                    datalist.agemix = datalist,
+                                                                                    work.dir = work.dir,
+                                                                                    sub.dir.rename = ABC_DestDir.classic.phylo.MAR.c.60,
+                                                                                    dirfasttree = work.dir,
+                                                                                    limitTransmEvents = 7,
+                                                                                    seq.cov = 45,
+                                                                                    seq.gender.ratio = 0.5,
+                                                                                    age.group.15.25 = c(15,25),
+                                                                                    age.group.25.40 = c(25,40),
+                                                                                    age.group.40.50 = c(40,50),
+                                                                                    endpoint = 40,
+                                                                                    timewindow = c(37,40),
+                                                                                    cut.off = 7),
+                                              error=function(e) return(rep(NA, 37)))
+      
+      
+      
+      
+      
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.c.60)
+      
+    }
+    
+  }
+  
+  unlink(paste0(ABC_DestDir.classic.phylo.MAR.c.60), recursive = TRUE)
+  
+  return(outputvector)
+}
+
+
+
+
+# Coverage of 65%
+simpact4ABC.classic.phylo.MAR.c.65 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
+  
+  
+  
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
+  
+  
+  setwd(paste0(work.dir))
+  
+  
+  
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
+  library(RSimpactCyan)
+  library(RSimpactHelper)
+  library(Rcpp)
+  library(ape)
+  library(expoTree)
+  library(data.table)
+  library(readr)
+  library(phangorn)
+  library(lme4)
+  library(nlme)
+  library(dplyr)
+  library(adephylo)
+  library(treedater)
+  library(geiger)
+  library(picante)
+  library(igraph)
+  library(phyloTop)
+  library(phytools)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
+  
+  
+  
+  ## Run Simpact for specific parameter combination
+  
+  age.distr <- agedistr.creator(shape = 5, scale = 65)
+  #
+  cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
+                                   population.simtime = 50, 
+                                   population.nummen = 4000, 
+                                   population.numwomen = 4000,
+                                   hivseed.time = 10, 
+                                   hivseed.type = "amount",
+                                   hivseed.amount = 40, 
+                                   hivseed.age.min = 20,
+                                   hivseed.age.max = 50,
+                                   formation.hazard.agegapry.meanage = -0.025,
+                                   debut.debutage = 15
+  )
+  
+  # # Assumption of nature of sexual network
+  # #########################################
+  #
+  cfg.list["population.msm"] = "no"
+  
+  
+  # # Sexual behaviour
+  # ###################
+  #
+  seedid <- inputvector[1]
+  
+  cfg.list["dissolution.alpha_0"] <- inputvector[2] # [1] # -0.52 c("unif", -1, 0)
+  cfg.list["dissolution.alpha_4"] <- inputvector [3] # [2] # -0.05 c("unif", -0.5, 0)
+  cfg.list["formation.hazard.agegapry.baseline"] <- inputvector[4] # [3] # 2 c("unif", 1, 3)
+  cfg.list["person.agegap.man.dist.normal.mu"] <- inputvector[5] # [4] # 0 c("unif", -0.5, 0.5)
+  cfg.list["person.agegap.woman.dist.normal.mu"] <- inputvector[5] # [4] # 0
+  cfg.list["person.agegap.man.dist.normal.sigma"] <- inputvector[6] # [5] # 3 c("unif", 2, 4)
+  cfg.list["person.agegap.woman.dist.normal.sigma"] <- inputvector[6] # [5] # 3 
+  cfg.list["formation.hazard.agegapry.gap_agescale_man"] <- inputvector[7] # [6] # 0.25 c("unif", 0, 1)
+  cfg.list["formation.hazard.agegapry.gap_agescale_woman"] <- inputvector[7] # [6] # 0.25
+  cfg.list["formation.hazard.agegapry.numrel_man"] <- inputvector[8] # [7] # -0.3 c("unif", -1, 0)
+  cfg.list["formation.hazard.agegapry.numrel_woman"] <- inputvector[8] # [7] # -0.3
+  cfg.list["formation.hazard.agegapry.numrel_diff"] <- inputvector[9] # [8] # -0.1 c("unif", -0.9, 0)
+  
+  
+  # # HIV transmission
+  # ###################
+  #
+  
+  cfg.list["hivtransmission.param.a"] <- inputvector[10] # [10] # -1 c("unif", -2, 0)
+  cfg.list["hivtransmission.param.b"] <- inputvector[11] # [11] # -90 c("unif", -100, -80)
+  cfg.list["hivtransmission.param.c"] <- inputvector[12] # [12] # 0.5 c("unif", 0, 1)
+  cfg.list["hivtransmission.param.f1"] <- inputvector[13] # [13] # 0.04879016 c("unif", 0, 0.5)
+  cfg.list["hivtransmission.param.f2"] <- inputvector[14] # [14] # -0.1386294 c("unif", -0.5, 0)
+  
+  # Disease progression > may be remove in parameter to estimates
+  
+  cfg.list["person.vsp.toacute.x"] <- inputvector[15] # [15] # 5 c("unif", 3, 7)
+  cfg.list["person.vsp.toaids.x"] <- inputvector[16] # [16] # 7 c("unif", 5, 9)
+  cfg.list["person.vsp.tofinalaids.x"] <- inputvector[17] # [17] # 12 c("unif", 10, 14)
+  
+  
+  #
+  # # Demographic
+  # ##############
+  #
+  
+  cfg.list["conception.alpha_base"] <- inputvector[18] # [18] # -2.7 c("unif", -3.5, -1.7)
+  
+  
+  # # Assumptions to avoid negative branch lengths
+  # ###############################################
+  # # + sampling == start ART
+  # # when someone start ART, he/she is sampled and becomes non-infectious
+  
+  cfg.list["monitoring.fraction.log_viralload"] <- 0
+  
+  
+  #
+  # ## Add-ons
+  #
+  ### BEGIN Add-on
+  cfg.list["formation.hazard.agegapry.baseline"] <- 2
+  cfg.list["mortality.aids.survtime.C"] <- 65
+  cfg.list["mortality.aids.survtime.k"] <- -0.2
+  cfg.list["monitoring.fraction.log_viralload"] <- 0 #0.3
+  cfg.list["dropout.interval.dist.type"] <- "uniform"
+  cfg.list["dropout.interval.dist.uniform.min"] <- 1000
+  cfg.list["dropout.interval.dist.uniform.max"] <- 2000
+  
+  cfg.list["person.survtime.logoffset.dist.type"] <- "normal"
+  cfg.list["person.survtime.logoffset.dist.normal.mu"] <- 0
+  cfg.list["person.survtime.logoffset.dist.normal.sigma"] <- 0.1
+  
+  cfg.list["person.agegap.man.dist.type"] <- "normal" #fixed
+  #cfg.list["person.agegap.man.dist.fixed.value"] <- -6
+  cfg.list["person.agegap.woman.dist.type"] <- "normal" #"fixed"
+  #cfg.list["person.agegap.woman.dist.fixed.value"] <- -6
+  
+  cfg.list["mortality.aids.survtime.C"] <- 65
+  cfg.list["mortality.aids.survtime.k"] <- -0.2
+  cfg.list["monitoring.cd4.threshold"] <- 0 # 0 means nobody qualifies for ART
+  cfg.list["diagnosis.baseline"] <- -2
+  
+  
+  cfg.list["person.eagerness.man.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.woman.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.man.dist.gamma.b"] <- 45 # 45
+  cfg.list["person.eagerness.woman.dist.gamma.b"] <- 45 # 45
+  
+  #### END Add-ons
+  
+  
+  # # ART intervention
+  # ###################
+  #
+  # # ART acceptability paramter and the ART  interventions
+  
+  cfg.list["person.art.accept.threshold.dist.fixed.value"] <- 0.6
+  
+  # Let's introduce ART, and evaluate whether the HIV prevalence drops less  rapidly
+  art.intro <- list()
+  art.intro["time"] <- 20
+  art.intro["diagnosis.baseline"] <- -2 # 0#100
+  art.intro["monitoring.cd4.threshold"] <- 100 # 1200
+  
+  ### add something about diagnosis
+  art.intro["diagnosis.agefactor"] <- 0
+  art.intro["diagnosis.genderfactor"] <- 0
+  art.intro["diagnosis.diagpartnersfactor"] <- 0
+  art.intro["diagnosis.isdiagnosedfactor"] <- 0
+  ### end of add-on about diagnosis
+  #art.intro["monitoring.interval.piecewise.cd4s"] <- "0,1300"
+  # Gradual increase in CD4 threshold. in 2007:200. in 2010:350. in 2013:500
+  art.intro1 <- list()
+  art.intro1["time"] <- 22
+  art.intro1["diagnosis.baseline"] <- -2 # 0#100
+  art.intro1["monitoring.cd4.threshold"] <- 150 # 1200
+  
+  art.intro2 <- list()
+  art.intro2["time"] <- 25 # inputvector[5] ######### 30
+  art.intro2["monitoring.cd4.threshold"] <- 200
+  
+  art.intro3 <- list()
+  art.intro3["time"] <- 30 # inputvector[4] + inputvector[5] + inputvector[6] ########### 33
+  art.intro3["monitoring.cd4.threshold"] <- 350
+  
+  art.intro4 <- list()
+  art.intro4["time"] <- 33 # inputvector[4] + inputvector[5] + inputvector[6] + inputvector[7] ########### 36
+  art.intro4["monitoring.cd4.threshold"] <- 500
+  
+  art.intro5 <- list()
+  art.intro5["time"] <- 36
+  art.intro5["monitoring.cd4.threshold"] <- 700 # This is equivalent to immediate access
+  
+  # tasp.indicator <- inputvector[9] # 1 if the scenario is TasP, 0 if the scenario is current status
+  interventionlist <- list(art.intro, art.intro1, art.intro2, art.intro3, art.intro4, art.intro5)
+  
+  intervention <- interventionlist
+  
+  # Events
+  cfg.list["population.maxevents"] <- as.numeric(cfg.list["population.simtime"][1]) * as.numeric(cfg.list["population.nummen"][1]) * 3
+  
+  # Avoid overlaping in same directory
+  
+  
+  #creating subfolder with unique name for each simulation
+  generate.filename <- function(how.long){
+    
+    rn <- sample(1:100,1)
+    t <- as.numeric(Sys.time())
+    set.seed((t - floor(t)) * 1e8)
+    chars <- c(letters, LETTERS)
+    sub.dir.sim.id <-  paste0(sample(chars,how.long), collapse = "")
+    
+    noise.sample1 <- sample(8:15,1, replace = TRUE)
+    sub.dir.sim.id.ext <- paste0(sample(chars,noise.sample1), collapse = "")
+    noise.sample <- sample(1:1000,1)
+    noise.sample2 <- sample(8:17,1, replace = TRUE)
+    sub.dir.sim.id <- paste0(sub.dir.sim.id.ext,
+                             paste0(sample(chars,noise.sample2), collapse = ""),noise.sample, rn)
+    
+    return(sub.dir.sim.id)
+  }
+  
+  ABC_DestDir.classic.phylo.MAR.c.65 <- paste0(work.dir,"/temp/",generate.filename(10))
+  
+  
+  # Error function when computing summary statistics
+  
+  err.functionGEN <- function(e){
+    return(chunk.summary.stats = rep(NA,64))
+    stop(e)
+  }
+  
+  
+  
+  results <- tryCatch(simpact.run(configParams = cfg.list,
+                                  destDir = ABC_DestDir.classic.phylo.MAR.c.65,
+                                  agedist = age.distr,
+                                  intervention = intervention),
+                      error = simpact.errFunction)
+  
+  
+  if (length(results) == 0){
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+  }else{
+    if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
+      outputvector <- rep(NA, 64)
+    }else{
+      
+      
+      datalist <- readthedata(results)
+      
+      simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
+      
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
+      
+      
+      
+      summary.stat.phylo.MAR.c.65 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                    datalist.agemix = datalist,
+                                                                                    work.dir = work.dir,
+                                                                                    sub.dir.rename = ABC_DestDir.classic.phylo.MAR.c.65,
+                                                                                    dirfasttree = work.dir,
+                                                                                    limitTransmEvents = 7,
+                                                                                    seq.cov = 45,
+                                                                                    seq.gender.ratio = 0.5,
+                                                                                    age.group.15.25 = c(15,25),
+                                                                                    age.group.25.40 = c(25,40),
+                                                                                    age.group.40.50 = c(40,50),
+                                                                                    endpoint = 40,
+                                                                                    timewindow = c(37,40),
+                                                                                    cut.off = 7),
+                                              error=function(e) return(rep(NA, 37)))
+      
+      
+      
+      
+      
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.c.65)
+      
+    }
+    
+  }
+  
+  unlink(paste0(ABC_DestDir.classic.phylo.MAR.c.65), recursive = TRUE)
+  
+  return(outputvector)
+}
+
+
+
+# Coverage of 70%
+simpact4ABC.classic.phylo.MAR.c.70 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
+  
+  
+  
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
+  
+  
+  setwd(paste0(work.dir))
+  
+  
+  
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
+  library(RSimpactCyan)
+  library(RSimpactHelper)
+  library(Rcpp)
+  library(ape)
+  library(expoTree)
+  library(data.table)
+  library(readr)
+  library(phangorn)
+  library(lme4)
+  library(nlme)
+  library(dplyr)
+  library(adephylo)
+  library(treedater)
+  library(geiger)
+  library(picante)
+  library(igraph)
+  library(phyloTop)
+  library(phytools)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
+  
+  
+  
+  ## Run Simpact for specific parameter combination
+  
+  age.distr <- agedistr.creator(shape = 5, scale = 65)
+  #
+  cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
+                                   population.simtime = 50, 
+                                   population.nummen = 4000, 
+                                   population.numwomen = 4000,
+                                   hivseed.time = 10, 
+                                   hivseed.type = "amount",
+                                   hivseed.amount = 40, 
+                                   hivseed.age.min = 20,
+                                   hivseed.age.max = 50,
+                                   formation.hazard.agegapry.meanage = -0.025,
+                                   debut.debutage = 15
+  )
+  
+  # # Assumption of nature of sexual network
+  # #########################################
+  #
+  cfg.list["population.msm"] = "no"
+  
+  
+  # # Sexual behaviour
+  # ###################
+  #
+  seedid <- inputvector[1]
+  
+  cfg.list["dissolution.alpha_0"] <- inputvector[2] # [1] # -0.52 c("unif", -1, 0)
+  cfg.list["dissolution.alpha_4"] <- inputvector [3] # [2] # -0.05 c("unif", -0.5, 0)
+  cfg.list["formation.hazard.agegapry.baseline"] <- inputvector[4] # [3] # 2 c("unif", 1, 3)
+  cfg.list["person.agegap.man.dist.normal.mu"] <- inputvector[5] # [4] # 0 c("unif", -0.5, 0.5)
+  cfg.list["person.agegap.woman.dist.normal.mu"] <- inputvector[5] # [4] # 0
+  cfg.list["person.agegap.man.dist.normal.sigma"] <- inputvector[6] # [5] # 3 c("unif", 2, 4)
+  cfg.list["person.agegap.woman.dist.normal.sigma"] <- inputvector[6] # [5] # 3 
+  cfg.list["formation.hazard.agegapry.gap_agescale_man"] <- inputvector[7] # [6] # 0.25 c("unif", 0, 1)
+  cfg.list["formation.hazard.agegapry.gap_agescale_woman"] <- inputvector[7] # [6] # 0.25
+  cfg.list["formation.hazard.agegapry.numrel_man"] <- inputvector[8] # [7] # -0.3 c("unif", -1, 0)
+  cfg.list["formation.hazard.agegapry.numrel_woman"] <- inputvector[8] # [7] # -0.3
+  cfg.list["formation.hazard.agegapry.numrel_diff"] <- inputvector[9] # [8] # -0.1 c("unif", -0.9, 0)
+  
+  
+  # # HIV transmission
+  # ###################
+  #
+  
+  cfg.list["hivtransmission.param.a"] <- inputvector[10] # [10] # -1 c("unif", -2, 0)
+  cfg.list["hivtransmission.param.b"] <- inputvector[11] # [11] # -90 c("unif", -100, -80)
+  cfg.list["hivtransmission.param.c"] <- inputvector[12] # [12] # 0.5 c("unif", 0, 1)
+  cfg.list["hivtransmission.param.f1"] <- inputvector[13] # [13] # 0.04879016 c("unif", 0, 0.5)
+  cfg.list["hivtransmission.param.f2"] <- inputvector[14] # [14] # -0.1386294 c("unif", -0.5, 0)
+  
+  # Disease progression > may be remove in parameter to estimates
+  
+  cfg.list["person.vsp.toacute.x"] <- inputvector[15] # [15] # 5 c("unif", 3, 7)
+  cfg.list["person.vsp.toaids.x"] <- inputvector[16] # [16] # 7 c("unif", 5, 9)
+  cfg.list["person.vsp.tofinalaids.x"] <- inputvector[17] # [17] # 12 c("unif", 10, 14)
+  
+  
+  #
+  # # Demographic
+  # ##############
+  #
+  
+  cfg.list["conception.alpha_base"] <- inputvector[18] # [18] # -2.7 c("unif", -3.5, -1.7)
+  
+  
+  # # Assumptions to avoid negative branch lengths
+  # ###############################################
+  # # + sampling == start ART
+  # # when someone start ART, he/she is sampled and becomes non-infectious
+  
+  cfg.list["monitoring.fraction.log_viralload"] <- 0
+  
+  
+  #
+  # ## Add-ons
+  #
+  ### BEGIN Add-on
+  cfg.list["formation.hazard.agegapry.baseline"] <- 2
+  cfg.list["mortality.aids.survtime.C"] <- 65
+  cfg.list["mortality.aids.survtime.k"] <- -0.2
+  cfg.list["monitoring.fraction.log_viralload"] <- 0 #0.3
+  cfg.list["dropout.interval.dist.type"] <- "uniform"
+  cfg.list["dropout.interval.dist.uniform.min"] <- 1000
+  cfg.list["dropout.interval.dist.uniform.max"] <- 2000
+  
+  cfg.list["person.survtime.logoffset.dist.type"] <- "normal"
+  cfg.list["person.survtime.logoffset.dist.normal.mu"] <- 0
+  cfg.list["person.survtime.logoffset.dist.normal.sigma"] <- 0.1
+  
+  cfg.list["person.agegap.man.dist.type"] <- "normal" #fixed
+  #cfg.list["person.agegap.man.dist.fixed.value"] <- -6
+  cfg.list["person.agegap.woman.dist.type"] <- "normal" #"fixed"
+  #cfg.list["person.agegap.woman.dist.fixed.value"] <- -6
+  
+  cfg.list["mortality.aids.survtime.C"] <- 65
+  cfg.list["mortality.aids.survtime.k"] <- -0.2
+  cfg.list["monitoring.cd4.threshold"] <- 0 # 0 means nobody qualifies for ART
+  cfg.list["diagnosis.baseline"] <- -2
+  
+  
+  cfg.list["person.eagerness.man.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.woman.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.man.dist.gamma.b"] <- 45 # 45
+  cfg.list["person.eagerness.woman.dist.gamma.b"] <- 45 # 45
+  
+  #### END Add-ons
+  
+  
+  # # ART intervention
+  # ###################
+  #
+  # # ART acceptability paramter and the ART  interventions
+  
+  cfg.list["person.art.accept.threshold.dist.fixed.value"] <- 0.6
+  
+  # Let's introduce ART, and evaluate whether the HIV prevalence drops less  rapidly
+  art.intro <- list()
+  art.intro["time"] <- 20
+  art.intro["diagnosis.baseline"] <- -2 # 0#100
+  art.intro["monitoring.cd4.threshold"] <- 100 # 1200
+  
+  ### add something about diagnosis
+  art.intro["diagnosis.agefactor"] <- 0
+  art.intro["diagnosis.genderfactor"] <- 0
+  art.intro["diagnosis.diagpartnersfactor"] <- 0
+  art.intro["diagnosis.isdiagnosedfactor"] <- 0
+  ### end of add-on about diagnosis
+  #art.intro["monitoring.interval.piecewise.cd4s"] <- "0,1300"
+  # Gradual increase in CD4 threshold. in 2007:200. in 2010:350. in 2013:500
+  art.intro1 <- list()
+  art.intro1["time"] <- 22
+  art.intro1["diagnosis.baseline"] <- -2 # 0#100
+  art.intro1["monitoring.cd4.threshold"] <- 150 # 1200
+  
+  art.intro2 <- list()
+  art.intro2["time"] <- 25 # inputvector[5] ######### 30
+  art.intro2["monitoring.cd4.threshold"] <- 200
+  
+  art.intro3 <- list()
+  art.intro3["time"] <- 30 # inputvector[4] + inputvector[5] + inputvector[6] ########### 33
+  art.intro3["monitoring.cd4.threshold"] <- 350
+  
+  art.intro4 <- list()
+  art.intro4["time"] <- 33 # inputvector[4] + inputvector[5] + inputvector[6] + inputvector[7] ########### 36
+  art.intro4["monitoring.cd4.threshold"] <- 500
+  
+  art.intro5 <- list()
+  art.intro5["time"] <- 36
+  art.intro5["monitoring.cd4.threshold"] <- 700 # This is equivalent to immediate access
+  
+  # tasp.indicator <- inputvector[9] # 1 if the scenario is TasP, 0 if the scenario is current status
+  interventionlist <- list(art.intro, art.intro1, art.intro2, art.intro3, art.intro4, art.intro5)
+  
+  intervention <- interventionlist
+  
+  # Events
+  cfg.list["population.maxevents"] <- as.numeric(cfg.list["population.simtime"][1]) * as.numeric(cfg.list["population.nummen"][1]) * 3
+  
+  # Avoid overlaping in same directory
+  
+  
+  #creating subfolder with unique name for each simulation
+  generate.filename <- function(how.long){
+    
+    rn <- sample(1:100,1)
+    t <- as.numeric(Sys.time())
+    set.seed((t - floor(t)) * 1e8)
+    chars <- c(letters, LETTERS)
+    sub.dir.sim.id <-  paste0(sample(chars,how.long), collapse = "")
+    
+    noise.sample1 <- sample(8:15,1, replace = TRUE)
+    sub.dir.sim.id.ext <- paste0(sample(chars,noise.sample1), collapse = "")
+    noise.sample <- sample(1:1000,1)
+    noise.sample2 <- sample(8:17,1, replace = TRUE)
+    sub.dir.sim.id <- paste0(sub.dir.sim.id.ext,
+                             paste0(sample(chars,noise.sample2), collapse = ""),noise.sample, rn)
+    
+    return(sub.dir.sim.id)
+  }
+  
+  ABC_DestDir.classic.phylo.MAR.c.70 <- paste0(work.dir,"/temp/",generate.filename(10))
+  
+  
+  # Error function when computing summary statistics
+  
+  err.functionGEN <- function(e){
+    return(chunk.summary.stats = rep(NA,64))
+    stop(e)
+  }
+  
+  
+  
+  results <- tryCatch(simpact.run(configParams = cfg.list,
+                                  destDir = ABC_DestDir.classic.phylo.MAR.c.70,
+                                  agedist = age.distr,
+                                  intervention = intervention),
+                      error = simpact.errFunction)
+  
+  
+  if (length(results) == 0){
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+  }else{
+    if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
+      outputvector <- rep(NA, 64)
+    }else{
+      
+      
+      datalist <- readthedata(results)
+      
+      simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
+      
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
+      
+      
+      
+      summary.stat.phylo.MAR.c.70 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                    datalist.agemix = datalist,
+                                                                                    work.dir = work.dir,
+                                                                                    sub.dir.rename = ABC_DestDir.classic.phylo.MAR.c.70,
+                                                                                    dirfasttree = work.dir,
+                                                                                    limitTransmEvents = 7,
+                                                                                    seq.cov = 45,
+                                                                                    seq.gender.ratio = 0.5,
+                                                                                    age.group.15.25 = c(15,25),
+                                                                                    age.group.25.40 = c(25,40),
+                                                                                    age.group.40.50 = c(40,50),
+                                                                                    endpoint = 40,
+                                                                                    timewindow = c(37,40),
+                                                                                    cut.off = 7),
+                                              error=function(e) return(rep(NA, 37)))
+      
+      
+      
+      
+      
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.c.70)
+      
+    }
+    
+  }
+  
+  unlink(paste0(ABC_DestDir.classic.phylo.MAR.c.70), recursive = TRUE)
+  
+  return(outputvector)
+}
+
+
+
+# Coverage of 75%
+simpact4ABC.classic.phylo.MAR.c.75 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
+  
+  
+  
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
+  
+  
+  setwd(paste0(work.dir))
+  
+  
+  
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
+  library(RSimpactCyan)
+  library(RSimpactHelper)
+  library(Rcpp)
+  library(ape)
+  library(expoTree)
+  library(data.table)
+  library(readr)
+  library(phangorn)
+  library(lme4)
+  library(nlme)
+  library(dplyr)
+  library(adephylo)
+  library(treedater)
+  library(geiger)
+  library(picante)
+  library(igraph)
+  library(phyloTop)
+  library(phytools)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
+  
+  
+  
+  ## Run Simpact for specific parameter combination
+  
+  age.distr <- agedistr.creator(shape = 5, scale = 65)
+  #
+  cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
+                                   population.simtime = 50, 
+                                   population.nummen = 4000, 
+                                   population.numwomen = 4000,
+                                   hivseed.time = 10, 
+                                   hivseed.type = "amount",
+                                   hivseed.amount = 40, 
+                                   hivseed.age.min = 20,
+                                   hivseed.age.max = 50,
+                                   formation.hazard.agegapry.meanage = -0.025,
+                                   debut.debutage = 15
+  )
+  
+  # # Assumption of nature of sexual network
+  # #########################################
+  #
+  cfg.list["population.msm"] = "no"
+  
+  
+  # # Sexual behaviour
+  # ###################
+  #
+  seedid <- inputvector[1]
+  
+  cfg.list["dissolution.alpha_0"] <- inputvector[2] # [1] # -0.52 c("unif", -1, 0)
+  cfg.list["dissolution.alpha_4"] <- inputvector [3] # [2] # -0.05 c("unif", -0.5, 0)
+  cfg.list["formation.hazard.agegapry.baseline"] <- inputvector[4] # [3] # 2 c("unif", 1, 3)
+  cfg.list["person.agegap.man.dist.normal.mu"] <- inputvector[5] # [4] # 0 c("unif", -0.5, 0.5)
+  cfg.list["person.agegap.woman.dist.normal.mu"] <- inputvector[5] # [4] # 0
+  cfg.list["person.agegap.man.dist.normal.sigma"] <- inputvector[6] # [5] # 3 c("unif", 2, 4)
+  cfg.list["person.agegap.woman.dist.normal.sigma"] <- inputvector[6] # [5] # 3 
+  cfg.list["formation.hazard.agegapry.gap_agescale_man"] <- inputvector[7] # [6] # 0.25 c("unif", 0, 1)
+  cfg.list["formation.hazard.agegapry.gap_agescale_woman"] <- inputvector[7] # [6] # 0.25
+  cfg.list["formation.hazard.agegapry.numrel_man"] <- inputvector[8] # [7] # -0.3 c("unif", -1, 0)
+  cfg.list["formation.hazard.agegapry.numrel_woman"] <- inputvector[8] # [7] # -0.3
+  cfg.list["formation.hazard.agegapry.numrel_diff"] <- inputvector[9] # [8] # -0.1 c("unif", -0.9, 0)
+  
+  
+  # # HIV transmission
+  # ###################
+  #
+  
+  cfg.list["hivtransmission.param.a"] <- inputvector[10] # [10] # -1 c("unif", -2, 0)
+  cfg.list["hivtransmission.param.b"] <- inputvector[11] # [11] # -90 c("unif", -100, -80)
+  cfg.list["hivtransmission.param.c"] <- inputvector[12] # [12] # 0.5 c("unif", 0, 1)
+  cfg.list["hivtransmission.param.f1"] <- inputvector[13] # [13] # 0.04879016 c("unif", 0, 0.5)
+  cfg.list["hivtransmission.param.f2"] <- inputvector[14] # [14] # -0.1386294 c("unif", -0.5, 0)
+  
+  # Disease progression > may be remove in parameter to estimates
+  
+  cfg.list["person.vsp.toacute.x"] <- inputvector[15] # [15] # 5 c("unif", 3, 7)
+  cfg.list["person.vsp.toaids.x"] <- inputvector[16] # [16] # 7 c("unif", 5, 9)
+  cfg.list["person.vsp.tofinalaids.x"] <- inputvector[17] # [17] # 12 c("unif", 10, 14)
+  
+  
+  #
+  # # Demographic
+  # ##############
+  #
+  
+  cfg.list["conception.alpha_base"] <- inputvector[18] # [18] # -2.7 c("unif", -3.5, -1.7)
+  
+  
+  # # Assumptions to avoid negative branch lengths
+  # ###############################################
+  # # + sampling == start ART
+  # # when someone start ART, he/she is sampled and becomes non-infectious
+  
+  cfg.list["monitoring.fraction.log_viralload"] <- 0
+  
+  
+  #
+  # ## Add-ons
+  #
+  ### BEGIN Add-on
+  cfg.list["formation.hazard.agegapry.baseline"] <- 2
+  cfg.list["mortality.aids.survtime.C"] <- 65
+  cfg.list["mortality.aids.survtime.k"] <- -0.2
+  cfg.list["monitoring.fraction.log_viralload"] <- 0 #0.3
+  cfg.list["dropout.interval.dist.type"] <- "uniform"
+  cfg.list["dropout.interval.dist.uniform.min"] <- 1000
+  cfg.list["dropout.interval.dist.uniform.max"] <- 2000
+  
+  cfg.list["person.survtime.logoffset.dist.type"] <- "normal"
+  cfg.list["person.survtime.logoffset.dist.normal.mu"] <- 0
+  cfg.list["person.survtime.logoffset.dist.normal.sigma"] <- 0.1
+  
+  cfg.list["person.agegap.man.dist.type"] <- "normal" #fixed
+  #cfg.list["person.agegap.man.dist.fixed.value"] <- -6
+  cfg.list["person.agegap.woman.dist.type"] <- "normal" #"fixed"
+  #cfg.list["person.agegap.woman.dist.fixed.value"] <- -6
+  
+  cfg.list["mortality.aids.survtime.C"] <- 65
+  cfg.list["mortality.aids.survtime.k"] <- -0.2
+  cfg.list["monitoring.cd4.threshold"] <- 0 # 0 means nobody qualifies for ART
+  cfg.list["diagnosis.baseline"] <- -2
+  
+  
+  cfg.list["person.eagerness.man.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.woman.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.man.dist.gamma.b"] <- 45 # 45
+  cfg.list["person.eagerness.woman.dist.gamma.b"] <- 45 # 45
+  
+  #### END Add-ons
+  
+  
+  # # ART intervention
+  # ###################
+  #
+  # # ART acceptability paramter and the ART  interventions
+  
+  cfg.list["person.art.accept.threshold.dist.fixed.value"] <- 0.6
+  
+  # Let's introduce ART, and evaluate whether the HIV prevalence drops less  rapidly
+  art.intro <- list()
+  art.intro["time"] <- 20
+  art.intro["diagnosis.baseline"] <- -2 # 0#100
+  art.intro["monitoring.cd4.threshold"] <- 100 # 1200
+  
+  ### add something about diagnosis
+  art.intro["diagnosis.agefactor"] <- 0
+  art.intro["diagnosis.genderfactor"] <- 0
+  art.intro["diagnosis.diagpartnersfactor"] <- 0
+  art.intro["diagnosis.isdiagnosedfactor"] <- 0
+  ### end of add-on about diagnosis
+  #art.intro["monitoring.interval.piecewise.cd4s"] <- "0,1300"
+  # Gradual increase in CD4 threshold. in 2007:200. in 2010:350. in 2013:500
+  art.intro1 <- list()
+  art.intro1["time"] <- 22
+  art.intro1["diagnosis.baseline"] <- -2 # 0#100
+  art.intro1["monitoring.cd4.threshold"] <- 150 # 1200
+  
+  art.intro2 <- list()
+  art.intro2["time"] <- 25 # inputvector[5] ######### 30
+  art.intro2["monitoring.cd4.threshold"] <- 200
+  
+  art.intro3 <- list()
+  art.intro3["time"] <- 30 # inputvector[4] + inputvector[5] + inputvector[6] ########### 33
+  art.intro3["monitoring.cd4.threshold"] <- 350
+  
+  art.intro4 <- list()
+  art.intro4["time"] <- 33 # inputvector[4] + inputvector[5] + inputvector[6] + inputvector[7] ########### 36
+  art.intro4["monitoring.cd4.threshold"] <- 500
+  
+  art.intro5 <- list()
+  art.intro5["time"] <- 36
+  art.intro5["monitoring.cd4.threshold"] <- 700 # This is equivalent to immediate access
+  
+  # tasp.indicator <- inputvector[9] # 1 if the scenario is TasP, 0 if the scenario is current status
+  interventionlist <- list(art.intro, art.intro1, art.intro2, art.intro3, art.intro4, art.intro5)
+  
+  intervention <- interventionlist
+  
+  # Events
+  cfg.list["population.maxevents"] <- as.numeric(cfg.list["population.simtime"][1]) * as.numeric(cfg.list["population.nummen"][1]) * 3
+  
+  # Avoid overlaping in same directory
+  
+  
+  #creating subfolder with unique name for each simulation
+  generate.filename <- function(how.long){
+    
+    rn <- sample(1:100,1)
+    t <- as.numeric(Sys.time())
+    set.seed((t - floor(t)) * 1e8)
+    chars <- c(letters, LETTERS)
+    sub.dir.sim.id <-  paste0(sample(chars,how.long), collapse = "")
+    
+    noise.sample1 <- sample(8:15,1, replace = TRUE)
+    sub.dir.sim.id.ext <- paste0(sample(chars,noise.sample1), collapse = "")
+    noise.sample <- sample(1:1000,1)
+    noise.sample2 <- sample(8:17,1, replace = TRUE)
+    sub.dir.sim.id <- paste0(sub.dir.sim.id.ext,
+                             paste0(sample(chars,noise.sample2), collapse = ""),noise.sample, rn)
+    
+    return(sub.dir.sim.id)
+  }
+  
+  ABC_DestDir.classic.phylo.MAR.c.75 <- paste0(work.dir,"/temp/",generate.filename(10))
+  
+  
+  # Error function when computing summary statistics
+  
+  err.functionGEN <- function(e){
+    return(chunk.summary.stats = rep(NA,64))
+    stop(e)
+  }
+  
+  
+  
+  results <- tryCatch(simpact.run(configParams = cfg.list,
+                                  destDir = ABC_DestDir.classic.phylo.MAR.c.75,
+                                  agedist = age.distr,
+                                  intervention = intervention),
+                      error = simpact.errFunction)
+  
+  
+  if (length(results) == 0){
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+  }else{
+    if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
+      outputvector <- rep(NA, 64)
+    }else{
+      
+      
+      datalist <- readthedata(results)
+      
+      simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
+      
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
+      
+      
+      
+      summary.stat.phylo.MAR.c.75 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                    datalist.agemix = datalist,
+                                                                                    work.dir = work.dir,
+                                                                                    sub.dir.rename = ABC_DestDir.classic.phylo.MAR.c.75,
+                                                                                    dirfasttree = work.dir,
+                                                                                    limitTransmEvents = 7,
+                                                                                    seq.cov = 45,
+                                                                                    seq.gender.ratio = 0.5,
+                                                                                    age.group.15.25 = c(15,25),
+                                                                                    age.group.25.40 = c(25,40),
+                                                                                    age.group.40.50 = c(40,50),
+                                                                                    endpoint = 40,
+                                                                                    timewindow = c(37,40),
+                                                                                    cut.off = 7),
+                                              error=function(e) return(rep(NA, 37)))
+      
+      
+      
+      
+      
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.c.75)
+      
+    }
+    
+  }
+  
+  unlink(paste0(ABC_DestDir.classic.phylo.MAR.c.75), recursive = TRUE)
+  
+  return(outputvector)
+}
+
+
+
+
+# Coverage of 80 %
+simpact4ABC.classic.phylo.MAR.c.80 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
+  
+  
+  
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
+  
+  
+  setwd(paste0(work.dir))
+  
+  
+  
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
+  library(RSimpactCyan)
+  library(RSimpactHelper)
+  library(Rcpp)
+  library(ape)
+  library(expoTree)
+  library(data.table)
+  library(readr)
+  library(phangorn)
+  library(lme4)
+  library(nlme)
+  library(dplyr)
+  library(adephylo)
+  library(treedater)
+  library(geiger)
+  library(picante)
+  library(igraph)
+  library(phyloTop)
+  library(phytools)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
+  
+  
+  
+  ## Run Simpact for specific parameter combination
+  
+  age.distr <- agedistr.creator(shape = 5, scale = 65)
+  #
+  cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
+                                   population.simtime = 50, 
+                                   population.nummen = 4000, 
+                                   population.numwomen = 4000,
+                                   hivseed.time = 10, 
+                                   hivseed.type = "amount",
+                                   hivseed.amount = 40, 
+                                   hivseed.age.min = 20,
+                                   hivseed.age.max = 50,
+                                   formation.hazard.agegapry.meanage = -0.025,
+                                   debut.debutage = 15
+  )
+  
+  # # Assumption of nature of sexual network
+  # #########################################
+  #
+  cfg.list["population.msm"] = "no"
+  
+  
+  # # Sexual behaviour
+  # ###################
+  #
+  seedid <- inputvector[1]
+  
+  cfg.list["dissolution.alpha_0"] <- inputvector[2] # [1] # -0.52 c("unif", -1, 0)
+  cfg.list["dissolution.alpha_4"] <- inputvector [3] # [2] # -0.05 c("unif", -0.5, 0)
+  cfg.list["formation.hazard.agegapry.baseline"] <- inputvector[4] # [3] # 2 c("unif", 1, 3)
+  cfg.list["person.agegap.man.dist.normal.mu"] <- inputvector[5] # [4] # 0 c("unif", -0.5, 0.5)
+  cfg.list["person.agegap.woman.dist.normal.mu"] <- inputvector[5] # [4] # 0
+  cfg.list["person.agegap.man.dist.normal.sigma"] <- inputvector[6] # [5] # 3 c("unif", 2, 4)
+  cfg.list["person.agegap.woman.dist.normal.sigma"] <- inputvector[6] # [5] # 3 
+  cfg.list["formation.hazard.agegapry.gap_agescale_man"] <- inputvector[7] # [6] # 0.25 c("unif", 0, 1)
+  cfg.list["formation.hazard.agegapry.gap_agescale_woman"] <- inputvector[7] # [6] # 0.25
+  cfg.list["formation.hazard.agegapry.numrel_man"] <- inputvector[8] # [7] # -0.3 c("unif", -1, 0)
+  cfg.list["formation.hazard.agegapry.numrel_woman"] <- inputvector[8] # [7] # -0.3
+  cfg.list["formation.hazard.agegapry.numrel_diff"] <- inputvector[9] # [8] # -0.1 c("unif", -0.9, 0)
+  
+  
+  # # HIV transmission
+  # ###################
+  #
+  
+  cfg.list["hivtransmission.param.a"] <- inputvector[10] # [10] # -1 c("unif", -2, 0)
+  cfg.list["hivtransmission.param.b"] <- inputvector[11] # [11] # -90 c("unif", -100, -80)
+  cfg.list["hivtransmission.param.c"] <- inputvector[12] # [12] # 0.5 c("unif", 0, 1)
+  cfg.list["hivtransmission.param.f1"] <- inputvector[13] # [13] # 0.04879016 c("unif", 0, 0.5)
+  cfg.list["hivtransmission.param.f2"] <- inputvector[14] # [14] # -0.1386294 c("unif", -0.5, 0)
+  
+  # Disease progression > may be remove in parameter to estimates
+  
+  cfg.list["person.vsp.toacute.x"] <- inputvector[15] # [15] # 5 c("unif", 3, 7)
+  cfg.list["person.vsp.toaids.x"] <- inputvector[16] # [16] # 7 c("unif", 5, 9)
+  cfg.list["person.vsp.tofinalaids.x"] <- inputvector[17] # [17] # 12 c("unif", 10, 14)
+  
+  
+  #
+  # # Demographic
+  # ##############
+  #
+  
+  cfg.list["conception.alpha_base"] <- inputvector[18] # [18] # -2.7 c("unif", -3.5, -1.7)
+  
+  
+  # # Assumptions to avoid negative branch lengths
+  # ###############################################
+  # # + sampling == start ART
+  # # when someone start ART, he/she is sampled and becomes non-infectious
+  
+  cfg.list["monitoring.fraction.log_viralload"] <- 0
+  
+  
+  #
+  # ## Add-ons
+  #
+  ### BEGIN Add-on
+  cfg.list["formation.hazard.agegapry.baseline"] <- 2
+  cfg.list["mortality.aids.survtime.C"] <- 65
+  cfg.list["mortality.aids.survtime.k"] <- -0.2
+  cfg.list["monitoring.fraction.log_viralload"] <- 0 #0.3
+  cfg.list["dropout.interval.dist.type"] <- "uniform"
+  cfg.list["dropout.interval.dist.uniform.min"] <- 1000
+  cfg.list["dropout.interval.dist.uniform.max"] <- 2000
+  
+  cfg.list["person.survtime.logoffset.dist.type"] <- "normal"
+  cfg.list["person.survtime.logoffset.dist.normal.mu"] <- 0
+  cfg.list["person.survtime.logoffset.dist.normal.sigma"] <- 0.1
+  
+  cfg.list["person.agegap.man.dist.type"] <- "normal" #fixed
+  #cfg.list["person.agegap.man.dist.fixed.value"] <- -6
+  cfg.list["person.agegap.woman.dist.type"] <- "normal" #"fixed"
+  #cfg.list["person.agegap.woman.dist.fixed.value"] <- -6
+  
+  cfg.list["mortality.aids.survtime.C"] <- 65
+  cfg.list["mortality.aids.survtime.k"] <- -0.2
+  cfg.list["monitoring.cd4.threshold"] <- 0 # 0 means nobody qualifies for ART
+  cfg.list["diagnosis.baseline"] <- -2
+  
+  
+  cfg.list["person.eagerness.man.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.woman.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.man.dist.gamma.b"] <- 45 # 45
+  cfg.list["person.eagerness.woman.dist.gamma.b"] <- 45 # 45
+  
+  #### END Add-ons
+  
+  
+  # # ART intervention
+  # ###################
+  #
+  # # ART acceptability paramter and the ART  interventions
+  
+  cfg.list["person.art.accept.threshold.dist.fixed.value"] <- 0.6
+  
+  # Let's introduce ART, and evaluate whether the HIV prevalence drops less  rapidly
+  art.intro <- list()
+  art.intro["time"] <- 20
+  art.intro["diagnosis.baseline"] <- -2 # 0#100
+  art.intro["monitoring.cd4.threshold"] <- 100 # 1200
+  
+  ### add something about diagnosis
+  art.intro["diagnosis.agefactor"] <- 0
+  art.intro["diagnosis.genderfactor"] <- 0
+  art.intro["diagnosis.diagpartnersfactor"] <- 0
+  art.intro["diagnosis.isdiagnosedfactor"] <- 0
+  ### end of add-on about diagnosis
+  #art.intro["monitoring.interval.piecewise.cd4s"] <- "0,1300"
+  # Gradual increase in CD4 threshold. in 2007:200. in 2010:350. in 2013:500
+  art.intro1 <- list()
+  art.intro1["time"] <- 22
+  art.intro1["diagnosis.baseline"] <- -2 # 0#100
+  art.intro1["monitoring.cd4.threshold"] <- 150 # 1200
+  
+  art.intro2 <- list()
+  art.intro2["time"] <- 25 # inputvector[5] ######### 30
+  art.intro2["monitoring.cd4.threshold"] <- 200
+  
+  art.intro3 <- list()
+  art.intro3["time"] <- 30 # inputvector[4] + inputvector[5] + inputvector[6] ########### 33
+  art.intro3["monitoring.cd4.threshold"] <- 350
+  
+  art.intro4 <- list()
+  art.intro4["time"] <- 33 # inputvector[4] + inputvector[5] + inputvector[6] + inputvector[7] ########### 36
+  art.intro4["monitoring.cd4.threshold"] <- 500
+  
+  art.intro5 <- list()
+  art.intro5["time"] <- 36
+  art.intro5["monitoring.cd4.threshold"] <- 700 # This is equivalent to immediate access
+  
+  # tasp.indicator <- inputvector[9] # 1 if the scenario is TasP, 0 if the scenario is current status
+  interventionlist <- list(art.intro, art.intro1, art.intro2, art.intro3, art.intro4, art.intro5)
+  
+  intervention <- interventionlist
+  
+  # Events
+  cfg.list["population.maxevents"] <- as.numeric(cfg.list["population.simtime"][1]) * as.numeric(cfg.list["population.nummen"][1]) * 3
+  
+  # Avoid overlaping in same directory
+  
+  
+  #creating subfolder with unique name for each simulation
+  generate.filename <- function(how.long){
+    
+    rn <- sample(1:100,1)
+    t <- as.numeric(Sys.time())
+    set.seed((t - floor(t)) * 1e8)
+    chars <- c(letters, LETTERS)
+    sub.dir.sim.id <-  paste0(sample(chars,how.long), collapse = "")
+    
+    noise.sample1 <- sample(8:15,1, replace = TRUE)
+    sub.dir.sim.id.ext <- paste0(sample(chars,noise.sample1), collapse = "")
+    noise.sample <- sample(1:1000,1)
+    noise.sample2 <- sample(8:17,1, replace = TRUE)
+    sub.dir.sim.id <- paste0(sub.dir.sim.id.ext,
+                             paste0(sample(chars,noise.sample2), collapse = ""),noise.sample, rn)
+    
+    return(sub.dir.sim.id)
+  }
+  
+  ABC_DestDir.classic.phylo.MAR.c.80 <- paste0(work.dir,"/temp/",generate.filename(10))
+  
+  
+  # Error function when computing summary statistics
+  
+  err.functionGEN <- function(e){
+    return(chunk.summary.stats = rep(NA,64))
+    stop(e)
+  }
+  
+  
+  
+  results <- tryCatch(simpact.run(configParams = cfg.list,
+                                  destDir = ABC_DestDir.classic.phylo.MAR.c.80,
+                                  agedist = age.distr,
+                                  intervention = intervention),
+                      error = simpact.errFunction)
+  
+  
+  if (length(results) == 0){
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+  }else{
+    if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
+      outputvector <- rep(NA, 64)
+    }else{
+      
+      
+      datalist <- readthedata(results)
+      
+      simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
+      
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
+      
+      
+      
+      summary.stat.phylo.MAR.c.80 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                    datalist.agemix = datalist,
+                                                                                    work.dir = work.dir,
+                                                                                    sub.dir.rename = ABC_DestDir.classic.phylo.MAR.c.80,
+                                                                                    dirfasttree = work.dir,
+                                                                                    limitTransmEvents = 7,
+                                                                                    seq.cov = 45,
+                                                                                    seq.gender.ratio = 0.5,
+                                                                                    age.group.15.25 = c(15,25),
+                                                                                    age.group.25.40 = c(25,40),
+                                                                                    age.group.40.50 = c(40,50),
+                                                                                    endpoint = 40,
+                                                                                    timewindow = c(37,40),
+                                                                                    cut.off = 7),
+                                              error=function(e) return(rep(NA, 37)))
+      
+      
+      
+      
+      
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.c.80)
+      
+    }
+    
+  }
+  
+  unlink(paste0(ABC_DestDir.classic.phylo.MAR.c.80), recursive = TRUE)
+  
+  return(outputvector)
+}
+
+
+
+
+# Coverage of 85 %
+simpact4ABC.classic.phylo.MAR.c.85 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
+  
+  
+  
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
+  
+  
+  setwd(paste0(work.dir))
+  
+  
+  
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
+  library(RSimpactCyan)
+  library(RSimpactHelper)
+  library(Rcpp)
+  library(ape)
+  library(expoTree)
+  library(data.table)
+  library(readr)
+  library(phangorn)
+  library(lme4)
+  library(nlme)
+  library(dplyr)
+  library(adephylo)
+  library(treedater)
+  library(geiger)
+  library(picante)
+  library(igraph)
+  library(phyloTop)
+  library(phytools)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
+  
+  
+  
+  ## Run Simpact for specific parameter combination
+  
+  age.distr <- agedistr.creator(shape = 5, scale = 65)
+  #
+  cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
+                                   population.simtime = 50, 
+                                   population.nummen = 4000, 
+                                   population.numwomen = 4000,
+                                   hivseed.time = 10, 
+                                   hivseed.type = "amount",
+                                   hivseed.amount = 40, 
+                                   hivseed.age.min = 20,
+                                   hivseed.age.max = 50,
+                                   formation.hazard.agegapry.meanage = -0.025,
+                                   debut.debutage = 15
+  )
+  
+  # # Assumption of nature of sexual network
+  # #########################################
+  #
+  cfg.list["population.msm"] = "no"
+  
+  
+  # # Sexual behaviour
+  # ###################
+  #
+  seedid <- inputvector[1]
+  
+  cfg.list["dissolution.alpha_0"] <- inputvector[2] # [1] # -0.52 c("unif", -1, 0)
+  cfg.list["dissolution.alpha_4"] <- inputvector [3] # [2] # -0.05 c("unif", -0.5, 0)
+  cfg.list["formation.hazard.agegapry.baseline"] <- inputvector[4] # [3] # 2 c("unif", 1, 3)
+  cfg.list["person.agegap.man.dist.normal.mu"] <- inputvector[5] # [4] # 0 c("unif", -0.5, 0.5)
+  cfg.list["person.agegap.woman.dist.normal.mu"] <- inputvector[5] # [4] # 0
+  cfg.list["person.agegap.man.dist.normal.sigma"] <- inputvector[6] # [5] # 3 c("unif", 2, 4)
+  cfg.list["person.agegap.woman.dist.normal.sigma"] <- inputvector[6] # [5] # 3 
+  cfg.list["formation.hazard.agegapry.gap_agescale_man"] <- inputvector[7] # [6] # 0.25 c("unif", 0, 1)
+  cfg.list["formation.hazard.agegapry.gap_agescale_woman"] <- inputvector[7] # [6] # 0.25
+  cfg.list["formation.hazard.agegapry.numrel_man"] <- inputvector[8] # [7] # -0.3 c("unif", -1, 0)
+  cfg.list["formation.hazard.agegapry.numrel_woman"] <- inputvector[8] # [7] # -0.3
+  cfg.list["formation.hazard.agegapry.numrel_diff"] <- inputvector[9] # [8] # -0.1 c("unif", -0.9, 0)
+  
+  
+  # # HIV transmission
+  # ###################
+  #
+  
+  cfg.list["hivtransmission.param.a"] <- inputvector[10] # [10] # -1 c("unif", -2, 0)
+  cfg.list["hivtransmission.param.b"] <- inputvector[11] # [11] # -90 c("unif", -100, -80)
+  cfg.list["hivtransmission.param.c"] <- inputvector[12] # [12] # 0.5 c("unif", 0, 1)
+  cfg.list["hivtransmission.param.f1"] <- inputvector[13] # [13] # 0.04879016 c("unif", 0, 0.5)
+  cfg.list["hivtransmission.param.f2"] <- inputvector[14] # [14] # -0.1386294 c("unif", -0.5, 0)
+  
+  # Disease progression > may be remove in parameter to estimates
+  
+  cfg.list["person.vsp.toacute.x"] <- inputvector[15] # [15] # 5 c("unif", 3, 7)
+  cfg.list["person.vsp.toaids.x"] <- inputvector[16] # [16] # 7 c("unif", 5, 9)
+  cfg.list["person.vsp.tofinalaids.x"] <- inputvector[17] # [17] # 12 c("unif", 10, 14)
+  
+  
+  #
+  # # Demographic
+  # ##############
+  #
+  
+  cfg.list["conception.alpha_base"] <- inputvector[18] # [18] # -2.7 c("unif", -3.5, -1.7)
+  
+  
+  # # Assumptions to avoid negative branch lengths
+  # ###############################################
+  # # + sampling == start ART
+  # # when someone start ART, he/she is sampled and becomes non-infectious
+  
+  cfg.list["monitoring.fraction.log_viralload"] <- 0
+  
+  
+  #
+  # ## Add-ons
+  #
+  ### BEGIN Add-on
+  cfg.list["formation.hazard.agegapry.baseline"] <- 2
+  cfg.list["mortality.aids.survtime.C"] <- 65
+  cfg.list["mortality.aids.survtime.k"] <- -0.2
+  cfg.list["monitoring.fraction.log_viralload"] <- 0 #0.3
+  cfg.list["dropout.interval.dist.type"] <- "uniform"
+  cfg.list["dropout.interval.dist.uniform.min"] <- 1000
+  cfg.list["dropout.interval.dist.uniform.max"] <- 2000
+  
+  cfg.list["person.survtime.logoffset.dist.type"] <- "normal"
+  cfg.list["person.survtime.logoffset.dist.normal.mu"] <- 0
+  cfg.list["person.survtime.logoffset.dist.normal.sigma"] <- 0.1
+  
+  cfg.list["person.agegap.man.dist.type"] <- "normal" #fixed
+  #cfg.list["person.agegap.man.dist.fixed.value"] <- -6
+  cfg.list["person.agegap.woman.dist.type"] <- "normal" #"fixed"
+  #cfg.list["person.agegap.woman.dist.fixed.value"] <- -6
+  
+  cfg.list["mortality.aids.survtime.C"] <- 65
+  cfg.list["mortality.aids.survtime.k"] <- -0.2
+  cfg.list["monitoring.cd4.threshold"] <- 0 # 0 means nobody qualifies for ART
+  cfg.list["diagnosis.baseline"] <- -2
+  
+  
+  cfg.list["person.eagerness.man.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.woman.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.man.dist.gamma.b"] <- 45 # 45
+  cfg.list["person.eagerness.woman.dist.gamma.b"] <- 45 # 45
+  
+  #### END Add-ons
+  
+  
+  # # ART intervention
+  # ###################
+  #
+  # # ART acceptability paramter and the ART  interventions
+  
+  cfg.list["person.art.accept.threshold.dist.fixed.value"] <- 0.6
+  
+  # Let's introduce ART, and evaluate whether the HIV prevalence drops less  rapidly
+  art.intro <- list()
+  art.intro["time"] <- 20
+  art.intro["diagnosis.baseline"] <- -2 # 0#100
+  art.intro["monitoring.cd4.threshold"] <- 100 # 1200
+  
+  ### add something about diagnosis
+  art.intro["diagnosis.agefactor"] <- 0
+  art.intro["diagnosis.genderfactor"] <- 0
+  art.intro["diagnosis.diagpartnersfactor"] <- 0
+  art.intro["diagnosis.isdiagnosedfactor"] <- 0
+  ### end of add-on about diagnosis
+  #art.intro["monitoring.interval.piecewise.cd4s"] <- "0,1300"
+  # Gradual increase in CD4 threshold. in 2007:200. in 2010:350. in 2013:500
+  art.intro1 <- list()
+  art.intro1["time"] <- 22
+  art.intro1["diagnosis.baseline"] <- -2 # 0#100
+  art.intro1["monitoring.cd4.threshold"] <- 150 # 1200
+  
+  art.intro2 <- list()
+  art.intro2["time"] <- 25 # inputvector[5] ######### 30
+  art.intro2["monitoring.cd4.threshold"] <- 200
+  
+  art.intro3 <- list()
+  art.intro3["time"] <- 30 # inputvector[4] + inputvector[5] + inputvector[6] ########### 33
+  art.intro3["monitoring.cd4.threshold"] <- 350
+  
+  art.intro4 <- list()
+  art.intro4["time"] <- 33 # inputvector[4] + inputvector[5] + inputvector[6] + inputvector[7] ########### 36
+  art.intro4["monitoring.cd4.threshold"] <- 500
+  
+  art.intro5 <- list()
+  art.intro5["time"] <- 36
+  art.intro5["monitoring.cd4.threshold"] <- 700 # This is equivalent to immediate access
+  
+  # tasp.indicator <- inputvector[9] # 1 if the scenario is TasP, 0 if the scenario is current status
+  interventionlist <- list(art.intro, art.intro1, art.intro2, art.intro3, art.intro4, art.intro5)
+  
+  intervention <- interventionlist
+  
+  # Events
+  cfg.list["population.maxevents"] <- as.numeric(cfg.list["population.simtime"][1]) * as.numeric(cfg.list["population.nummen"][1]) * 3
+  
+  # Avoid overlaping in same directory
+  
+  
+  #creating subfolder with unique name for each simulation
+  generate.filename <- function(how.long){
+    
+    rn <- sample(1:100,1)
+    t <- as.numeric(Sys.time())
+    set.seed((t - floor(t)) * 1e8)
+    chars <- c(letters, LETTERS)
+    sub.dir.sim.id <-  paste0(sample(chars,how.long), collapse = "")
+    
+    noise.sample1 <- sample(8:15,1, replace = TRUE)
+    sub.dir.sim.id.ext <- paste0(sample(chars,noise.sample1), collapse = "")
+    noise.sample <- sample(1:1000,1)
+    noise.sample2 <- sample(8:17,1, replace = TRUE)
+    sub.dir.sim.id <- paste0(sub.dir.sim.id.ext,
+                             paste0(sample(chars,noise.sample2), collapse = ""),noise.sample, rn)
+    
+    return(sub.dir.sim.id)
+  }
+  
+  ABC_DestDir.classic.phylo.MAR.c.85 <- paste0(work.dir,"/temp/",generate.filename(10))
+  
+  
+  # Error function when computing summary statistics
+  
+  err.functionGEN <- function(e){
+    return(chunk.summary.stats = rep(NA,64))
+    stop(e)
+  }
+  
+  
+  
+  results <- tryCatch(simpact.run(configParams = cfg.list,
+                                  destDir = ABC_DestDir.classic.phylo.MAR.c.85,
+                                  agedist = age.distr,
+                                  intervention = intervention),
+                      error = simpact.errFunction)
+  
+  
+  if (length(results) == 0){
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+  }else{
+    if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
+      outputvector <- rep(NA, 64)
+    }else{
+      
+      
+      datalist <- readthedata(results)
+      
+      simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
+      
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
+      
+      
+      
+      summary.stat.phylo.MAR.c.85 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                    datalist.agemix = datalist,
+                                                                                    work.dir = work.dir,
+                                                                                    sub.dir.rename = ABC_DestDir.classic.phylo.MAR.c.85,
+                                                                                    dirfasttree = work.dir,
+                                                                                    limitTransmEvents = 7,
+                                                                                    seq.cov = 45,
+                                                                                    seq.gender.ratio = 0.5,
+                                                                                    age.group.15.25 = c(15,25),
+                                                                                    age.group.25.40 = c(25,40),
+                                                                                    age.group.40.50 = c(40,50),
+                                                                                    endpoint = 40,
+                                                                                    timewindow = c(37,40),
+                                                                                    cut.off = 7),
+                                              error=function(e) return(rep(NA, 37)))
+      
+      
+      
+      
+      
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.c.85)
+      
+    }
+    
+  }
+  
+  unlink(paste0(ABC_DestDir.classic.phylo.MAR.c.85), recursive = TRUE)
+  
+  return(outputvector)
+}
+
+
+
+
+# Coverage of 90 %
+simpact4ABC.classic.phylo.MAR.c.90 <- function(inputvector = inputvector){
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/age_mix_final/advanced.transmission.network.builder.R")
+  
+  # source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/ALL.funs.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
+  
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/complete.master.epic.metrics.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.classic.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/mixed.effect.fit.transmission.clusters.R")
+  # 
+  source("~/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/stats.age.groups.trans.clust.network.fun.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MCAR.R")
+  
+  source("/home/niyukuri/phylosimpact_simulation_studies_2018/stress_testing/stress_testing_final/compute.summary.statistics.phylo.MAR.R")
+  
+  
+  
+  work.dir <-  "/home/niyukuri/Desktop/mastermodeltest"  # on laptop
+  
+  # work.dir <- "/home/dniyukuri/lustre/stress_testing_master_model" # on CHPC
+  
+  # destDir <- "/home/david/Desktop/mastermodeltest/temp" # on laptop
+  
+  
+  setwd(paste0(work.dir))
+  
+  
+  
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/advanced.transmission.network.builder.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/needed.functions.RSimpactHelp.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/complete.master.epic.metrics.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.classic.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MCAR.R")
+  # 
+  # source("/home/dniyukuri/lustre/stress_testing_master_model/compute.summary.statistics.phylo.MAR.R")
+  
+  
+  library(RSimpactCyan)
+  library(RSimpactHelper)
+  library(Rcpp)
+  library(ape)
+  library(expoTree)
+  library(data.table)
+  library(readr)
+  library(phangorn)
+  library(lme4)
+  library(nlme)
+  library(dplyr)
+  library(adephylo)
+  library(treedater)
+  library(geiger)
+  library(picante)
+  library(igraph)
+  library(phyloTop)
+  library(phytools)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  
+  library(lubridate)
+  
+  library(tidyr)
+  
+  
+  
+  ###########################################
+  # Step 1: Setup and running simpact      #
+  ###########################################
+  
+  
+  
+  
+  
+  
+  ## Run Simpact for specific parameter combination
+  
+  age.distr <- agedistr.creator(shape = 5, scale = 65)
+  #
+  cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
+                                   population.simtime = 50, 
+                                   population.nummen = 4000, 
+                                   population.numwomen = 4000,
+                                   hivseed.time = 10, 
+                                   hivseed.type = "amount",
+                                   hivseed.amount = 40, 
+                                   hivseed.age.min = 20,
+                                   hivseed.age.max = 50,
+                                   formation.hazard.agegapry.meanage = -0.025,
+                                   debut.debutage = 15
+  )
+  
+  # # Assumption of nature of sexual network
+  # #########################################
+  #
+  cfg.list["population.msm"] = "no"
+  
+  
+  # # Sexual behaviour
+  # ###################
+  #
+  seedid <- inputvector[1]
+  
+  cfg.list["dissolution.alpha_0"] <- inputvector[2] # [1] # -0.52 c("unif", -1, 0)
+  cfg.list["dissolution.alpha_4"] <- inputvector [3] # [2] # -0.05 c("unif", -0.5, 0)
+  cfg.list["formation.hazard.agegapry.baseline"] <- inputvector[4] # [3] # 2 c("unif", 1, 3)
+  cfg.list["person.agegap.man.dist.normal.mu"] <- inputvector[5] # [4] # 0 c("unif", -0.5, 0.5)
+  cfg.list["person.agegap.woman.dist.normal.mu"] <- inputvector[5] # [4] # 0
+  cfg.list["person.agegap.man.dist.normal.sigma"] <- inputvector[6] # [5] # 3 c("unif", 2, 4)
+  cfg.list["person.agegap.woman.dist.normal.sigma"] <- inputvector[6] # [5] # 3 
+  cfg.list["formation.hazard.agegapry.gap_agescale_man"] <- inputvector[7] # [6] # 0.25 c("unif", 0, 1)
+  cfg.list["formation.hazard.agegapry.gap_agescale_woman"] <- inputvector[7] # [6] # 0.25
+  cfg.list["formation.hazard.agegapry.numrel_man"] <- inputvector[8] # [7] # -0.3 c("unif", -1, 0)
+  cfg.list["formation.hazard.agegapry.numrel_woman"] <- inputvector[8] # [7] # -0.3
+  cfg.list["formation.hazard.agegapry.numrel_diff"] <- inputvector[9] # [8] # -0.1 c("unif", -0.9, 0)
+  
+  
+  # # HIV transmission
+  # ###################
+  #
+  
+  cfg.list["hivtransmission.param.a"] <- inputvector[10] # [10] # -1 c("unif", -2, 0)
+  cfg.list["hivtransmission.param.b"] <- inputvector[11] # [11] # -90 c("unif", -100, -80)
+  cfg.list["hivtransmission.param.c"] <- inputvector[12] # [12] # 0.5 c("unif", 0, 1)
+  cfg.list["hivtransmission.param.f1"] <- inputvector[13] # [13] # 0.04879016 c("unif", 0, 0.5)
+  cfg.list["hivtransmission.param.f2"] <- inputvector[14] # [14] # -0.1386294 c("unif", -0.5, 0)
+  
+  # Disease progression > may be remove in parameter to estimates
+  
+  cfg.list["person.vsp.toacute.x"] <- inputvector[15] # [15] # 5 c("unif", 3, 7)
+  cfg.list["person.vsp.toaids.x"] <- inputvector[16] # [16] # 7 c("unif", 5, 9)
+  cfg.list["person.vsp.tofinalaids.x"] <- inputvector[17] # [17] # 12 c("unif", 10, 14)
+  
+  
+  #
+  # # Demographic
+  # ##############
+  #
+  
+  cfg.list["conception.alpha_base"] <- inputvector[18] # [18] # -2.7 c("unif", -3.5, -1.7)
+  
+  
+  # # Assumptions to avoid negative branch lengths
+  # ###############################################
+  # # + sampling == start ART
+  # # when someone start ART, he/she is sampled and becomes non-infectious
+  
+  cfg.list["monitoring.fraction.log_viralload"] <- 0
+  
+  
+  #
+  # ## Add-ons
+  #
+  ### BEGIN Add-on
+  cfg.list["formation.hazard.agegapry.baseline"] <- 2
+  cfg.list["mortality.aids.survtime.C"] <- 65
+  cfg.list["mortality.aids.survtime.k"] <- -0.2
+  cfg.list["monitoring.fraction.log_viralload"] <- 0 #0.3
+  cfg.list["dropout.interval.dist.type"] <- "uniform"
+  cfg.list["dropout.interval.dist.uniform.min"] <- 1000
+  cfg.list["dropout.interval.dist.uniform.max"] <- 2000
+  
+  cfg.list["person.survtime.logoffset.dist.type"] <- "normal"
+  cfg.list["person.survtime.logoffset.dist.normal.mu"] <- 0
+  cfg.list["person.survtime.logoffset.dist.normal.sigma"] <- 0.1
+  
+  cfg.list["person.agegap.man.dist.type"] <- "normal" #fixed
+  #cfg.list["person.agegap.man.dist.fixed.value"] <- -6
+  cfg.list["person.agegap.woman.dist.type"] <- "normal" #"fixed"
+  #cfg.list["person.agegap.woman.dist.fixed.value"] <- -6
+  
+  cfg.list["mortality.aids.survtime.C"] <- 65
+  cfg.list["mortality.aids.survtime.k"] <- -0.2
+  cfg.list["monitoring.cd4.threshold"] <- 0 # 0 means nobody qualifies for ART
+  cfg.list["diagnosis.baseline"] <- -2
+  
+  
+  cfg.list["person.eagerness.man.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.woman.dist.gamma.a"] <- 0.23 # 0.23
+  cfg.list["person.eagerness.man.dist.gamma.b"] <- 45 # 45
+  cfg.list["person.eagerness.woman.dist.gamma.b"] <- 45 # 45
+  
+  #### END Add-ons
+  
+  
+  # # ART intervention
+  # ###################
+  #
+  # # ART acceptability paramter and the ART  interventions
+  
+  cfg.list["person.art.accept.threshold.dist.fixed.value"] <- 0.6
+  
+  # Let's introduce ART, and evaluate whether the HIV prevalence drops less  rapidly
+  art.intro <- list()
+  art.intro["time"] <- 20
+  art.intro["diagnosis.baseline"] <- -2 # 0#100
+  art.intro["monitoring.cd4.threshold"] <- 100 # 1200
+  
+  ### add something about diagnosis
+  art.intro["diagnosis.agefactor"] <- 0
+  art.intro["diagnosis.genderfactor"] <- 0
+  art.intro["diagnosis.diagpartnersfactor"] <- 0
+  art.intro["diagnosis.isdiagnosedfactor"] <- 0
+  ### end of add-on about diagnosis
+  #art.intro["monitoring.interval.piecewise.cd4s"] <- "0,1300"
+  # Gradual increase in CD4 threshold. in 2007:200. in 2010:350. in 2013:500
+  art.intro1 <- list()
+  art.intro1["time"] <- 22
+  art.intro1["diagnosis.baseline"] <- -2 # 0#100
+  art.intro1["monitoring.cd4.threshold"] <- 150 # 1200
+  
+  art.intro2 <- list()
+  art.intro2["time"] <- 25 # inputvector[5] ######### 30
+  art.intro2["monitoring.cd4.threshold"] <- 200
+  
+  art.intro3 <- list()
+  art.intro3["time"] <- 30 # inputvector[4] + inputvector[5] + inputvector[6] ########### 33
+  art.intro3["monitoring.cd4.threshold"] <- 350
+  
+  art.intro4 <- list()
+  art.intro4["time"] <- 33 # inputvector[4] + inputvector[5] + inputvector[6] + inputvector[7] ########### 36
+  art.intro4["monitoring.cd4.threshold"] <- 500
+  
+  art.intro5 <- list()
+  art.intro5["time"] <- 36
+  art.intro5["monitoring.cd4.threshold"] <- 700 # This is equivalent to immediate access
+  
+  # tasp.indicator <- inputvector[9] # 1 if the scenario is TasP, 0 if the scenario is current status
+  interventionlist <- list(art.intro, art.intro1, art.intro2, art.intro3, art.intro4, art.intro5)
+  
+  intervention <- interventionlist
+  
+  # Events
+  cfg.list["population.maxevents"] <- as.numeric(cfg.list["population.simtime"][1]) * as.numeric(cfg.list["population.nummen"][1]) * 3
+  
+  # Avoid overlaping in same directory
+  
+  
+  #creating subfolder with unique name for each simulation
+  generate.filename <- function(how.long){
+    
+    rn <- sample(1:100,1)
+    t <- as.numeric(Sys.time())
+    set.seed((t - floor(t)) * 1e8)
+    chars <- c(letters, LETTERS)
+    sub.dir.sim.id <-  paste0(sample(chars,how.long), collapse = "")
+    
+    noise.sample1 <- sample(8:15,1, replace = TRUE)
+    sub.dir.sim.id.ext <- paste0(sample(chars,noise.sample1), collapse = "")
+    noise.sample <- sample(1:1000,1)
+    noise.sample2 <- sample(8:17,1, replace = TRUE)
+    sub.dir.sim.id <- paste0(sub.dir.sim.id.ext,
+                             paste0(sample(chars,noise.sample2), collapse = ""),noise.sample, rn)
+    
+    return(sub.dir.sim.id)
+  }
+  
+  ABC_DestDir.classic.phylo.MAR.c.90 <- paste0(work.dir,"/temp/",generate.filename(10))
+  
+  
+  # Error function when computing summary statistics
+  
+  err.functionGEN <- function(e){
+    return(chunk.summary.stats = rep(NA,64))
+    stop(e)
+  }
+  
+  
+  
+  results <- tryCatch(simpact.run(configParams = cfg.list,
+                                  destDir = ABC_DestDir.classic.phylo.MAR.c.90,
+                                  agedist = age.distr,
+                                  intervention = intervention),
+                      error = simpact.errFunction)
+  
+  
+  if (length(results) == 0){
+    outputvector <- rep(NA, 64) # 37 + 82 + 33 + 1 + 1 + 53 = 207
+  }else{
+    if (as.numeric(results["eventsexecuted"]) >= (as.numeric(cfg.list["population.maxevents"]) - 1)){
+      outputvector <- rep(NA, 64)
+    }else{
+      
+      
+      datalist <- readthedata(results)
+      
+      simpact.trans.net <-  transmission.network.builder(datalist = datalist, endpoint = 40)
+      
+      summary.stat.classic <- tryCatch(compute.summary.statistics.classic(datalist = datalist.agemix,
+                                                                          timewindow = c(35, 40)),
+                                       error=function(e) return(rep(NA, 27))) # len = 27
+      
+      
+      
+      summary.stat.phylo.MAR.c.90 <- tryCatch(compute.summary.statistics.phylo.MCAR(simpact.trans.net = simpact.trans.net,
+                                                                                    datalist.agemix = datalist,
+                                                                                    work.dir = work.dir,
+                                                                                    sub.dir.rename = ABC_DestDir.classic.phylo.MAR.c.90,
+                                                                                    dirfasttree = work.dir,
+                                                                                    limitTransmEvents = 7,
+                                                                                    seq.cov = 45,
+                                                                                    seq.gender.ratio = 0.5,
+                                                                                    age.group.15.25 = c(15,25),
+                                                                                    age.group.25.40 = c(25,40),
+                                                                                    age.group.40.50 = c(40,50),
+                                                                                    endpoint = 40,
+                                                                                    timewindow = c(37,40),
+                                                                                    cut.off = 7),
+                                              error=function(e) return(rep(NA, 37)))
+      
+      
+      
+      
+      
+      
+      outputvector <- c(summary.stat.classic, summary.stat.phylo.MAR.c.90)
+      
+    }
+    
+  }
+  
+  unlink(paste0(ABC_DestDir.classic.phylo.MAR.c.90), recursive = TRUE)
+  
+  return(outputvector)
+}
+
+
+
+
+
 
